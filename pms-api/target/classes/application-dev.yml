@@ -1,0 +1,38 @@
+logging:
+  level:
+    com:
+      guangxun:
+        iot:
+          ps: debug
+spring:
+  datasource:
+    password: admin
+    url: jdbc:mysql://127.0.0.1:3306/pms?useUnicode=true&characterEncoding=utf8&serverTimezone=Hongkong
+    username: root
+  jpa:
+    database: mysql
+    hibernate:
+      ddl-auto: update
+      naming-strategy: org.hibernate.cfg.ImprovedNamingStrategy
+    show-sql: true
+    database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
+  influx:
+    password: user
+    url: http://127.0.0.1:8086
+    user: user
+  rabbitmq:
+    host: 192.168.1.2
+    password: admin
+    port: 5672
+    username: admin
+  redis:
+    database: 1
+    host: 192.168.1.2
+    jedis:
+      pool:
+        max-active: 8
+        max-idle: 8
+        max-wait: -1
+        min-idle: 0
+    password: redis123
+    port: 6380
