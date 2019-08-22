@@ -1,0 +1,50 @@
+package com.kry.pms.api.marketing;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.kry.pms.api.BaseController;
+import com.kry.pms.base.HttpResponse;
+import com.kry.pms.base.PageRequest;
+import com.kry.pms.base.PageResponse;
+import com.kry.pms.model.persistence.marketing.RoomPriceScheme;
+import com.kry.pms.service.marketing.RoomPriceSchemeService;
+
+@RestController
+@RequestMapping(path = "/api/v1/marketing/roomPriceScheme")
+public class RoomPriceSchemeController extends BaseController<RoomPriceScheme> {
+	@Autowired
+	RoomPriceSchemeService roomPriceSchemeService;
+	@PostMapping
+	public HttpResponse<RoomPriceScheme> add(@RequestBody RoomPriceScheme roomPriceScheme) {
+		return getDefaultResponse().addData(roomPriceSchemeService.add(roomPriceScheme));
+	}
+
+	@PutMapping
+	public HttpResponse<RoomPriceScheme> modify(@RequestBody RoomPriceScheme roomPriceScheme) {
+		return getDefaultResponse().addData(roomPriceSchemeService.modify(roomPriceScheme));
+	}
+
+	@DeleteMapping
+	public HttpResponse<String> delete(String id) {
+		HttpResponse<String> rep = new HttpResponse<>();
+		roomPriceSchemeService.delete(id);
+		return rep;
+	}
+
+	@GetMapping
+	public HttpResponse<PageResponse<RoomPriceScheme>> query(HttpServletRequest request) throws InstantiationException, IllegalAccessException{
+		HttpResponse<PageResponse<RoomPriceScheme>> rep = new HttpResponse<PageResponse<RoomPriceScheme>>();
+		PageRequest<RoomPriceScheme> req = parse2PageRequest(request);
+		return rep.addData(roomPriceSchemeService.listPage(req));
+	}
+
+}
