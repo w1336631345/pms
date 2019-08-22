@@ -10,7 +10,7 @@ import lombok.Setter;
 @Entity
 @Getter
 @Setter
-@Table
+@Table(name = "t_customer_level")
 public class CustomerLevel extends PersistenceModel{
 
 }

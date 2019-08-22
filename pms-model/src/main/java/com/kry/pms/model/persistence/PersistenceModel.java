@@ -36,9 +36,12 @@ public class PersistenceModel implements Serializable {
 	@Column(columnDefinition = "varchar(255) COMMENT '修改人'")
 	protected String updateUser;
 	@Column(columnDefinition = "varchar(32) default 'draft' COMMENT '状态'")
+	protected Boolean deleted;
+	@Column(columnDefinition = "tinyint(1) default '0' COMMENT '删除状态'")
 	protected String status;
-	//格式为0001-0002  前四位为一级公司编码，后四位为二级公司编码
 	@Column(columnDefinition = "varchar(64) default '0000' COMMENT '企业编码'")
 	protected String corporationCode;
+	@Column(columnDefinition = "varchar(64) default '0000' COMMENT '酒店编码'")
+	protected String hotelCode;
 
 }

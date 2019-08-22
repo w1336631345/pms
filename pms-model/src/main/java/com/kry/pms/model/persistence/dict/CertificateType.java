@@ -1,6 +1,7 @@
 package com.kry.pms.model.persistence.dict;
 
 import javax.persistence.Column;
+
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
@@ -8,6 +9,11 @@ import com.kry.pms.model.persistence.PersistenceModel;
 
 import lombok.Getter;
 import lombok.Setter;
+/**
+ * 证件类型
+ * @author Louis
+ *
+ */
 @Entity
 @Getter
 @Setter
