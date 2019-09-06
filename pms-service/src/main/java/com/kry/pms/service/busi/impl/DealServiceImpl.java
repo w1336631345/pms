@@ -8,6 +8,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
+import com.kry.pms.base.Constants;
 import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
 import com.kry.pms.dao.busi.DealDao;
@@ -28,7 +29,7 @@ public class  DealServiceImpl implements  DealService{
 	public void delete(String id) {
 		Deal deal = dealDao.findById(id).get();
 		if (deal != null) {
-			deal.setDeleted(true);
+			deal.setDeleted(Constants.DELETED_TRUE);
 		}
 		dealDao.saveAndFlush(deal);
 	}

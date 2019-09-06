@@ -18,14 +18,14 @@ import com.kry.pms.util.StringUtil;
 
 public class BaseController<T> {
 	
-	public String getCurrentUserId() {
-		return "";
+	public String getCurrentAccountId() {
+		return "1";
 	}
 	public String getEmployeeId() {
 		return "";
 	}
 	public String getCurrentHotleCode() {
-		return "";
+		return "0000";
 	}
 	public HttpResponse<T> getDefaultResponse(){
 		return new HttpResponse<T>();
@@ -168,5 +168,4 @@ public class BaseController<T> {
 		}
 		return t;
 	}
-
 }

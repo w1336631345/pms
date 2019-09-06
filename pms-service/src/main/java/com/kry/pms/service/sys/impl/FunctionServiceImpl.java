@@ -8,6 +8,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
+import com.kry.pms.base.Constants;
 import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
 import com.kry.pms.dao.sys.FunctionDao;
@@ -28,7 +29,7 @@ public class  FunctionServiceImpl implements  FunctionService{
 	public void delete(String id) {
 		Function function = functionDao.findById(id).get();
 		if (function != null) {
-			function.setDeleted(true);
+			function.setDeleted(Constants.DELETED_TRUE);
 		}
 		functionDao.saveAndFlush(function);
 	}

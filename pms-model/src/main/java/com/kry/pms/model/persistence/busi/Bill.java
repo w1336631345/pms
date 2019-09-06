@@ -9,6 +9,7 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import com.kry.pms.model.persistence.PersistenceModel;
+import com.kry.pms.model.persistence.guest.Customer;
 import com.kry.pms.model.persistence.org.Employee;
 
 import lombok.Getter;
@@ -20,13 +21,22 @@ import lombok.Setter;
 @Table(name = "t_bill")
 public class Bill extends PersistenceModel {
 	@OneToMany
-	private List<BillItem> bills;
+	private List<BillItem> items;
 	@Column
-	private Double tatal;
+	private Double total;
 	@Column
 	private String type;
 	@OneToOne
-	private Employee authorizeEmployee;
+	private Employee operationEmployee;
 	@Column(columnDefinition = "varchar(255) COMMENT '操作员备注'")
 	private String operationRemark;
+	@OneToOne
+	private Customer customer;
+	@OneToOne
+	private Group group;
+	@Column
+	private Integer currentItemSeq;
+	@Column
+	private String statusPayment;
+
 }

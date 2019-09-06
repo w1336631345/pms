@@ -5,4 +5,6 @@ import com.kry.pms.service.BaseService;
 
 public interface AccountService extends BaseService<Account>{
 
+	Account findTopByMobileOrUsername(String username);
+
 }

@@ -8,10 +8,12 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
+import com.kry.pms.base.Constants;
 import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
 import com.kry.pms.dao.org.EmployeeDao;
 import com.kry.pms.model.persistence.org.Employee;
+import com.kry.pms.model.persistence.sys.Account;
 import com.kry.pms.service.org.EmployeeService;
 
 @Service
@@ -28,7 +30,7 @@ public class  EmployeeServiceImpl implements  EmployeeService{
 	public void delete(String id) {
 		Employee employee = employeeDao.findById(id).get();
 		if (employee != null) {
-			employee.setDeleted(true);
+			employee.setDeleted(Constants.DELETED_TRUE);
 		}
 		employeeDao.saveAndFlush(employee);
 	}
@@ -60,6 +62,14 @@ public class  EmployeeServiceImpl implements  EmployeeService{
 			req = org.springframework.data.domain.PageRequest.of(prq.getPageNum(), prq.getPageSize());
 		}
 		return convent(employeeDao.findAll(ex, req));
+	}
+
+	@Override
+	public Employee findByAccount(Account account) {
+		Employee employee = new Employee();
+		employee.setAccount(account);
+		Example<Employee> ex = Example.of(employee);
+		return employeeDao.findOne(ex).orElse(null);
 	}
 	 
 	 

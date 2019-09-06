@@ -8,6 +8,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
+import com.kry.pms.base.Constants;
 import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
 import com.kry.pms.dao.org.CorporationDao;
@@ -28,7 +29,7 @@ public class  CorporationServiceImpl implements  CorporationService{
 	public void delete(String id) {
 		Corporation corporation = corporationDao.findById(id).get();
 		if (corporation != null) {
-			corporation.setDeleted(true);
+			corporation.setDeleted(Constants.DELETED_TRUE);
 		}
 		corporationDao.saveAndFlush(corporation);
 	}

@@ -13,7 +13,9 @@ public class HttpResponse<T> {
 
 	public boolean success = true;
 
-	private int statusCode = 0;
+	private int status = 0;
+	
+	private int code = 0;
 
 	private String message = "success";
 
@@ -23,6 +25,13 @@ public class HttpResponse<T> {
 
 	public HttpResponse() {
 	}
+	public HttpResponse(DtoResponse rep) {
+		this.status = rep.getStatus();
+		this.message = rep.getMessage();
+		this.code = rep.getCode();
+		this.success = rep.isSuccess()&&rep.getStatus()==0;
+	}
+
 
 	public HttpResponse<T> addData(T data) {
 		this.data = data;
@@ -37,14 +46,12 @@ public class HttpResponse<T> {
 		this.success = success;
 	}
 
-	public int getStatusCode() {
-		return statusCode;
+	public int getStatus() {
+		return status;
 	}
-
-	public void setStatusCode(int statusCode) {
-		this.statusCode = statusCode;
+	public void setStatus(int status) {
+		this.status = status;
 	}
-
 	public String getMessage() {
 		return message;
 	}
@@ -60,7 +67,10 @@ public class HttpResponse<T> {
 	public void setData(T data) {
 		this.data = data;
 	}
-
-
-
+	public int getCode() {
+		return code;
+	}
+	public void setCode(int code) {
+		this.code = code;
+	}
 }

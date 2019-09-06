@@ -2,6 +2,7 @@ package com.kry.pms.api;
 
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -23,7 +24,7 @@ public class AccountControllerTest {
 	private MockMvc mockMvc;
 	@Test
 	public void loginTest() throws Exception {
-		this.mockMvc.perform(get("/api/v1/sys/account/login")).andDo(print()).andExpect(status().isOk()).andDo(document("1.1 登陆"));
+		this.mockMvc.perform(post("/auth/admin/login")).andDo(print()).andExpect(status().isOk()).andDo(document("1.1 登陆"));
 	}
     
 

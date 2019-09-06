@@ -8,6 +8,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
+import com.kry.pms.base.Constants;
 import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
 import com.kry.pms.dao.guest.CustomerPointsRecordDao;
@@ -28,7 +29,7 @@ public class  CustomerPointsRecordServiceImpl implements  CustomerPointsRecordSe
 	public void delete(String id) {
 		CustomerPointsRecord customerPointsRecord = customerPointsRecordDao.findById(id).get();
 		if (customerPointsRecord != null) {
-			customerPointsRecord.setDeleted(true);
+			customerPointsRecord.setDeleted(Constants.DELETED_TRUE);
 		}
 		customerPointsRecordDao.saveAndFlush(customerPointsRecord);
 	}

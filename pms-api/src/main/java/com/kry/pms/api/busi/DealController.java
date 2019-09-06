@@ -23,7 +23,7 @@ import com.kry.pms.service.busi.DealService;
 public class DealController extends BaseController<Deal> {
 	@Autowired
 	DealService dealService;
-	@PostMapping
+ 	@PostMapping
 	public HttpResponse<Deal> add(@RequestBody Deal deal) {
 		return getDefaultResponse().addData(dealService.add(deal));
 	}

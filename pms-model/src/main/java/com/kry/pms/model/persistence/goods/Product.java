@@ -17,6 +17,10 @@ import lombok.Setter;
 public class Product extends PersistenceModel {
 	@Column
 	private String name;
+	@Column(name = "type_")
+	private String type;
+	@Column(name="code_")
+	private String code;
 	@Column
 	private String description;
 	@OneToOne

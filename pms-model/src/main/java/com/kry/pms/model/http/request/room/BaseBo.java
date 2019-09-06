@@ -2,6 +2,8 @@ package com.kry.pms.model.http.request.room;
 
 import java.util.Date;
 
+import lombok.Data;
+@Data
 public class BaseBo {
 	protected String id;
 	protected Date createDate;

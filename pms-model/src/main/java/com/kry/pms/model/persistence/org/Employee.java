@@ -6,6 +6,7 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import com.kry.pms.model.persistence.PersistenceModel;
+import com.kry.pms.model.persistence.sys.Account;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -22,4 +23,6 @@ public class Employee extends PersistenceModel{
 	private String code;
 	@Column
 	private String description;
+	@OneToOne
+	private Account account;
 }

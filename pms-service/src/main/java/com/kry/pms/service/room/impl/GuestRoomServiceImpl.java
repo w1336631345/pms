@@ -8,6 +8,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
+import com.kry.pms.base.Constants;
 import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
 import com.kry.pms.dao.room.GuestRoomDao;
@@ -28,7 +29,7 @@ public class  GuestRoomServiceImpl implements  GuestRoomService{
 	public void delete(String id) {
 		GuestRoom guestRoom = guestRoomDao.findById(id).get();
 		if (guestRoom != null) {
-			guestRoom.setDeleted(true);
+			guestRoom.setDeleted(Constants.DELETED_TRUE);
 		}
 		guestRoomDao.saveAndFlush(guestRoom);
 	}
@@ -40,7 +41,7 @@ public class  GuestRoomServiceImpl implements  GuestRoomService{
 
 	@Override
 	public GuestRoom findById(String id) {
-		return guestRoomDao.getOne(id);
+		return guestRoomDao.findById(id).orElse(null);
 	}
 
 	@Override

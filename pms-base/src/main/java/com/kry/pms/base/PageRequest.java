@@ -1,7 +1,6 @@
 package com.kry.pms.base;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * 
@@ -65,7 +64,7 @@ public class PageRequest<T> {
 	}
 	public void addOrderBy(String order) {
 		if(this.orderBy==null) {
-			this.orderBy = new ArrayList<>();
+			this.orderBy = new ArrayList<String>();
 		}
 		this.orderBy.add(order);
 	}

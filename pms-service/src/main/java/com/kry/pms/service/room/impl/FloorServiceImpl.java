@@ -8,6 +8,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
+import com.kry.pms.base.Constants;
 import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
 import com.kry.pms.dao.room.FloorDao;
@@ -28,7 +29,7 @@ public class  FloorServiceImpl implements  FloorService{
 	public void delete(String id) {
 		Floor floor = floorDao.findById(id).get();
 		if (floor != null) {
-			floor.setDeleted(true);
+			floor.setDeleted(Constants.DELETED_TRUE);
 		}
 		floorDao.saveAndFlush(floor);
 	}
@@ -45,8 +46,7 @@ public class  FloorServiceImpl implements  FloorService{
 
 	@Override
 	public List<Floor> getAllByHotelCode(String code) {
-		return null;//默认不实现
-		//return floorDao.findByHotelCode(code);
+		return floorDao.findByHotelCodeAndStatus(code,Constants.Status.NORMAL);
 	}
 
 	@Override

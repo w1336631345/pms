@@ -8,6 +8,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
+import com.kry.pms.base.Constants;
 import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
 import com.kry.pms.dao.marketing.ProtocolCorpationDao;
@@ -28,7 +29,7 @@ public class  ProtocolCorpationServiceImpl implements  ProtocolCorpationService{
 	public void delete(String id) {
 		ProtocolCorpation protocolCorpation = protocolCorpationDao.findById(id).get();
 		if (protocolCorpation != null) {
-			protocolCorpation.setDeleted(true);
+			protocolCorpation.setDeleted(Constants.DELETED_TRUE);
 		}
 		protocolCorpationDao.saveAndFlush(protocolCorpation);
 	}

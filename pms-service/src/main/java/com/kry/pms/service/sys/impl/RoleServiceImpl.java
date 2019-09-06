@@ -8,6 +8,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
+import com.kry.pms.base.Constants;
 import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
 import com.kry.pms.dao.sys.RoleDao;
@@ -28,7 +29,7 @@ public class  RoleServiceImpl implements  RoleService{
 	public void delete(String id) {
 		Role role = roleDao.findById(id).get();
 		if (role != null) {
-			role.setDeleted(true);
+			role.setDeleted(Constants.DELETED_TRUE);
 		}
 		roleDao.saveAndFlush(role);
 	}

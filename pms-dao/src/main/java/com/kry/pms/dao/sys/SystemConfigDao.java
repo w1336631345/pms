@@ -5,4 +5,6 @@ import com.kry.pms.model.persistence.sys.SystemConfig;
 
 public interface SystemConfigDao extends BaseDao<SystemConfig>{
 
+	SystemConfig findByHotelCodeAndKey(String hotelCode, String key);
+
 }

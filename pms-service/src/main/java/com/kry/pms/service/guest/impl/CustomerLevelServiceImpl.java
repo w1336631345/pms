@@ -8,6 +8,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
+import com.kry.pms.base.Constants;
 import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
 import com.kry.pms.dao.guest.CustomerLevelDao;
@@ -28,7 +29,7 @@ public class  CustomerLevelServiceImpl implements  CustomerLevelService{
 	public void delete(String id) {
 		CustomerLevel customerLevel = customerLevelDao.findById(id).get();
 		if (customerLevel != null) {
-			customerLevel.setDeleted(true);
+			customerLevel.setDeleted(Constants.DELETED_TRUE);
 		}
 		customerLevelDao.saveAndFlush(customerLevel);
 	}

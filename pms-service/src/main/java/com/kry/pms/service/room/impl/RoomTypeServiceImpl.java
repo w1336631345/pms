@@ -3,11 +3,14 @@
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
+import com.kry.pms.base.Constants;
 import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
 import com.kry.pms.dao.room.RoomTypeDao;
@@ -19,20 +22,20 @@ public class  RoomTypeServiceImpl implements  RoomTypeService{
 	@Autowired
 	 RoomTypeDao roomTypeDao;
 	 
-	 @Override
+	@Override
+	@CacheEvict(value="room_type",key = "targetClass+#p0.hotelCode")
 	public RoomType add(RoomType roomType) {
 		return roomTypeDao.saveAndFlush(roomType);
 	}
-
 	@Override
 	public void delete(String id) {
 		RoomType roomType = roomTypeDao.findById(id).get();
 		if (roomType != null) {
-			roomType.setDeleted(true);
+			roomType.setDeleted(Constants.DELETED_TRUE);
 		}
-		roomTypeDao.saveAndFlush(roomType);
+		modify(roomType);
 	}
-
+	@CacheEvict(value="room_type",key = "targetClass+#p0.hotelCode")
 	@Override
 	public RoomType modify(RoomType roomType) {
 		return roomTypeDao.saveAndFlush(roomType);
@@ -44,9 +47,9 @@ public class  RoomTypeServiceImpl implements  RoomTypeService{
 	}
 
 	@Override
+	@Cacheable(value="room_type",key="targetClass+#p0")
 	public List<RoomType> getAllByHotelCode(String code) {
-		return null;//默认不实现
-		//return roomTypeDao.findByHotelCode(code);
+		return roomTypeDao.findByHotelCode(code);
 	}
 
 	@Override

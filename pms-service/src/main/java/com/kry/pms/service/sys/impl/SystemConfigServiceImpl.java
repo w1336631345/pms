@@ -1,5 +1,6 @@
 ﻿package com.kry.pms.service.sys.impl;
 
+import java.time.LocalTime;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +9,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
+import com.kry.pms.base.Constants;
 import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
 import com.kry.pms.dao.sys.SystemConfigDao;
@@ -15,11 +17,11 @@ import com.kry.pms.model.persistence.sys.SystemConfig;
 import com.kry.pms.service.sys.SystemConfigService;
 
 @Service
-public class  SystemConfigServiceImpl implements  SystemConfigService{
+public class SystemConfigServiceImpl implements SystemConfigService {
 	@Autowired
-	 SystemConfigDao systemConfigDao;
-	 
-	 @Override
+	SystemConfigDao systemConfigDao;
+
+	@Override
 	public SystemConfig add(SystemConfig systemConfig) {
 		return systemConfigDao.saveAndFlush(systemConfig);
 	}
@@ -28,7 +30,7 @@ public class  SystemConfigServiceImpl implements  SystemConfigService{
 	public void delete(String id) {
 		SystemConfig systemConfig = systemConfigDao.findById(id).get();
 		if (systemConfig != null) {
-			systemConfig.setDeleted(true);
+			systemConfig.setDeleted(Constants.DELETED_TRUE);
 		}
 		systemConfigDao.saveAndFlush(systemConfig);
 	}
@@ -45,8 +47,8 @@ public class  SystemConfigServiceImpl implements  SystemConfigService{
 
 	@Override
 	public List<SystemConfig> getAllByHotelCode(String code) {
-		return null;//默认不实现
-		//return systemConfigDao.findByHotelCode(code);
+		return null;// 默认不实现
+		// return systemConfigDao.findByHotelCode(code);
 	}
 
 	@Override
@@ -61,8 +63,35 @@ public class  SystemConfigServiceImpl implements  SystemConfigService{
 		}
 		return convent(systemConfigDao.findAll(ex, req));
 	}
-	 
-	 
-	 
-	 
+
+	@Override
+	public SystemConfig getByHotelCodeAndKey(String hotelCode, String key) {
+		// TODO Auto-generated method stub
+		return systemConfigDao.findByHotelCodeAndKey(hotelCode, key);
+	}
+
+	/**
+	 * 获取夜审时间
+	 */
+	@Override
+	public LocalTime getAuditTime(String hotelCode) {
+		SystemConfig sc = systemConfigDao.findByHotelCodeAndKey(hotelCode, Constants.SystemConfig.CODE_AUDIT_TIME);
+		if (sc != null) {
+			return LocalTime.parse(sc.getValue());
+		}
+		return Constants.SystemConfig.VALUE_DEFAULT_AUDIT_TIME;
+	}
+
+	/**
+	 * 获取过夜临界时间
+	 */
+	@Override
+	public LocalTime getCriticalTime(String hotelCode) {
+		SystemConfig sc = systemConfigDao.findByHotelCodeAndKey(hotelCode, Constants.SystemConfig.CODE_CRITICAL_TIME);
+		if (sc != null) {
+			return LocalTime.parse(sc.getValue());
+		}
+		return Constants.SystemConfig.VALUE_DEFAULT_CRITICAL_TIME;
+	}
+
 }

@@ -8,6 +8,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
+import com.kry.pms.base.Constants;
 import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
 import com.kry.pms.dao.busi.ChangeRoomRecordDao;
@@ -28,7 +29,7 @@ public class  ChangeRoomRecordServiceImpl implements  ChangeRoomRecordService{
 	public void delete(String id) {
 		ChangeRoomRecord changeRoomRecord = changeRoomRecordDao.findById(id).get();
 		if (changeRoomRecord != null) {
-			changeRoomRecord.setDeleted(true);
+			changeRoomRecord.setDeleted(Constants.DELETED_TRUE);
 		}
 		changeRoomRecordDao.saveAndFlush(changeRoomRecord);
 	}

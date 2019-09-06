@@ -8,6 +8,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
+import com.kry.pms.base.Constants;
 import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
 import com.kry.pms.dao.sys.AccountDao;
@@ -28,7 +29,7 @@ public class  AccountServiceImpl implements  AccountService{
 	public void delete(String id) {
 		Account account = accountDao.findById(id).get();
 		if (account != null) {
-			account.setDeleted(true);
+			account.setDeleted(Constants.DELETED_TRUE);
 		}
 		accountDao.saveAndFlush(account);
 	}
@@ -60,6 +61,12 @@ public class  AccountServiceImpl implements  AccountService{
 			req = org.springframework.data.domain.PageRequest.of(prq.getPageNum(), prq.getPageSize());
 		}
 		return convent(accountDao.findAll(ex, req));
+	}
+
+	@Override
+	public Account findTopByMobileOrUsername(String username) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	 
 	 

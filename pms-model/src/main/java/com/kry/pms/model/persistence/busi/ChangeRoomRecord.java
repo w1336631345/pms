@@ -20,10 +20,6 @@ public class ChangeRoomRecord extends PersistenceModel{
 	@OneToOne
 	private RoomChangeReason reason;
 	@OneToOne
-	private RoomRecord oldRecord;
-	@OneToOne
-	private RoomRecord newRecord;
-	@OneToOne
 	private Employee operationEmployee;
 	@OneToOne
 	private Employee authorizeEmployee;

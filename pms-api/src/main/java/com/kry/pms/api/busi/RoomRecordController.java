@@ -1,6 +1,7 @@
 package com.kry.pms.api.busi;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -24,7 +25,7 @@ public class RoomRecordController extends BaseController<RoomRecord> {
 	@Autowired
 	RoomRecordService roomRecordService;
 	@PostMapping
-	public HttpResponse<RoomRecord> add(@RequestBody RoomRecord roomRecord) {
+	public HttpResponse<RoomRecord> add(@RequestBody  RoomRecord roomRecord) {
 		return getDefaultResponse().addData(roomRecordService.add(roomRecord));
 	}
 

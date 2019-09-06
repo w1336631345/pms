@@ -8,6 +8,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
+import com.kry.pms.base.Constants;
 import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
 import com.kry.pms.dao.dict.CountryOrRegionDao;
@@ -28,7 +29,7 @@ public class  CountryOrRegionServiceImpl implements  CountryOrRegionService{
 	public void delete(String id) {
 		CountryOrRegion countryOrRegion = countryOrRegionDao.findById(id).get();
 		if (countryOrRegion != null) {
-			countryOrRegion.setDeleted(true);
+			countryOrRegion.setDeleted(Constants.DELETED_TRUE);
 		}
 		countryOrRegionDao.saveAndFlush(countryOrRegion);
 	}

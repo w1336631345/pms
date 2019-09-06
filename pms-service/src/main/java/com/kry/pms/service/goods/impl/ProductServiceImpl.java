@@ -8,6 +8,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
+import com.kry.pms.base.Constants;
 import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
 import com.kry.pms.dao.goods.ProductDao;
@@ -28,7 +29,7 @@ public class  ProductServiceImpl implements  ProductService{
 	public void delete(String id) {
 		Product product = productDao.findById(id).get();
 		if (product != null) {
-			product.setDeleted(true);
+			product.setDeleted(Constants.DELETED_TRUE);
 		}
 		productDao.saveAndFlush(product);
 	}

@@ -52,7 +52,7 @@ public class Freemarker {
 				file.getParentFile().mkdirs();				//不存在就全部创建
 			}
 			System.out.println(file.getPath());
-			Writer out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "utf-8"));
+			Writer out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file),"UTF-8"));
 			Template template = getTemplate(ftlName, ftlPath);
 			template.process(root, out);					//模版输出 
 			out.flush();

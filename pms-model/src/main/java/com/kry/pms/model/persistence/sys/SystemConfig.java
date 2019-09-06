@@ -11,7 +11,7 @@ import lombok.Setter;
 @Entity
 @Getter
 @Setter
-@Table(name="t_function")
+@Table(name="t_system_config")
 public class SystemConfig extends PersistenceModel{
 	@Column
 	private String name;
@@ -21,14 +21,10 @@ public class SystemConfig extends PersistenceModel{
 	private String value;
 	@Column(name="type_")
 	private String type;
-	@Column(name="version_")
-	private Integer version;
 	@Column(name="group_")
 	private String group;
 	@Column(name="group_key")
 	private String groupKey;
-	@Column
-	private boolean currentVersion = true;
 	@Column
 	private String description;
 	@Column

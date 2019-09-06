@@ -25,6 +25,8 @@ public class Corporation extends PersistenceModel {
 	@Column
 	private String province;
 	@Column
+	private String code;
+	@Column
 	private String city;
 	@Column
 	private String area;

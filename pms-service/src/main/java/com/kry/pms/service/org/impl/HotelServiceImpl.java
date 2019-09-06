@@ -8,6 +8,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
+import com.kry.pms.base.Constants;
 import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
 import com.kry.pms.dao.org.HotelDao;
@@ -28,7 +29,7 @@ public class  HotelServiceImpl implements  HotelService{
 	public void delete(String id) {
 		Hotel hotel = hotelDao.findById(id).get();
 		if (hotel != null) {
-			hotel.setDeleted(true);
+			hotel.setDeleted(Constants.DELETED_TRUE);
 		}
 		hotelDao.saveAndFlush(hotel);
 	}

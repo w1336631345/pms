@@ -8,6 +8,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
+import com.kry.pms.base.Constants;
 import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
 import com.kry.pms.dao.marketing.RoomPriceSchemeItemDao;
@@ -28,7 +29,7 @@ public class  RoomPriceSchemeItemServiceImpl implements  RoomPriceSchemeItemServ
 	public void delete(String id) {
 		RoomPriceSchemeItem roomPriceSchemeItem = roomPriceSchemeItemDao.findById(id).get();
 		if (roomPriceSchemeItem != null) {
-			roomPriceSchemeItem.setDeleted(true);
+			roomPriceSchemeItem.setDeleted(Constants.DELETED_TRUE);
 		}
 		roomPriceSchemeItemDao.saveAndFlush(roomPriceSchemeItem);
 	}

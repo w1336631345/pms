@@ -1,5 +1,7 @@
 package com.kry.pms.api.room;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +25,7 @@ import com.kry.pms.service.room.RoomTypeService;
 public class RoomTypeController extends BaseController<RoomType> {
 	@Autowired
 	RoomTypeService roomTypeService;
+
 	@PostMapping
 	public HttpResponse<RoomType> add(@RequestBody RoomType roomType) {
 		return getDefaultResponse().addData(roomTypeService.add(roomType));
@@ -41,10 +44,17 @@ public class RoomTypeController extends BaseController<RoomType> {
 	}
 
 	@GetMapping
-	public HttpResponse<PageResponse<RoomType>> query(HttpServletRequest request) throws InstantiationException, IllegalAccessException{
+	public HttpResponse<PageResponse<RoomType>> query(HttpServletRequest request)
+			throws InstantiationException, IllegalAccessException {
 		HttpResponse<PageResponse<RoomType>> rep = new HttpResponse<PageResponse<RoomType>>();
 		PageRequest<RoomType> req = parse2PageRequest(request);
 		return rep.addData(roomTypeService.listPage(req));
+	}
+	@GetMapping(path="/hotel")
+	public HttpResponse<List<RoomType>> hotelAllRoomType() {
+		HttpResponse<List<RoomType>> rep = new HttpResponse<List<RoomType>>();
+		rep.addData(roomTypeService.getAllByHotelCode(getCurrentHotleCode()));
+		return rep;
 	}
 
 }

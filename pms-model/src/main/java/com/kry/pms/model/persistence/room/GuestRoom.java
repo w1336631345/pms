@@ -5,6 +5,7 @@ import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
@@ -19,13 +20,13 @@ import lombok.Setter;
 @Setter
 @Table(name = "t_guest_room")
 public class GuestRoom extends PersistenceModel {
-	@OneToOne
+	@OneToOne(fetch = FetchType.LAZY)
 	private RoomType roomType;
 	@OneToMany(cascade = CascadeType.PERSIST)
 	private List<RoomTag> tags;
-	@OneToOne
+	@OneToOne(fetch = FetchType.LAZY)
 	private Building building;
-	@OneToOne
+	@OneToOne(fetch = FetchType.LAZY)
 	private Floor floor;
 	@Column
 	private String roomNum;

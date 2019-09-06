@@ -25,8 +25,10 @@ public class Account extends PersistenceModel {
 	private String mobile;
 	@Column
 	private String password;
-	@Column(name="type_")
+	@Column(name = "type_")
 	private String type;
 	@OneToMany
 	private List<Role> roles;
+	@Column
+	private String avatar;
 }

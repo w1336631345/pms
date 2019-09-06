@@ -8,6 +8,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
+import com.kry.pms.base.Constants;
 import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
 import com.kry.pms.dao.guest.CustomerInvoiceInfoDao;
@@ -28,7 +29,7 @@ public class  CustomerInvoiceInfoServiceImpl implements  CustomerInvoiceInfoServ
 	public void delete(String id) {
 		CustomerInvoiceInfo customerInvoiceInfo = customerInvoiceInfoDao.findById(id).get();
 		if (customerInvoiceInfo != null) {
-			customerInvoiceInfo.setDeleted(true);
+			customerInvoiceInfo.setDeleted(Constants.DELETED_TRUE);
 		}
 		customerInvoiceInfoDao.saveAndFlush(customerInvoiceInfo);
 	}

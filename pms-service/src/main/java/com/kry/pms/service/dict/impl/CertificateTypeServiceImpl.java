@@ -8,6 +8,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
+import com.kry.pms.base.Constants;
 import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
 import com.kry.pms.dao.dict.CertificateTypeDao;
@@ -28,7 +29,7 @@ public class  CertificateTypeServiceImpl implements  CertificateTypeService{
 	public void delete(String id) {
 		CertificateType certificateType = certificateTypeDao.findById(id).get();
 		if (certificateType != null) {
-			certificateType.setDeleted(true);
+			certificateType.setDeleted(Constants.DELETED_TRUE);
 		}
 		certificateTypeDao.saveAndFlush(certificateType);
 	}

@@ -8,6 +8,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
+import com.kry.pms.base.Constants;
 import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
 import com.kry.pms.dao.org.DepartmentDao;
@@ -28,7 +29,7 @@ public class  DepartmentServiceImpl implements  DepartmentService{
 	public void delete(String id) {
 		Department department = departmentDao.findById(id).get();
 		if (department != null) {
-			department.setDeleted(true);
+			department.setDeleted(Constants.DELETED_TRUE);
 		}
 		departmentDao.saveAndFlush(department);
 	}
