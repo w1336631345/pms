@@ -10,7 +10,9 @@ public class BaseBo {
 	protected String createUser;
 	protected Date updateDate;
 	protected String updateUser;
-	protected String status;
+	protected String status ="normal";
 	protected String corporationCode;
 	protected String hotelCode;
 }
+
+

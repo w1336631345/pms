@@ -25,6 +25,8 @@ public class Group extends PersistenceModel {
 	private Boolean groupPayEnable;
 	@OneToMany
 	private List<ProductCategory> groupPayment;
+	@Column(name="type_")
+	private String type;
 	@Column
 	private String contactName;
 	@Column

@@ -23,6 +23,8 @@ import lombok.Setter;
 @Setter
 @Table(name = "t_customer")
 public class Customer extends PersistenceModel {
+	@Column
+	private String name;
 	@OneToMany
 	private List<CustomerInvoiceInfo> invoiceInfos;
 	@OneToOne

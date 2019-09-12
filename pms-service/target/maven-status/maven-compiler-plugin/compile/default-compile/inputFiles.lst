@@ -30,6 +30,7 @@ D:\workspace\kry\pms\pms-service\src\main\java\com\kry\pms\service\goods\Product
 D:\workspace\kry\pms\pms-service\src\main\java\com\kry\pms\service\room\impl\BuildingServiceImpl.java
 D:\workspace\kry\pms\pms-service\src\main\java\com\kry\pms\service\dict\RoomChangeReasonService.java
 D:\workspace\kry\pms\pms-service\src\main\java\com\kry\pms\service\marketing\RoomPriceSchemeItemService.java
+D:\workspace\kry\pms\pms-service\src\main\java\com\kry\pms\service\marketing\DistributionChannelService.java
 D:\workspace\kry\pms\pms-service\src\main\java\com\kry\pms\service\room\RoomStatusQuantityService.java
 D:\workspace\kry\pms\pms-service\src\main\java\com\kry\pms\service\dict\CountryOrRegionService.java
 D:\workspace\kry\pms\pms-service\src\main\java\com\kry\pms\service\room\impl\RoomStatusQuantityServiceImpl.java
@@ -46,6 +47,7 @@ D:\workspace\kry\pms\pms-service\src\main\java\com\kry\pms\service\marketing\imp
 D:\workspace\kry\pms\pms-service\src\main\java\com\kry\pms\service\guest\impl\CustomerPointsServiceImpl.java
 D:\workspace\kry\pms\pms-service\src\main\java\com\kry\pms\service\marketing\impl\RoomPriceSchemeItemServiceImpl.java
 D:\workspace\kry\pms\pms-service\src\main\java\com\kry\pms\service\busi\DealService.java
+D:\workspace\kry\pms\pms-service\src\main\java\com\kry\pms\service\marketing\impl\DistributionChannelServiceImpl.java
 D:\workspace\kry\pms\pms-service\src\main\java\com\kry\pms\service\goods\impl\ProductServiceImpl.java
 D:\workspace\kry\pms\pms-service\src\main\java\com\kry\pms\service\room\impl\RoomTypeQuantityServiceImpl.java
 D:\workspace\kry\pms\pms-service\src\main\java\com\kry\pms\service\room\impl\FloorServiceImpl.java
@@ -63,6 +65,7 @@ D:\workspace\kry\pms\pms-service\src\main\java\com\kry\pms\service\room\impl\Roo
 D:\workspace\kry\pms\pms-service\src\main\java\com\kry\pms\service\busi\ReceptionService.java
 D:\workspace\kry\pms\pms-service\src\main\java\com\kry\pms\service\busi\impl\BillServiceImpl.java
 D:\workspace\kry\pms\pms-service\src\main\java\com\kry\pms\service\busi\impl\DealServiceImpl.java
+D:\workspace\kry\pms\pms-service\src\main\java\com\kry\pms\service\goods\SetMealService.java
 D:\workspace\kry\pms\pms-service\src\main\java\com\kry\pms\service\guest\impl\CustomerInvoiceServiceImpl.java
 D:\workspace\kry\pms\pms-service\src\main\java\com\kry\pms\service\marketing\RoomPriceSchemeService.java
 D:\workspace\kry\pms\pms-service\src\main\java\com\kry\pms\service\org\CorporationService.java
@@ -74,6 +77,7 @@ D:\workspace\kry\pms\pms-service\src\main\java\com\kry\pms\service\guest\impl\Gu
 D:\workspace\kry\pms\pms-service\src\main\java\com\kry\pms\service\busi\impl\DailyVerifyServiceImpl.java
 D:\workspace\kry\pms\pms-service\src\main\java\com\kry\pms\service\room\impl\GuestRoomServiceImpl.java
 D:\workspace\kry\pms\pms-service\src\main\java\com\kry\pms\service\busi\impl\CheckInRecordServiceImpl.java
+D:\workspace\kry\pms\pms-service\src\main\java\com\kry\pms\service\goods\impl\SetMealItemServiceImpl.java
 D:\workspace\kry\pms\pms-service\src\main\java\com\kry\pms\service\busi\impl\BookingRecordServiceImpl.java
 D:\workspace\kry\pms\pms-service\src\main\java\com\kry\pms\service\guest\impl\CustomerInvoiceInfoServiceImpl.java
 D:\workspace\kry\pms\pms-service\src\main\java\com\kry\pms\service\org\impl\EmployeeServiceImpl.java
@@ -85,6 +89,8 @@ D:\workspace\kry\pms\pms-service\src\main\java\com\kry\pms\service\busi\impl\Cha
 D:\workspace\kry\pms\pms-service\src\main\java\com\kry\pms\service\busi\impl\ReceptionServiceImpl.java
 D:\workspace\kry\pms\pms-service\src\main\java\com\kry\pms\service\guest\CustomerPointsService.java
 D:\workspace\kry\pms\pms-service\src\main\java\com\kry\pms\service\room\RoomTypeQuantityService.java
+D:\workspace\kry\pms\pms-service\src\main\java\com\kry\pms\service\goods\SetMealItemService.java
 D:\workspace\kry\pms\pms-service\src\main\java\com\kry\pms\service\room\RoomTagService.java
+D:\workspace\kry\pms\pms-service\src\main\java\com\kry\pms\service\goods\impl\SetMealServiceImpl.java
 D:\workspace\kry\pms\pms-service\src\main\java\com\kry\pms\service\guest\CustomerLevelService.java
 D:\workspace\kry\pms\pms-service\src\main\java\com\kry\pms\service\busi\DailyVerifyService.java

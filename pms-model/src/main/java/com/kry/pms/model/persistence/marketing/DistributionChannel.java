@@ -10,7 +10,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * 
+ * 销售渠道
  * @author Louis
  *
  */

@@ -22,7 +22,7 @@ import lombok.Setter;
 public class GuestRoom extends PersistenceModel {
 	@OneToOne(fetch = FetchType.LAZY)
 	private RoomType roomType;
-	@OneToMany(cascade = CascadeType.PERSIST)
+	@OneToMany
 	private List<RoomTag> tags;
 	@OneToOne(fetch = FetchType.LAZY)
 	private Building building;

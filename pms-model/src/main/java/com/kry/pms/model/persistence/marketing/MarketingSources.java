@@ -9,7 +9,11 @@ import com.kry.pms.model.persistence.PersistenceModel;
 
 import lombok.Getter;
 import lombok.Setter;
-
+/**
+ * 市场来源
+ * @author Louis
+ *
+ */
 @Entity
 @Getter
 @Setter

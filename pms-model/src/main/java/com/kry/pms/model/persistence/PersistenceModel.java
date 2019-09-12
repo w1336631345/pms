@@ -2,7 +2,6 @@ package com.kry.pms.model.persistence;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
@@ -10,6 +9,8 @@ import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 
 import org.hibernate.annotations.GenericGenerator;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -22,6 +23,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @MappedSuperclass
+@JsonIgnoreProperties(value = { "hibernateLazyInitializer", "handler","createDate","updateDate","createUser","updateUser" })
 public class PersistenceModel implements Serializable {
 	@Id
 	@GeneratedValue(generator = "uuid")
@@ -43,6 +45,6 @@ public class PersistenceModel implements Serializable {
 	@Column(columnDefinition = "varchar(64) default '0000' COMMENT '企业编码'")
 	protected String corporationCode;
 	@Column(columnDefinition = "varchar(64) default '0000' COMMENT '酒店编码'")
-	protected String hotelCode;
+	protected String hotelCode = "0000";
 
 }

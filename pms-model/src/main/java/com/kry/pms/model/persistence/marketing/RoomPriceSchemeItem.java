@@ -5,12 +5,13 @@ import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import com.kry.pms.model.persistence.PersistenceModel;
-import com.kry.pms.model.persistence.goods.Product;
+import com.kry.pms.model.persistence.goods.SetMeal;
 import com.kry.pms.model.persistence.room.RoomType;
 
 import lombok.Getter;
@@ -27,11 +28,13 @@ public class RoomPriceSchemeItem extends PersistenceModel {
 	private Double price;
 	@Column
 	private String name;
-	@Column
+	@Column(name="code_")
 	private String code;
 	@Column
 	private String description;
 	@OneToMany
 	@JoinColumn(name="extra_")
-	private List<Product> extra;
+	private List<SetMeal> extra;
+	@ManyToOne
+	private RoomPriceScheme roomPriceScheme;
 }

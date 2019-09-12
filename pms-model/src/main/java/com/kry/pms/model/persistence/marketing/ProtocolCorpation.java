@@ -5,6 +5,8 @@ import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
@@ -53,8 +55,8 @@ public class ProtocolCorpation extends PersistenceModel {
 	private String contactMobile;
 	@OneToMany
 	private List<Customer> authorizeCustomers;
-	@OneToOne
-	private RoomPriceScheme roomPriceScheme;
+	@ManyToMany
+	private List<RoomPriceScheme> roomPriceSchemes;
 	@OneToMany
 	private List<ProductCategory> categorys;
 }

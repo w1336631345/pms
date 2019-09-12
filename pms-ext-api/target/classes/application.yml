@@ -1,0 +1,44 @@
+logging:
+  level:
+    org.hibernate.type.descriptor.sql.BasicBinder: trace
+    com.kry.pms: debug
+server:
+  address: 0.0.0.0
+  port: 8060
+  servlet:
+    context-path: /pms-ext
+spring:
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: Asia/Shanghai
+    default-property-inclusion: non-null
+  datasource:
+    password: admin
+    url: jdbc:mysql://127.0.0.1:3306/pms?useUnicode=true&characterEncoding=utf8&serverTimezone=Hongkong
+    username: root
+  jpa:
+    database: mysql
+    database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+  redis:
+    database: 1
+    host: 127.0.0.1
+    jedis:
+      pool:
+        max-active: 8
+        max-idle: 8
+        max-wait: -1
+        min-idle: 0
+    port: 6379
+qiniu:
+  oss:
+    access-key: 5azdaObcIs01xmYikeM6dSPB4O32Dy97t5Z4R45K
+    secret-key: Bw62mruVQ2-tamUe5YllBf9MFyO67VptKNciuNMl
+    bucket: gxx-oss
+    path: http://pkoqxs4zt.bkt.clouddn.com
+    image-host: http://exoss.daihenkuai.com/ 
+
+    
+  

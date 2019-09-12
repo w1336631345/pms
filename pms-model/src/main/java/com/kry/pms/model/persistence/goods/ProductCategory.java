@@ -18,4 +18,6 @@ public class ProductCategory extends PersistenceModel {
 	private String name;
 	@Column
 	private String description;
+	@Column(name="code_")
+	private String code;
 }

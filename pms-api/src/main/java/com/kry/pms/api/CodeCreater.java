@@ -9,7 +9,12 @@ import javax.persistence.Entity;
 
 import org.reflections.Reflections;
 
-import com.kry.pms.model.persistence.busi.BillItem;
+import com.kry.pms.model.persistence.goods.Product;
+import com.kry.pms.model.persistence.goods.ProductCategory;
+import com.kry.pms.model.persistence.goods.SetMeal;
+import com.kry.pms.model.persistence.goods.SetMealItem;
+import com.kry.pms.model.persistence.marketing.RoomPriceScheme;
+import com.kry.pms.model.persistence.marketing.RoomPriceSchemeItem;
 import com.kry.pms.util.Freemarker;
 
 public class CodeCreater {
@@ -26,7 +31,10 @@ public class CodeCreater {
 		ArrayList<Class> clazzs = new ArrayList<>();
 //		clazzs.add(RoomTypeQuantity.class);
 //		clazzs.add(RoomStatusQuantity.class);
-		clazzs.add(BillItem.class);
+//		clazzs.add(Product.class);
+//		clazzs.add(ProductCategory.class);
+		clazzs.add(SetMeal.class);
+		clazzs.add(SetMealItem.class);
 		for(Class cls : clazzs) {
 			createCodeForClass(cls);
 		}

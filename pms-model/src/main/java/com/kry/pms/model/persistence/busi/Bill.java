@@ -1,15 +1,13 @@
 package com.kry.pms.model.persistence.busi;
 
-import java.util.List;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import com.kry.pms.model.persistence.PersistenceModel;
 import com.kry.pms.model.persistence.guest.Customer;
+import com.kry.pms.model.persistence.marketing.ProtocolCorpation;
 import com.kry.pms.model.persistence.org.Employee;
 
 import lombok.Getter;
@@ -20,8 +18,6 @@ import lombok.Setter;
 @Setter
 @Table(name = "t_bill")
 public class Bill extends PersistenceModel {
-	@OneToMany
-	private List<BillItem> items;
 	@Column
 	private Double total;
 	@Column
@@ -34,9 +30,13 @@ public class Bill extends PersistenceModel {
 	private Customer customer;
 	@OneToOne
 	private Group group;
+	@OneToOne
+	private ProtocolCorpation ProtocolCorpation;
 	@Column
 	private Integer currentItemSeq;
 	@Column
-	private String statusPayment;
+	private String paymentStatus;
+	@Column
+	private String settlementStatus;
 
 }
