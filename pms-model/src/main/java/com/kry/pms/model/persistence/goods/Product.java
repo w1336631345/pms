@@ -19,8 +19,12 @@ public class Product extends PersistenceModel {
 	private String name;
 	@Column(name = "type_")
 	private String type;
-	@Column(name="code_")
+	@Column(name = "code_")
 	private String code;
+	@Column(columnDefinition = "varchar(400) default NUll COMMENT '主图'")
+	private String mainPicture;
+	@Column(columnDefinition = "varchar(400) default NUll COMMENT '缩略图'")
+	private String thumbnail;
 	@Column
 	private String description;
 	@OneToOne

@@ -14,9 +14,9 @@ import lombok.Setter;
 @Setter
 @Table(name = "t_building")
 public class Building extends PersistenceModel {
-	@Column
+	@Column(columnDefinition = "varchar(40) default NUll COMMENT '名称'")
 	private String name;
-	@Column
+	@Column(columnDefinition = "varchar(400) default NUll COMMENT '描述'")
 	private String description;
 	@Column
 	private Integer sortNum;

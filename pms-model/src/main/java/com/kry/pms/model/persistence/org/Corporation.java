@@ -14,28 +14,28 @@ import lombok.Setter;
 @Setter
 @Table(name = "t_corporation")
 public class Corporation extends PersistenceModel {
-	@Column
+	@Column(columnDefinition = "varchar(40) default NUll COMMENT '名称'")
 	private String name;
-	@Column
+	@Column(columnDefinition = "varchar(40) default NUll COMMENT '手机'")
 	private String mobile;
-	@Column
+	@Column(columnDefinition = "varchar(40) default NUll COMMENT '电话'")
 	private String tel;
-	@Column
+	@Column(columnDefinition = "varchar(40) default NUll COMMENT '主页地址'")
 	private String homeUrl;
-	@Column
+	@Column(columnDefinition = "varchar(40) default NUll COMMENT '省'")
 	private String province;
-	@Column
+	@Column(columnDefinition = "varchar(40) default NUll COMMENT '编码'")
 	private String code;
-	@Column
+	@Column(columnDefinition = "varchar(40) default NUll COMMENT '城市'")
 	private String city;
-	@Column
+	@Column(columnDefinition = "varchar(40) default NUll COMMENT '县'")
 	private String area;
-	@Column
+	@Column(columnDefinition = "varchar(40) default NUll COMMENT '详细地址'")
 	private String address;
-	@Column
+	@Column(columnDefinition = "varchar(40) default NUll COMMENT '描述'")
 	private String description;
-	@Column
+	@Column(columnDefinition = "varchar(40) default NUll COMMENT '联系人'")
 	private String contactName;
-	@Column
+	@Column(columnDefinition = "varchar(40) default NUll COMMENT '联系电话'")
 	private String contactMobile;
 }

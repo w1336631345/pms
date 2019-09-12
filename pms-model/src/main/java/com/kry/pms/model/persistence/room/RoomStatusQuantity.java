@@ -14,10 +14,10 @@ import lombok.Setter;
 @Setter
 @Table(name = "t_room_status_quantity")
 public class RoomStatusQuantity extends PersistenceModel{
-	@Column
+	@Column(columnDefinition = "varchar(64) default NULL COMMENT '客房状态码'")
 	private String statusCode;
-	@Column
+	@Column(columnDefinition = "varchar(64) default NULL COMMENT '客房状态'")
 	private String statusName;
-	@Column
+	@Column(columnDefinition = "int(6) default NULL COMMENT '数量'")
 	private Integer quantity;
 }

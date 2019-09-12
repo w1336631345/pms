@@ -15,13 +15,13 @@ import lombok.Setter;
 @Setter
 @Table(name = "t_employee")
 public class Employee extends PersistenceModel{
-	@Column
-	private String name;
 	@OneToOne
 	private Department department;
-	@Column
+	@Column(columnDefinition = "varchar(64) default NULL COMMENT '名称'")
+	private String name;
+	@Column(columnDefinition = "varchar(40) default NULL COMMENT '编码'")
 	private String code;
-	@Column
+	@Column(columnDefinition = "varchar(400) default NULL COMMENT '描述'")
 	private String description;
 	@OneToOne
 	private Account account;

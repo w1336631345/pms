@@ -14,11 +14,11 @@ import lombok.Setter;
 @Setter
 @Table(name="t_department")
 public class Department extends PersistenceModel{
-	@Column
+	@Column(columnDefinition = "varchar(64) default NULL COMMENT '名称'")
 	private String name;
-	@Column
+	@Column(columnDefinition = "varchar(40) default NULL COMMENT '编码'")
 	private String code;
-	@Column
+	@Column(columnDefinition = "varchar(400) default NULL COMMENT '描述'")
 	private String description;
 	@OneToOne
 	private Corporation corporation;

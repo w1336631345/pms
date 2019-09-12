@@ -28,7 +28,8 @@ public class GuestRoom extends PersistenceModel {
 	private Building building;
 	@OneToOne(fetch = FetchType.LAZY)
 	private Floor floor;
-	@Column
+	@Column(columnDefinition = "varchar(40) default NUll COMMENT '房间号'")
 	private String roomNum;
-
+	@Column(columnDefinition = "varchar(400) default NUll COMMENT '主图'")
+	private String mainPicture;
 }
