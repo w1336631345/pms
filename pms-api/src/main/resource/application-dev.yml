@@ -14,7 +14,7 @@ spring:
     default-property-inclusion: non-null
   datasource:
     password: admin
-    url: jdbc:mysql://127.0.0.1:3306/pms?useUnicode=true&characterEncoding=utf8&serverTimezone=Hongkong
+    url: jdbc:mysql://localhost:3306/pms?useUnicode=true&characterEncoding=utf8&serverTimezone=Hongkong
     username: root
   jpa:
     database: mysql
