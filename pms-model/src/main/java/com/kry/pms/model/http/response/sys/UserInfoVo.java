@@ -5,7 +5,7 @@ import com.kry.pms.model.persistence.sys.Role;
 
 import lombok.Data;
 @Data
-public class AccountInfoVo {
+public class UserInfoVo {
 	private Role role;
 	private Employee employee;
 	private String nickname;

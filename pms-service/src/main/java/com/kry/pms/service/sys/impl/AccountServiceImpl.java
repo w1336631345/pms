@@ -12,6 +12,7 @@ import com.kry.pms.base.Constants;
 import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
 import com.kry.pms.dao.sys.AccountDao;
+import com.kry.pms.model.persistence.busi.RoomRecord;
 import com.kry.pms.model.persistence.sys.Account;
 import com.kry.pms.service.sys.AccountService;
 
@@ -64,10 +65,11 @@ public class  AccountServiceImpl implements  AccountService{
 	}
 
 	@Override
-	public Account findTopByMobileOrUsername(String username) {
-		// TODO Auto-generated method stub
+	public Account billEntry(RoomRecord rr) {
+		
 		return null;
 	}
+
 	 
 	 
 	 

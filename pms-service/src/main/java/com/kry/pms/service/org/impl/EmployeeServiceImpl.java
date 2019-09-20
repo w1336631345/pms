@@ -9,19 +9,28 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
 import com.kry.pms.base.Constants;
+import com.kry.pms.base.DtoResponse;
 import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
 import com.kry.pms.dao.org.EmployeeDao;
 import com.kry.pms.model.persistence.org.Employee;
 import com.kry.pms.model.persistence.sys.Account;
+import com.kry.pms.model.persistence.sys.User;
 import com.kry.pms.service.org.EmployeeService;
+import com.kry.pms.service.sys.AccountService;
+import com.kry.pms.service.sys.SystemConfigService;
+import com.kry.pms.service.sys.UserService;
 
 @Service
-public class  EmployeeServiceImpl implements  EmployeeService{
+public class EmployeeServiceImpl implements EmployeeService {
 	@Autowired
-	 EmployeeDao employeeDao;
-	 
-	 @Override
+	EmployeeDao employeeDao;
+	@Autowired
+	SystemConfigService systemConfigService;
+	@Autowired
+	UserService userService;
+
+	@Override
 	public Employee add(Employee employee) {
 		return employeeDao.saveAndFlush(employee);
 	}
@@ -47,8 +56,8 @@ public class  EmployeeServiceImpl implements  EmployeeService{
 
 	@Override
 	public List<Employee> getAllByHotelCode(String code) {
-		return null;//默认不实现
-		//return employeeDao.findByHotelCode(code);
+		return null;// 默认不实现
+		// return employeeDao.findByHotelCode(code);
 	}
 
 	@Override
@@ -65,14 +74,30 @@ public class  EmployeeServiceImpl implements  EmployeeService{
 	}
 
 	@Override
-	public Employee findByAccount(Account account) {
+	public Employee findByUser(User user) {
 		Employee employee = new Employee();
-		employee.setAccount(account);
+		employee.setUser(user);
 		Example<Employee> ex = Example.of(employee);
 		return employeeDao.findOne(ex).orElse(null);
 	}
-	 
-	 
-	 
-	 
+
+	@Override
+	public DtoResponse<Employee> createEmployee(Employee employee) {
+		DtoResponse<Employee> rep = new DtoResponse<Employee>();
+		User user = new User();
+		user.setUsername(employee.getCode());
+		user.setNickname(employee.getName());
+		user.setMobile(employee.getMobile());
+		user.setHotelCode(employee.getHotelCode());
+		user.setCorporationCode(employee.getCorporationCode());
+		user.setCreateUser(employee.getCreateUser());
+		user.setPassword(systemConfigService
+				.getByHotelCodeAndKey(employee.getHotelCode(), Constants.SystemConfig.CODE_DEFAULT_ACCOUNT_PASSWORD)
+				.getValue());
+		user = userService.add(user);
+		employee.setUser(user);
+		add(employee);
+		return rep.addData(employee);
+	}
+
 }

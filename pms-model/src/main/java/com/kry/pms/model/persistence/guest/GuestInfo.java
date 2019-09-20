@@ -43,6 +43,4 @@ public class GuestInfo extends PersistenceModel {
 	private String licensingAuthority;
 	@OneToOne
 	private CountryOrRegion countryOrRegion;
-	@OneToOne
-	private Account account;
 }

@@ -12,14 +12,14 @@ import lombok.Setter;
 @Entity
 @Getter
 @Setter
-@Table(name="t_room_lock_reason")
+@Table(name = "t_room_lock_reason")
 public class RoomLockReason extends PersistenceModel {
-	@Column
+	@Column(columnDefinition = "varchar(64) default NULL COMMENT '名称'")
 	private String name;
-	@Column
-	private String description;
-	@Column(name="code_")
+	@Column(columnDefinition = "varchar(40) default NULL COMMENT '编码'")
 	private String code;
+	@Column(columnDefinition = "varchar(400) default NULL COMMENT '描述'")
+	private String description;
 	@Column
 	private Integer sortNum;
 }

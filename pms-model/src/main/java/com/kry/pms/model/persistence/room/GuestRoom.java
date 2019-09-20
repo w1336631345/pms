@@ -32,4 +32,9 @@ public class GuestRoom extends PersistenceModel {
 	private String roomNum;
 	@Column(columnDefinition = "varchar(400) default NUll COMMENT '主图'")
 	private String mainPicture;
+	@Column(columnDefinition = "int(8) COMMENT '床数'")
+	private Integer bedCount;
+	@Column(columnDefinition = "int(8) COMMENT '允许入住人数'")
+	private Integer occupantCapacity;
+	
 }

@@ -17,7 +17,9 @@ import lombok.Setter;
 public class Product extends PersistenceModel {
 	@Column
 	private String name;
-	@Column(name = "type_")
+	@Column(name = "price_type", columnDefinition = "varchar(40) COMMENT '定价类型 FREE_PRICE 不定价| FIXED_PRICE 固定定价'")
+	private String priceType;
+	@Column(name = "type_",columnDefinition = "varchar(40) COMMENT '产品类型GOODS 商品 |SERVICE 服务）'")
 	private String type;
 	@Column(name = "code_")
 	private String code;
@@ -25,6 +27,8 @@ public class Product extends PersistenceModel {
 	private String mainPicture;
 	@Column(columnDefinition = "varchar(400) default NUll COMMENT '缩略图'")
 	private String thumbnail;
+	@Column(name = "price")
+	private Double price;
 	@Column
 	private String description;
 	@OneToOne

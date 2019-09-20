@@ -3,6 +3,7 @@ package com.kry.pms.api.room;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,12 +25,12 @@ public class FloorController extends BaseController<Floor> {
 	@Autowired
 	FloorService floorService;
 	@PostMapping
-	public HttpResponse<Floor> add(@RequestBody Floor floor) {
+	public HttpResponse<Floor> add(@RequestBody @Validated Floor floor) {
 		return getDefaultResponse().addData(floorService.add(floor));
 	}
 
 	@PutMapping
-	public HttpResponse<Floor> modify(@RequestBody Floor floor) {
+	public HttpResponse<Floor> modify(@RequestBody @Validated Floor floor) {
 		return getDefaultResponse().addData(floorService.modify(floor));
 	}
 

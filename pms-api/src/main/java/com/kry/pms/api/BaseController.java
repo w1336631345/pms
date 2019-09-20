@@ -18,9 +18,10 @@ import com.kry.pms.util.StringUtil;
 
 public class BaseController<T> {
 	
-	public String getCurrentAccountId() {
+	public String getCurrentUserId() {
 		return "1";
 	}
+	
 	public String getEmployeeId() {
 		return "";
 	}

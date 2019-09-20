@@ -24,7 +24,7 @@ import lombok.Setter;
 @Setter
 @MappedSuperclass
 @JsonIgnoreProperties(value = { "hibernateLazyInitializer", "handler","createDate","updateDate","createUser","updateUser" })
-public class PersistenceModel implements Serializable {
+public class PersistenceModel implements Serializable,Cloneable {
 	@Id
 	@GeneratedValue(generator = "uuid")
 	@GenericGenerator(name = "uuid", strategy = "uuid")
@@ -46,5 +46,8 @@ public class PersistenceModel implements Serializable {
 	protected String corporationCode;
 	@Column(columnDefinition = "varchar(64) default '0000' COMMENT '酒店编码'")
 	protected String hotelCode = "0000";
-
+    @Override
+	public Object clone() throws CloneNotSupportedException {
+        return super.clone();
+    }
 }

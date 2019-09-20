@@ -15,16 +15,30 @@ import lombok.Setter;
 @Setter
 @Table(name = "t_room_type_ext_info")
 public class RoomTypeExtInfo extends PersistenceModel {
-	@Column(columnDefinition="int(8) COMMENT '面积'")
+	@Column(columnDefinition = "int(8) COMMENT '面积'")
 	private Integer size;
-	@Column(columnDefinition="int(8) COMMENT '最低楼层'")
+	@Column(columnDefinition = "int(8) COMMENT '最低楼层'")
 	private Integer minFoolr;
-	@Column(columnDefinition="int(8) COMMENT '最高楼层'")
+	@Column(columnDefinition = "int(8) COMMENT '最高楼层'")
 	private Integer maxFoolr;
-	@Column(columnDefinition="int(8) COMMENT '窗户'")
+	@Column(columnDefinition = "varchar(100) COMMENT '床尺寸'")
+	private String bedSize;
+	@Column(columnDefinition = "varchar(400) default NULL COMMENT '全景地址'")
+	private String overallView;
+	@Column(columnDefinition = "int(8) COMMENT '窗户'")
 	private Integer windowSize;
-	@Column(columnDefinition="int(8) COMMENT '加床费'")
+	@Column(columnDefinition = "tinyint(1)  COMMENT '大床房'")
+	private Boolean singleBed;
+	@Column(columnDefinition = "tinyint(1)  COMMENT '标准间'")
+	private Boolean twinBed;
+	@Column(columnDefinition = "tinyint(1)  COMMENT '三人间'")
+	private Boolean threeBed;
+	@Column(columnDefinition = "tinyint(1)  COMMENT '删除状态'")
+	private Boolean extraBed;
+	@Column(columnDefinition = "int(8) COMMENT '加床费'")
 	private Integer extraBedPrice;
+	@Column(columnDefinition = "int(8) COMMENT '可住人数'")
+	private Integer availablNum;
 	@Column(columnDefinition = "varchar(400) default NULL COMMENT '便利信息'")
 	private String convenienceInfo;
 	@Column(columnDefinition = "varchar(400) default NULL COMMENT '多媒体信息'")

@@ -2,6 +2,7 @@ package com.kry.pms.model.persistence.room;
 
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.OneToMany;
@@ -14,7 +15,7 @@ import com.kry.pms.model.persistence.sys.StaticResource;
 import lombok.Getter;
 import lombok.Setter;
 
-@Entity
+@Entity()
 @Getter
 @Setter
 @Table(name = "t_room_type")
@@ -35,13 +36,13 @@ public class RoomType extends PersistenceModel {
 	private Integer roomCount;
 	@Column(columnDefinition = "int(8) COMMENT '审核阈值'")
 	private Integer bookingVerifyThreshold;
-	@OneToOne
+	@OneToOne(cascade=CascadeType.ALL)
 	private RoomTypeExtInfo roomTypeExtInfo;
 	@Column(columnDefinition = "varchar(400) default NUll COMMENT '主图'")
 	private String mainPicture;
 	@Column(columnDefinition = "varchar(400) default NUll COMMENT '缩略图'")
 	private String thumbnail;
-	@OneToMany
+	@OneToMany(cascade=CascadeType.ALL)
 	private List<StaticResource> pictures;
 
 }

@@ -57,4 +57,6 @@ public class Hotel extends PersistenceModel {
 	private String mainPicture;
 	@Column(columnDefinition = "varchar(400) default NUll COMMENT '缩略图'")
 	private String thumbnail;
+	@Column
+	private String businessStatus;
 }
