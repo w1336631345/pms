@@ -12,6 +12,7 @@ import javax.persistence.Table;
 import com.kry.pms.model.persistence.PersistenceModel;
 import com.kry.pms.model.persistence.guest.Customer;
 import com.kry.pms.model.persistence.room.GuestRoom;
+import com.kry.pms.model.persistence.sys.Account;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -37,8 +38,8 @@ public class CheckInRecord extends PersistenceModel {
 	private String checkInSn;
 	@Column(name = "type_")
 	private String type;
-	@OneToOne
-	private Bill bill;
 	@ManyToOne
 	private Group group;
+	@OneToOne
+	private Account account;
 }

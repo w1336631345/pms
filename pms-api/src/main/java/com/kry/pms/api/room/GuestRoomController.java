@@ -1,7 +1,10 @@
 package com.kry.pms.api.room;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,7 +28,9 @@ public class GuestRoomController extends BaseController<GuestRoom> {
 	GuestRoomService guestRoomService;
 	@PostMapping
 	public HttpResponse<GuestRoom> add(@RequestBody GuestRoom guestRoom) {
-		return getDefaultResponse().addData(guestRoomService.add(guestRoom));
+		HttpResponse<GuestRoom> rep = getDefaultResponse();
+		BeanUtils.copyProperties(guestRoomService.addWithDto(guestRoom), rep);
+		return rep;
 	}
 
 	@PutMapping
@@ -39,7 +44,14 @@ public class GuestRoomController extends BaseController<GuestRoom> {
 		guestRoomService.delete(id);
 		return rep;
 	}
-
+	@PostMapping(path="/batch")
+	public HttpResponse<List<GuestRoom>> batchAdd(@RequestBody GuestRoom guestRoom) {
+		HttpResponse<List<GuestRoom>> rep = new HttpResponse<List<GuestRoom>>();
+		BeanUtils.copyProperties(guestRoomService.batchAdd(guestRoom), rep);
+		return rep;
+	}
+	
+	
 	@GetMapping
 	public HttpResponse<PageResponse<GuestRoom>> query(HttpServletRequest request) throws InstantiationException, IllegalAccessException{
 		HttpResponse<PageResponse<GuestRoom>> rep = new HttpResponse<PageResponse<GuestRoom>>();

@@ -18,15 +18,16 @@ import com.kry.pms.model.persistence.room.RoomType;
 import com.kry.pms.service.room.RoomTypeService;
 
 @Service
-public class  RoomTypeServiceImpl implements  RoomTypeService{
+public class RoomTypeServiceImpl implements RoomTypeService {
 	@Autowired
-	 RoomTypeDao roomTypeDao;
-	 
+	RoomTypeDao roomTypeDao;
+
 	@Override
-	@CacheEvict(value="room_type",key = "targetClass+#p0.hotelCode")
+	@CacheEvict(value = "room_type", key = "targetClass+#p0.hotelCode")
 	public RoomType add(RoomType roomType) {
 		return roomTypeDao.saveAndFlush(roomType);
 	}
+
 	@Override
 	public void delete(String id) {
 		RoomType roomType = roomTypeDao.findById(id).get();
@@ -35,7 +36,8 @@ public class  RoomTypeServiceImpl implements  RoomTypeService{
 		}
 		modify(roomType);
 	}
-	@CacheEvict(value="room_type",key = "targetClass+#p0.hotelCode")
+
+	@CacheEvict(value = "room_type", key = "targetClass+#p0.hotelCode")
 	@Override
 	public RoomType modify(RoomType roomType) {
 		return roomTypeDao.saveAndFlush(roomType);
@@ -47,7 +49,7 @@ public class  RoomTypeServiceImpl implements  RoomTypeService{
 	}
 
 	@Override
-	@Cacheable(value="room_type",key="targetClass+#p0")
+	@Cacheable(value = "room_type", key = "targetClass+#p0")
 	public List<RoomType> getAllByHotelCode(String code) {
 		return roomTypeDao.findByHotelCode(code);
 	}
@@ -64,8 +66,5 @@ public class  RoomTypeServiceImpl implements  RoomTypeService{
 		}
 		return convent(roomTypeDao.findAll(ex, req));
 	}
-	 
-	 
-	 
-	 
+
 }

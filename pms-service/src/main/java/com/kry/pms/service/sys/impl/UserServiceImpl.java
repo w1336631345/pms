@@ -11,49 +11,48 @@ import org.springframework.stereotype.Service;
 import com.kry.pms.base.Constants;
 import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
-import com.kry.pms.dao.sys.AccountDao;
-import com.kry.pms.model.persistence.busi.RoomRecord;
-import com.kry.pms.model.persistence.sys.Account;
-import com.kry.pms.service.sys.AccountService;
+import com.kry.pms.dao.sys.UserDao;
+import com.kry.pms.model.persistence.sys.User;
+import com.kry.pms.service.sys.UserService;
 
 @Service
-public class  AccountServiceImpl implements  AccountService{
+public class  UserServiceImpl implements  UserService{
 	@Autowired
-	 AccountDao accountDao;
+	 UserDao userDao;
 	 
 	 @Override
-	public Account add(Account account) {
-		return accountDao.saveAndFlush(account);
+	public User add(User user) {
+		return userDao.saveAndFlush(user);
 	}
 
 	@Override
 	public void delete(String id) {
-		Account account = accountDao.findById(id).get();
-		if (account != null) {
-			account.setDeleted(Constants.DELETED_TRUE);
+		User user = userDao.findById(id).get();
+		if (user != null) {
+			user.setDeleted(Constants.DELETED_TRUE);
 		}
-		accountDao.saveAndFlush(account);
+		modify(user);
 	}
 
 	@Override
-	public Account modify(Account account) {
-		return accountDao.saveAndFlush(account);
+	public User modify(User user) {
+		return userDao.saveAndFlush(user);
 	}
 
 	@Override
-	public Account findById(String id) {
-		return accountDao.getOne(id);
+	public User findById(String id) {
+		return userDao.getOne(id);
 	}
 
 	@Override
-	public List<Account> getAllByHotelCode(String code) {
+	public List<User> getAllByHotelCode(String code) {
 		return null;//默认不实现
-		//return accountDao.findByHotelCode(code);
+		//return userDao.findByHotelCode(code);
 	}
 
 	@Override
-	public PageResponse<Account> listPage(PageRequest<Account> prq) {
-		Example<Account> ex = Example.of(prq.getExb());
+	public PageResponse<User> listPage(PageRequest<User> prq) {
+		Example<User> ex = Example.of(prq.getExb());
 		org.springframework.data.domain.PageRequest req;
 		if (prq.getOrderBy() != null) {
 			Sort sort = new Sort(prq.isAsc() ? Direction.ASC : Direction.DESC, prq.getOrderBy());
@@ -61,15 +60,8 @@ public class  AccountServiceImpl implements  AccountService{
 		} else {
 			req = org.springframework.data.domain.PageRequest.of(prq.getPageNum(), prq.getPageSize());
 		}
-		return convent(accountDao.findAll(ex, req));
+		return convent(userDao.findAll(ex, req));
 	}
-
-	@Override
-	public Account billEntry(RoomRecord rr) {
-		
-		return null;
-	}
-
 	 
 	 
 	 

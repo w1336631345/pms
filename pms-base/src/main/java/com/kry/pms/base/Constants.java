@@ -39,7 +39,7 @@ public class Constants {
 		public static final String CUSTOMER_STATUS_OUT_UNSETTLED = "S";
 		public static final String CUSTOMER_STATUS_CANCLE_BOOK = "X";
 		public static final String BILL_PAYMENTED = "PAYMENTED";
-		public static final String BILL_TO_BE_PAID="TO_BE_PAID";
+		public static final String BILL_TO_BE_PAID = "TO_BE_PAID";
 		public static final String BILL_NO_PAYMENT_REQUIRED = "NO_PAYMENT_REQUIRED";
 
 	}
@@ -49,10 +49,32 @@ public class Constants {
 		public static final String BOOK_CHECK_IN = "booked";
 		public static final String AUTO_DAILY_VERIFY = "auto_daily_verify";
 		public static final String BILL_ITEM_ROOM_RECORD = "room";
+		// AR 账户
+		public static final String ACCOUNT_AR = "AR";
+		// 客户账户
+		public static final String ACCOUNT_CUSTOMER = "CUSTOMER";
+		// 内部账户
+		public static final String ACCOUNT_INNER = "INNER";
+		// 团队账户
+		public static final String ACCOUNT_GROUP = "GROUP";
+		
+		
+		// 自由定价
+		public static final String PRODUCT_FREE_PRICE = "FREE_PRICE";
+		// 定价商品
+		public static final String PRODUCT_FIXED_PRICE = "FIXED_PRICE";
+		// 实物商品
+		public static final String PRODUCT_GOODS = "GOODS";
+		// 服务（虚拟商品）
+		public static final String PRODUCT_SERVICE = "SERVICE";
+
 	}
 
 	public static final int DELETED_TRUE = 1;
 	public static final int DELETED_FALSE = 0;
+	public static final int CODE_SHOW_LEVEL_ERROR = 3;
+	public static final int CODE_SHOW_LEVEL_WARING = 2;
+	public static final int CODE_SHOW_LEVEL_SUCCESS = 1;
 
 	public interface ErrorCode {
 		public static final int REQUIRED_PARAMETER_MISSING = 600;
@@ -61,11 +83,13 @@ public class Constants {
 
 	public interface BusinessCode {
 		public static final int CODE_RESOURCE_NOT_ENOUGH = 900;
+		public static final int CODE_PARAMETER_INVALID = 901;
 	}
 
 	public interface SystemConfig {
 		public static final String CODE_VARCANT_DIRTY_CHECK_IN_ABLE = "varcant_dirty_check_in_able";
 		public static final String CODE_AUDIT_TIME = "audit_time";
+		public static final String CODE_DEFAULT_ACCOUNT_PASSWORD = "default_account_password";
 		public static final String CODE_CRITICAL_TIME = "critical_time";
 		public static final LocalTime VALUE_DEFAULT_AUDIT_TIME = LocalTime.parse("01:00:00");
 		public static final LocalTime VALUE_DEFAULT_CRITICAL_TIME = LocalTime.parse("06:00:00");

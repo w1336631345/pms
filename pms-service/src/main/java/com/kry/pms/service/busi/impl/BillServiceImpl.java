@@ -19,6 +19,7 @@ import com.kry.pms.model.persistence.busi.Bill;
 import com.kry.pms.model.persistence.busi.BillItem;
 import com.kry.pms.model.persistence.busi.CheckInRecord;
 import com.kry.pms.model.persistence.busi.RoomRecord;
+import com.kry.pms.model.persistence.sys.Account;
 import com.kry.pms.service.busi.BillItemService;
 import com.kry.pms.service.busi.BillService;
 
@@ -74,10 +75,10 @@ public class BillServiceImpl implements BillService {
 
 	@Override
 	public boolean billEntry(RoomRecord rr, LocalDate recordDate) {
-		Bill bill = rr.getCheckInRecord().getBill();
-		BillItem billItem = billItemService.createAndSaveBillItem(bill, rr, recordDate);
-		bill.setCurrentItemSeq(billItem.getItemSeq());
-		bill.setTotal(billItem.getTotal() + bill.getTotal());
+		Account account = rr.getCheckInRecord().getAccount();
+//		BillItem billItem = billItemService.createAndSaveBillItem(bill, rr, recordDate);
+//		bill.setCurrentItemSeq(billItem.getItemSeq());
+//		bill.setTotal(billItem.getTotal() + bill.getTotal());
 		return true;
 	}
 
@@ -85,7 +86,7 @@ public class BillServiceImpl implements BillService {
 	public boolean checkAndPayBill(List<CheckInRecord> crs, double total) {
 		double billTatal = 0.0;
 		for (CheckInRecord cir : crs) {
-			billTatal += cir.getBill().getTotal();
+//			billTatal += cir.getBill().getTotal();
 		}
 		if (total == billTatal) {
 

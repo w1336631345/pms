@@ -14,10 +14,14 @@ import lombok.Setter;
 @Setter
 @Table(name = "t_product_category")
 public class ProductCategory extends PersistenceModel {
-	@Column
+	@Column(columnDefinition = "varchar(40) default NUll COMMENT '名称'")
 	private String name;
 	@Column
 	private String description;
-	@Column(name="code_")
+	@Column(name = "code_")
 	private String code;
+	@Column(columnDefinition = "varchar(400) default NUll COMMENT '主图'")
+	private String mainPicture;
+	@Column(columnDefinition = "varchar(400) default NUll COMMENT '缩略图'")
+	private String thumbnail;
 }

@@ -8,12 +8,9 @@ import javax.persistence.FetchType;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
-import javax.security.cert.Certificate;
 
 import com.kry.pms.model.persistence.PersistenceModel;
-import com.kry.pms.model.persistence.dict.CertificateType;
-import com.kry.pms.model.persistence.dict.CountryOrRegion;
-import com.kry.pms.model.persistence.sys.Account;
+import com.kry.pms.model.persistence.sys.User;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -30,7 +27,7 @@ public class Customer extends PersistenceModel {
 	@OneToOne
 	private CustomerLevel customerLevel;
 	@OneToOne
-	private Account account;
-	@OneToOne(fetch=FetchType.EAGER)
+	private User user;
+	@OneToOne(fetch = FetchType.EAGER)
 	private GuestInfo guestInfo;
 }
