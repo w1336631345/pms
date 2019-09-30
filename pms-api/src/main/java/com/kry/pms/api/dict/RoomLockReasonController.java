@@ -1,5 +1,7 @@
 package com.kry.pms.api.dict;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +47,11 @@ public class RoomLockReasonController extends BaseController<RoomLockReason> {
 		HttpResponse<PageResponse<RoomLockReason>> rep = new HttpResponse<PageResponse<RoomLockReason>>();
 		PageRequest<RoomLockReason> req = parse2PageRequest(request);
 		return rep.addData(roomLockReasonService.listPage(req));
+	}
+	@GetMapping(path = "/all")
+	public HttpResponse<List<RoomLockReason>> all(HttpServletRequest request) throws InstantiationException, IllegalAccessException{
+		HttpResponse<List<RoomLockReason>> rep = new HttpResponse<List<RoomLockReason>>();
+		return rep.addData(roomLockReasonService.getAllByHotelCode(getCurrentHotleCode()));
 	}
 
 }

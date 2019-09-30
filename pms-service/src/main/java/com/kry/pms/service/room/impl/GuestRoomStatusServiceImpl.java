@@ -1,8 +1,10 @@
 ﻿package com.kry.pms.service.room.impl;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Sort;
@@ -13,11 +15,20 @@ import com.kry.pms.base.Constants;
 import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
 import com.kry.pms.dao.room.GuestRoomStatusDao;
-import com.kry.pms.dao.room.RoomStatusQuantityDao;
+import com.kry.pms.model.http.response.room.BuildingVo;
+import com.kry.pms.model.http.response.room.FloorVo;
+import com.kry.pms.model.http.response.room.GuestRoomStatusVo;
+import com.kry.pms.model.http.response.room.RoomStatusTableVo;
+import com.kry.pms.model.persistence.room.Building;
+import com.kry.pms.model.persistence.room.Floor;
 import com.kry.pms.model.persistence.room.GuestRoom;
 import com.kry.pms.model.persistence.room.GuestRoomStatus;
+import com.kry.pms.service.room.BuildingService;
+import com.kry.pms.service.room.FloorService;
+import com.kry.pms.service.room.GuestRoomService;
 import com.kry.pms.service.room.GuestRoomStatusService;
 import com.kry.pms.service.room.RoomStatusQuantityService;
+import com.kry.pms.service.room.RoomTypeService;
 
 @Service
 public class GuestRoomStatusServiceImpl implements GuestRoomStatusService {
@@ -25,6 +36,14 @@ public class GuestRoomStatusServiceImpl implements GuestRoomStatusService {
 	GuestRoomStatusDao guestRoomStatusDao;
 	@Autowired
 	RoomStatusQuantityService roomStatusQuantityService;
+	@Autowired
+	RoomTypeService roomTypeService;
+	@Autowired
+	BuildingService buildingService;
+	@Autowired
+	GuestRoomService guestRoomService;
+	@Autowired
+	FloorService floorService;
 
 	@Override
 	public GuestRoomStatus add(GuestRoomStatus guestRoomStatus) {
@@ -54,6 +73,24 @@ public class GuestRoomStatusServiceImpl implements GuestRoomStatusService {
 	public List<GuestRoomStatus> getAllByHotelCode(String code) {
 		return null;// 默认不实现
 		// return guestRoomStatusDao.findByHotelCode(code);
+	}
+
+	@Override
+	public GuestRoomStatus initNewGuestRoomStatus(GuestRoom guestRoom) {
+		GuestRoomStatus status = new GuestRoomStatus();
+		if (guestRoom.getRoomType().getName() == null) {
+			guestRoom.setRoomType(roomTypeService.findById(guestRoom.getRoomType().getId()));
+		}
+		status.setRoomTypeName(guestRoom.getRoomType().getName());
+		status.setGuestRoom(guestRoom);
+		status.setRoomNum(guestRoom.getRoomNum());
+		initStatus(status);
+		status = add(status);
+		return status;
+	}
+
+	private void initStatus(GuestRoomStatus status) {
+		status.setRoomStatus(Constants.Status.ROOM_STATUS_VACANT_CLEAN);
 	}
 
 	@Override
@@ -132,7 +169,48 @@ public class GuestRoomStatusServiceImpl implements GuestRoomStatusService {
 	@Override
 	public void checkOut(String roomId) {
 		// TODO Auto-generated method stub
-		
+
+	}
+
+	@Override
+	public RoomStatusTableVo table(String currentHotleCode) {
+		RoomStatusTableVo roomStatusTableVo = new RoomStatusTableVo();
+		ArrayList<BuildingVo> data = new ArrayList<>();
+		List<Building> list = buildingService.getAllByHotelCode(currentHotleCode);
+		ArrayList<FloorVo> fvs = null;
+		ArrayList<GuestRoomStatusVo> grsvs = null;
+		GuestRoomStatusVo grsv = null;
+		FloorVo fv = null;
+		BuildingVo bv = null;
+		for (Building b : list) {
+			List<Floor> fs = floorService.findByBuildingId(b.getId(), Constants.DELETED_FALSE);
+			if (fs != null && !fs.isEmpty()) {
+				fvs = new ArrayList<FloorVo>();
+				for (Floor f : fs) {
+					List<GuestRoomStatus> rs = guestRoomStatusDao.queryByFloorId(f.getId());
+					if (rs != null && !rs.isEmpty()) {
+						grsvs = new ArrayList<>();
+						for (GuestRoomStatus grs : rs) {
+							grsv = new GuestRoomStatusVo();
+							BeanUtils.copyProperties(grs, grsv);
+							grsv.setGuestRoomId(grs.getGuestRoom().getId());
+							grsvs.add(grsv);
+						}
+						fv = new FloorVo();
+						BeanUtils.copyProperties(f, fv);
+						fv.setRooms(grsvs);
+						fvs.add(fv);
+					}
+
+				}
+				bv = new BuildingVo();
+				BeanUtils.copyProperties(b, bv);
+				bv.setFloors(fvs);
+				data.add(bv);
+			}
+		}
+		roomStatusTableVo.setBuildings(data);
+		return roomStatusTableVo;
 	}
 
 }

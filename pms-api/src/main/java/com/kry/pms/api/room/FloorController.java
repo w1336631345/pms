@@ -2,6 +2,7 @@ package com.kry.pms.api.room;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -24,6 +25,7 @@ import com.kry.pms.service.room.FloorService;
 public class FloorController extends BaseController<Floor> {
 	@Autowired
 	FloorService floorService;
+
 	@PostMapping
 	public HttpResponse<Floor> add(@RequestBody @Validated Floor floor) {
 		return getDefaultResponse().addData(floorService.add(floor));
@@ -37,12 +39,13 @@ public class FloorController extends BaseController<Floor> {
 	@DeleteMapping
 	public HttpResponse<String> delete(String id) {
 		HttpResponse<String> rep = new HttpResponse<>();
-		floorService.delete(id);
+		BeanUtils.copyProperties(floorService.deleteWithCheck(id), rep);
 		return rep;
 	}
 
 	@GetMapping
-	public HttpResponse<PageResponse<Floor>> query(HttpServletRequest request) throws InstantiationException, IllegalAccessException{
+	public HttpResponse<PageResponse<Floor>> query(HttpServletRequest request)
+			throws InstantiationException, IllegalAccessException {
 		HttpResponse<PageResponse<Floor>> rep = new HttpResponse<PageResponse<Floor>>();
 		PageRequest<Floor> req = parse2PageRequest(request);
 		return rep.addData(floorService.listPage(req));

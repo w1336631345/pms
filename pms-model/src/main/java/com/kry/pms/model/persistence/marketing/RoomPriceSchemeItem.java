@@ -2,9 +2,11 @@ package com.kry.pms.model.persistence.marketing;
 
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
@@ -22,7 +24,7 @@ import lombok.Setter;
 @Setter
 @Table(name = "t_room_price_scheme_item")
 public class RoomPriceSchemeItem extends PersistenceModel {
-	@OneToOne
+	@OneToOne(cascade = CascadeType.DETACH)
 	private RoomType roomType;
 	@Column
 	private Double price;
@@ -32,9 +34,6 @@ public class RoomPriceSchemeItem extends PersistenceModel {
 	private String code;
 	@Column
 	private String description;
-	@OneToMany
-	@JoinColumn(name="extra_")
+	@ManyToMany
 	private List<SetMeal> extra;
-	@ManyToOne
-	private RoomPriceScheme roomPriceScheme;
 }

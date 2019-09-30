@@ -3,6 +3,7 @@ package com.kry.pms.service.room;
 import java.time.LocalDate;
 import java.util.List;
 
+import com.kry.pms.model.http.response.room.RoomStatusTableVo;
 import com.kry.pms.model.persistence.room.GuestRoom;
 import com.kry.pms.model.persistence.room.GuestRoomStatus;
 import com.kry.pms.service.BaseService;
@@ -18,4 +19,8 @@ public interface GuestRoomStatusService extends BaseService<GuestRoomStatus> {
 	public int batchChangeRoomStatus(String hotelCode,String currentRoomStatus,String toRoomStatus);
 
 	public void checkOut(String roomId);
+
+	GuestRoomStatus initNewGuestRoomStatus(GuestRoom guestRoom);
+
+	public RoomStatusTableVo table(String currentHotleCode);
 }

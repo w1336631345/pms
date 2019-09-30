@@ -46,8 +46,7 @@ public class  BuildingServiceImpl implements  BuildingService{
 
 	@Override
 	public List<Building> getAllByHotelCode(String code) {
-		return null;//默认不实现
-		//return buildingDao.findByHotelCode(code);
+		return buildingDao.findByHotelCodeAndStatus(code,Constants.Status.NORMAL);
 	}
 
 	@Override

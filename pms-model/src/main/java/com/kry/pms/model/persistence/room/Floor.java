@@ -22,7 +22,6 @@ public class Floor extends PersistenceModel {
 	@NotBlank
 	private String name;
 	@Column(columnDefinition = "int(8) COMMENT '层数'")
-	@NotBlank
 	private Integer floorNum;
 	@NotBlank
 	@Column(columnDefinition = "varchar(40) default NUll COMMENT '简称'")

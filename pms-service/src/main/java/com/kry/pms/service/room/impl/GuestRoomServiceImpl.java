@@ -17,17 +17,24 @@ import com.kry.pms.base.DtoResponse;
 import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
 import com.kry.pms.dao.room.GuestRoomDao;
+import com.kry.pms.model.persistence.room.Floor;
 import com.kry.pms.model.persistence.room.GuestRoom;
+import com.kry.pms.model.persistence.room.GuestRoomStatus;
 import com.kry.pms.service.room.GuestRoomService;
+import com.kry.pms.service.room.GuestRoomStatusService;
 
 @Service
 public class GuestRoomServiceImpl implements GuestRoomService {
 	@Autowired
 	GuestRoomDao guestRoomDao;
+	@Autowired
+	GuestRoomStatusService guestRoomStatusService;
 
 	@Override
 	public GuestRoom add(GuestRoom guestRoom) {
-		return guestRoomDao.saveAndFlush(guestRoom);
+		guestRoom =guestRoomDao.saveAndFlush(guestRoom);
+		guestRoomStatusService.initNewGuestRoomStatus(guestRoom);
+		return guestRoom;
 	}
 
 	@Override
@@ -113,6 +120,20 @@ public class GuestRoomServiceImpl implements GuestRoomService {
 			rep.addData(add(guestRoom));
 		}
 		return rep;
+	}
+
+	@Override
+	public List<GuestRoom> findByFloor(Floor floor) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public long findCountByFloor(Floor floor) {
+		GuestRoom guestRoom = new GuestRoom();
+		guestRoom.setFloor(floor);
+		Example<GuestRoom> ex = Example.of(guestRoom);
+		return guestRoomDao.count(ex);
 	}
 
 }

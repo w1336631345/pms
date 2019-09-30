@@ -35,6 +35,5 @@ public class RoomPriceScheme extends PersistenceModel {
 	@Column
 	private Boolean isDefault;
 	@OneToMany(cascade = CascadeType.ALL)
-	@JoinColumn(name = "room_price_scheme_id")
-	private List<RoomPriceSchemeItem> item;
+	private List<RoomPriceSchemeItem> items;
 }

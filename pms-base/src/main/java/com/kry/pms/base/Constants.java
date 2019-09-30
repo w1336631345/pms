@@ -11,7 +11,7 @@ public class Constants {
 	public interface Status {
 		public static final String DELETE = "DELETE";
 		public static final String DRAFT = "DRAFT";
-		public static final String NORMAL = "NORMAL";
+		public static final String NORMAL = "normal";
 		public static final String DISABLE = "DISABLE";
 		public static final String BOOKING_VERIFY = "booking_verify";
 		public static final String BOOKING_SUCCESS = "booking_success";
@@ -57,8 +57,6 @@ public class Constants {
 		public static final String ACCOUNT_INNER = "INNER";
 		// 团队账户
 		public static final String ACCOUNT_GROUP = "GROUP";
-		
-		
 		// 自由定价
 		public static final String PRODUCT_FREE_PRICE = "FREE_PRICE";
 		// 定价商品
@@ -72,9 +70,9 @@ public class Constants {
 
 	public static final int DELETED_TRUE = 1;
 	public static final int DELETED_FALSE = 0;
-	public static final int CODE_SHOW_LEVEL_ERROR = 3;
-	public static final int CODE_SHOW_LEVEL_WARING = 2;
-	public static final int CODE_SHOW_LEVEL_SUCCESS = 1;
+	public static final int CODE_SHOW_LEVEL_ERROR = 2;
+	public static final int CODE_SHOW_LEVEL_WARING = 1;
+	public static final int CODE_SHOW_LEVEL_SUCCESS = 0;
 
 	public interface ErrorCode {
 		public static final int REQUIRED_PARAMETER_MISSING = 600;
@@ -84,6 +82,8 @@ public class Constants {
 	public interface BusinessCode {
 		public static final int CODE_RESOURCE_NOT_ENOUGH = 900;
 		public static final int CODE_PARAMETER_INVALID = 901;
+		
+		public static final int CODE_ILLEGAL_OPERATION = 801;
 	}
 
 	public interface SystemConfig {

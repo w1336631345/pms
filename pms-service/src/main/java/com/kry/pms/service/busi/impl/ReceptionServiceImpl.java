@@ -18,7 +18,7 @@ import com.kry.pms.model.http.request.busi.BookingBo;
 import com.kry.pms.model.http.request.busi.CheckInBo;
 import com.kry.pms.model.http.request.busi.CheckInItemBo;
 import com.kry.pms.model.http.request.busi.CheckOutBo;
-import com.kry.pms.model.http.response.sys.busi.CheckOutVo;
+import com.kry.pms.model.http.response.busi.CheckOutVo;
 import com.kry.pms.model.persistence.busi.BillItem;
 import com.kry.pms.model.persistence.busi.BookingRecord;
 import com.kry.pms.model.persistence.busi.CheckInRecord;

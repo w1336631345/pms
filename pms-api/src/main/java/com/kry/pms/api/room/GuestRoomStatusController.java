@@ -1,8 +1,11 @@
 package com.kry.pms.api.room;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpRequest;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,6 +18,8 @@ import com.kry.pms.api.BaseController;
 import com.kry.pms.base.HttpResponse;
 import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
+import com.kry.pms.model.http.response.room.GuestRoomStatusVo;
+import com.kry.pms.model.http.response.room.RoomStatusTableVo;
 import com.kry.pms.model.persistence.room.GuestRoomStatus;
 import com.kry.pms.service.room.GuestRoomStatusService;
 
@@ -38,6 +43,16 @@ public class GuestRoomStatusController extends BaseController<GuestRoomStatus> {
 		HttpResponse<String> rep = new HttpResponse<>();
 		guestRoomStatusService.delete(id);
 		return rep;
+	}
+	@GetMapping(path = "/table")
+	public HttpResponse<RoomStatusTableVo> table(HttpServletRequest request){
+		HttpResponse<RoomStatusTableVo> rep = new HttpResponse<>();
+		rep.setData(guestRoomStatusService.table(getCurrentHotleCode()));
+		return rep;
+	}
+	@GetMapping(path = "/lock")
+	public HttpResponse<List<GuestRoomStatusVo>> lockRoom(){
+		return null;
 	}
 
 	@GetMapping
