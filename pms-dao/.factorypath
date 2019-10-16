@@ -25,8 +25,8 @@
     <factorypathentry kind="VARJAR" id="M2_REPO/org/dom4j/dom4j/2.1.1/dom4j-2.1.1.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/org/hibernate/common/hibernate-commons-annotations/5.0.4.Final/hibernate-commons-annotations-5.0.4.Final.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/javax/validation/validation-api/2.0.1.Final/validation-api-2.0.1.Final.jar" enabled="true" runInBatchMode="false"/>
-    <factorypathentry kind="VARJAR" id="M2_REPO/com/qiniu/qiniu-java-sdk/7.2.25/qiniu-java-sdk-7.2.25.jar" enabled="true" runInBatchMode="false"/>
-    <factorypathentry kind="VARJAR" id="M2_REPO/com/squareup/okhttp3/okhttp/3.14.2/okhttp-3.14.2.jar" enabled="true" runInBatchMode="false"/>
+    <factorypathentry kind="VARJAR" id="M2_REPO/com/qiniu/qiniu-java-sdk/7.2.26/qiniu-java-sdk-7.2.26.jar" enabled="true" runInBatchMode="false"/>
+    <factorypathentry kind="VARJAR" id="M2_REPO/com/squareup/okhttp3/okhttp/3.14.4/okhttp-3.14.4.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/com/squareup/okio/okio/1.17.2/okio-1.17.2.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/com/google/code/gson/gson/2.8.5/gson-2.8.5.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/com/fasterxml/jackson/core/jackson-annotations/2.9.0/jackson-annotations-2.9.0.jar" enabled="true" runInBatchMode="false"/>

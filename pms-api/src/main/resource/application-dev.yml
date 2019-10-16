@@ -13,8 +13,8 @@ spring:
     time-zone: Asia/Shanghai
     default-property-inclusion: non-null
   datasource:
-    password: admin
-    url: jdbc:mysql://localhost:3306/pms?useUnicode=true&characterEncoding=utf8&serverTimezone=Hongkong
+    password: 123456
+    url: jdbc:mysql://127.0.0.1:3306/pms?useUnicode=true&characterEncoding=utf8&serverTimezone=Hongkong
     username: root
   jpa:
     database: mysql
