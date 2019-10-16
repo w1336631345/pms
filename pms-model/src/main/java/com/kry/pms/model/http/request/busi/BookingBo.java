@@ -1,12 +1,11 @@
 package com.kry.pms.model.http.request.busi;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.util.List;
 
 import javax.validation.constraints.Future;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
-
-import org.springframework.format.annotation.DateTimeFormat;
 
 import com.kry.pms.model.http.request.room.BaseBo;
 
@@ -26,23 +25,20 @@ public class BookingBo extends BaseBo {
 	@NotBlank(message = "销售员不能为空")
 	private String marketingId;// 销售员
 	@Future(message = "到店时间错误")
-	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-	private LocalDateTime arriveTime;
+	private LocalDate arriveDate;
 	private String operationId;
-	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-	private LocalDateTime leaveTime;
-	@Min(value = 1, message = "人数必须大于1")
+	@Future(message = "离店时间错误")
+	private LocalDate leaveDate;
 	private Integer humanCount;
 	@Min(value = 1, message = "预定房间数必须大于1")
 	private Integer roomCount;
-	@NotBlank(message = "请选择房间类型")
 	private String roomTypeId;
+	private List<BookingItemBo> items;
 	private String channelId;
 	private String protocolId;// 协议单位
-	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-	private LocalDateTime retainTime;
 	@Min(value = 1, message = "预定天数至少大于1")
 	private Integer days;
 	private String remark;
+	private String holdTime;
 	private Boolean priceSecret = false;// 房价保密
 }

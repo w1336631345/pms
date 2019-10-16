@@ -1,7 +1,8 @@
+
+
 package com.kry.pms.api.busi;
 
 import javax.validation.Valid;
-import javax.validation.constraints.NotBlank;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,8 +20,10 @@ import com.kry.pms.model.http.request.busi.BookingBo;
 import com.kry.pms.model.http.request.busi.CheckInBo;
 import com.kry.pms.model.http.request.busi.CheckOutBo;
 import com.kry.pms.model.http.request.busi.RenewBo;
+import com.kry.pms.model.http.request.busi.RoomAssignBo;
 import com.kry.pms.model.persistence.busi.BookingRecord;
 import com.kry.pms.service.busi.ReceptionService;
+import com.kry.pms.service.room.GuestRoomService;
 
 /**
  * 预定接待
@@ -33,6 +36,8 @@ import com.kry.pms.service.busi.ReceptionService;
 public class ReceptionController extends BaseController<String> {
 	@Autowired
 	ReceptionService receptionService;
+	@Autowired
+	GuestRoomService guestRoomService;
 
 	/**
 	 * 入住
@@ -59,6 +64,19 @@ public class ReceptionController extends BaseController<String> {
 		BeanUtils.copyProperties(receptionService.checkOut(checkOut), rep);
 		return rep;
 	}
+	
+	/**
+	 * 入住
+	 * 
+	 * @param checkIn
+	 * @return
+	 */
+	@PostMapping(path = "/assign")
+	public HttpResponse<String> assignRoom(@RequestBody @Valid RoomAssignBo roomAssignBo) {
+		HttpResponse<String> rep = new HttpResponse<String>();
+		receptionService.assignRoom(roomAssignBo);
+		return rep;
+	}
 
 	/**
 	 * 预定
@@ -68,6 +86,7 @@ public class ReceptionController extends BaseController<String> {
 	 */
 	@PostMapping(path = "/book")
 	public HttpResponse<String> apply(@RequestBody @Valid BookingBo book) {
+		book.setHotelCode(getCurrentHotleCode());
 		DtoResponse<BookingRecord> dtoRep = receptionService.book(book);
 		HttpResponse<String> rep = new HttpResponse<String>(dtoRep);
 		return rep;
@@ -96,6 +115,8 @@ public class ReceptionController extends BaseController<String> {
 		HttpResponse<String> rep = new HttpResponse<String>();
 		return rep;
 	}
+
+
 
 	/**
 	 * 拆分账单

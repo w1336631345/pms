@@ -1,5 +1,6 @@
 ﻿package com.kry.pms.service.marketing.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,13 +13,18 @@ import com.kry.pms.base.Constants;
 import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
 import com.kry.pms.dao.marketing.RoomPriceSchemeDao;
+import com.kry.pms.model.http.response.marketing.RoomPriceSchemeVo;
+import com.kry.pms.model.persistence.marketing.ProtocolCorpation;
 import com.kry.pms.model.persistence.marketing.RoomPriceScheme;
+import com.kry.pms.service.marketing.ProtocolCorpationService;
 import com.kry.pms.service.marketing.RoomPriceSchemeService;
 
 @Service
 public class  RoomPriceSchemeServiceImpl implements  RoomPriceSchemeService{
 	@Autowired
 	 RoomPriceSchemeDao roomPriceSchemeDao;
+	@Autowired
+	ProtocolCorpationService protocolCorpationService;
 	 
 	 @Override
 	public RoomPriceScheme add(RoomPriceScheme roomPriceScheme) {
@@ -61,6 +67,31 @@ public class  RoomPriceSchemeServiceImpl implements  RoomPriceSchemeService{
 			req = org.springframework.data.domain.PageRequest.of(prq.getPageNum(), prq.getPageSize());
 		}
 		return convent(roomPriceSchemeDao.findAll(ex, req));
+	}
+	@Override
+	public List<RoomPriceSchemeVo> findDefaultScheme(String hotelCode){
+		return null;
+		
+	}
+
+	@Override
+	public List<RoomPriceSchemeVo> findCorpationScheme(String hotelCode, String corpId) {
+		ProtocolCorpation pc = protocolCorpationService.findById(corpId);
+		if(pc!=null) {
+			List<RoomPriceScheme> rpsc = pc.getRoomPriceSchemes();
+			if(rpsc!=null&&!rpsc.isEmpty()) {
+				ArrayList<RoomPriceSchemeVo> data = new ArrayList<>();
+				for(RoomPriceScheme rps:rpsc) {
+					data.add(new RoomPriceSchemeVo(rps));
+				}
+				
+				return data;
+			}else {
+				return findDefaultScheme(hotelCode);
+			}
+		}
+		//TODO
+		return null;
 	}
 	 
 	 

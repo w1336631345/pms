@@ -6,6 +6,7 @@ import lombok.Data;
 @Data
 public class GuestRoomStatusVo implements Serializable {
 	private String roomTypeName;
+	private String roomStatusId;
 	private String roomNum;
 	private String summary;
 	private String guestRoomId;

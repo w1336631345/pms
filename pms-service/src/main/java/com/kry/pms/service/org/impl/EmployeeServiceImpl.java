@@ -100,4 +100,9 @@ public class EmployeeServiceImpl implements EmployeeService {
 		return rep.addData(employee);
 	}
 
+	@Override
+	public List<Employee> findEmployeeByDeptCode(String deptMarketingDefaultCode, String currentHotleCode) {
+		return employeeDao.findByDepartmentCodeAndHotelCode(deptMarketingDefaultCode,currentHotleCode);
+	}
+
 }

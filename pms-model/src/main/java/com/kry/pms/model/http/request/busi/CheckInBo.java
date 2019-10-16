@@ -14,6 +14,8 @@ public class CheckInBo extends BaseBo{
 	
 	private String bookingId;
 	
+	private String operation;
+	
 	private String type;
 	@Valid
 	private List<CheckInItemBo> items;

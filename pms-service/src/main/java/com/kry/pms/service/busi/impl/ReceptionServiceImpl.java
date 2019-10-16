@@ -1,5 +1,6 @@
 package com.kry.pms.service.busi.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.transaction.Transactional;
@@ -15,20 +16,21 @@ import com.kry.pms.base.DtoResponse;
 import com.kry.pms.model.http.request.busi.BillItemBo;
 import com.kry.pms.model.http.request.busi.BillSettleBo;
 import com.kry.pms.model.http.request.busi.BookingBo;
+import com.kry.pms.model.http.request.busi.BookingItemBo;
 import com.kry.pms.model.http.request.busi.CheckInBo;
 import com.kry.pms.model.http.request.busi.CheckInItemBo;
 import com.kry.pms.model.http.request.busi.CheckOutBo;
+import com.kry.pms.model.http.request.busi.RoomAssignBo;
 import com.kry.pms.model.http.response.busi.CheckOutVo;
 import com.kry.pms.model.persistence.busi.BillItem;
+import com.kry.pms.model.persistence.busi.BookingItem;
 import com.kry.pms.model.persistence.busi.BookingRecord;
 import com.kry.pms.model.persistence.busi.CheckInRecord;
-import com.kry.pms.model.persistence.busi.RoomRecord;
 import com.kry.pms.model.persistence.org.Employee;
 import com.kry.pms.model.persistence.room.GuestRoom;
 import com.kry.pms.model.persistence.room.GuestRoomStatus;
 import com.kry.pms.model.persistence.room.RoomType;
 import com.kry.pms.model.persistence.sys.SystemConfig;
-import com.kry.pms.service.BaseService;
 import com.kry.pms.service.busi.BillService;
 import com.kry.pms.service.busi.BookingRecordService;
 import com.kry.pms.service.busi.CheckInRecordService;
@@ -37,7 +39,6 @@ import com.kry.pms.service.busi.RoomRecordService;
 import com.kry.pms.service.org.EmployeeService;
 import com.kry.pms.service.room.GuestRoomService;
 import com.kry.pms.service.room.GuestRoomStatusService;
-import com.kry.pms.service.room.RoomTypeQuantityService;
 import com.kry.pms.service.room.RoomTypeService;
 import com.kry.pms.service.sys.SystemConfigService;
 
@@ -76,15 +77,31 @@ public class ReceptionServiceImpl implements ReceptionService {
 		if (me == null) {
 			rep.setStatus(Constants.ErrorCode.REQUIRED_PARAMETER_INVALID);
 		}
-		RoomType rt = roomTypeService.findById(book.getRoomTypeId());
-		if (rt == null) {
-			rep.setStatus(Constants.ErrorCode.REQUIRED_PARAMETER_INVALID);
-		}
-		if (rep.getStatus() == 0) {
-			br.setRoomType(rt);
-			br.setOperationEmployee(oe);
-			br.setMarketEmployee(me);
+		if(book.getRoomTypeId()==null) {
+			RoomType rt = roomTypeService.findById(book.getRoomTypeId());
+			if (rt == null) {
+				rep.setStatus(Constants.ErrorCode.REQUIRED_PARAMETER_INVALID);
+			}
+			if (rep.getStatus() == 0) {
+				br.setHotelCode(book.getHotelCode());
+				br.setRoomType(rt);
+				br.setOperationEmployee(oe);
+				br.setMarketEmployee(me);
+				rep = bookingRecordService.book(br);
+			}
+		}else if(book.getItems()!=null&&!book.getItems().isEmpty()){
+			ArrayList<BookingItem> items = new ArrayList<BookingItem>();
+			BookingItem item ;
+			for(BookingItemBo bib:book.getItems()) {
+				item = new BookingItem();
+				BeanUtils.copyProperties(item, bib);
+				items.add(item);
+			}
+			br.setItems(items);
 			rep = bookingRecordService.book(br);
+		}else {
+			rep.setStatus(Constants.ErrorCode.REQUIRED_PARAMETER_INVALID);
+			rep.setMessage("请预留房间");
 		}
 		if (rep.getStatus() != 0) {
 			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
@@ -178,5 +195,11 @@ public class ReceptionServiceImpl implements ReceptionService {
 		billService.checkAndPayBill(bsb);
 		DtoResponse<String> rep = new DtoResponse<String>();
 		return rep;
+	}
+
+	@Override
+	public DtoResponse<String> assignRoom(@Valid RoomAssignBo roomAssignBo) {
+		
+		return null;
 	}
 }

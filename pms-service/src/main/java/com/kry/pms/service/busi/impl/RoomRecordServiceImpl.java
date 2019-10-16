@@ -108,7 +108,7 @@ public class RoomRecordServiceImpl implements RoomRecordService {
 				rr.setStatus(Constants.Status.ROOM_RECORD_STATUS_DAILY_VERIFY_PASS);
 				rr.setDailyVerify(dv);
 				modify(rr);
-				//billService.billEntry(rr,recordDate);
+//				billService.billEntry(rr,recordDate);
 			}
 		}
 	}

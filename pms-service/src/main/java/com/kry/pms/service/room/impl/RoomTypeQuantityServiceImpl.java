@@ -1,7 +1,7 @@
 ﻿package com.kry.pms.service.room.impl;
 
 import java.time.LocalDate;
-import java.util.Date;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,15 +14,19 @@ import com.kry.pms.base.Constants;
 import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
 import com.kry.pms.dao.room.RoomTypeQuantityDao;
+import com.kry.pms.model.http.response.busi.RoomTypeQuantityPredictableVo;
 import com.kry.pms.model.persistence.room.GuestRoom;
 import com.kry.pms.model.persistence.room.RoomType;
 import com.kry.pms.model.persistence.room.RoomTypeQuantity;
 import com.kry.pms.service.room.RoomTypeQuantityService;
+import com.kry.pms.service.room.RoomTypeService;
 
 @Service
 public class RoomTypeQuantityServiceImpl implements RoomTypeQuantityService {
 	@Autowired
 	RoomTypeQuantityDao roomTypeQuantityDao;
+	@Autowired
+	RoomTypeService roomTypeService;
 
 	@Override
 	public RoomTypeQuantity add(RoomTypeQuantity roomTypeQuantity) {
@@ -105,7 +109,8 @@ public class RoomTypeQuantityServiceImpl implements RoomTypeQuantityService {
 		rtq.setRoomCount(roomType.getRoomCount());
 		return rtq;
 	}
-
+	
+	
 	@Override
 	public boolean bookCheck(RoomType roomType, LocalDate quantityDate, int quantity) {
 		RoomTypeQuantity rtq = findByRoomTypeAndQuantityDateForUpdate(roomType, quantityDate);
@@ -131,5 +136,27 @@ public class RoomTypeQuantityServiceImpl implements RoomTypeQuantityService {
 		rtq = findByRoomTypeAndQuantityDateForUpdate(gr.getRoomType(), startDate.plusDays(days));
 		rtq.setWillLeaveTotal(rtq.getWillLeaveTotal()+1);
 		modify(rtq);
+	}
+
+	@Override
+	public List<RoomTypeQuantityPredictableVo> queryPredictable(String hotelCode, LocalDate startDate,
+			LocalDate endDate) {
+		List<RoomType> types = roomTypeService.getAllByHotelCode(hotelCode, Constants.DELETED_FALSE);
+		List<RoomTypeQuantityPredictableVo> data = new ArrayList<>();
+		RoomTypeQuantityPredictableVo rtpv= null;
+		for(RoomType type:types) {
+			RoomTypeQuantity rtq = roomTypeQuantityDao.queryPredictable(type.getId(), startDate,endDate);
+			if(rtq!=null) {
+				rtpv = new RoomTypeQuantityPredictableVo();
+				rtpv.setPrice(type.getPrice());
+				rtpv.setRoomTypeName(type.getName());
+				rtpv.setRoomTypeId(type.getId());
+				rtpv.setStartDate(startDate);
+				rtpv.setEndDate(endDate);
+				rtpv.setAvailableTotal(rtq.getPredictableTotal());
+				data.add(rtpv);
+			}
+		}
+		return data;
 	}
 }

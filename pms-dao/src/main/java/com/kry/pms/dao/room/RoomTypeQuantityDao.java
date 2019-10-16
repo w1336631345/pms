@@ -1,3 +1,4 @@
+
 package com.kry.pms.dao.room;
 
 import java.time.LocalDate;
@@ -22,5 +23,8 @@ public interface RoomTypeQuantityDao extends BaseDao<RoomTypeQuantity> {
 	
 	@Lock(LockModeType.PESSIMISTIC_WRITE)
 	RoomTypeQuantity findByRoomTypeAndQuantityDate(RoomType roomType,LocalDate quantityDate);
+	
+	@Query(value = "select t.* from t_room_type_quantity t where t.room_type_id =?1 and t.quantity_date between ?2 and ?3 order by predictable_total asc limit 1", nativeQuery = true)
+	RoomTypeQuantity queryPredictable(String roomTypeId, LocalDate startDate, LocalDate endDate);
 
 }

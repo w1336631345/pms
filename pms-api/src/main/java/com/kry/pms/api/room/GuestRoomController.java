@@ -3,6 +3,7 @@ package com.kry.pms.api.room;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,7 @@ import com.kry.pms.api.BaseController;
 import com.kry.pms.base.HttpResponse;
 import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
+import com.kry.pms.model.http.request.busi.RoomLockBo;
 import com.kry.pms.model.persistence.room.GuestRoom;
 import com.kry.pms.service.room.GuestRoomService;
 
@@ -50,7 +52,12 @@ public class GuestRoomController extends BaseController<GuestRoom> {
 		BeanUtils.copyProperties(guestRoomService.batchAdd(guestRoom), rep);
 		return rep;
 	}
-	
+	@PostMapping(path = "/lock")
+	public HttpResponse<String> lock(@Valid @RequestBody RoomLockBo rlb) {
+		HttpResponse<String> rep = new HttpResponse<String>();
+		BeanUtils.copyProperties(guestRoomService.locked(rlb), rep);
+		return rep;
+	}
 	
 	@GetMapping
 	public HttpResponse<PageResponse<GuestRoom>> query(HttpServletRequest request) throws InstantiationException, IllegalAccessException{

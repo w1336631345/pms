@@ -12,6 +12,7 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
 import com.kry.pms.base.Constants;
+import com.kry.pms.base.DtoResponse;
 import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
 import com.kry.pms.dao.room.GuestRoomStatusDao;
@@ -193,6 +194,8 @@ public class GuestRoomStatusServiceImpl implements GuestRoomStatusService {
 						for (GuestRoomStatus grs : rs) {
 							grsv = new GuestRoomStatusVo();
 							BeanUtils.copyProperties(grs, grsv);
+							grsv.setRoomStatusId(grs.getId());
+							grsv.setRoomNum(grs.getGuestRoom().getRoomNum());
 							grsv.setGuestRoomId(grs.getGuestRoom().getId());
 							grsvs.add(grsv);
 						}
@@ -211,6 +214,26 @@ public class GuestRoomStatusServiceImpl implements GuestRoomStatusService {
 		}
 		roomStatusTableVo.setBuildings(data);
 		return roomStatusTableVo;
+	}
+
+	@Override
+	public DtoResponse<String> changeRoomStatus(String id, String status) {
+		DtoResponse<String> rep = new DtoResponse<String>();
+		GuestRoomStatus roomStatus = findById(id);
+		String oldStatus = roomStatus.getStatus();
+		roomStatus.setStatus(status);
+		modify(roomStatus);
+		roomStatusQuantityService.transformRoomStatusQuantity(roomStatus.getHotelCode(), oldStatus, status, 1);
+		return rep;
+	}
+
+	@Override
+	public void deleteByRoomId(String id) {
+		GuestRoomStatus status = guestRoomStatusDao.findByGuestRoomId(id);
+		if (status != null) {
+			delete(status.getId());
+		}
+
 	}
 
 }

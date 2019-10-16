@@ -3,6 +3,7 @@ package com.kry.pms.service.room;
 import java.time.LocalDate;
 import java.util.List;
 
+import com.kry.pms.base.DtoResponse;
 import com.kry.pms.model.http.response.room.RoomStatusTableVo;
 import com.kry.pms.model.persistence.room.GuestRoom;
 import com.kry.pms.model.persistence.room.GuestRoomStatus;
@@ -23,4 +24,8 @@ public interface GuestRoomStatusService extends BaseService<GuestRoomStatus> {
 	GuestRoomStatus initNewGuestRoomStatus(GuestRoom guestRoom);
 
 	public RoomStatusTableVo table(String currentHotleCode);
+
+	public DtoResponse<String> changeRoomStatus(String id, String status);
+
+	public void deleteByRoomId(String id);
 }

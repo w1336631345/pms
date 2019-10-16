@@ -14,6 +14,7 @@ import com.kry.pms.base.DtoResponse;
 import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
 import com.kry.pms.dao.busi.BookingRecordDao;
+import com.kry.pms.model.http.request.busi.BookOperationBo;
 import com.kry.pms.model.persistence.busi.BookingRecord;
 import com.kry.pms.service.busi.BookingRecordService;
 import com.kry.pms.service.room.RoomStatisticsService;
@@ -78,6 +79,50 @@ public class BookingRecordServiceImpl implements BookingRecordService {
 			rep.setStatus(Constants.BusinessCode.CODE_RESOURCE_NOT_ENOUGH);
 		}
 		return rep;
+	}
+
+	@Override
+	public DtoResponse<BookingRecord> operation(BookOperationBo bookOperationBo) {
+		String bookId = bookOperationBo.getBookId();
+		BookingRecord br = findById(bookId);
+		DtoResponse<BookingRecord> rep = new DtoResponse<>();
+		if (br == null) {
+			rep.setStatus(Constants.BusinessCode.CODE_PARAMETER_INVALID);
+			rep.setMessage("找不到该订单数据");
+		} else {
+			switch (bookOperationBo.getOperation()) {
+			case Constants.Operation.BOOK_CANCEL:
+				cancleBook(rep, bookOperationBo, br);
+				break;
+			case Constants.Operation.BOOK_VERIFY_PASS:
+				verify(rep, bookOperationBo, br, true);
+				break;
+			case Constants.Operation.BOOK_VERIFY_REFUSE:
+				verify(rep, bookOperationBo, br, false);
+				break;
+			default:
+				break;
+			}
+		}
+		return rep;
+	}
+
+	private void cancleBook(DtoResponse<BookingRecord> rep, BookOperationBo bookOperationBo, BookingRecord br) {
+
+		br.setStatus(Constants.Status.BOOKING_CANCLE);
+		modify(br);
+		rep.setData(br);
+	}
+
+	private void verify(DtoResponse<BookingRecord> rep, BookOperationBo bookOperationBo, BookingRecord br,
+			boolean success) {
+		if (success) {
+			br.setStatus(Constants.Status.BOOKING_SUCCESS);
+		} else {
+			br.setStatus(Constants.Status.BOOKING_VERIFY_REFUSE);
+		}
+		modify(br);
+		rep.setData(br);
 	}
 
 }

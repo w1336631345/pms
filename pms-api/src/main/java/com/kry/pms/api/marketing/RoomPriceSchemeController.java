@@ -1,10 +1,13 @@
 package com.kry.pms.api.marketing;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -15,6 +18,7 @@ import com.kry.pms.api.BaseController;
 import com.kry.pms.base.HttpResponse;
 import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
+import com.kry.pms.model.http.response.marketing.RoomPriceSchemeVo;
 import com.kry.pms.model.persistence.marketing.RoomPriceScheme;
 import com.kry.pms.service.marketing.RoomPriceSchemeService;
 
@@ -23,6 +27,7 @@ import com.kry.pms.service.marketing.RoomPriceSchemeService;
 public class RoomPriceSchemeController extends BaseController<RoomPriceScheme> {
 	@Autowired
 	RoomPriceSchemeService roomPriceSchemeService;
+
 	@PostMapping
 	public HttpResponse<RoomPriceScheme> add(@RequestBody RoomPriceScheme roomPriceScheme) {
 		return getDefaultResponse().addData(roomPriceSchemeService.add(roomPriceScheme));
@@ -40,8 +45,24 @@ public class RoomPriceSchemeController extends BaseController<RoomPriceScheme> {
 		return rep;
 	}
 
+	@GetMapping(path = "/corpation/{corpId}")
+	public HttpResponse<List<RoomPriceSchemeVo>> corpation(@PathVariable("corpId") String corpId) {
+		HttpResponse<List<RoomPriceSchemeVo>> rep = new HttpResponse<>();
+		List<RoomPriceSchemeVo> data = roomPriceSchemeService.findCorpationScheme(getCurrentHotleCode(), corpId);
+		rep.addData(data);
+		return rep;
+	}
+	@GetMapping(path = "/default")
+	public HttpResponse<List<RoomPriceSchemeVo>> corpation() {
+		HttpResponse<List<RoomPriceSchemeVo>> rep = new HttpResponse<>();
+		List<RoomPriceSchemeVo> data = roomPriceSchemeService.findDefaultScheme(getCurrentHotleCode());
+		rep.addData(data);
+		return rep;
+	}
+
 	@GetMapping
-	public HttpResponse<PageResponse<RoomPriceScheme>> query(HttpServletRequest request) throws InstantiationException, IllegalAccessException{
+	public HttpResponse<PageResponse<RoomPriceScheme>> query(HttpServletRequest request)
+			throws InstantiationException, IllegalAccessException {
 		HttpResponse<PageResponse<RoomPriceScheme>> rep = new HttpResponse<PageResponse<RoomPriceScheme>>();
 		PageRequest<RoomPriceScheme> req = parse2PageRequest(request);
 		return rep.addData(roomPriceSchemeService.listPage(req));

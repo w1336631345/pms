@@ -1,9 +1,11 @@
 package com.kry.pms.model.persistence.busi;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
@@ -23,6 +25,8 @@ import lombok.Setter;
 public class BookingRecord extends PersistenceModel {
 	@Column
 	public Integer roomCount;
+	@Column(name = "type_")
+	private String type;
 	@OneToOne
 	public RoomType roomType;
 	@Column
@@ -55,5 +59,7 @@ public class BookingRecord extends PersistenceModel {
 	private ProtocolCorpation protocolCorpation;
 	@OneToOne
 	private MarketingSources marketingSources;
+	@OneToMany
+	private List<BookingItem> items;
 
 }

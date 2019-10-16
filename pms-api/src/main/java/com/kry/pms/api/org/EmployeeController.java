@@ -1,5 +1,7 @@
 package com.kry.pms.api.org;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.kry.pms.api.BaseController;
+import com.kry.pms.base.Constants;
 import com.kry.pms.base.HttpResponse;
 import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
@@ -37,6 +40,18 @@ public class EmployeeController extends BaseController<Employee> {
 	public HttpResponse<String> delete(String id) {
 		HttpResponse<String> rep = new HttpResponse<>();
 		employeeService.delete(id);
+		return rep;
+	}
+	@GetMapping(path="/marketing")
+	public HttpResponse<List<Employee>> findMarketingEmplyee(){
+		HttpResponse<List<Employee>> rep = new HttpResponse<List<Employee>>();
+		List<Employee> emps = employeeService.findEmployeeByDeptCode(Constants.BusinessCode.DEPT_MARKETING_DEFAULT_CODE,getCurrentHotleCode());
+		if(emps==null||emps.isEmpty()) {
+			rep.setStatus(Constants.BusinessCode.CODE_RESOURCE_NOT_ENOUGH);
+			rep.setMessage("请先添加销售部人员");
+		}else {
+			rep.setData(emps);
+		}
 		return rep;
 	}
 

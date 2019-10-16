@@ -26,6 +26,8 @@ public class CheckInRecord extends PersistenceModel {
 	private Customer customer;
 	@OneToOne
 	private GuestRoom guestRoom;
+	@Column(name="name_")
+	private String name;
 	@Column
 	private LocalDateTime arriveTime;
 	@Column

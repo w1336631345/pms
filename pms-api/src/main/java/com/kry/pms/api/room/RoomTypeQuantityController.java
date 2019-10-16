@@ -1,8 +1,12 @@
 package com.kry.pms.api.room;
 
+import java.time.LocalDate;
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Required;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,6 +19,7 @@ import com.kry.pms.api.BaseController;
 import com.kry.pms.base.HttpResponse;
 import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
+import com.kry.pms.model.http.response.busi.RoomTypeQuantityPredictableVo;
 import com.kry.pms.model.persistence.room.RoomTypeQuantity;
 import com.kry.pms.service.room.RoomTypeQuantityService;
 
@@ -23,6 +28,7 @@ import com.kry.pms.service.room.RoomTypeQuantityService;
 public class RoomTypeQuantityController extends BaseController<RoomTypeQuantity> {
 	@Autowired
 	RoomTypeQuantityService roomTypeQuantityService;
+
 	@PostMapping
 	public HttpResponse<RoomTypeQuantity> add(@RequestBody RoomTypeQuantity roomTypeQuantity) {
 		return getDefaultResponse().addData(roomTypeQuantityService.add(roomTypeQuantity));
@@ -40,8 +46,18 @@ public class RoomTypeQuantityController extends BaseController<RoomTypeQuantity>
 		return rep;
 	}
 
+	@GetMapping(path = "/predictable")
+	public HttpResponse<List<RoomTypeQuantityPredictableVo>> queryPredictable(String startDate, String endDate) {
+		HttpResponse<List<RoomTypeQuantityPredictableVo>> response = new HttpResponse<List<RoomTypeQuantityPredictableVo>>();
+		List<RoomTypeQuantityPredictableVo> data = roomTypeQuantityService.queryPredictable(getCurrentHotleCode(),
+				LocalDate.parse(startDate), LocalDate.parse(endDate));
+		response.addData(data);
+		return response;
+	}
+
 	@GetMapping
-	public HttpResponse<PageResponse<RoomTypeQuantity>> query(HttpServletRequest request) throws InstantiationException, IllegalAccessException{
+	public HttpResponse<PageResponse<RoomTypeQuantity>> query(HttpServletRequest request)
+			throws InstantiationException, IllegalAccessException {
 		HttpResponse<PageResponse<RoomTypeQuantity>> rep = new HttpResponse<PageResponse<RoomTypeQuantity>>();
 		PageRequest<RoomTypeQuantity> req = parse2PageRequest(request);
 		return rep.addData(roomTypeQuantityService.listPage(req));

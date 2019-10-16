@@ -62,6 +62,15 @@ public class  ProtocolCorpationServiceImpl implements  ProtocolCorpationService{
 		}
 		return convent(protocolCorpationDao.findAll(ex, req));
 	}
+
+	@Override
+	public List<ProtocolCorpation> queryByNameOrCode(String key, String currentHotleCode) {
+		if(key.contains("%")) {
+			key.replace("%", "");
+		}
+		key = "%"+key+"%";
+		return protocolCorpationDao.fetchByKey(key,currentHotleCode,Constants.DELETED_FALSE);
+	}
 	 
 	 
 	 

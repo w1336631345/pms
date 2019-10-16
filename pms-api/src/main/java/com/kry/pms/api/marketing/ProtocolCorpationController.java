@@ -1,8 +1,12 @@
 package com.kry.pms.api.marketing;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.constraints.NotBlank;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Required;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -39,7 +43,14 @@ public class ProtocolCorpationController extends BaseController<ProtocolCorpatio
 		protocolCorpationService.delete(id);
 		return rep;
 	}
-
+	@GetMapping(path="/query")
+	public HttpResponse<List<ProtocolCorpation>> queryByNameOrCode(@NotBlank String key){
+		HttpResponse<List<ProtocolCorpation>> rep = new HttpResponse<List<ProtocolCorpation>>();
+		List<ProtocolCorpation> data = protocolCorpationService.queryByNameOrCode(key,getCurrentHotleCode());
+		rep.addData(data);
+		return rep;
+	}
+	
 	@GetMapping
 	public HttpResponse<PageResponse<ProtocolCorpation>> query(HttpServletRequest request) throws InstantiationException, IllegalAccessException{
 		HttpResponse<PageResponse<ProtocolCorpation>> rep = new HttpResponse<PageResponse<ProtocolCorpation>>();

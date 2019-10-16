@@ -2,12 +2,15 @@ package com.kry.pms.service.busi;
 
 import java.util.List;
 
+import javax.validation.Valid;
+
 import com.kry.pms.base.DtoResponse;
 import com.kry.pms.model.http.request.busi.BillItemBo;
 import com.kry.pms.model.http.request.busi.BillSettleBo;
 import com.kry.pms.model.http.request.busi.BookingBo;
 import com.kry.pms.model.http.request.busi.CheckInBo;
 import com.kry.pms.model.http.request.busi.CheckOutBo;
+import com.kry.pms.model.http.request.busi.RoomAssignBo;
 import com.kry.pms.model.http.response.busi.CheckOutVo;
 import com.kry.pms.model.persistence.busi.BillItem;
 import com.kry.pms.model.persistence.busi.BookingRecord;
@@ -50,4 +53,6 @@ public interface ReceptionService {
 	 */
 
 	public DtoResponse<String> billSettle(BillSettleBo bsb);
+
+	public DtoResponse<String> assignRoom(@Valid RoomAssignBo roomAssignBo);
 }

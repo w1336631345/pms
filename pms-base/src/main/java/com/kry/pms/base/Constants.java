@@ -7,13 +7,20 @@ public class Constants {
 	public static final String KEY_PAGE_NUM = "pageNum";
 	public static final String KEY_METHOD_SET_PRE = "set";
 	public static final String KEY_METHOD_GET_PRE = "get";
-
+	public static final String KEY_DEFAULT_SEPARATOR = ",";
+	public interface Operation{
+		public static final String BOOK_CANCEL = "cancel";
+		public static final String BOOK_VERIFY_PASS = "verify_pass";
+		public static final String BOOK_VERIFY_REFUSE = "verify_refuse";
+	}
+	
 	public interface Status {
 		public static final String DELETE = "DELETE";
 		public static final String DRAFT = "DRAFT";
 		public static final String NORMAL = "normal";
 		public static final String DISABLE = "DISABLE";
 		public static final String BOOKING_VERIFY = "booking_verify";
+		public static final String BOOKING_VERIFY_REFUSE = "booking_verify_refuse";
 		public static final String BOOKING_SUCCESS = "booking_success";
 		public static final String BOOKING_NO_SHOW = "no_show";
 		public static final String BOOKING_CANCLE = "cancle";
@@ -28,16 +35,17 @@ public class Constants {
 		public static final String ROOM_STATUS_OUT_OF_ORDER = "OO";
 		public static final String ROOM_STATUS_OUT_OF_SERVCIE = "OS";
 		public static final String ROOM_STATUS_EXPECTE_DEPARTURE = "ED";
+		public static final String ROOM_STATUS_FREE = "COM";		
 		public static final String ROOM_RECORD_STATUS_CHECK_IN = "check_in";
 		public static final String ROOM_RECORD_STATUS_DAILY_VERIFY_PASS = "daily_verif_pass";
 		public static final String ROOM_RECORD_STATUS_CHECK_OUT = "check_out";
-		public static final String CUSTOMER_STATUS_RESERVATION = "R";
-		public static final String CUSTOMER_STATUS_CHECK_IN = "I";
-		public static final String CUSTOMER_STATUS_CHECK_OUT = "O";
-		public static final String CUSTOMER_STATUS_DEPARTURE_YESTERDAY = "D";
-		public static final String CUSTOMER_STATUS_NO_SHOW = "N";
-		public static final String CUSTOMER_STATUS_OUT_UNSETTLED = "S";
-		public static final String CUSTOMER_STATUS_CANCLE_BOOK = "X";
+		public static final String CHECKIN_RECORD_STATUS_RESERVATION = "R";
+		public static final String CHECKIN_RECORD_STATUS_CHECK_IN = "I";
+		public static final String CHECKIN_RECORD_STATUS_CHECK_OUT = "O";
+		public static final String CHECKIN_RECORD_STATUS_DEPARTURE_YESTERDAY = "D";
+		public static final String CHECKIN_RECORD_STATUS_NO_SHOW = "N";
+		public static final String CHECKIN_RECORD_STATUS_OUT_UNSETTLED = "S";
+		public static final String CHECKIN_RECORD_STATUS_CANCLE_BOOK = "X";
 		public static final String BILL_PAYMENTED = "PAYMENTED";
 		public static final String BILL_TO_BE_PAID = "TO_BE_PAID";
 		public static final String BILL_NO_PAYMENT_REQUIRED = "NO_PAYMENT_REQUIRED";
@@ -82,8 +90,10 @@ public class Constants {
 	public interface BusinessCode {
 		public static final int CODE_RESOURCE_NOT_ENOUGH = 900;
 		public static final int CODE_PARAMETER_INVALID = 901;
-		
 		public static final int CODE_ILLEGAL_OPERATION = 801;
+		
+		
+		public static final String DEPT_MARKETING_DEFAULT_CODE="MARKETING";
 	}
 
 	public interface SystemConfig {

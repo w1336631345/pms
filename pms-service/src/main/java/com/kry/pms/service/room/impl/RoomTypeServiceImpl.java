@@ -53,6 +53,11 @@ public class RoomTypeServiceImpl implements RoomTypeService {
 	public List<RoomType> getAllByHotelCode(String code) {
 		return roomTypeDao.findByHotelCode(code);
 	}
+	
+	@Override
+	public List<RoomType> getAllByHotelCode(String code,int deleted) {
+		return roomTypeDao.findByHotelCodeAndDeleted(code,deleted);
+	}
 
 	@Override
 	public PageResponse<RoomType> listPage(PageRequest<RoomType> prq) {

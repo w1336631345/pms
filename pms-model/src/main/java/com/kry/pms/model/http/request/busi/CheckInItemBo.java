@@ -18,6 +18,8 @@ public class CheckInItemBo extends BaseBo{
 	private String roomId;
 	@Min(value=1)
 	private Integer days;
+	@Min(value=1)
+	private Integer humanCount;
 	@Valid
 	private List<GuestInfoBo> guests;
 	

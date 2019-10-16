@@ -1,5 +1,7 @@
 package com.kry.pms.service.org;
 
+import java.util.List;
+
 import com.kry.pms.base.DtoResponse;
 import com.kry.pms.model.persistence.org.Employee;
 import com.kry.pms.model.persistence.sys.User;
@@ -10,5 +12,7 @@ public interface EmployeeService extends BaseService<Employee> {
 	DtoResponse<Employee> createEmployee(Employee employee);
 
 	Employee findByUser(User user);
+
+	List<Employee> findEmployeeByDeptCode(String deptMarketingDefaultCode, String currentHotleCode);
 
 }

@@ -61,12 +61,14 @@ E:\kry\src\pms-server\pms-service\src\main\java\com\kry\pms\service\guest\Custom
 E:\kry\src\pms-server\pms-service\src\main\java\com\kry\pms\service\room\impl\GuestRoomStatusServiceImpl.java
 E:\kry\src\pms-server\pms-service\src\main\java\com\kry\pms\service\busi\ReceptionService.java
 E:\kry\src\pms-server\pms-service\src\main\java\com\kry\pms\service\busi\impl\DailyVerifyServiceImpl.java
+E:\kry\src\pms-server\pms-service\src\main\java\com\kry\pms\service\busi\impl\RoomLockRecordServiceImpl.java
 E:\kry\src\pms-server\pms-service\src\main\java\com\kry\pms\service\room\RoomStatusQuantityService.java
 E:\kry\src\pms-server\pms-service\src\main\java\com\kry\pms\service\dict\RoomLockReasonService.java
 E:\kry\src\pms-server\pms-service\src\main\java\com\kry\pms\service\room\RoomTypeQuantityService.java
 E:\kry\src\pms-server\pms-service\src\main\java\com\kry\pms\service\sys\impl\RoleServiceImpl.java
 E:\kry\src\pms-server\pms-service\src\main\java\com\kry\pms\service\dict\AreaService.java
 E:\kry\src\pms-server\pms-service\src\main\java\com\kry\pms\service\room\impl\RoomStatisticsServiceImpl.java
+E:\kry\src\pms-server\pms-service\src\main\java\com\kry\pms\service\busi\RoomLockRecordService.java
 E:\kry\src\pms-server\pms-service\src\main\java\com\kry\pms\service\dict\impl\CertificateTypeServiceImpl.java
 E:\kry\src\pms-server\pms-service\src\main\java\com\kry\pms\service\room\impl\RoomStatusQuantityServiceImpl.java
 E:\kry\src\pms-server\pms-service\src\main\java\com\kry\pms\service\sys\FunctionService.java

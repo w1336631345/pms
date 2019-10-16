@@ -22,7 +22,6 @@ public class Employee extends PersistenceModel{
 	@OneToOne
 	private Department department;
 	@NotBlank
-	@NotBlank
 	@Column(columnDefinition = "varchar(64) default NULL COMMENT '名称'")
 	private String name;
 	@NotBlank
