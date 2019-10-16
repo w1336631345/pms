@@ -44,7 +44,8 @@
 		<module>pms-util</module>
 		<module>pms-base</module>
 		<module>pms-ext-api</module>
-    <module>pms-asyn-service</module>
+    	<module>pms-asyn-service</module>
+    	<module>pms-auth</module>
   </modules>
 	<build>
 		<plugins>

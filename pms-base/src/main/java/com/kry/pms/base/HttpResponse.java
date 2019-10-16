@@ -31,6 +31,26 @@ public class HttpResponse<T> {
 		this.code = rep.getCode();
 		this.success = rep.isSuccess()&&rep.getStatus()==0;
 	}
+	
+	public HttpResponse<T> error(int code, String message) {
+		HttpResponse<T> hr = new HttpResponse<T>();
+		hr.setCode(code);
+		hr.setMessage(message);
+		return hr;
+	}
+	
+	public HttpResponse<T> ok(String message) {
+		HttpResponse<T> hr = new HttpResponse<T>();
+		hr.setCode(200);
+		hr.setMessage(message);
+		return hr;
+	}
+	public HttpResponse<T> ok() {
+		HttpResponse<T> hr = new HttpResponse<T>();
+		hr.setCode(200);
+		hr.setMessage(message);
+		return hr;
+	}
 
 
 	public HttpResponse<T> addData(T data) {

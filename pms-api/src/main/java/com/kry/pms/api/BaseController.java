@@ -13,13 +13,23 @@ import javax.servlet.http.HttpServletRequest;
 import com.kry.pms.base.Constants;
 import com.kry.pms.base.HttpResponse;
 import com.kry.pms.base.PageRequest;
+import com.kry.pms.model.persistence.sys.User;
 import com.kry.pms.util.StringUtil;
+import com.kry.pms.utils.ShiroUtils;
 
 
 public class BaseController<T> {
 	
 	public String getCurrentUserId() {
 		return "1";
+	}
+	
+	public String getUserId() {
+		return ShiroUtils.getUserId();
+	}
+	
+	public User getUser() {
+		return ShiroUtils.getUser();
 	}
 	
 	public String getEmployeeId() {

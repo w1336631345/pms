@@ -60,8 +60,12 @@ public class UserController extends BaseController<User> {
 	public HttpResponse<UserInfoVo> info() {
 		HttpResponse<UserInfoVo> rep = new HttpResponse<UserInfoVo>();
 		String userId = getCurrentUserId();
+		String userid = getUserId();
+		if(userid == null) {
+			return rep.error(403, "登录过期，请重新登录");
+		}
 		UserInfoVo userInfoVo = new UserInfoVo();
-		User user = userService.findById(userId);
+		User user = userService.findById(userid);
 		BeanUtils.copyProperties(user, userInfoVo);
 		Employee employee = employeeService.findByUser(user);
 		employee.setUser(user);
