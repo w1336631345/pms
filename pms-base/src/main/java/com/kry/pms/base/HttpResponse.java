@@ -32,22 +32,20 @@ public class HttpResponse<T> {
 		this.success = rep.isSuccess()&&rep.getStatus()==0;
 	}
 	
-	public HttpResponse<T> error(int code, String message) {
+	public HttpResponse<T> error(int status, String message) {
 		HttpResponse<T> hr = new HttpResponse<T>();
-		hr.setCode(code);
+		hr.setStatus(status);
 		hr.setMessage(message);
 		return hr;
 	}
 	
 	public HttpResponse<T> ok(String message) {
 		HttpResponse<T> hr = new HttpResponse<T>();
-		hr.setCode(200);
 		hr.setMessage(message);
 		return hr;
 	}
 	public HttpResponse<T> ok() {
 		HttpResponse<T> hr = new HttpResponse<T>();
-		hr.setCode(200);
 		hr.setMessage(message);
 		return hr;
 	}

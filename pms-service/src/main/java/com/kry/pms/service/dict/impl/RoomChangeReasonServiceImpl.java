@@ -1,4 +1,4 @@
-﻿package com.kry.pms.service.dict.impl;
+package com.kry.pms.service.dict.impl;
 
 import java.util.List;
 
