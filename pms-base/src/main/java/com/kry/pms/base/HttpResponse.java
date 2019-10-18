@@ -40,14 +40,14 @@ public class HttpResponse<T> {
 	}
 	
 	public HttpResponse<T> ok(String message) {
-		HttpResponse<T> hr = new HttpResponse<T>();
-		hr.setMessage(message);
-		return hr;
+//		HttpResponse<T> hr = new HttpResponse<T>();
+		this.setMessage(message);
+		return this;
 	}
 	public HttpResponse<T> ok() {
-		HttpResponse<T> hr = new HttpResponse<T>();
-		hr.setMessage(message);
-		return hr;
+//		HttpResponse<T> hr = new HttpResponse<T>();
+		this.setMessage(message);
+		return this;
 	}
 
 

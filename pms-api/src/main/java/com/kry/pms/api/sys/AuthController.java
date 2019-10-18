@@ -37,6 +37,8 @@ public class AuthController {
 		Subject subject = SecurityUtils.getSubject();
 		try {
 			subject.login(token);
+			String id = (String)subject.getSession().getId();
+			response.addData(id);
 			return response.ok("登录成功");
 		} catch (AuthenticationException e) {
 			return response.error(1000,"用户或密码错误");

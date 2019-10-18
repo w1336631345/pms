@@ -23,6 +23,6 @@ public class MD5Utils {
 	}
 	public static void main(String[] args) {
 		
-		System.out.println(MD5Utils.encrypt("admin", "1"));
+		System.out.println(MD5Utils.encrypt("admin", "123456"));
 	}
 }
