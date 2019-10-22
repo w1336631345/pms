@@ -2,6 +2,7 @@ package com.kry.pms.api.sys;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.kry.pms.utils.MD5Utils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -72,6 +73,34 @@ public class UserController extends BaseController<User> {
 		userInfoVo.setEmployee(employee);
 		userInfoVo.setRole(user.getRoles().get(0));
 		return rep.addData(userInfoVo);
+	}
+
+	/**
+	 * 功能描述: 修改密码
+	 * 〈〉
+	 * @Param: [oldpwd, newpwd, topwd]
+	 * @Return: com.kry.pms.base.HttpResponse<java.lang.String>
+	 * @Author: huanghaibin
+	 * @Date: 2019/10/18 16:25
+	 */
+	@PostMapping(path = "/reset_by_oldpwd")
+	public HttpResponse<String> updatePassword(String oldPassword, String newPassword) {
+		HttpResponse<String> rep = new HttpResponse<String>();
+		String userid = getUserId();
+		if(userid == null) {
+			return rep.error(403, "登录过期，请重新登录");
+		}
+		User user = userService.findById(userid);
+		if(oldPassword == null || newPassword == null){
+			return rep.error(400, "密码不能为空");
+		}
+		String pwd = MD5Utils.encrypt(user.getUsername(), oldPassword);
+		if(!pwd.equals(user.getPassword())){
+			return rep.error(400, "原密码错误");
+		}
+		user.setPassword(MD5Utils.encrypt(user.getUsername(), newPassword));
+		userService.modify(user);
+		return rep.ok("密码修改成功");
 	}
 
 }
