@@ -20,9 +20,13 @@ import com.kry.pms.base.PageResponse;
 import com.kry.pms.dao.busi.CheckInRecordDao;
 import com.kry.pms.model.http.request.busi.CheckInBo;
 import com.kry.pms.model.http.request.busi.CheckInItemBo;
+import com.kry.pms.model.persistence.busi.BookingItem;
+import com.kry.pms.model.persistence.busi.BookingRecord;
 import com.kry.pms.model.persistence.busi.CheckInRecord;
 import com.kry.pms.model.persistence.guest.Customer;
 import com.kry.pms.model.persistence.room.GuestRoom;
+import com.kry.pms.model.persistence.room.RoomUsage;
+import com.kry.pms.model.persistence.sys.Account;
 import com.kry.pms.service.busi.CheckInRecordService;
 import com.kry.pms.service.busi.RoomRecordService;
 import com.kry.pms.service.guest.CustomerService;
@@ -31,6 +35,7 @@ import com.kry.pms.service.room.GuestRoomStatusService;
 import com.kry.pms.service.room.RoomStatisticsService;
 import com.kry.pms.service.room.RoomStatusQuantityService;
 import com.kry.pms.service.room.RoomTypeQuantityService;
+import com.kry.pms.service.room.RoomUsageService;
 import com.kry.pms.service.sys.SystemConfigService;
 
 @Service
@@ -53,6 +58,8 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 	RoomTypeQuantityService roomTypeQuantityService;
 	@Autowired
 	RoomStatusQuantityService roomStatusQuantityService;
+	@Autowired
+	RoomUsageService roomUsageService;
 
 	@Override
 	public CheckInRecord add(CheckInRecord checkInRecord) {
@@ -134,12 +141,77 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 			sb.append(" ");
 		}
 		guestRoomStatausService.checkIn(gr, startDate, sb.toString(), false, false, false, false, false);
-		roomTypeQuantityService.checkIn(gr,startDate,ciib.getDays());
+		roomTypeQuantityService.checkIn(gr, startDate, ciib.getDays());
 		return list;
 	}
 
 	@Override
 	public List<CheckInRecord> checkOut(String roomId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public CheckInRecord checkInByTempName(String tempName, String roomId, DtoResponse<String> response) {
+		Customer customer = customerService.createTempCustomer(tempName);
+		GuestRoom gr = guestRoomService.findById(roomId);
+		if (gr != null) {
+
+		} else {
+
+		}
+
+		return null;
+	}
+
+	@Override
+	public List<CheckInRecord> checkInByTempName(int humanCount, BookingRecord br, BookingItem item, GuestRoom gr,
+			DtoResponse<String> response) {
+		List<CheckInRecord> data = new ArrayList<CheckInRecord>();
+		LocalTime criticalTime = systemConfigService.getCriticalTime(gr.getHotelCode());
+		LocalDate startDate = br.getArriveTime().toLocalDate();
+		if (br.getArriveTime().toLocalTime().isBefore(criticalTime)) {
+			startDate = startDate.plusDays(-1);
+		}
+		String tempName = null;
+		String checkInSn = null;
+		roomUsageService.use(gr, Constants.Status.ROOM_USAGE_BOOK, br.getArriveTime(), br.getLeaveTime(), checkInSn,
+				tempName, response);
+		if (response.getStatus() == 0) {
+			for (int i = 1; i <= humanCount; i++) {
+				tempName = br.getName() + gr.getRoomNum() + "#" + i;
+				Customer customer = customerService.createTempCustomer(tempName);
+				CheckInRecord cir = new CheckInRecord();
+				cir.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION);
+				cir.setCustomer(customer);
+				cir.setCheckInSn(checkInSn);
+				cir.setType(Constants.Type.BOOK_CHECK_IN);
+				cir.setGroup(br.getGroup());
+				cir.setArriveTime(br.getArriveTime());
+				cir.setLeaveTime(br.getLeaveTime());
+				cir.setStartDate(startDate);
+				cir.setDays(br.getDays());
+				cir.setGuestRoom(gr);
+				cir.setHotelCode(gr.getHotelCode());
+				Account account = new Account();
+				account.setCustomer(customer);
+				account.setType(Constants.Type.ACCOUNT_CUSTOMER);
+				cir.setAccount(account);
+				cir = add(cir);
+				data.add(cir);
+				roomRecordService.createRoomRecord(cir);
+			}
+		}
+		return data;
+	}
+
+	@Override
+	public List<CheckInRecord> findByBookId(String bookId) {
+		return checkInRecordDao.fingByBookId(bookId);
+	}
+
+	@Override
+	public List<CheckInRecord> findDetailByBookingId(String bookId) {
 		// TODO Auto-generated method stub
 		return null;
 	}

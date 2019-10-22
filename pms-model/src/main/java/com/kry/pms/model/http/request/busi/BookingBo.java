@@ -33,7 +33,6 @@ public class BookingBo extends BaseBo {
 	@Min(value = 1, message = "预定房间数必须大于1")
 	private Integer roomCount;
 	private String roomTypeId;
-	private List<BookingItemBo> items;
 	private String channelId;
 	private String protocolId;// 协议单位
 	@Min(value = 1, message = "预定天数至少大于1")
@@ -41,4 +40,5 @@ public class BookingBo extends BaseBo {
 	private String remark;
 	private String holdTime;
 	private Boolean priceSecret = false;// 房价保密
+	private List<BookingItemBo> items;
 }

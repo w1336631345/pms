@@ -25,4 +25,7 @@ public class BookingItem extends PersistenceModel {
 	private RoomPriceSchemeItem PriceSchemeItem;
 	@Column
 	private Double purchasePrice;
+	@Column
+	private Integer checkInCount = 0;
+	
 }

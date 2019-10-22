@@ -1,10 +1,13 @@
 package com.kry.pms.api.busi;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -37,6 +40,18 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
 	public HttpResponse<String> delete(String id) {
 		HttpResponse<String> rep = new HttpResponse<>();
 		checkInRecordService.delete(id);
+		return rep;
+	}
+	@GetMapping(path = "/book/{id}")
+	public HttpResponse<List<CheckInRecord>> findByBookingId(@PathVariable("id") String bookId){
+		HttpResponse<List<CheckInRecord>> rep = new HttpResponse<List<CheckInRecord>>();
+		rep.addData(checkInRecordService.findByBookId(bookId));
+		return rep;
+	}
+	@GetMapping(path = "/detail/book/{id}")
+	public HttpResponse<List<CheckInRecord>> findDetailByBookingId(@PathVariable("id") String bookId){
+		HttpResponse<List<CheckInRecord>> rep = new HttpResponse<List<CheckInRecord>>();
+		rep.addData(checkInRecordService.findDetailByBookingId(bookId));
 		return rep;
 	}
 

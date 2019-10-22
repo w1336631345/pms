@@ -94,4 +94,9 @@ public class SystemConfigServiceImpl implements SystemConfigService {
 		return Constants.SystemConfig.VALUE_DEFAULT_CRITICAL_TIME;
 	}
 
+	@Override
+	public int getCurrentSeq(String key) {
+		return 0;
+	}
+
 }

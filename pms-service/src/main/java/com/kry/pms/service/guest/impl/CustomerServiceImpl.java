@@ -99,4 +99,12 @@ public class CustomerServiceImpl implements CustomerService {
 		return customer;
 	}
 
+	@Override
+	public Customer createTempCustomer(String tempName) {
+		Customer customer = new Customer();
+		customer.setName(tempName);
+		customer = add(customer);
+		return customer;
+	}
+
 }

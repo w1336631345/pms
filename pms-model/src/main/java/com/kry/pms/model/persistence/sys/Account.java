@@ -24,6 +24,8 @@ public class Account extends PersistenceModel {
 	@Column
 	private String username;
 	@Column
+	private String code;
+	@Column
 	private Double total;
 	@Column(name="type_")
 	private String type;

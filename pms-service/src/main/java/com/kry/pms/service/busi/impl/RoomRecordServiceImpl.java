@@ -116,7 +116,7 @@ public class RoomRecordServiceImpl implements RoomRecordService {
 	@Override
 	public void checkOut(List<CheckInRecord> crs) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 }

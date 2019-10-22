@@ -10,4 +10,6 @@ public interface BookingRecordService extends BaseService<BookingRecord> {
 
 	public DtoResponse<BookingRecord> operation(BookOperationBo bookOperationBo);
 
+	BookingRecord findByBookingItemId(String bookingItemId);
+
 }

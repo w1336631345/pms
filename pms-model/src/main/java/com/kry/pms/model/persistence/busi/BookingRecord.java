@@ -3,8 +3,11 @@ package com.kry.pms.model.persistence.busi;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
@@ -25,6 +28,8 @@ import lombok.Setter;
 public class BookingRecord extends PersistenceModel {
 	@Column
 	public Integer roomCount;
+	@Column
+	private String name;
 	@Column(name = "type_")
 	private String type;
 	@OneToOne
@@ -41,6 +46,8 @@ public class BookingRecord extends PersistenceModel {
 	private LocalDateTime arriveTime;
 	@Column
 	private LocalDateTime leaveTime;
+	@OneToOne
+	private Group group;
 	@Column
 	private Integer days;
 	@Column
@@ -59,7 +66,7 @@ public class BookingRecord extends PersistenceModel {
 	private ProtocolCorpation protocolCorpation;
 	@OneToOne
 	private MarketingSources marketingSources;
-	@OneToMany
-	private List<BookingItem> items;
+	@OneToMany(targetEntity = CheckInRecord.class,cascade = CascadeType.ALL)
+	private List<CheckInRecord> checkInRecord;
 
 }

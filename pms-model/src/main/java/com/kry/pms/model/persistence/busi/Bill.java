@@ -28,6 +28,8 @@ public class Bill extends PersistenceModel {
 	private String operationRemark;
 	@OneToOne
 	private Customer customer;
+	@OneToOne
+	private Group group;
 	@Column
 	private Integer currentItemSeq;
 	@Column

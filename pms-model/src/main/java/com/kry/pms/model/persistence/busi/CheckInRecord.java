@@ -3,6 +3,7 @@ package com.kry.pms.model.persistence.busi;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
@@ -11,7 +12,9 @@ import javax.persistence.Table;
 
 import com.kry.pms.model.persistence.PersistenceModel;
 import com.kry.pms.model.persistence.guest.Customer;
+import com.kry.pms.model.persistence.marketing.RoomPriceSchemeItem;
 import com.kry.pms.model.persistence.room.GuestRoom;
+import com.kry.pms.model.persistence.room.RoomType;
 import com.kry.pms.model.persistence.sys.Account;
 
 import lombok.Getter;
@@ -25,15 +28,35 @@ public class CheckInRecord extends PersistenceModel {
 	@OneToOne
 	private Customer customer;
 	@OneToOne
+	private RoomPriceSchemeItem PriceSchemeItem;
+	@OneToOne
 	private GuestRoom guestRoom;
-	@Column(name="name_")
+	@Column(name = "name_")
 	private String name;
+	@OneToOne
+	private RoomType roomType;
+	@Column
+	private String orderType;
+	@Column
+	private String mainSn;
+	@Column
+	private Integer humanCount;
+	@Column
+	private Integer roomCount;
+	@Column
+	private Integer chrildrenCount;
 	@Column
 	private LocalDateTime arriveTime;
 	@Column
 	private LocalDate startDate;
 	@Column
+	private Double purchasePrice;
+	@Column
+	private Integer checkInCount = 0;
+	@Column
 	private Integer days;
+	@Column
+	private String holdTime;
 	@Column
 	private LocalDateTime leaveTime;
 	@Column(columnDefinition = "varchar(64) default '0000' COMMENT '入住编号'")
@@ -42,6 +65,6 @@ public class CheckInRecord extends PersistenceModel {
 	private String type;
 	@ManyToOne
 	private Group group;
-	@OneToOne
+	@OneToOne(cascade = CascadeType.ALL)
 	private Account account;
 }

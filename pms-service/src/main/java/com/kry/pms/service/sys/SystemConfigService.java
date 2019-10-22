@@ -11,5 +11,7 @@ public interface SystemConfigService extends BaseService<SystemConfig>{
 	public LocalTime getAuditTime(String hotelCode);
 
 	public LocalTime getCriticalTime(String hotelCode);
+	
+	public int getCurrentSeq(String key);
 
 }

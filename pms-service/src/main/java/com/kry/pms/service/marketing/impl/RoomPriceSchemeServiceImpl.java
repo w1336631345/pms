@@ -70,7 +70,17 @@ public class  RoomPriceSchemeServiceImpl implements  RoomPriceSchemeService{
 	}
 	@Override
 	public List<RoomPriceSchemeVo> findDefaultScheme(String hotelCode){
-		return null;
+		RoomPriceScheme rps = new RoomPriceScheme();
+		rps.setHotelCode(hotelCode);
+		rps.setIsDefault(true);
+		rps.setDeleted(Constants.DELETED_FALSE);
+		Example<RoomPriceScheme> ex = Example.of(rps);
+		List<RoomPriceScheme> rpsc = roomPriceSchemeDao.findAll(ex);
+		if(rpsc!=null&&!rpsc.isEmpty()) {
+			return convertToVo(rpsc);
+		}else {
+			return null;
+		}
 		
 	}
 
@@ -80,12 +90,7 @@ public class  RoomPriceSchemeServiceImpl implements  RoomPriceSchemeService{
 		if(pc!=null) {
 			List<RoomPriceScheme> rpsc = pc.getRoomPriceSchemes();
 			if(rpsc!=null&&!rpsc.isEmpty()) {
-				ArrayList<RoomPriceSchemeVo> data = new ArrayList<>();
-				for(RoomPriceScheme rps:rpsc) {
-					data.add(new RoomPriceSchemeVo(rps));
-				}
-				
-				return data;
+				return convertToVo(rpsc);
 			}else {
 				return findDefaultScheme(hotelCode);
 			}
@@ -94,7 +99,13 @@ public class  RoomPriceSchemeServiceImpl implements  RoomPriceSchemeService{
 		return null;
 	}
 	 
-	 
+	 private List<RoomPriceSchemeVo> convertToVo(List<RoomPriceScheme> rpsc){
+			ArrayList<RoomPriceSchemeVo> data = new ArrayList<>();
+			for(RoomPriceScheme rps:rpsc) {
+				data.add(new RoomPriceSchemeVo(rps));
+			}
+			return data;
+	 }
 	 
 	 
 }

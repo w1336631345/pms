@@ -70,11 +70,11 @@ public class BaseController<T> {
 			if (key.startsWith("page")) {
 				continue;
 			}
-			if (key.contains(".")) {
+			if (key.contains("_")) {
 				// 如果带。表示为传入子类参数
 				Field sf = null;
 				Method sm = null;
-				String[] keys = key.split("\\.");
+				String[] keys = key.split("_");
 				if (keys.length != 2) {
 					continue;
 				} else {

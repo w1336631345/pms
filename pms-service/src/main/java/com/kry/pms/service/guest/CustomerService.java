@@ -8,4 +8,6 @@ public interface CustomerService extends BaseService<Customer>{
 	
 	public Customer createOrGetCustomer(GuestInfoBo guestInfoBo);
 
+	public Customer createTempCustomer(String tempName);
+
 }

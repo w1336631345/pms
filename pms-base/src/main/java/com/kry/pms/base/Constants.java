@@ -49,12 +49,24 @@ public class Constants {
 		public static final String BILL_PAYMENTED = "PAYMENTED";
 		public static final String BILL_TO_BE_PAID = "TO_BE_PAID";
 		public static final String BILL_NO_PAYMENT_REQUIRED = "NO_PAYMENT_REQUIRED";
+		
+		public static final String ROOM_USAGE_FREE="F";
+		public static final String ROOM_USAGE_CHECK_IN="I";
+		public static final String ROOM_USAGE_LOCKED="L";
+		public static final String ROOM_USAGE_BOOK="R";
+		public static final String ROOM_USAGE_REPARIE="p";
 
 	}
 
 	public interface Type {
+		public static final String CHECK_IN_RECORD_GROUP = "G";
+		public static final String CHECK_IN_RECORD_CUSTOMER = "C";
+		public static final String CHECK_IN_RECORD_GROUP_CUSTOMER = "GC";
+		public static final String CHECK_IN_RECORD_LINK_CUSTOMER = "LC";
+		public static final String CHECK_IN_RECORD_LINK = "L";
 		public static final String NO_BOOK_CHECK_IN = "nobook";
 		public static final String BOOK_CHECK_IN = "booked";
+		public static final String BOOK_CHECK_IN_TEMP = "booked_temp";
 		public static final String AUTO_DAILY_VERIFY = "auto_daily_verify";
 		public static final String BILL_ITEM_ROOM_RECORD = "room";
 		// AR 账户

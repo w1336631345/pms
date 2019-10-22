@@ -1,11 +1,14 @@
 package com.kry.pms.service.busi.impl;
 
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.transaction.Transactional;
 import javax.validation.Valid;
 
+import org.aspectj.internal.lang.annotation.ajcDeclareAnnotation;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,16 +29,19 @@ import com.kry.pms.model.persistence.busi.BillItem;
 import com.kry.pms.model.persistence.busi.BookingItem;
 import com.kry.pms.model.persistence.busi.BookingRecord;
 import com.kry.pms.model.persistence.busi.CheckInRecord;
+import com.kry.pms.model.persistence.marketing.RoomPriceSchemeItem;
 import com.kry.pms.model.persistence.org.Employee;
 import com.kry.pms.model.persistence.room.GuestRoom;
 import com.kry.pms.model.persistence.room.GuestRoomStatus;
 import com.kry.pms.model.persistence.room.RoomType;
 import com.kry.pms.model.persistence.sys.SystemConfig;
 import com.kry.pms.service.busi.BillService;
+import com.kry.pms.service.busi.BookingItemService;
 import com.kry.pms.service.busi.BookingRecordService;
 import com.kry.pms.service.busi.CheckInRecordService;
 import com.kry.pms.service.busi.ReceptionService;
 import com.kry.pms.service.busi.RoomRecordService;
+import com.kry.pms.service.marketing.RoomPriceSchemeItemService;
 import com.kry.pms.service.org.EmployeeService;
 import com.kry.pms.service.room.GuestRoomService;
 import com.kry.pms.service.room.GuestRoomStatusService;
@@ -62,6 +68,10 @@ public class ReceptionServiceImpl implements ReceptionService {
 	GuestRoomStatusService guestRoomStatusService;
 	@Autowired
 	BillService billService;
+	@Autowired
+	BookingItemService bookingItemService;
+	@Autowired
+	RoomPriceSchemeItemService roomPriceSchemeItemService;
 
 	@Transactional
 	@Override
@@ -69,6 +79,8 @@ public class ReceptionServiceImpl implements ReceptionService {
 		DtoResponse<BookingRecord> rep = new DtoResponse<>();
 		BookingRecord br = new BookingRecord();
 		BeanUtils.copyProperties(book, br);
+		br.setArriveTime(LocalDateTime.of(book.getArriveDate(), LocalTime.parse("14:00:00")));
+		br.setLeaveTime(LocalDateTime.of(book.getLeaveDate(),LocalTime.parse("12:00:00")));
 		Employee oe = employeeService.findById(book.getOperationId());
 		if (oe == null) {
 			rep.setStatus(Constants.ErrorCode.REQUIRED_PARAMETER_INVALID);
@@ -77,7 +89,7 @@ public class ReceptionServiceImpl implements ReceptionService {
 		if (me == null) {
 			rep.setStatus(Constants.ErrorCode.REQUIRED_PARAMETER_INVALID);
 		}
-		if(book.getRoomTypeId()==null) {
+		if (book.getRoomTypeId() != null) {
 			RoomType rt = roomTypeService.findById(book.getRoomTypeId());
 			if (rt == null) {
 				rep.setStatus(Constants.ErrorCode.REQUIRED_PARAMETER_INVALID);
@@ -89,17 +101,27 @@ public class ReceptionServiceImpl implements ReceptionService {
 				br.setMarketEmployee(me);
 				rep = bookingRecordService.book(br);
 			}
-		}else if(book.getItems()!=null&&!book.getItems().isEmpty()){
-			ArrayList<BookingItem> items = new ArrayList<BookingItem>();
-			BookingItem item ;
-			for(BookingItemBo bib:book.getItems()) {
-				item = new BookingItem();
-				BeanUtils.copyProperties(item, bib);
-				items.add(item);
+		} else if (book.getItems() != null && !book.getItems().isEmpty()) {
+			ArrayList<CheckInRecord> items = new ArrayList<CheckInRecord>();
+			CheckInRecord cir;
+			for (BookingItemBo bib : book.getItems()) {
+				cir = new CheckInRecord();
+				//BeanUtils.copyProperties(item, bib);
+				cir.setPurchasePrice(bib.getPurchasePrice());
+				cir.setRoomCount(bib.getRoomCount());
+				cir.setType(Constants.Type.BOOK_CHECK_IN_TEMP);
+				cir.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION);
+				cir.setArriveTime(br.getArriveTime());
+				cir.setLeaveTime(br.getLeaveTime());
+				cir.setDays(br.getDays());
+				cir.setHoldTime(book.getHoldTime());
+				cir.setRoomType(roomTypeService.findById(bib.getRoomTypeId()));
+				cir.setPriceSchemeItem(roomPriceSchemeItemService.findById(bib.getPriceSchemeItemId()));
+				items.add(cir);
 			}
-			br.setItems(items);
+			br.setCheckInRecord(items);
 			rep = bookingRecordService.book(br);
-		}else {
+		} else {
 			rep.setStatus(Constants.ErrorCode.REQUIRED_PARAMETER_INVALID);
 			rep.setMessage("请预留房间");
 		}
@@ -196,10 +218,34 @@ public class ReceptionServiceImpl implements ReceptionService {
 		DtoResponse<String> rep = new DtoResponse<String>();
 		return rep;
 	}
-
+	@Transactional
 	@Override
 	public DtoResponse<String> assignRoom(@Valid RoomAssignBo roomAssignBo) {
-		
-		return null;
+		DtoResponse<String> response = new DtoResponse<String>();
+		String bookId = roomAssignBo.getBookId();
+		BookingRecord br = bookingRecordService.findById(bookId);
+		String bookItemId = roomAssignBo.getBookItemId();
+		BookingItem item = bookingItemService.findById(bookItemId);
+		if (item != null && br != null) {
+			if (roomAssignBo.getRoomId().length < (item.getRoomCount() - item.getCheckInCount())) {
+				for (String roomId : roomAssignBo.getRoomId()) {
+					GuestRoom gr = guestRoomService.findById(roomId);
+					checkInRecordService.checkInByTempName(roomAssignBo.getHumanCountPreRoom(), br, item, gr, response);
+				}
+			} else {
+				response.setStatus(Constants.BusinessCode.CODE_RESOURCE_NOT_ENOUGH);
+				response.setMessage("选择房间数过多，请重新选择");
+			}
+		} else {
+			response.setStatus(Constants.BusinessCode.CODE_PARAMETER_INVALID);
+			response.setMessage("找不到预定信息，请重新选择");
+		}
+		if(response.getStatus()==0) {
+			item.setCheckInCount(item.getCheckInCount()+roomAssignBo.getRoomId().length);
+			bookingItemService.modify(item);
+		}else {
+			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+		}
+		return response;
 	}
 }

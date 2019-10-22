@@ -1,5 +1,4 @@
 
-
 package com.kry.pms.api.busi;
 
 import javax.validation.Valid;
@@ -64,7 +63,7 @@ public class ReceptionController extends BaseController<String> {
 		BeanUtils.copyProperties(receptionService.checkOut(checkOut), rep);
 		return rep;
 	}
-	
+
 	/**
 	 * 入住
 	 * 
@@ -74,7 +73,7 @@ public class ReceptionController extends BaseController<String> {
 	@PostMapping(path = "/assign")
 	public HttpResponse<String> assignRoom(@RequestBody @Valid RoomAssignBo roomAssignBo) {
 		HttpResponse<String> rep = new HttpResponse<String>();
-		receptionService.assignRoom(roomAssignBo);
+		BeanUtils.copyProperties(receptionService.assignRoom(roomAssignBo), rep);
 		return rep;
 	}
 
@@ -87,6 +86,7 @@ public class ReceptionController extends BaseController<String> {
 	@PostMapping(path = "/book")
 	public HttpResponse<String> apply(@RequestBody @Valid BookingBo book) {
 		book.setHotelCode(getCurrentHotleCode());
+		book.setOperationId(getEmployeeId());
 		DtoResponse<BookingRecord> dtoRep = receptionService.book(book);
 		HttpResponse<String> rep = new HttpResponse<String>(dtoRep);
 		return rep;
@@ -115,8 +115,6 @@ public class ReceptionController extends BaseController<String> {
 		HttpResponse<String> rep = new HttpResponse<String>();
 		return rep;
 	}
-
-
 
 	/**
 	 * 拆分账单

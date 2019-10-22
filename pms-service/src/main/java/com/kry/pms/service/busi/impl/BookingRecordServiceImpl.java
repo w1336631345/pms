@@ -15,7 +15,9 @@ import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
 import com.kry.pms.dao.busi.BookingRecordDao;
 import com.kry.pms.model.http.request.busi.BookOperationBo;
+import com.kry.pms.model.persistence.busi.BookingItem;
 import com.kry.pms.model.persistence.busi.BookingRecord;
+import com.kry.pms.model.persistence.busi.CheckInRecord;
 import com.kry.pms.service.busi.BookingRecordService;
 import com.kry.pms.service.room.RoomStatisticsService;
 
@@ -57,6 +59,11 @@ public class BookingRecordServiceImpl implements BookingRecordService {
 	}
 
 	@Override
+	public BookingRecord findByBookingItemId(String bookingItemId) {
+		return bookingRecordDao.findByBookingItemId(bookingItemId);
+	}
+
+	@Override
 	public PageResponse<BookingRecord> listPage(PageRequest<BookingRecord> prq) {
 		Example<BookingRecord> ex = Example.of(prq.getExb());
 		org.springframework.data.domain.PageRequest req;
@@ -72,11 +79,17 @@ public class BookingRecordServiceImpl implements BookingRecordService {
 	@Override
 	public DtoResponse<BookingRecord> book(BookingRecord record) {
 		DtoResponse<BookingRecord> rep = new DtoResponse<BookingRecord>();
-		if (roomStatisticsService.booking(record.getRoomType(), record.getArriveTime(), record.getRoomCount(),
-				record.getDays())) {
-			rep.addData(add(record));
-		} else {
+		boolean result = true;
+		for (CheckInRecord cir : record.getCheckInRecord()) {
+			if (roomStatisticsService.booking(cir.getRoomType(), record.getArriveTime(), cir.getRoomCount(),
+					record.getDays())) {
+				result = false;
+			}
+		}
+		if (result) {
 			rep.setStatus(Constants.BusinessCode.CODE_RESOURCE_NOT_ENOUGH);
+		} else {
+			rep.addData(add(record));
 		}
 		return rep;
 	}
@@ -108,7 +121,6 @@ public class BookingRecordServiceImpl implements BookingRecordService {
 	}
 
 	private void cancleBook(DtoResponse<BookingRecord> rep, BookOperationBo bookOperationBo, BookingRecord br) {
-
 		br.setStatus(Constants.Status.BOOKING_CANCLE);
 		modify(br);
 		rep.setData(br);

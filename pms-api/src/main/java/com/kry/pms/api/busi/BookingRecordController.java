@@ -45,7 +45,7 @@ public class BookingRecordController extends BaseController<BookingRecord> {
 	}
 
 	@PostMapping("/operation")
-	public HttpResponse<BookingRecord> operation(@Valid BookOperationBo bob) {
+	public HttpResponse<BookingRecord> operation(@RequestBody @Valid BookOperationBo bob) {
 		HttpResponse<BookingRecord> rep = new HttpResponse<BookingRecord>();
 		BeanUtils.copyProperties(bookingRecordService.operation(bob), rep);
 		return rep;
