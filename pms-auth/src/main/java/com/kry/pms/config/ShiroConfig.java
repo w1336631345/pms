@@ -1,12 +1,14 @@
 package com.kry.pms.config;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-
+import com.kry.pms.shiro.SessionManager;
+import com.kry.pms.shiro.UserRealm;
 import org.apache.shiro.cache.CacheManager;
 import org.apache.shiro.cache.MemoryConstrainedCacheManager;
-import org.apache.shiro.cache.ehcache.EhCacheManager;
 import org.apache.shiro.codec.Base64;
+import org.apache.shiro.mgt.SecurityManager;
+import org.apache.shiro.session.SessionListener;
+import org.apache.shiro.session.mgt.eis.MemorySessionDAO;
+import org.apache.shiro.session.mgt.eis.SessionDAO;
 import org.apache.shiro.spring.LifecycleBeanPostProcessor;
 import org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
@@ -16,10 +18,11 @@ import org.apache.shiro.web.servlet.SimpleCookie;
 import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.apache.shiro.mgt.SecurityManager;
 
-import com.kry.pms.shiro.SessionManager;
-import com.kry.pms.shiro.UserRealm;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 @Configuration
 public class ShiroConfig {
@@ -38,7 +41,6 @@ public class ShiroConfig {
         filterChainDefinitionMap.put("/auth/admin/login", "anon");
         filterChainDefinitionMap.put("/api/**", "anon");
 
-        filterChainDefinitionMap.put("/admin/**", "authc");
         filterChainDefinitionMap.put("/user/**", "authc");
         //<!-- 过滤链定义，从上向下顺序执行，一般将/**放在最为下边 -->:这是一个坑呢，一不小心代码就不好使了;
         //<!-- authc:所有url都必须认证通过才可以访问; anon:所有url都都可以匿名访问-->
@@ -52,16 +54,35 @@ public class ShiroConfig {
         DefaultWebSecurityManager securityManager = new DefaultWebSecurityManager();
         securityManager.setRealm(userRealm());
         //缓存设置
-//        securityManager.setCacheManager(cacheManager());
+        securityManager.setCacheManager(cacheManager());
          //注入记住我管理器(cookie管理)
-//        securityManager.setRememberMeManager(rememberMeManager());
-        securityManager.setSessionManager(new SessionManager());//自定义的sessionManager
+        securityManager.setRememberMeManager(rememberMeManager());
+        securityManager.setSessionManager(sessionManager());//自定义的sessionManager
         return securityManager;
     }
+
+    //shiro session的管理
+    @Bean
+    public DefaultWebSessionManager sessionManager() {
+        DefaultWebSessionManager sessionManager = new SessionManager();
+        //自定义session时效时间，shiro的session默认失效时间是30分钟
+//        sessionManager.setGlobalSessionTimeout(DEFAULT_GLOBAL_SESSION_TIMEOUT * 48);
+        sessionManager.setSessionDAO(sessionDAO());
+        Collection<SessionListener> listeners = new ArrayList<SessionListener>();
+        listeners.add(new BDSessionListener());
+        sessionManager.setSessionListeners(listeners);
+        return sessionManager;
+    }
+
     @Bean
     public UserRealm userRealm() {
     	UserRealm userRealm = new UserRealm();
         return userRealm;
+    }
+
+    @Bean
+    public SessionDAO sessionDAO() {
+	    return new MemorySessionDAO();
     }
 
     /**
@@ -106,6 +127,17 @@ public class ShiroConfig {
         return authorizationAttributeSourceAdvisor;
     }
 
+//    @Bean
+//    public EhCacheManager ehCacheManager() {
+//        EhCacheManager em = new EhCacheManager();
+//        em.setCacheManager(cacheManager());
+//        return em;
+//    }
+
+//    @Bean("cacheManager2")
+//    CacheManager cacheManager(){
+//        return CacheManager.create();
+//    }
     @Bean("cacheManager2")
     public CacheManager cacheManager() {
         return new MemoryConstrainedCacheManager();

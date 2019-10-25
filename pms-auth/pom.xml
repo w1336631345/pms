@@ -56,6 +56,15 @@
             </exclusions>
             <version>1.4.0</version>
         </dependency>
+        <!-- ehchache -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-cache</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>net.sf.ehcache</groupId>
+            <artifactId>ehcache</artifactId>
+        </dependency>
         <!-- https://mvnrepository.com/artifact/org.apache.tomcat.embed/tomcat-embed-core -->
         <dependency>
             <groupId>org.apache.tomcat.embed</groupId>

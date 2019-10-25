@@ -1,10 +1,15 @@
 package com.kry.pms.shiro;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 
+import com.kry.pms.config.BDSessionListener;
+import org.apache.shiro.session.SessionListener;
+import org.apache.shiro.session.mgt.eis.MemorySessionDAO;
 import org.apache.shiro.web.servlet.ShiroHttpServletRequest;
 import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
 import org.apache.shiro.web.util.WebUtils;
@@ -35,6 +40,7 @@ public class SessionManager extends DefaultWebSessionManager {
             request.setAttribute(ShiroHttpServletRequest.REFERENCED_SESSION_ID_IS_VALID, Boolean.TRUE);
             return id;
         } else {
+            Serializable sid = super.getSessionId(request, response);
             //否则按默认规则从cookie取sessionId
             return super.getSessionId(request, response);
         }
