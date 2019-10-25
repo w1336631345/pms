@@ -15,6 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.kry.pms.dao.sys.UserDao;
 import com.kry.pms.model.persistence.sys.User;
 
+import lombok.extern.java.Log;
+@Log
 public class UserRealm extends AuthorizingRealm {
 
 	@Autowired
@@ -32,7 +34,6 @@ public class UserRealm extends AuthorizingRealm {
 		String password = new String((char[]) token.getCredentials());
 		// 查询用户信息
 		List<User>  user = userDao.getByUsernameAndPassword(username, password);
-
 		// 账号不存在
 		if (user == null || user.isEmpty()) {
 			throw new UnknownAccountException("账号或密码不正确");

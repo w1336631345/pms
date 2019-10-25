@@ -22,13 +22,6 @@ public class AuthController {
 	@Autowired
 	AccountService accountService;
 
-//	@RequestMapping(path = "/admin/login", method = RequestMethod.POST)
-//	public HttpResponse<String> loginAdmin(String username, String password) {
-//		HttpResponse<String> response = new HttpResponse<>();
-//	//	Account account = accountService.findTopByMobileOrUsername(username);
-//		return response;
-//	}
-	
 	@RequestMapping(path = "/admin/login", method = RequestMethod.POST)
 	public HttpResponse<String> loginTest(String username, String password) {
 		HttpResponse<String> response = new HttpResponse<>();
@@ -43,7 +36,6 @@ public class AuthController {
 		} catch (AuthenticationException e) {
 			return response.error(1000,"用户或密码错误");
 		}
-	//	Account account = accountService.findTopByMobileOrUsername(username);
 	}
 
 	@RequestMapping(path = "/admin/logout", method = RequestMethod.POST)

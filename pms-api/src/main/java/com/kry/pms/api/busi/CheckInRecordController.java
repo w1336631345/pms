@@ -35,6 +35,12 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
 	public HttpResponse<CheckInRecord> modify(@RequestBody CheckInRecord checkInRecord) {
 		return getDefaultResponse().addData(checkInRecordService.modify(checkInRecord));
 	}
+	
+	@PostMapping(path = "/book")
+	public HttpResponse<CheckInRecord> book(@RequestBody CheckInRecord checkInRecord) {
+		checkInRecord.setHotelCode(getCurrentHotleCode());
+		return getDefaultResponse().addData(checkInRecordService.book(checkInRecord));
+	}
 
 	@DeleteMapping
 	public HttpResponse<String> delete(String id) {
@@ -54,7 +60,15 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
 		rep.addData(checkInRecordService.findDetailByBookingId(bookId));
 		return rep;
 	}
+	@GetMapping(path = "/detail/{id}")
+	public HttpResponse<CheckInRecord> findDetailById(@PathVariable("id") String id){
+		HttpResponse<CheckInRecord> rep = new HttpResponse<CheckInRecord>();
+		rep.addData(checkInRecordService.findById(id));
+		return rep;
+	}
 
+	
+	
 	@GetMapping
 	public HttpResponse<PageResponse<CheckInRecord>> query(HttpServletRequest request) throws InstantiationException, IllegalAccessException{
 		HttpResponse<PageResponse<CheckInRecord>> rep = new HttpResponse<PageResponse<CheckInRecord>>();

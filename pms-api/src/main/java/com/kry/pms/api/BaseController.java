@@ -10,15 +10,21 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.kry.pms.base.Constants;
 import com.kry.pms.base.HttpResponse;
 import com.kry.pms.base.PageRequest;
+import com.kry.pms.model.persistence.org.Employee;
 import com.kry.pms.model.persistence.sys.User;
+import com.kry.pms.service.org.EmployeeService;
 import com.kry.pms.util.StringUtil;
 import com.kry.pms.utils.ShiroUtils;
 
 
 public class BaseController<T> {
+	@Autowired
+	EmployeeService employeeService;
 	
 	public String getCurrentUserId() {
 		return "1";
@@ -32,9 +38,10 @@ public class BaseController<T> {
 		return ShiroUtils.getUser();
 	}
 	
-	public String getEmployeeId() {
-		return "";
+	public Employee getCurrentEmployee() {
+		return employeeService.findByUser(getUser());
 	}
+	
 	public String getCurrentHotleCode() {
 		return "0000";
 	}

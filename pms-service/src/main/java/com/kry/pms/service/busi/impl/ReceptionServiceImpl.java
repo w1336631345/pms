@@ -34,6 +34,7 @@ import com.kry.pms.model.persistence.org.Employee;
 import com.kry.pms.model.persistence.room.GuestRoom;
 import com.kry.pms.model.persistence.room.GuestRoomStatus;
 import com.kry.pms.model.persistence.room.RoomType;
+import com.kry.pms.model.persistence.sys.BusinessSeq;
 import com.kry.pms.model.persistence.sys.SystemConfig;
 import com.kry.pms.service.busi.BillService;
 import com.kry.pms.service.busi.BookingItemService;
@@ -46,6 +47,7 @@ import com.kry.pms.service.org.EmployeeService;
 import com.kry.pms.service.room.GuestRoomService;
 import com.kry.pms.service.room.GuestRoomStatusService;
 import com.kry.pms.service.room.RoomTypeService;
+import com.kry.pms.service.sys.BusinessSeqService;
 import com.kry.pms.service.sys.SystemConfigService;
 
 @Service
@@ -72,6 +74,8 @@ public class ReceptionServiceImpl implements ReceptionService {
 	BookingItemService bookingItemService;
 	@Autowired
 	RoomPriceSchemeItemService roomPriceSchemeItemService;
+	@Autowired
+	BusinessSeqService businessSeqService;
 
 	@Transactional
 	@Override
@@ -80,7 +84,7 @@ public class ReceptionServiceImpl implements ReceptionService {
 		BookingRecord br = new BookingRecord();
 		BeanUtils.copyProperties(book, br);
 		br.setArriveTime(LocalDateTime.of(book.getArriveDate(), LocalTime.parse("14:00:00")));
-		br.setLeaveTime(LocalDateTime.of(book.getLeaveDate(),LocalTime.parse("12:00:00")));
+		br.setLeaveTime(LocalDateTime.of(book.getLeaveDate(), LocalTime.parse("12:00:00")));
 		Employee oe = employeeService.findById(book.getOperationId());
 		if (oe == null) {
 			rep.setStatus(Constants.ErrorCode.REQUIRED_PARAMETER_INVALID);
@@ -102,24 +106,11 @@ public class ReceptionServiceImpl implements ReceptionService {
 				rep = bookingRecordService.book(br);
 			}
 		} else if (book.getItems() != null && !book.getItems().isEmpty()) {
-			ArrayList<CheckInRecord> items = new ArrayList<CheckInRecord>();
-			CheckInRecord cir;
-			for (BookingItemBo bib : book.getItems()) {
-				cir = new CheckInRecord();
-				//BeanUtils.copyProperties(item, bib);
-				cir.setPurchasePrice(bib.getPurchasePrice());
-				cir.setRoomCount(bib.getRoomCount());
-				cir.setType(Constants.Type.BOOK_CHECK_IN_TEMP);
-				cir.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION);
-				cir.setArriveTime(br.getArriveTime());
-				cir.setLeaveTime(br.getLeaveTime());
-				cir.setDays(br.getDays());
-				cir.setHoldTime(book.getHoldTime());
-				cir.setRoomType(roomTypeService.findById(bib.getRoomTypeId()));
-				cir.setPriceSchemeItem(roomPriceSchemeItemService.findById(bib.getPriceSchemeItemId()));
-				items.add(cir);
+			if (book.getType().equals(Constants.Type.BOOK_GROUP)) {
+
+			} else {
+				br.setCheckInRecords(createBookingCheckInRecords(br, book.getItems()));
 			}
-			br.setCheckInRecord(items);
 			rep = bookingRecordService.book(br);
 		} else {
 			rep.setStatus(Constants.ErrorCode.REQUIRED_PARAMETER_INVALID);
@@ -131,36 +122,72 @@ public class ReceptionServiceImpl implements ReceptionService {
 		return rep;
 	}
 
+	@Override
+	public DtoResponse<BookingRecord> groupBook(BookingRecord br) {
+		DtoResponse<BookingRecord> rep = new DtoResponse<>();
+		br.setCheckInRecords(createGroupMainCheckInRecord(br));
+		rep = bookingRecordService.book(br);
+		return rep;
+	}
+
+	private List<CheckInRecord> createBookingCheckInRecords(BookingRecord br, List<BookingItemBo> bibs) {
+		ArrayList<CheckInRecord> items = new ArrayList<CheckInRecord>();
+		CheckInRecord cir;
+		for (BookingItemBo bib : bibs) {
+			cir = new CheckInRecord();
+			cir.setPurchasePrice(bib.getPurchasePrice());
+			cir.setRoomCount(bib.getRoomCount());
+			cir.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION);
+			cir.setArriveTime(br.getArriveTime());
+			cir.setLeaveTime(br.getLeaveTime());
+			cir.setDays(br.getDays());
+			cir.setHoldTime(br.getHoldTime());
+			cir.setRoomType(roomTypeService.findById(bib.getRoomTypeId()));
+			cir.setPriceSchemeItem(roomPriceSchemeItemService.findById(bib.getPriceSchemeItemId()));
+			items.add(cir);
+		}
+		return items;
+	}
+
+	private List<CheckInRecord> createGroupMainCheckInRecord(BookingRecord br) {
+		BusinessSeq bs = businessSeqService.fetchNextSeq(br.getHotelCode(), Constants.Key.BUSINESS_SEQ_KEY);
+		String tempName = br.getName();
+		String checkInSn = bs.getCurrentDateStr() + bs.getCurrentSeq();
+		List<CheckInRecord> data = new ArrayList<CheckInRecord>();
+		List<CheckInRecord> sub = new ArrayList<CheckInRecord>();
+		CheckInRecord mcir = new CheckInRecord();
+		mcir.setType(Constants.Type.CHECK_IN_RECORD_GROUP);
+		mcir.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION);
+		mcir.setArriveTime(br.getArriveTime());
+		mcir.setLeaveTime(br.getLeaveTime());
+		mcir.setDays(br.getDays());
+		mcir.setHoldTime(br.getHoldTime());
+		for (CheckInRecord cir : br.getCheckInRecords()) {
+			try {
+				cir = (CheckInRecord) cir.clone();
+			} catch (CloneNotSupportedException e) {
+				e.printStackTrace();
+			}
+			cir.setHotelCode(br.getHotelCode());
+			cir.setOrderNum(checkInSn);
+			cir.setName(tempName);
+			cir.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION);
+			cir.setArriveTime(br.getArriveTime());
+			cir.setLeaveTime(br.getLeaveTime());
+			cir.setDays(br.getDays());
+			cir.setHoldTime(br.getHoldTime());
+			cir.setRoomType(roomTypeService.findById(cir.getRoomTypeId()));
+			sub.add(cir);
+		}
+		mcir.setSubRecords(sub);
+		data.add(mcir);
+		return data;
+	}
+
 	@Transactional
 	@Override
 	public DtoResponse<List<CheckInRecord>> checkIn(CheckInBo checkInBo) {
 		DtoResponse<List<CheckInRecord>> rep = new DtoResponse<List<CheckInRecord>>();
-		switch (checkInBo.getType()) {
-		case Constants.Type.BOOK_CHECK_IN:
-			if (checkInBo.getBookingId() == null) {
-				rep.setStatus(Constants.ErrorCode.REQUIRED_PARAMETER_MISSING);
-			} else {
-				BookingRecord br = bookingRecordService.findById(checkInBo.getBookingId());
-				if (br == null) {// 找不到预定记录
-					rep.setStatus(Constants.ErrorCode.REQUIRED_PARAMETER_INVALID);
-				} else if (roomStatusCheck(checkInBo, rep)) {// 房间状态确认
-					checkInRecordService.checkIn(checkInBo, rep);
-				} else {
-					rep.setStatus(Constants.ErrorCode.REQUIRED_PARAMETER_INVALID);
-				}
-			}
-			break;
-		case Constants.Type.NO_BOOK_CHECK_IN:
-			if (roomStatusCheck(checkInBo, rep)) {
-				checkInRecordService.checkIn(checkInBo, rep);
-			} else {
-				rep.setStatus(Constants.ErrorCode.REQUIRED_PARAMETER_INVALID);
-			}
-			break;
-		default:
-			rep.setStatus(Constants.ErrorCode.REQUIRED_PARAMETER_INVALID);
-			break;
-		}
 		return rep;
 	}
 
@@ -218,19 +245,18 @@ public class ReceptionServiceImpl implements ReceptionService {
 		DtoResponse<String> rep = new DtoResponse<String>();
 		return rep;
 	}
+
 	@Transactional
 	@Override
 	public DtoResponse<String> assignRoom(@Valid RoomAssignBo roomAssignBo) {
 		DtoResponse<String> response = new DtoResponse<String>();
-		String bookId = roomAssignBo.getBookId();
-		BookingRecord br = bookingRecordService.findById(bookId);
-		String bookItemId = roomAssignBo.getBookItemId();
-		BookingItem item = bookingItemService.findById(bookItemId);
-		if (item != null && br != null) {
-			if (roomAssignBo.getRoomId().length < (item.getRoomCount() - item.getCheckInCount())) {
+		String checkInRecordId = roomAssignBo.getCheckInRecordId();
+		CheckInRecord cir = checkInRecordService.findById(checkInRecordId);
+		if (cir != null) {
+			if (roomAssignBo.getRoomId().length <= (cir.getRoomCount() - cir.getCheckInCount())) {
 				for (String roomId : roomAssignBo.getRoomId()) {
 					GuestRoom gr = guestRoomService.findById(roomId);
-					checkInRecordService.checkInByTempName(roomAssignBo.getHumanCountPreRoom(), br, item, gr, response);
+					checkInRecordService.checkInByTempName(roomAssignBo.getHumanCountPreRoom(), cir, gr, response);
 				}
 			} else {
 				response.setStatus(Constants.BusinessCode.CODE_RESOURCE_NOT_ENOUGH);
@@ -240,12 +266,30 @@ public class ReceptionServiceImpl implements ReceptionService {
 			response.setStatus(Constants.BusinessCode.CODE_PARAMETER_INVALID);
 			response.setMessage("找不到预定信息，请重新选择");
 		}
-		if(response.getStatus()==0) {
-			item.setCheckInCount(item.getCheckInCount()+roomAssignBo.getRoomId().length);
-			bookingItemService.modify(item);
-		}else {
+		if (response.getStatus() == 0) {
+			cir.setCheckInCount(cir.getCheckInCount() + roomAssignBo.getRoomId().length);
+			if(cir.getRoomCount()==cir.getCheckInCount()) {
+				cir.setDeleted(Constants.DELETED_TRUE);
+			}
+			checkInRecordService.modify(cir);
+		} else {
 			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 		}
 		return response;
 	}
+
+	@Override
+	public DtoResponse<String> checkIn(String id) {
+		DtoResponse<String> rep = new DtoResponse<>();
+		CheckInRecord cir = checkInRecordService.findById(id);
+		if(cir!=null) {
+			cir.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN);
+			checkInRecordService.modify(cir);
+		}else {
+			rep.setStatus(Constants.BusinessCode.CODE_PARAMETER_INVALID);
+			rep.setMessage("没有找到对应的入住记录");
+		}
+		return rep;
+	}
+
 }

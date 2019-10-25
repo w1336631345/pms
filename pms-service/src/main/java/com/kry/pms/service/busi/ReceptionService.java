@@ -55,4 +55,8 @@ public interface ReceptionService {
 	public DtoResponse<String> billSettle(BillSettleBo bsb);
 
 	public DtoResponse<String> assignRoom(@Valid RoomAssignBo roomAssignBo);
+
+	DtoResponse<BookingRecord> groupBook(BookingRecord br);
+
+	public DtoResponse<String> checkIn(String id);
 }

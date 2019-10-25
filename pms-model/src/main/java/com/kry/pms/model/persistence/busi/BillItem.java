@@ -22,7 +22,6 @@ import lombok.Setter;
 @Table(name = "t_bill_item")
 public class BillItem extends PersistenceModel {
 	@ManyToOne
-	@JsonIgnore
 	private Bill bill;
 	@Column
 	private String type;
@@ -44,4 +43,9 @@ public class BillItem extends PersistenceModel {
 	private Integer itemSeq;
 	@Column
 	private String statusPayment;
+	@JsonIgnore
+	public Bill getBill() {
+		return bill;
+	}
+	
 }

@@ -5,6 +5,8 @@ import javax.validation.Valid;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,6 +24,7 @@ import com.kry.pms.model.http.request.busi.RenewBo;
 import com.kry.pms.model.http.request.busi.RoomAssignBo;
 import com.kry.pms.model.persistence.busi.BookingRecord;
 import com.kry.pms.service.busi.ReceptionService;
+import com.kry.pms.service.org.EmployeeService;
 import com.kry.pms.service.room.GuestRoomService;
 
 /**
@@ -37,6 +40,8 @@ public class ReceptionController extends BaseController<String> {
 	ReceptionService receptionService;
 	@Autowired
 	GuestRoomService guestRoomService;
+	@Autowired
+	EmployeeService employeeService;
 
 	/**
 	 * 入住
@@ -48,6 +53,13 @@ public class ReceptionController extends BaseController<String> {
 	public HttpResponse<String> checkIn(@RequestBody @Valid CheckInBo checkIn) {
 		HttpResponse<String> rep = new HttpResponse<String>();
 		BeanUtils.copyProperties(receptionService.checkIn(checkIn), rep);
+		return rep;
+	}
+	
+	@GetMapping(path = "/checkIn/{id}")
+	public HttpResponse<String> checkIn(@PathVariable String id) {
+		HttpResponse<String> rep = new HttpResponse<String>();
+		BeanUtils.copyProperties(receptionService.checkIn(id), rep);
 		return rep;
 	}
 
@@ -86,8 +98,23 @@ public class ReceptionController extends BaseController<String> {
 	@PostMapping(path = "/book")
 	public HttpResponse<String> apply(@RequestBody @Valid BookingBo book) {
 		book.setHotelCode(getCurrentHotleCode());
-		book.setOperationId(getEmployeeId());
+		book.setOperationId(getCurrentEmployee().getId());
 		DtoResponse<BookingRecord> dtoRep = receptionService.book(book);
+		HttpResponse<String> rep = new HttpResponse<String>(dtoRep);
+		return rep;
+	}
+	
+	/**
+	 * 预定
+	 * 
+	 * @param book
+	 * @return
+	 */
+	@PostMapping(path = "/newBook")
+	public HttpResponse<String> book(@RequestBody BookingRecord br) {
+		br.setHotelCode(getCurrentHotleCode());
+		br.setOperationEmployee(getCurrentEmployee());
+		DtoResponse<BookingRecord> dtoRep = receptionService.groupBook(br);
 		HttpResponse<String> rep = new HttpResponse<String>(dtoRep);
 		return rep;
 	}

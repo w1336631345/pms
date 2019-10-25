@@ -43,6 +43,12 @@ public class CustomerServiceImpl implements CustomerService {
 
 	@Override
 	public Customer modify(Customer customer) {
+		if(customer.getIdCardNum()!=null) {
+			Customer dbc = customerDao.findByIdCardNum(customer.getIdCardNum());
+			if(dbc!=null) {
+				return dbc;
+			}
+		}
 		return customerDao.saveAndFlush(customer);
 	}
 

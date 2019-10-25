@@ -198,4 +198,20 @@ public class RoomUsageServiceImpl implements RoomUsageService {
 		return null;
 	}
 
+	@Override
+	public List<RoomUsageVo> queryUsableGuestRoomsByCheckInRecordId(String cid) {
+		CheckInRecord cir = checkInRecordService.findById(cid);
+		List<RoomUsageVo> data = new ArrayList<RoomUsageVo>();
+		if(cir!=null) {
+			List<RoomUsage> list = queryUsableGuestRooms(cir.getRoomType().getId(), cir.getArriveTime(), cir.getLeaveTime());
+			if(list!=null&&!list.isEmpty()) {
+				for(RoomUsage ru:list) {
+					data.add(new RoomUsageVo(ru));
+				}
+				return data;
+			}
+		}
+		return null;
+	}
+
 }

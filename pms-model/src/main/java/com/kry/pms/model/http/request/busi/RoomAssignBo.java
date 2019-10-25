@@ -4,8 +4,7 @@ import lombok.Data;
 
 @Data
 public class RoomAssignBo {
-	String bookItemId;
-	String bookId;
+	String  checkInRecordId;
 	Integer humanCountPreRoom;
 	String roomId[];
 }

@@ -6,6 +6,8 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.aspectj.internal.lang.annotation.ajcDeclareAnnotation;
+import org.jboss.jandex.Main;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
@@ -27,6 +29,7 @@ import com.kry.pms.model.persistence.guest.Customer;
 import com.kry.pms.model.persistence.room.GuestRoom;
 import com.kry.pms.model.persistence.room.RoomUsage;
 import com.kry.pms.model.persistence.sys.Account;
+import com.kry.pms.model.persistence.sys.BusinessSeq;
 import com.kry.pms.service.busi.CheckInRecordService;
 import com.kry.pms.service.busi.RoomRecordService;
 import com.kry.pms.service.guest.CustomerService;
@@ -35,7 +38,9 @@ import com.kry.pms.service.room.GuestRoomStatusService;
 import com.kry.pms.service.room.RoomStatisticsService;
 import com.kry.pms.service.room.RoomStatusQuantityService;
 import com.kry.pms.service.room.RoomTypeQuantityService;
+import com.kry.pms.service.room.RoomTypeService;
 import com.kry.pms.service.room.RoomUsageService;
+import com.kry.pms.service.sys.BusinessSeqService;
 import com.kry.pms.service.sys.SystemConfigService;
 
 @Service
@@ -60,6 +65,10 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 	RoomStatusQuantityService roomStatusQuantityService;
 	@Autowired
 	RoomUsageService roomUsageService;
+	@Autowired
+	BusinessSeqService businessSeqService;
+	@Autowired
+	RoomTypeService roomTypeService;
 
 	@Override
 	public CheckInRecord add(CheckInRecord checkInRecord) {
@@ -77,7 +86,16 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 
 	@Override
 	public CheckInRecord modify(CheckInRecord checkInRecord) {
-		return checkInRecordDao.saveAndFlush(checkInRecord);
+		CheckInRecord dbCir = findById(checkInRecord.getId());
+		if(dbCir!=null) {
+			checkInRecord.setMainRecord(dbCir.getMainRecord());
+			if(checkInRecord.getCustomer()!=null) {
+				Customer customer = customerService.modify(checkInRecord.getCustomer());
+				checkInRecord.setCustomer(customer);
+			}
+			return checkInRecordDao.saveAndFlush(checkInRecord);
+		}
+		return null;
 	}
 
 	@Override
@@ -173,8 +191,9 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 		if (br.getArriveTime().toLocalTime().isBefore(criticalTime)) {
 			startDate = startDate.plusDays(-1);
 		}
-		String tempName = null;
-		String checkInSn = null;
+		BusinessSeq bs = businessSeqService.fetchNextSeq(gr.getHotelCode(), Constants.Key.BUSINESS_SEQ_KEY);
+		String tempName = br.getName();
+		String checkInSn =bs.getCurrentDateStr()+bs.getCurrentSeq();
 		roomUsageService.use(gr, Constants.Status.ROOM_USAGE_BOOK, br.getArriveTime(), br.getLeaveTime(), checkInSn,
 				tempName, response);
 		if (response.getStatus() == 0) {
@@ -185,7 +204,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 				cir.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION);
 				cir.setCustomer(customer);
 				cir.setCheckInSn(checkInSn);
-				cir.setType(Constants.Type.BOOK_CHECK_IN);
+				cir.setType(Constants.Type.CHECK_IN_RECORD_GROUP_CUSTOMER);
 				cir.setGroup(br.getGroup());
 				cir.setArriveTime(br.getArriveTime());
 				cir.setLeaveTime(br.getLeaveTime());
@@ -214,6 +233,71 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 	public List<CheckInRecord> findDetailByBookingId(String bookId) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public List<CheckInRecord> checkInByTempName(int humanCount, CheckInRecord cir, GuestRoom gr,
+			DtoResponse<String> response) {
+		LocalTime criticalTime = systemConfigService.getCriticalTime(gr.getHotelCode());
+		LocalDate startDate = cir.getArriveTime().toLocalDate();
+		if (cir.getArriveTime().toLocalTime().isBefore(criticalTime)) {
+			startDate = startDate.plusDays(-1);
+		}
+		List<CheckInRecord> data = new ArrayList<CheckInRecord>();
+		String tempName = cir.getName()+gr.getRoomNum();
+		if (response.getStatus() == 0) {
+			for (int i = 1; i <= humanCount; i++) {
+				Customer customer = customerService.createTempCustomer(tempName+"#"+i);
+				CheckInRecord ncir = null;
+				try {
+					ncir = (CheckInRecord) cir.clone();
+				} catch (CloneNotSupportedException e) {
+					e.printStackTrace();
+				}
+				ncir.setId(null);
+				ncir.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION);
+				ncir.setCustomer(customer);
+				ncir.setName(customer.getName());
+				ncir.setType(Constants.Type.CHECK_IN_RECORD_GROUP_CUSTOMER);
+				ncir.setGuestRoom(gr);
+				ncir.setSubRecords(null);
+				ncir.setStartDate(startDate);
+				ncir.setHotelCode(gr.getHotelCode());
+				Account account = new Account();
+				account.setCustomer(customer);
+				ncir.setCheckInCount(1);
+				ncir.setRoomCount(1);
+				account.setType(Constants.Type.ACCOUNT_CUSTOMER);
+				ncir.setAccount(account);
+				ncir = add(ncir);
+				data.add(ncir);
+				roomRecordService.createRoomRecord(ncir);
+			}
+		}
+		return data;
+	}
+
+	@Override
+	public CheckInRecord book(CheckInRecord checkInRecord) {
+		BusinessSeq bs = businessSeqService.fetchNextSeq(checkInRecord.getHotelCode(), Constants.Key.BUSINESS_ORDER_NUM_SEQ_KEY);
+		String orderNum =bs.getCurrentDateStr()+String.format("%04d", bs.getCurrentSeq()); 
+		checkInRecord.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION);
+		checkInRecord.setType(Constants.Type.CHECK_IN_RECORD_GROUP);
+		checkInRecord.setOrderNum(orderNum);
+		for(CheckInRecord item:checkInRecord.getSubRecords()) {
+			item.setOrderNum(orderNum);
+			item.setHoldTime(checkInRecord.getHoldTime());
+			item.setArriveTime(checkInRecord.getArriveTime());
+			item.setLeaveTime(checkInRecord.getLeaveTime());
+			item.setDays(checkInRecord.getDays());
+			item.setRoomType(roomTypeService.findById(item.getRoomTypeId()));
+			item.setContactName(checkInRecord.getContactName());
+			item.setContactMobile(checkInRecord.getContactMobile());
+			item.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION);
+			item.setType(Constants.Type.CHECK_IN_RECORD_GROUP_CUSTOMER);
+			item.setProtocolCorpation(checkInRecord.getProtocolCorpation());
+		}
+		return add(checkInRecord);
 	}
 
 }

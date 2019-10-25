@@ -17,6 +17,7 @@ import lombok.NoArgsConstructor;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class BookingBo extends BaseBo {
+	private String name;
 	private String groupName;
 	@NotBlank(message = "联系人不能为空")
 	private String contactName;
@@ -34,6 +35,7 @@ public class BookingBo extends BaseBo {
 	private Integer roomCount;
 	private String roomTypeId;
 	private String channelId;
+	private String type;
 	private String protocolId;// 协议单位
 	@Min(value = 1, message = "预定天数至少大于1")
 	private Integer days;

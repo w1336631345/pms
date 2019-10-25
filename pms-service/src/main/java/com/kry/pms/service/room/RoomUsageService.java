@@ -21,4 +21,6 @@ public interface RoomUsageService extends BaseService<RoomUsage> {
 
 	public List<RoomUsageVo> queryUsableGuestRoomsByBookItemId(String bookItemId);
 
+	public List<RoomUsageVo> queryUsableGuestRoomsByCheckInRecordId(String bookItemId);
+
 }

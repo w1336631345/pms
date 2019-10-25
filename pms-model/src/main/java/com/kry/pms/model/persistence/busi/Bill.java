@@ -1,7 +1,12 @@
 package com.kry.pms.model.persistence.busi;
 
+import java.util.List;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
@@ -36,5 +41,8 @@ public class Bill extends PersistenceModel {
 	private String paymentStatus;
 	@Column
 	private String settlementStatus;
+	@OneToMany(cascade = CascadeType.ALL)
+	@JoinColumn(name = "bill_id")
+	private List<BillItem> items;
 
 }
