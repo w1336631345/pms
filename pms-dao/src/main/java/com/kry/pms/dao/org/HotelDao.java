@@ -5,4 +5,6 @@ import com.kry.pms.model.persistence.org.Hotel;
 
 public interface HotelDao extends BaseDao<Hotel>{
 
+    Hotel findByHotelCode(String hotelCode);
+
 }

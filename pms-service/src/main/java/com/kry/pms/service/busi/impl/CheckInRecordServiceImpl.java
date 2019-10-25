@@ -5,14 +5,25 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Path;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 
 import org.aspectj.internal.lang.annotation.ajcDeclareAnnotation;
 import org.jboss.jandex.Main;
+import com.kry.pms.model.persistence.sys.User;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import com.kry.pms.base.Constants;
@@ -298,6 +309,61 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 			item.setProtocolCorpation(checkInRecord.getProtocolCorpation());
 		}
 		return add(checkInRecord);
+	}
+
+	@Override
+	public PageResponse<CheckInRecord> notYet(int pageIndex, int pageSize, String status, User user) {
+		Pageable page = org.springframework.data.domain.PageRequest.of(pageIndex-1, pageSize);
+		Specification<CheckInRecord> specification = new Specification<CheckInRecord>() {
+			@Override
+			public Predicate toPredicate(Root<CheckInRecord> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
+				ArrayList<Predicate> list = new ArrayList<>();
+				//旅馆编码
+				if (user != null){
+					Path<Object> hotelCode = root.get("hotelCode");
+					Predicate p1 = criteriaBuilder.equal(hotelCode.as(String.class), user.getHotelCode());
+					list.add(p1);
+				}
+				//状态（R：预订，I：入住，O：退房，D：历史订单，N：未到，S：退房未结账，X：取消）
+				if (status != null && status != ""){
+					Path<Object> status1 = root.get("status");
+					Predicate p1 = criteriaBuilder.equal(status1.as(String.class), status);
+					list.add(p1);
+				}
+				Predicate[] parr = new Predicate[list.size()];
+				parr = list.toArray(parr);
+				return criteriaBuilder.and(parr);
+			}
+
+		};
+		Page<CheckInRecord> p = checkInRecordDao.findAll(specification,page);
+		return convent(p);
+	}
+
+	@Override
+	public PageResponse<Map<String, Object>> unreturnedGuests(int pageIndex, int pageSize, String status, User user) {
+		Pageable page = org.springframework.data.domain.PageRequest.of(pageIndex-1, pageSize);
+		String hotelCode = null;
+		if(user != null){
+			hotelCode = user.getHotelCode();
+		}
+		Page<Map<String, Object>> p = checkInRecordDao.unreturnedGuests(page, status, hotelCode);
+		PageResponse<Map<String, Object>> pr = new PageResponse<>();
+		pr.setPageSize(p.getNumberOfElements());
+		pr.setPageCount(p.getTotalPages());
+		pr.setTotal(p.getTotalElements());
+		pr.setCurrentPage(p.getNumber());
+		pr.setContent(p.getContent());
+		return pr;
+	}
+	@Override
+	public List<Map<String, Object>> getStatistics(User user){
+		String hotelCode = null;
+		if(user != null){
+			hotelCode = user.getHotelCode();
+		}
+		List<Map<String, Object>> list = checkInRecordDao.getStatistics(hotelCode);
+		return list;
 	}
 
 }

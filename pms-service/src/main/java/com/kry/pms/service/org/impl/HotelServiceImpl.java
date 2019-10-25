@@ -51,6 +51,12 @@ public class  HotelServiceImpl implements  HotelService{
 	}
 
 	@Override
+	public Hotel getByHotelCode(String code) {
+//		return null;//默认不实现
+		return hotelDao.findByHotelCode(code);
+	}
+
+	@Override
 	public PageResponse<Hotel> listPage(PageRequest<Hotel> prq) {
 		Example<Hotel> ex = Example.of(prq.getExb());
 		org.springframework.data.domain.PageRequest req;

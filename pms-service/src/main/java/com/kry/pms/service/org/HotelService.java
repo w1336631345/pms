@@ -5,4 +5,5 @@ import com.kry.pms.service.BaseService;
 
 public interface HotelService extends BaseService<Hotel>{
 
+    Hotel getByHotelCode(String code);
 }
