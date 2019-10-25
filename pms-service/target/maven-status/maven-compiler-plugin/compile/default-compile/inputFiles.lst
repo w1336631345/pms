@@ -23,6 +23,7 @@ E:\kry\src\pms-server\pms-service\src\main\java\com\kry\pms\service\busi\impl\Bo
 E:\kry\src\pms-server\pms-service\src\main\java\com\kry\pms\service\org\impl\EmployeeServiceImpl.java
 E:\kry\src\pms-server\pms-service\src\main\java\com\kry\pms\service\room\impl\BuildingServiceImpl.java
 E:\kry\src\pms-server\pms-service\src\main\java\com\kry\pms\service\room\RoomStatisticsService.java
+E:\kry\src\pms-server\pms-service\src\main\java\com\kry\pms\service\sys\impl\BusinessSeqServiceImpl.java
 E:\kry\src\pms-server\pms-service\src\main\java\com\kry\pms\service\room\impl\RoomTagServiceImpl.java
 E:\kry\src\pms-server\pms-service\src\main\java\com\kry\pms\service\guest\GuestInfoService.java
 E:\kry\src\pms-server\pms-service\src\main\java\com\kry\pms\service\busi\impl\DealServiceImpl.java
@@ -59,6 +60,7 @@ E:\kry\src\pms-server\pms-service\src\main\java\com\kry\pms\service\org\Employee
 E:\kry\src\pms-server\pms-service\src\main\java\com\kry\pms\service\guest\impl\CustomerInvoiceInfoServiceImpl.java
 E:\kry\src\pms-server\pms-service\src\main\java\com\kry\pms\service\busi\DealService.java
 E:\kry\src\pms-server\pms-service\src\main\java\com\kry\pms\service\guest\impl\CustomerPointsRecordServiceImpl.java
+E:\kry\src\pms-server\pms-service\src\main\java\com\kry\pms\service\sys\BusinessSeqService.java
 E:\kry\src\pms-server\pms-service\src\main\java\com\kry\pms\service\guest\CustomerInvoiceInfoService.java
 E:\kry\src\pms-server\pms-service\src\main\java\com\kry\pms\service\room\impl\GuestRoomStatusServiceImpl.java
 E:\kry\src\pms-server\pms-service\src\main\java\com\kry\pms\service\busi\ReceptionService.java
