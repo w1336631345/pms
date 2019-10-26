@@ -9,4 +9,6 @@ public interface BillDao extends BaseDao<Bill> {
 	
 	public List<Bill> findByHotelCode(String hotelCode);
 
+	public List<Bill> findByAccountId(String id);
+
 }

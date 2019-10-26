@@ -23,4 +23,6 @@ public interface BillService extends BaseService<Bill> {
 
 	public boolean checkAndPayBill(BillSettleBo bsb);
 
+	public List<Bill> findByAccountId(String id);
+
 }

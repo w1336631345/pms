@@ -120,4 +120,9 @@ public class BillServiceImpl implements BillService {
 		return false;
 	}
 
+	@Override
+	public List<Bill> findByAccountId(String id) {
+		return billDao.findByAccountId(id);
+	}
+
 }

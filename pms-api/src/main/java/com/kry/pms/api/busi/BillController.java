@@ -1,5 +1,7 @@
 package com.kry.pms.api.busi;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +39,14 @@ public class BillController extends BaseController<Bill> {
 	public HttpResponse<String> delete(String id) {
 		HttpResponse<String> rep = new HttpResponse<>();
 		billService.delete(id);
+		return rep;
+	}
+	
+	@GetMapping(path = "/account/{id}")
+	public HttpResponse<List<Bill>> queryByAccountId(String id) throws InstantiationException, IllegalAccessException{
+		HttpResponse<List<Bill>> rep = new HttpResponse<List<Bill>>();
+		List<Bill> data = billService.findByAccountId(id);
+		rep.setData(data);
 		return rep;
 	}
 

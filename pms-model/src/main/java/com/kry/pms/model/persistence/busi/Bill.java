@@ -11,9 +11,11 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import com.kry.pms.model.persistence.PersistenceModel;
+import com.kry.pms.model.persistence.goods.Product;
 import com.kry.pms.model.persistence.guest.Customer;
 import com.kry.pms.model.persistence.marketing.ProtocolCorpation;
 import com.kry.pms.model.persistence.org.Employee;
+import com.kry.pms.model.persistence.sys.Account;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -23,22 +25,26 @@ import lombok.Setter;
 @Setter
 @Table(name = "t_bill")
 public class Bill extends PersistenceModel {
+	@OneToOne
+	private Account account;
 	@Column
 	private Double total;
+	@Column
+	private Integer quantity;
+	@OneToOne
+	private Product product;
 	@Column
 	private String type;
 	@OneToOne
 	private Employee operationEmployee;
 	@Column(columnDefinition = "varchar(255) COMMENT '操作员备注'")
 	private String operationRemark;
-	@OneToOne
-	private Customer customer;
-	@OneToOne
-	private Group group;
 	@Column
 	private Integer currentItemSeq;
 	@Column
 	private String paymentStatus;
+	@Column
+	private Integer billSeq;
 	@Column
 	private String settlementStatus;
 	@OneToMany(cascade = CascadeType.ALL)
