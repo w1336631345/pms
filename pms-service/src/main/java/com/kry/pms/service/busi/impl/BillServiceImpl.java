@@ -19,9 +19,13 @@ import com.kry.pms.model.persistence.busi.Bill;
 import com.kry.pms.model.persistence.busi.BillItem;
 import com.kry.pms.model.persistence.busi.CheckInRecord;
 import com.kry.pms.model.persistence.busi.RoomRecord;
+import com.kry.pms.model.persistence.goods.Product;
 import com.kry.pms.model.persistence.sys.Account;
+import com.kry.pms.model.persistence.sys.BusinessSeq;
 import com.kry.pms.service.busi.BillItemService;
 import com.kry.pms.service.busi.BillService;
+import com.kry.pms.service.goods.ProductService;
+import com.kry.pms.service.sys.BusinessSeqService;
 
 @Service
 public class BillServiceImpl implements BillService {
@@ -29,9 +33,26 @@ public class BillServiceImpl implements BillService {
 	BillDao billDao;
 	@Autowired
 	BillItemService billItemService;
-
+	@Autowired
+	ProductService productService;
+	@Autowired
+	BusinessSeqService businessSeqService;
 	@Override
 	public Bill add(Bill bill) {
+		if(bill.getProduct()!=null&&bill.getProduct().getId()!=null) {
+			Product p = productService.findById(bill.getProduct().getId());
+			if(p!=null) {
+				if(1==p.getDirection()) {
+					bill.setCost(bill.getTotal());
+				}else {
+					bill.setPay(bill.getTotal());
+				}
+				bill.setType(p.getType());
+				bill.setBusinessDate(businessSeqService.getBuinessDate(p.getHotelCode()));
+			}
+		}else {
+			return null;
+		}
 		return billDao.saveAndFlush(bill);
 	}
 

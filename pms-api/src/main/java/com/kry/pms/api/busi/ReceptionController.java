@@ -22,6 +22,7 @@ import com.kry.pms.model.http.request.busi.CheckInBo;
 import com.kry.pms.model.http.request.busi.CheckOutBo;
 import com.kry.pms.model.http.request.busi.RenewBo;
 import com.kry.pms.model.http.request.busi.RoomAssignBo;
+import com.kry.pms.model.http.response.busi.AccountSummaryVo;
 import com.kry.pms.model.persistence.busi.BookingRecord;
 import com.kry.pms.service.busi.ReceptionService;
 import com.kry.pms.service.org.EmployeeService;
@@ -60,6 +61,13 @@ public class ReceptionController extends BaseController<String> {
 	public HttpResponse<String> checkIn(@PathVariable String id) {
 		HttpResponse<String> rep = new HttpResponse<String>();
 		BeanUtils.copyProperties(receptionService.checkIn(id), rep);
+		return rep;
+	}
+	@GetMapping(path="/account/summary/{id}")
+	public HttpResponse<AccountSummaryVo> getAccountSummary(@PathVariable String id){
+		HttpResponse<AccountSummaryVo> rep = new HttpResponse<>();
+		AccountSummaryVo accountSummaryVo = receptionService.getAccountSummaryByCheckRecordId(id);
+		rep.setData(accountSummaryVo);
 		return rep;
 	}
 

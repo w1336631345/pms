@@ -40,7 +40,7 @@ public class CheckInRecord extends PersistenceModel {
 	@JoinColumn(name="booking_record_id")
 	private BookingRecord BookingRecord;
 	@OneToOne
-	private RoomPriceSchemeItem PriceSchemeItem;
+	private RoomPriceSchemeItem priceSchemeItem;
 	@OneToOne
 	private GuestRoom guestRoom;
 	@Column(name = "name_")
@@ -181,10 +181,10 @@ public class CheckInRecord extends PersistenceModel {
 		BookingRecord = bookingRecord;
 	}
 	public RoomPriceSchemeItem getPriceSchemeItem() {
-		return PriceSchemeItem;
+		return priceSchemeItem;
 	}
 	public void setPriceSchemeItem(RoomPriceSchemeItem priceSchemeItem) {
-		PriceSchemeItem = priceSchemeItem;
+		this.priceSchemeItem = priceSchemeItem;
 	}
 	public GuestRoom getGuestRoom() {
 		return guestRoom;

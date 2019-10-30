@@ -1,11 +1,13 @@
 package com.kry.pms.service.busi;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
 import com.kry.pms.base.DtoResponse;
 import com.kry.pms.base.PageResponse;
 import com.kry.pms.model.http.request.busi.CheckInBo;
+import com.kry.pms.model.http.response.busi.AccountSummaryVo;
 import com.kry.pms.model.persistence.busi.BookingItem;
 import com.kry.pms.model.persistence.busi.BookingRecord;
 import com.kry.pms.model.persistence.busi.CheckInRecord;
@@ -39,4 +41,6 @@ public interface CheckInRecordService extends BaseService<CheckInRecord> {
 	PageResponse<Map<String, Object>> unreturnedGuests(int pageIndex, int pageSize, String status, User user);
 
 	List<Map<String, Object>> getStatistics(User user);
+
+	public Collection<AccountSummaryVo> getAccountSummaryByOrderNum(String orderNum, String accountCustomer);
 }

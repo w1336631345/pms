@@ -24,16 +24,16 @@ import com.kry.pms.model.http.request.busi.CheckInBo;
 import com.kry.pms.model.http.request.busi.CheckInItemBo;
 import com.kry.pms.model.http.request.busi.CheckOutBo;
 import com.kry.pms.model.http.request.busi.RoomAssignBo;
+import com.kry.pms.model.http.response.busi.AccountSummaryVo;
 import com.kry.pms.model.http.response.busi.CheckOutVo;
 import com.kry.pms.model.persistence.busi.BillItem;
-import com.kry.pms.model.persistence.busi.BookingItem;
 import com.kry.pms.model.persistence.busi.BookingRecord;
 import com.kry.pms.model.persistence.busi.CheckInRecord;
-import com.kry.pms.model.persistence.marketing.RoomPriceSchemeItem;
 import com.kry.pms.model.persistence.org.Employee;
 import com.kry.pms.model.persistence.room.GuestRoom;
 import com.kry.pms.model.persistence.room.GuestRoomStatus;
 import com.kry.pms.model.persistence.room.RoomType;
+import com.kry.pms.model.persistence.sys.Account;
 import com.kry.pms.model.persistence.sys.BusinessSeq;
 import com.kry.pms.model.persistence.sys.SystemConfig;
 import com.kry.pms.service.busi.BillService;
@@ -47,6 +47,7 @@ import com.kry.pms.service.org.EmployeeService;
 import com.kry.pms.service.room.GuestRoomService;
 import com.kry.pms.service.room.GuestRoomStatusService;
 import com.kry.pms.service.room.RoomTypeService;
+import com.kry.pms.service.sys.AccountService;
 import com.kry.pms.service.sys.BusinessSeqService;
 import com.kry.pms.service.sys.SystemConfigService;
 
@@ -76,6 +77,8 @@ public class ReceptionServiceImpl implements ReceptionService {
 	RoomPriceSchemeItemService roomPriceSchemeItemService;
 	@Autowired
 	BusinessSeqService businessSeqService;
+	@Autowired
+	AccountService accountService;
 
 	@Transactional
 	@Override
@@ -268,7 +271,7 @@ public class ReceptionServiceImpl implements ReceptionService {
 		}
 		if (response.getStatus() == 0) {
 			cir.setCheckInCount(cir.getCheckInCount() + roomAssignBo.getRoomId().length);
-			if(cir.getRoomCount()==cir.getCheckInCount()) {
+			if (cir.getRoomCount() == cir.getCheckInCount()) {
 				cir.setDeleted(Constants.DELETED_TRUE);
 			}
 			checkInRecordService.modify(cir);
@@ -282,14 +285,43 @@ public class ReceptionServiceImpl implements ReceptionService {
 	public DtoResponse<String> checkIn(String id) {
 		DtoResponse<String> rep = new DtoResponse<>();
 		CheckInRecord cir = checkInRecordService.findById(id);
-		if(cir!=null) {
+		if (cir != null) {
 			cir.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN);
 			checkInRecordService.modify(cir);
-		}else {
+		} else {
 			rep.setStatus(Constants.BusinessCode.CODE_PARAMETER_INVALID);
 			rep.setMessage("没有找到对应的入住记录");
 		}
 		return rep;
+	}
+
+	@Override
+	public AccountSummaryVo getAccountSummaryByCheckRecordId(String id) {
+		CheckInRecord cir = checkInRecordService.findById(id);
+		AccountSummaryVo asv = null;
+		if (cir != null && cir.getType() != null) {
+			switch (cir.getType()) {
+			case Constants.Type.CHECK_IN_RECORD_GROUP:
+				Account account = cir.getAccount();
+				asv = new AccountSummaryVo(account);
+				asv.setChildren(checkInRecordService.getAccountSummaryByOrderNum(cir.getOrderNum(),Constants.Type.CHECK_IN_RECORD_GROUP_CUSTOMER));
+				break;
+			case Constants.Type.CHECK_IN_RECORD_GROUP_CUSTOMER:
+
+				break;
+			case Constants.Type.CHECK_IN_RECORD_LINK:
+
+				break;
+			case Constants.Type.CHECK_IN_RECORD_LINK_CUSTOMER:
+
+				break;
+			case Constants.Type.CHECK_IN_RECORD_CUSTOMER:
+				break;
+			default:
+				break;
+			}
+		}
+		return asv;
 	}
 
 }

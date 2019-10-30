@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.kry.pms.api.BaseController;
+import com.kry.pms.base.Constants;
 import com.kry.pms.base.HttpResponse;
 import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
@@ -27,7 +29,13 @@ public class BillController extends BaseController<Bill> {
 	BillService billService;
 	@PostMapping
 	public HttpResponse<Bill> add(@RequestBody Bill bill) {
-		return getDefaultResponse().addData(billService.add(bill));
+		HttpResponse<Bill> rep = getDefaultResponse();
+		bill = billService.add(bill);
+		if(bill==null) {
+			rep.setStatus(Constants.BusinessCode.CODE_PARAMETER_INVALID);
+			rep.setMessage("消费项目不合法");
+		}
+		return rep.addData(bill);
 	}
 
 	@PutMapping
@@ -43,12 +51,20 @@ public class BillController extends BaseController<Bill> {
 	}
 	
 	@GetMapping(path = "/account/{id}")
-	public HttpResponse<List<Bill>> queryByAccountId(String id) throws InstantiationException, IllegalAccessException{
+	public HttpResponse<List<Bill>> queryByAccountId(@PathVariable String id) throws InstantiationException, IllegalAccessException{
 		HttpResponse<List<Bill>> rep = new HttpResponse<List<Bill>>();
 		List<Bill> data = billService.findByAccountId(id);
 		rep.setData(data);
 		return rep;
 	}
+	@GetMapping(path = "/group/{id}")
+	public HttpResponse<List<Bill>> queryByGroupId(@PathVariable String id) throws InstantiationException, IllegalAccessException{
+		HttpResponse<List<Bill>> rep = new HttpResponse<List<Bill>>();
+		List<Bill> data = billService.findByAccountId(id);
+		rep.setData(data);
+		return rep;
+	}
+
 
 	@GetMapping
 	public HttpResponse<PageResponse<Bill>> query(HttpServletRequest request) throws InstantiationException, IllegalAccessException{

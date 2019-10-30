@@ -1,5 +1,6 @@
 package com.kry.pms.model.persistence.busi;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -35,6 +36,10 @@ public class Bill extends PersistenceModel {
 	private Product product;
 	@Column
 	private String type;
+	@Column
+	private Double cost;
+	@Column
+	private Double pay;
 	@OneToOne
 	private Employee operationEmployee;
 	@Column(columnDefinition = "varchar(255) COMMENT '操作员备注'")
@@ -50,5 +55,15 @@ public class Bill extends PersistenceModel {
 	@OneToMany(cascade = CascadeType.ALL)
 	@JoinColumn(name = "bill_id")
 	private List<BillItem> items;
+	@Column
+	private LocalDate businessDate;
+	@Column
+	private String remark;
+	@Column
+	private String transferFlag;
+	@OneToOne
+	private Bill sourceBill;
+	
+	
 
 }

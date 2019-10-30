@@ -1,6 +1,10 @@
 package com.kry.pms.service.sys.impl;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
@@ -12,17 +16,22 @@ import com.kry.pms.base.Constants;
 import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
 import com.kry.pms.dao.sys.AccountDao;
+import com.kry.pms.model.http.response.busi.AccountSummaryVo;
 import com.kry.pms.model.persistence.busi.Bill;
+import com.kry.pms.model.persistence.busi.CheckInRecord;
 import com.kry.pms.model.persistence.busi.RoomRecord;
 import com.kry.pms.model.persistence.sys.Account;
+import com.kry.pms.service.busi.CheckInRecordService;
 import com.kry.pms.service.sys.AccountService;
 
+import lombok.val;
+
 @Service
-public class  AccountServiceImpl implements  AccountService{
+public class AccountServiceImpl implements AccountService {
 	@Autowired
-	 AccountDao accountDao;
-	 
-	 @Override
+	AccountDao accountDao;
+
+	@Override
 	public Account add(Account account) {
 		return accountDao.saveAndFlush(account);
 	}
@@ -48,8 +57,8 @@ public class  AccountServiceImpl implements  AccountService{
 
 	@Override
 	public List<Account> getAllByHotelCode(String code) {
-		return null;//默认不实现
-		//return accountDao.findByHotelCode(code);
+		return null;// 默认不实现
+		// return accountDao.findByHotelCode(code);
 	}
 
 	@Override
@@ -67,7 +76,7 @@ public class  AccountServiceImpl implements  AccountService{
 
 	@Override
 	public Account billEntry(RoomRecord rr) {
-		
+
 		return null;
 	}
 
@@ -77,8 +86,26 @@ public class  AccountServiceImpl implements  AccountService{
 		return null;
 	}
 
-	 
-	 
-	 
-	 
+	@Override
+	public Collection<AccountSummaryVo> getAccountSummaryByOrderNum(String orderNum, String checkInType) {
+		List<Account> accs = accountDao.findByOrderNum(orderNum, checkInType);
+		Map<String, AccountSummaryVo> asvm = new HashMap<>();
+		for (Account acc : accs) {
+			AccountSummaryVo asv = null;
+			if (!asvm.containsKey(acc.getRoomNum())) {
+				asv = new AccountSummaryVo();
+				asv.setType("temp");
+				asv.setRoomNum(acc.getRoomNum());
+				asv.setId(acc.getRoomNum());
+				asv.setName(acc.getRoomNum());
+				asv.setChildren(new ArrayList<AccountSummaryVo>());
+				asvm.put(acc.getRoomNum(), asv);
+			} else {
+				asv = asvm.get(acc.getRoomNum());
+			}
+			asv.getChildren().add(new AccountSummaryVo(acc));
+		}
+		return asvm.values();
+	}
+
 }

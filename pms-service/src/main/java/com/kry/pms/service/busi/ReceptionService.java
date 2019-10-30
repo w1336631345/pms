@@ -11,6 +11,7 @@ import com.kry.pms.model.http.request.busi.BookingBo;
 import com.kry.pms.model.http.request.busi.CheckInBo;
 import com.kry.pms.model.http.request.busi.CheckOutBo;
 import com.kry.pms.model.http.request.busi.RoomAssignBo;
+import com.kry.pms.model.http.response.busi.AccountSummaryVo;
 import com.kry.pms.model.http.response.busi.CheckOutVo;
 import com.kry.pms.model.persistence.busi.BillItem;
 import com.kry.pms.model.persistence.busi.BookingRecord;
@@ -59,4 +60,6 @@ public interface ReceptionService {
 	DtoResponse<BookingRecord> groupBook(BookingRecord br);
 
 	public DtoResponse<String> checkIn(String id);
+
+	public AccountSummaryVo getAccountSummaryByCheckRecordId(String id);
 }

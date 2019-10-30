@@ -4,6 +4,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import com.kry.pms.model.persistence.PersistenceModel;
 import com.kry.pms.model.persistence.busi.Group;
@@ -20,11 +21,11 @@ import lombok.Setter;
 @Table(name = "t_account")
 public class Account extends PersistenceModel {
 	@Column
-	private String nickname;
-	@Column
-	private String username;
+	private String name;
 	@Column
 	private String code;
+	@Transient
+	private String roomNum;
 	@Column
 	private Double total;
 	@Column(name="type_")

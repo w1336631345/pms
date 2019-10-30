@@ -23,6 +23,8 @@ public class Product extends PersistenceModel {
 	private String type;
 	@Column(name = "code_")
 	private String code;
+	@Column
+	private Integer direction;
 	@Column(columnDefinition = "varchar(400) default NUll COMMENT '主图'")
 	private String mainPicture;
 	@Column(columnDefinition = "varchar(400) default NUll COMMENT '缩略图'")

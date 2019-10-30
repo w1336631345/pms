@@ -4,6 +4,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -33,6 +35,7 @@ import com.kry.pms.base.PageResponse;
 import com.kry.pms.dao.busi.CheckInRecordDao;
 import com.kry.pms.model.http.request.busi.CheckInBo;
 import com.kry.pms.model.http.request.busi.CheckInItemBo;
+import com.kry.pms.model.http.response.busi.AccountSummaryVo;
 import com.kry.pms.model.persistence.busi.BookingItem;
 import com.kry.pms.model.persistence.busi.BookingRecord;
 import com.kry.pms.model.persistence.busi.CheckInRecord;
@@ -98,9 +101,9 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 	@Override
 	public CheckInRecord modify(CheckInRecord checkInRecord) {
 		CheckInRecord dbCir = findById(checkInRecord.getId());
-		if(dbCir!=null) {
+		if (dbCir != null) {
 			checkInRecord.setMainRecord(dbCir.getMainRecord());
-			if(checkInRecord.getCustomer()!=null) {
+			if (checkInRecord.getCustomer() != null) {
 				Customer customer = customerService.modify(checkInRecord.getCustomer());
 				checkInRecord.setCustomer(customer);
 			}
@@ -204,7 +207,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 		}
 		BusinessSeq bs = businessSeqService.fetchNextSeq(gr.getHotelCode(), Constants.Key.BUSINESS_SEQ_KEY);
 		String tempName = br.getName();
-		String checkInSn =bs.getCurrentDateStr()+bs.getCurrentSeq();
+		String checkInSn = bs.getCurrentDateStr() + bs.getCurrentSeq();
 		roomUsageService.use(gr, Constants.Status.ROOM_USAGE_BOOK, br.getArriveTime(), br.getLeaveTime(), checkInSn,
 				tempName, response);
 		if (response.getStatus() == 0) {
@@ -255,10 +258,10 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 			startDate = startDate.plusDays(-1);
 		}
 		List<CheckInRecord> data = new ArrayList<CheckInRecord>();
-		String tempName = cir.getName()+gr.getRoomNum();
+		String tempName = cir.getName() + gr.getRoomNum();
 		if (response.getStatus() == 0) {
 			for (int i = 1; i <= humanCount; i++) {
-				Customer customer = customerService.createTempCustomer(tempName+"#"+i);
+				Customer customer = customerService.createTempCustomer(tempName + "#" + i);
 				CheckInRecord ncir = null;
 				try {
 					ncir = (CheckInRecord) cir.clone();
@@ -290,12 +293,17 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 
 	@Override
 	public CheckInRecord book(CheckInRecord checkInRecord) {
-		BusinessSeq bs = businessSeqService.fetchNextSeq(checkInRecord.getHotelCode(), Constants.Key.BUSINESS_ORDER_NUM_SEQ_KEY);
-		String orderNum =bs.getCurrentDateStr()+String.format("%04d", bs.getCurrentSeq()); 
+		BusinessSeq bs = businessSeqService.fetchNextSeq(checkInRecord.getHotelCode(),
+				Constants.Key.BUSINESS_ORDER_NUM_SEQ_KEY);
+		String orderNum = bs.getCurrentDateStr() + String.format("%04d", bs.getCurrentSeq());
 		checkInRecord.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION);
 		checkInRecord.setType(Constants.Type.CHECK_IN_RECORD_GROUP);
 		checkInRecord.setOrderNum(orderNum);
-		for(CheckInRecord item:checkInRecord.getSubRecords()) {
+		Account account = new Account();
+		account.setType(Constants.Type.ACCOUNT_GROUP);
+		account.setName(checkInRecord.getName());
+		checkInRecord.setAccount(account);
+		for (CheckInRecord item : checkInRecord.getSubRecords()) {
 			item.setOrderNum(orderNum);
 			item.setHoldTime(checkInRecord.getHoldTime());
 			item.setArriveTime(checkInRecord.getArriveTime());
@@ -313,19 +321,20 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 
 	@Override
 	public PageResponse<CheckInRecord> notYet(int pageIndex, int pageSize, String status, User user) {
-		Pageable page = org.springframework.data.domain.PageRequest.of(pageIndex-1, pageSize);
+		Pageable page = org.springframework.data.domain.PageRequest.of(pageIndex - 1, pageSize);
 		Specification<CheckInRecord> specification = new Specification<CheckInRecord>() {
 			@Override
-			public Predicate toPredicate(Root<CheckInRecord> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
+			public Predicate toPredicate(Root<CheckInRecord> root, CriteriaQuery<?> query,
+					CriteriaBuilder criteriaBuilder) {
 				ArrayList<Predicate> list = new ArrayList<>();
-				//旅馆编码
-				if (user != null){
+				// 旅馆编码
+				if (user != null) {
 					Path<Object> hotelCode = root.get("hotelCode");
 					Predicate p1 = criteriaBuilder.equal(hotelCode.as(String.class), user.getHotelCode());
 					list.add(p1);
 				}
-				//状态（R：预订，I：入住，O：退房，D：历史订单，N：未到，S：退房未结账，X：取消）
-				if (status != null && status != ""){
+				// 状态（R：预订，I：入住，O：退房，D：历史订单，N：未到，S：退房未结账，X：取消）
+				if (status != null && status != "") {
 					Path<Object> status1 = root.get("status");
 					Predicate p1 = criteriaBuilder.equal(status1.as(String.class), status);
 					list.add(p1);
@@ -336,15 +345,15 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 			}
 
 		};
-		Page<CheckInRecord> p = checkInRecordDao.findAll(specification,page);
+		Page<CheckInRecord> p = checkInRecordDao.findAll(specification, page);
 		return convent(p);
 	}
 
 	@Override
 	public PageResponse<Map<String, Object>> unreturnedGuests(int pageIndex, int pageSize, String status, User user) {
-		Pageable page = org.springframework.data.domain.PageRequest.of(pageIndex-1, pageSize);
+		Pageable page = org.springframework.data.domain.PageRequest.of(pageIndex - 1, pageSize);
 		String hotelCode = null;
-		if(user != null){
+		if (user != null) {
 			hotelCode = user.getHotelCode();
 		}
 		Page<Map<String, Object>> p = checkInRecordDao.unreturnedGuests(page, status, hotelCode);
@@ -356,14 +365,42 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 		pr.setContent(p.getContent());
 		return pr;
 	}
+
 	@Override
-	public List<Map<String, Object>> getStatistics(User user){
+	public List<Map<String, Object>> getStatistics(User user) {
 		String hotelCode = null;
-		if(user != null){
+		if (user != null) {
 			hotelCode = user.getHotelCode();
 		}
 		List<Map<String, Object>> list = checkInRecordDao.getStatistics(hotelCode);
 		return list;
+	}
+
+	@Override
+	public Collection<AccountSummaryVo> getAccountSummaryByOrderNum(String orderNum, String type) {
+		List<CheckInRecord> cirs = checkInRecordDao.findByOrderNumAndTypeAndDeleted(orderNum,type,Constants.DELETED_FALSE);
+		Map<String, AccountSummaryVo> asvm = new HashMap<>();
+		for (CheckInRecord cir : cirs) {
+			AccountSummaryVo asv = null;
+			if (cir.getAccount()!=null) {
+				Account acc = cir.getAccount();
+				acc.setRoomNum(cir.getGuestRoom().getRoomNum());
+				acc.setName(cir.getCustomer().getName());
+				if(!asvm.containsKey(cir.getGuestRoom().getRoomNum())) {
+					asv = new AccountSummaryVo();
+					asv.setType("temp");
+					asv.setRoomNum(acc.getRoomNum());
+					asv.setId(acc.getRoomNum());
+					asv.setName(acc.getRoomNum());
+					asv.setChildren(new ArrayList<AccountSummaryVo>());
+					asvm.put(acc.getRoomNum(), asv);
+				} else {
+					asv = asvm.get(acc.getRoomNum());
+				}
+				asv.getChildren().add(new AccountSummaryVo(acc));
+			}	
+		}
+		return asvm.values();
 	}
 
 }

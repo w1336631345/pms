@@ -1,5 +1,8 @@
 package com.kry.pms.service.sys.impl;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +41,16 @@ public class  BusinessSeqServiceImpl implements  BusinessSeqService{
 	public BusinessSeq modify(BusinessSeq businessSeq) {
 		return businessSeqDao.saveAndFlush(businessSeq);
 	}
-
+	@Override
+	public LocalDate getBuinessDate(String hotelCode) {
+		BusinessSeq bs = businessSeqDao.findByHotelCodeAndSeqKey(hotelCode, Constants.Key.BUSINESS_BUSINESS_DATE_SEQ_KEY);
+		if(bs!=null) {
+			return LocalDate.parse(bs.getCurrentSeq().toString(),DateTimeFormatter.ofPattern("yyyyMMdd"));
+		}
+		return null;
+		
+	}
+	
 	@Override
 	public BusinessSeq findById(String id) {
 		return businessSeqDao.getOne(id);

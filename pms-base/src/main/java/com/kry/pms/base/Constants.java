@@ -61,9 +61,14 @@ public class Constants {
 	public interface Key{
 		public static final String BUSINESS_SEQ_KEY="CHECKIN_SN";
 		public static final String BUSINESS_ORDER_NUM_SEQ_KEY="ORDER_NUM";
+		public static final String BUSINESS_BUSINESS_DATE_SEQ_KEY="BUINESS_DATE";
 	}
 
 	public interface Type {
+		
+		public static final String PRODUCT_TYPE_COST="cost";
+		public static final String PRODUCT_TYPE_PAY="pay";
+		
 		
 		public static final String BOOK_GROUP = "GROUP";
 		

@@ -40,4 +40,6 @@ public interface CheckInRecordDao extends BaseDao<CheckInRecord>{
 			" and if(:hotelCode is not null && :hotelCode != '', hotel_code=:hotelCode, 1=1 ) "+
 			" GROUP BY status ",nativeQuery = true)
 	List<Map<String, Object>> getStatistics(@Param("hotelCode")String hotelCode);
+
+	List<CheckInRecord> findByOrderNumAndTypeAndDeleted(String orderNum, String type, int deletedFalse);
 }
