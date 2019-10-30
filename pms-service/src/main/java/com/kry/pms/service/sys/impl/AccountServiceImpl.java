@@ -1,5 +1,6 @@
 package com.kry.pms.service.sys.impl;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -23,6 +24,7 @@ import com.kry.pms.model.persistence.busi.RoomRecord;
 import com.kry.pms.model.persistence.sys.Account;
 import com.kry.pms.service.busi.CheckInRecordService;
 import com.kry.pms.service.sys.AccountService;
+import com.kry.pms.util.BigDecimalUtil;
 
 import lombok.val;
 
@@ -82,8 +84,18 @@ public class AccountServiceImpl implements AccountService {
 
 	@Override
 	public Account billEntry(Bill bill) {
-		// TODO Auto-generated method stub
-		return null;
+		Account account = findById(bill.getAccount().getId());
+		if (account != null) {
+			if (bill.getCost() != null) {
+				account.setCost(BigDecimalUtil.add(account.getCost(), bill.getCost()));
+			}
+			if (bill.getPay() != null) {
+				account.setPay(BigDecimalUtil.add(account.getPay(), bill.getPay()));
+			}
+			account.setTotal(BigDecimalUtil.sub(account.getPay(), account.getCost()));
+		}
+		account.setCurrentBillSeq(account.getCurrentBillSeq()+1);
+		return modify(account);
 	}
 
 	@Override

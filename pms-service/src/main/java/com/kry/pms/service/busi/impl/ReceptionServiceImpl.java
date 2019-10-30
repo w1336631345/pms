@@ -302,9 +302,14 @@ public class ReceptionServiceImpl implements ReceptionService {
 		if (cir != null && cir.getType() != null) {
 			switch (cir.getType()) {
 			case Constants.Type.CHECK_IN_RECORD_GROUP:
+				asv = new AccountSummaryVo();
+				asv.setName("团队所有账务");
+				asv.setType("temp");
+				asv.setChildren(new ArrayList<>());
 				Account account = cir.getAccount();
-				asv = new AccountSummaryVo(account);
-				asv.setChildren(checkInRecordService.getAccountSummaryByOrderNum(cir.getOrderNum(),Constants.Type.CHECK_IN_RECORD_GROUP_CUSTOMER));
+				AccountSummaryVo group = new AccountSummaryVo(account);
+				asv.getChildren().add(group);
+				asv.getChildren().addAll((checkInRecordService.getAccountSummaryByOrderNum(cir.getOrderNum(),Constants.Type.CHECK_IN_RECORD_GROUP_CUSTOMER)));
 				break;
 			case Constants.Type.CHECK_IN_RECORD_GROUP_CUSTOMER:
 

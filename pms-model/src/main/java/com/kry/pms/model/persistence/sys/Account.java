@@ -27,9 +27,13 @@ public class Account extends PersistenceModel {
 	@Transient
 	private String roomNum;
 	@Column
-	private Double total;
+	private Double total = 0.0;
 	@Column(name="type_")
 	private String type;
+	@Column
+	private Double cost=0.0;
+	@Column
+	private Double pay =0.0;
 	@OneToOne
 	private Employee operationEmployee;
 	@Column(columnDefinition = "varchar(255) COMMENT '操作员备注'")
@@ -41,5 +45,5 @@ public class Account extends PersistenceModel {
 	@OneToOne
 	private ProtocolCorpation ProtocolCorpation;
 	@Column
-	private Integer currentItemSeq;
+	private Integer currentBillSeq = 0;
 }

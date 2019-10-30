@@ -29,6 +29,7 @@ public class BillController extends BaseController<Bill> {
 	BillService billService;
 	@PostMapping
 	public HttpResponse<Bill> add(@RequestBody Bill bill) {
+		bill.setOperationEmployee(getCurrentEmployee());
 		HttpResponse<Bill> rep = getDefaultResponse();
 		bill = billService.add(bill);
 		if(bill==null) {

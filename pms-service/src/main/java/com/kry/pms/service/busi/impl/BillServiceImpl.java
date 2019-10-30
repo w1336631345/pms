@@ -25,6 +25,7 @@ import com.kry.pms.model.persistence.sys.BusinessSeq;
 import com.kry.pms.service.busi.BillItemService;
 import com.kry.pms.service.busi.BillService;
 import com.kry.pms.service.goods.ProductService;
+import com.kry.pms.service.sys.AccountService;
 import com.kry.pms.service.sys.BusinessSeqService;
 
 @Service
@@ -37,6 +38,8 @@ public class BillServiceImpl implements BillService {
 	ProductService productService;
 	@Autowired
 	BusinessSeqService businessSeqService;
+	@Autowired
+	AccountService accountService;
 	@Override
 	public Bill add(Bill bill) {
 		if(bill.getProduct()!=null&&bill.getProduct().getId()!=null) {
@@ -53,6 +56,9 @@ public class BillServiceImpl implements BillService {
 		}else {
 			return null;
 		}
+		Account account = accountService.billEntry(bill);
+		bill.setBillSeq(account.getCurrentBillSeq());
+		bill.setAccount(account);
 		return billDao.saveAndFlush(bill);
 	}
 

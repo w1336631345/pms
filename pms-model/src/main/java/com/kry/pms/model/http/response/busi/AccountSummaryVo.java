@@ -13,7 +13,8 @@ public class AccountSummaryVo {
 	private Double total;
 	private String roomNum;
 	private String type;
-	
+	private Double pay;
+	private Double cost;
 	private Collection<AccountSummaryVo> children;
 
 	public AccountSummaryVo() {
@@ -25,5 +26,7 @@ public class AccountSummaryVo {
 		this.total = acc.getTotal();
 		this.roomNum = acc.getRoomNum();
 		this.type = acc.getType();
+		this.cost = acc.getCost();
+		this.pay = acc.getPay();
 	}
 }
