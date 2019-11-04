@@ -79,7 +79,7 @@ public class BillItemServiceImpl implements BillItemService {
 		billItem.setType(Constants.Type.BILL_ITEM_ROOM_RECORD);
 		billItem.setTotal(rr.getCost());
 		if (billItem.getTotal() != null && billItem.getTotal() > 0) {
-			billItem.setStatusPayment(Constants.Status.BILL_TO_BE_PAID);
+			billItem.setStatusPayment(Constants.Status.BILL_NEED_SETTLED);
 		}
 		billItem.setBillDate(recordDate);
 		billItem.setItemSeq(bill.getCurrentItemSeq() + 1);
@@ -90,7 +90,7 @@ public class BillItemServiceImpl implements BillItemService {
 	public BillItem checkAndPayBill(String id) {
 		BillItem item = findById(id);
 		if (item != null) {
-			item.setStatusPayment(Constants.Status.BILL_PAYMENTED);
+			item.setStatusPayment(Constants.Status.BILL_SETTLED);
 		}
 		return null;
 	}

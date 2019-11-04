@@ -1,37 +1,48 @@
 package com.kry.pms.service.sys.impl;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.transaction.Transactional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import com.kry.pms.base.Constants;
+import com.kry.pms.base.DtoResponse;
 import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
 import com.kry.pms.dao.sys.AccountDao;
+import com.kry.pms.model.http.request.busi.BillCheckBo;
 import com.kry.pms.model.http.response.busi.AccountSummaryVo;
 import com.kry.pms.model.persistence.busi.Bill;
-import com.kry.pms.model.persistence.busi.CheckInRecord;
+import com.kry.pms.model.persistence.busi.CreditGrantingRecord;
 import com.kry.pms.model.persistence.busi.RoomRecord;
+import com.kry.pms.model.persistence.busi.SettleAccountRecord;
 import com.kry.pms.model.persistence.sys.Account;
-import com.kry.pms.service.busi.CheckInRecordService;
+import com.kry.pms.service.busi.BillService;
+import com.kry.pms.service.busi.CreditGrantingRecordService;
+import com.kry.pms.service.busi.SettleAccountRecordService;
 import com.kry.pms.service.sys.AccountService;
 import com.kry.pms.util.BigDecimalUtil;
-
-import lombok.val;
 
 @Service
 public class AccountServiceImpl implements AccountService {
 	@Autowired
 	AccountDao accountDao;
+	@Autowired
+	BillService billService;
+	@Autowired
+	CreditGrantingRecordService creditGrantingRecordService;
+	@Autowired
+	SettleAccountRecordService settleAccountRecordService;
 
 	@Override
 	public Account add(Account account) {
@@ -92,9 +103,12 @@ public class AccountServiceImpl implements AccountService {
 			if (bill.getPay() != null) {
 				account.setPay(BigDecimalUtil.add(account.getPay(), bill.getPay()));
 			}
-			account.setTotal(BigDecimalUtil.sub(account.getPay(), account.getCost()));
+			account.setTotal(BigDecimalUtil.sub(account.getCost(), account.getPay()));
 		}
-		account.setCurrentBillSeq(account.getCurrentBillSeq()+1);
+		account.setCurrentBillSeq(account.getCurrentBillSeq() + 1);
+		if(Constants.Status.BILL_NEED_SETTLED.equals(bill.getStatus())) {
+			
+		}
 		return modify(account);
 	}
 
@@ -118,6 +132,53 @@ public class AccountServiceImpl implements AccountService {
 			asv.getChildren().add(new AccountSummaryVo(acc));
 		}
 		return asvm.values();
+	}
+
+	@Override
+	public Collection<Account> getAccountByOrderNumAndStatusAndCheckInType(String orderNum, String checkInType,
+			String status) {
+		return accountDao.findAccountByOrderNumAndStatusAndCheckInType(orderNum, checkInType, status);
+	}
+
+	@Transactional
+	@Override
+	public DtoResponse<Account> checkCustomerBill(BillCheckBo billCheckBo) {
+		DtoResponse<Account> rep = new DtoResponse<Account>();
+		Account account = findById(billCheckBo.getAccountId());
+		List<Bill> bills = null;
+		double total = 0.0;
+		for(Bill b:billCheckBo.getBills()) {
+			if(b.getCost()!=null) {
+				BigDecimalUtil.sub(total, b.getCost());
+			}
+			if(b.getPay()!=null) {
+				BigDecimalUtil.add(total, b.getPay());
+			}
+		}
+		if (account != null) {
+			SettleAccountRecord settleAccountRecord = settleAccountRecordService.create(billCheckBo, account);
+			if (Constants.Type.BILL_CHECK_TYPE_ALL.equals(billCheckBo.getCheckType())) {
+				bills = billService.checkAccountAllBill(account,total,rep,settleAccountRecord.getRecordNum());
+			} else {
+				bills = billService.checkBillIds(billCheckBo.getBillIds(),total, rep,settleAccountRecord.getRecordNum());
+			}
+			if (rep.getStatus() == 0) {
+				List<Bill> flatBills = billService.addFlatBills(billCheckBo.getBills(),billCheckBo.getOperationEmployee(),settleAccountRecord.getRecordNum());
+				if (rep.getStatus() == 0) {
+					settleAccountRecord.setBills(bills);
+					settleAccountRecord.setFlatBills(flatBills);
+					settleAccountRecordService.modify(settleAccountRecord);
+				}
+			}
+		} else {
+			rep.setStatus(Constants.BusinessCode.CODE_PARAMETER_INVALID);
+			rep.setMessage("找不到需要结账的订单");
+		}
+		if (rep.getStatus() != 0) {
+			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+		}
+		rep.setData(account);
+		return rep;
 	}
 
 }

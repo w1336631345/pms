@@ -46,15 +46,19 @@ public class Constants {
 		public static final String CHECKIN_RECORD_STATUS_NO_SHOW = "N";//未到
 		public static final String CHECKIN_RECORD_STATUS_OUT_UNSETTLED = "S";//退房未结账
 		public static final String CHECKIN_RECORD_STATUS_CANCLE_BOOK = "X";//取消
-		public static final String BILL_PAYMENTED = "PAYMENTED";
-		public static final String BILL_TO_BE_PAID = "TO_BE_PAID";
-		public static final String BILL_NO_PAYMENT_REQUIRED = "NO_PAYMENT_REQUIRED";
+		public static final String BILL_SETTLED = "SETTLED";
+		public static final String BILL_NEED_SETTLED = "NEED_SETTLED";
+		public static final String BILL_TRANSFER = "TRANSFER";
 		
 		public static final String ROOM_USAGE_FREE="F";
 		public static final String ROOM_USAGE_CHECK_IN="I";
 		public static final String ROOM_USAGE_LOCKED="L";
 		public static final String ROOM_USAGE_BOOK="R";
 		public static final String ROOM_USAGE_REPARIE="p";
+		
+		public static final String ACCOUNT_IN="I";
+		public static final String ACCOUNT_SETTLE="S";
+		public static final String ACCOUNT_HOLD="H";
 
 	}
 	
@@ -62,9 +66,17 @@ public class Constants {
 		public static final String BUSINESS_SEQ_KEY="CHECKIN_SN";
 		public static final String BUSINESS_ORDER_NUM_SEQ_KEY="ORDER_NUM";
 		public static final String BUSINESS_BUSINESS_DATE_SEQ_KEY="BUINESS_DATE";
+		public static final String BUSINESS_BUSINESS_SETTLE_SEQ_KEY="SETTLE_NUM";
 	}
 
 	public interface Type {
+		
+		public static final String BILL_CHECK_TYPE_ALL = "ALL";
+		public static final String BILL_CHECK_TYPE_PART = "PART";
+		
+		public static final String BUSINESS_SEQ_PDS = "PDS";
+		public static final String BUSINESS_SEQ_PS="PS";
+		public static final String BUSINESS_SEQ_DS="DS";
 		
 		public static final String PRODUCT_TYPE_COST="cost";
 		public static final String PRODUCT_TYPE_PAY="pay";
@@ -87,6 +99,8 @@ public class Constants {
 		public static final String ACCOUNT_INNER = "INNER";
 		// 团队账户
 		public static final String ACCOUNT_GROUP = "GROUP";
+		// 会员账户
+		public static final String ACCOUNT_MEMBER = "MEMBER";
 		// 自由定价
 		public static final String PRODUCT_FREE_PRICE = "FREE_PRICE";
 		// 定价商品

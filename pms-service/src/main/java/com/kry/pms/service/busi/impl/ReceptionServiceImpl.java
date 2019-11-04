@@ -3,6 +3,7 @@ package com.kry.pms.service.busi.impl;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import javax.transaction.Transactional;
@@ -153,9 +154,8 @@ public class ReceptionServiceImpl implements ReceptionService {
 	}
 
 	private List<CheckInRecord> createGroupMainCheckInRecord(BookingRecord br) {
-		BusinessSeq bs = businessSeqService.fetchNextSeq(br.getHotelCode(), Constants.Key.BUSINESS_SEQ_KEY);
 		String tempName = br.getName();
-		String checkInSn = bs.getCurrentDateStr() + bs.getCurrentSeq();
+		String checkInSn = businessSeqService.fetchNextSeqNum(br.getHotelCode(), Constants.Key.BUSINESS_SEQ_KEY);
 		List<CheckInRecord> data = new ArrayList<CheckInRecord>();
 		List<CheckInRecord> sub = new ArrayList<CheckInRecord>();
 		CheckInRecord mcir = new CheckInRecord();
@@ -309,7 +309,8 @@ public class ReceptionServiceImpl implements ReceptionService {
 				Account account = cir.getAccount();
 				AccountSummaryVo group = new AccountSummaryVo(account);
 				asv.getChildren().add(group);
-				asv.getChildren().addAll((checkInRecordService.getAccountSummaryByOrderNum(cir.getOrderNum(),Constants.Type.CHECK_IN_RECORD_GROUP_CUSTOMER)));
+				asv.getChildren().addAll((checkInRecordService.getAccountSummaryByOrderNum(cir.getOrderNum(),
+						Constants.Type.CHECK_IN_RECORD_GROUP_CUSTOMER)));
 				break;
 			case Constants.Type.CHECK_IN_RECORD_GROUP_CUSTOMER:
 
@@ -327,6 +328,21 @@ public class ReceptionServiceImpl implements ReceptionService {
 			}
 		}
 		return asv;
+	}
+
+	@Override
+	public DtoResponse<List<AccountSummaryVo>> groupCheckBillConfirm(String id) {
+		DtoResponse<List<AccountSummaryVo>> rep = new DtoResponse<List<AccountSummaryVo>>();
+		CheckInRecord cir = checkInRecordService.findById(id);
+		if(cir!=null) {
+			String orderNum = cir.getOrderNum();
+			Collection<Account> asvs = accountService.getAccountByOrderNumAndStatusAndCheckInType(orderNum, Constants.Type.CHECK_IN_RECORD_GROUP_CUSTOMER, Constants.Status.ACCOUNT_IN);
+			if(asvs!=null&&!asvs.isEmpty()) {
+				rep.setStatus(Constants.BusinessCode.CODE_ILLEGAL_OPERATION);
+				rep.setMessage("有未结账的客房，请先结客房帐");
+			}
+		}
+		return rep;
 	}
 
 }

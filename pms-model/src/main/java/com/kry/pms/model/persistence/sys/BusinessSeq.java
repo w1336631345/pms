@@ -32,12 +32,16 @@ public class BusinessSeq implements Serializable {
 	protected Integer deleted = 0;
 	@Column(name = "type_")
 	private String type;
-	@Column(name="seq_key")
+	@Column(name = "seq_key")
 	private String seqKey;
-	@Column(name="current_seq")
+	@Column(name = "current_seq")
 	private Integer currentSeq;
-	@Column(name="current_date_")
+	@Column(name = "current_date_")
 	private LocalDate currentDate;
 	@Column
-	private String currentDateStr;
+	private String prefix;
+	@Column
+	private Integer snLength;
+	@Column
+	private Integer yearLength =2;
 }

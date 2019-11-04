@@ -3,6 +3,8 @@ package com.kry.pms.service.sys;
 import java.util.Collection;
 import java.util.List;
 
+import com.kry.pms.base.DtoResponse;
+import com.kry.pms.model.http.request.busi.BillCheckBo;
 import com.kry.pms.model.http.response.busi.AccountSummaryVo;
 import com.kry.pms.model.persistence.busi.Bill;
 import com.kry.pms.model.persistence.busi.RoomRecord;
@@ -21,5 +23,9 @@ public interface AccountService extends BaseService<Account> {
 	Account billEntry(Bill bill);
 	
 	Collection<AccountSummaryVo> getAccountSummaryByOrderNum(String orderNum, String checkInType);
+
+	Collection<Account> getAccountByOrderNumAndStatusAndCheckInType(String orderNum, String checkInType, String status);
+
+	DtoResponse<Account> checkCustomerBill(BillCheckBo billCheckBo);
 
 }

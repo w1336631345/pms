@@ -1,6 +1,8 @@
 
 package com.kry.pms.api.busi;
 
+import java.util.List;
+
 import javax.validation.Valid;
 
 import org.springframework.beans.BeanUtils;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.kry.pms.api.BaseController;
 import com.kry.pms.base.DtoResponse;
 import com.kry.pms.base.HttpResponse;
+import com.kry.pms.model.http.request.busi.BillCheckBo;
 import com.kry.pms.model.http.request.busi.BillItemBo;
 import com.kry.pms.model.http.request.busi.BillSettleBo;
 import com.kry.pms.model.http.request.busi.BookingBo;
@@ -24,9 +27,11 @@ import com.kry.pms.model.http.request.busi.RenewBo;
 import com.kry.pms.model.http.request.busi.RoomAssignBo;
 import com.kry.pms.model.http.response.busi.AccountSummaryVo;
 import com.kry.pms.model.persistence.busi.BookingRecord;
+import com.kry.pms.model.persistence.sys.Account;
 import com.kry.pms.service.busi.ReceptionService;
 import com.kry.pms.service.org.EmployeeService;
 import com.kry.pms.service.room.GuestRoomService;
+import com.kry.pms.service.sys.AccountService;
 
 /**
  * 预定接待
@@ -43,6 +48,8 @@ public class ReceptionController extends BaseController<String> {
 	GuestRoomService guestRoomService;
 	@Autowired
 	EmployeeService employeeService;
+	@Autowired
+	AccountService accountService;
 
 	/**
 	 * 入住
@@ -70,7 +77,7 @@ public class ReceptionController extends BaseController<String> {
 		rep.setData(accountSummaryVo);
 		return rep;
 	}
-
+	
 	/**
 	 * 入住
 	 * 
@@ -81,6 +88,41 @@ public class ReceptionController extends BaseController<String> {
 	public HttpResponse<String> checkOut(@RequestBody @Valid CheckOutBo checkOut) {
 		HttpResponse<String> rep = new HttpResponse<String>();
 		BeanUtils.copyProperties(receptionService.checkOut(checkOut), rep);
+		return rep;
+	}
+	/**
+	 * 结账确认
+	 * @return
+	 */
+	@GetMapping(path="/bill/check/confirm/group/{id}")
+	public HttpResponse<List<AccountSummaryVo>> groupCheckBillConfirm(@PathVariable String id){
+		HttpResponse<List<AccountSummaryVo>> rep = new HttpResponse<List<AccountSummaryVo>>();
+		DtoResponse<List<AccountSummaryVo>> data = receptionService.groupCheckBillConfirm(id);
+		BeanUtils.copyProperties(data, rep);
+		rep.setData(data.getData());
+		return rep;
+	}
+	/**
+	 * 团队结账
+	 * @return
+	 */
+	@GetMapping(path="/bill/check/group/{id}")
+	public HttpResponse<String> groupCheckBill(){
+		HttpResponse<String> rep = new HttpResponse<String>();
+		return rep;
+	}
+	/**
+	 * 宾客结账
+	 * 
+	 * @return
+	 */
+	@PostMapping(path="/bill/check")
+	public HttpResponse<Account> customerCheckBill(@RequestBody BillCheckBo	billCheckBo){
+		billCheckBo.setHotelCode(getCurrentHotleCode());
+		billCheckBo.setOperationEmployee(getCurrentEmployee());
+		HttpResponse<Account> rep = new HttpResponse<Account>();
+		DtoResponse<Account> data = accountService.checkCustomerBill(billCheckBo);
+		BeanUtils.copyProperties(data, rep);
 		return rep;
 	}
 

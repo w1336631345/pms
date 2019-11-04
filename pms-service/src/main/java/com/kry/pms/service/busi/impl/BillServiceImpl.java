@@ -1,6 +1,7 @@
 package com.kry.pms.service.busi.impl;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,7 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
 import com.kry.pms.base.Constants;
+import com.kry.pms.base.DtoResponse;
 import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
 import com.kry.pms.dao.busi.BillDao;
@@ -20,6 +22,7 @@ import com.kry.pms.model.persistence.busi.BillItem;
 import com.kry.pms.model.persistence.busi.CheckInRecord;
 import com.kry.pms.model.persistence.busi.RoomRecord;
 import com.kry.pms.model.persistence.goods.Product;
+import com.kry.pms.model.persistence.org.Employee;
 import com.kry.pms.model.persistence.sys.Account;
 import com.kry.pms.model.persistence.sys.BusinessSeq;
 import com.kry.pms.service.busi.BillItemService;
@@ -27,6 +30,7 @@ import com.kry.pms.service.busi.BillService;
 import com.kry.pms.service.goods.ProductService;
 import com.kry.pms.service.sys.AccountService;
 import com.kry.pms.service.sys.BusinessSeqService;
+import com.kry.pms.util.BigDecimalUtil;
 
 @Service
 public class BillServiceImpl implements BillService {
@@ -40,20 +44,25 @@ public class BillServiceImpl implements BillService {
 	BusinessSeqService businessSeqService;
 	@Autowired
 	AccountService accountService;
+
 	@Override
 	public Bill add(Bill bill) {
-		if(bill.getProduct()!=null&&bill.getProduct().getId()!=null) {
+		if (bill.getProduct() != null && bill.getProduct().getId() != null) {
 			Product p = productService.findById(bill.getProduct().getId());
-			if(p!=null) {
-				if(1==p.getDirection()) {
+			if (p != null) {
+				if (1 == p.getDirection()) {
 					bill.setCost(bill.getTotal());
-				}else {
+				} else {
 					bill.setPay(bill.getTotal());
 				}
 				bill.setType(p.getType());
+				bill.setCreateDate(LocalDateTime.now());
 				bill.setBusinessDate(businessSeqService.getBuinessDate(p.getHotelCode()));
+				if(bill.getStatus()!=null) {
+					bill.setStatus(Constants.Status.BILL_NEED_SETTLED);
+				}
 			}
-		}else {
+		} else {
 			return null;
 		}
 		Account account = accountService.billEntry(bill);
@@ -133,7 +142,7 @@ public class BillServiceImpl implements BillService {
 				if (bis != null && !bis.isEmpty()) {
 					for (BillItem bi : bis) {
 						actualTotal += bi.getTotal();
-						bi.setStatus(Constants.Status.BILL_PAYMENTED);
+						bi.setStatus(Constants.Status.BILL_SETTLED);
 						billItemService.modify(bi);
 					}
 				}
@@ -150,6 +159,58 @@ public class BillServiceImpl implements BillService {
 	@Override
 	public List<Bill> findByAccountId(String id) {
 		return billDao.findByAccountId(id);
+	}
+
+	@Override
+	public List<Bill> checkBillIds(List<String> billIds,double total, DtoResponse<Account> rep,String recordNum) {
+		List<Bill> bills = billDao.findAllById(billIds);
+		return checkBills(bills, total, rep,recordNum);
+	}
+	
+	private List<Bill> checkBills(List<Bill> bills,double total,DtoResponse<Account> rep,String recordNum){
+		for (Bill b : bills) {
+			if (Constants.Status.BILL_NEED_SETTLED.equals(b.getStatus())) {
+				if(b.getCost()!=null) {
+					BigDecimalUtil.sub(total, b.getCost());
+				}
+				if(b.getPay()!=null) {
+					BigDecimalUtil.add(total, b.getPay());
+				}
+				b.setStatus(Constants.Status.BILL_SETTLED);
+				b.setCurrentSettleAccountRecordNum(recordNum);
+				modify(b);
+			} else {
+				rep.setStatus(Constants.BusinessCode.CODE_ILLEGAL_OPERATION);
+				break;
+			}
+		}
+		if(total!=0) {
+			rep.setStatus(Constants.BusinessCode.CODE_ILLEGAL_OPERATION);
+			rep.setMessage("账务不平，无法结账");
+		}
+		return bills;
+	}
+
+	@Override
+	public List<Bill> addFlatBills(List<Bill> list, Employee employee,String orderNum) {
+		for (Bill bill : list) {
+			bill = add(bill);
+			bill.setStatus(Constants.Status.BILL_SETTLED);
+			bill.setOperationEmployee(employee);
+			bill.setCurrentSettleAccountRecordNum(orderNum);
+		}
+		return list;
+	}
+
+	@Override
+	public List<Bill> checkAccountAllBill(Account account, double total,DtoResponse<Account> rep,String recordNum) {
+		List<Bill> bills =billDao.findByAccountAndStatus(account, Constants.Status.BILL_NEED_SETTLED);
+		bills = checkBills(bills, total, rep,recordNum);
+		if(rep.getStatus()==0) {
+			account.setStatus(Constants.Status.ACCOUNT_SETTLE);
+			accountService.modify(account);
+		}
+		return bills;
 	}
 
 }

@@ -207,7 +207,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 		}
 		BusinessSeq bs = businessSeqService.fetchNextSeq(gr.getHotelCode(), Constants.Key.BUSINESS_SEQ_KEY);
 		String tempName = br.getName();
-		String checkInSn = bs.getCurrentDateStr() + bs.getCurrentSeq();
+		String checkInSn = "";
 		roomUsageService.use(gr, Constants.Status.ROOM_USAGE_BOOK, br.getArriveTime(), br.getLeaveTime(), checkInSn,
 				tempName, response);
 		if (response.getStatus() == 0) {
@@ -278,6 +278,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 				ncir.setStartDate(startDate);
 				ncir.setHotelCode(gr.getHotelCode());
 				Account account = new Account();
+				account.setRoomNum(gr.getRoomNum());
 				account.setCustomer(customer);
 				ncir.setCheckInCount(1);
 				ncir.setRoomCount(1);
@@ -293,9 +294,8 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 
 	@Override
 	public CheckInRecord book(CheckInRecord checkInRecord) {
-		BusinessSeq bs = businessSeqService.fetchNextSeq(checkInRecord.getHotelCode(),
+		String orderNum = businessSeqService.fetchNextSeqNum(checkInRecord.getHotelCode(),
 				Constants.Key.BUSINESS_ORDER_NUM_SEQ_KEY);
-		String orderNum = bs.getCurrentDateStr() + String.format("%04d", bs.getCurrentSeq());
 		checkInRecord.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION);
 		checkInRecord.setType(Constants.Type.CHECK_IN_RECORD_GROUP);
 		checkInRecord.setOrderNum(orderNum);

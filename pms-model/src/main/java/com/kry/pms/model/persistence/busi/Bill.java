@@ -7,14 +7,13 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import com.kry.pms.model.persistence.PersistenceModel;
 import com.kry.pms.model.persistence.goods.Product;
-import com.kry.pms.model.persistence.guest.Customer;
-import com.kry.pms.model.persistence.marketing.ProtocolCorpation;
 import com.kry.pms.model.persistence.org.Employee;
 import com.kry.pms.model.persistence.sys.Account;
 
@@ -58,12 +57,13 @@ public class Bill extends PersistenceModel {
 	@Column
 	private LocalDate businessDate;
 	@Column
+	private String receiptNum;
+	@Column
 	private String remark;
 	@Column
 	private String transferFlag;
 	@OneToOne
 	private Bill sourceBill;
-	
-	
-
+	@Column
+	private String currentSettleAccountRecordNum;
 }

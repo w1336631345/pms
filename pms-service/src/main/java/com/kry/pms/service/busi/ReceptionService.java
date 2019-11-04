@@ -62,4 +62,7 @@ public interface ReceptionService {
 	public DtoResponse<String> checkIn(String id);
 
 	public AccountSummaryVo getAccountSummaryByCheckRecordId(String id);
+
+	public DtoResponse<List<AccountSummaryVo>> groupCheckBillConfirm(String id);
+
 }

@@ -80,6 +80,41 @@ public class  BusinessSeqServiceImpl implements  BusinessSeqService{
 		}
 		return convent(businessSeqDao.findAll(ex, req));
 	}
+
+	@Override
+	public String fetchNextSeqNum(String hotelCode, String seqKey) {
+		BusinessSeq dbs = businessSeqDao.findByHotelCodeAndSeqKey(hotelCode, Constants.Key.BUSINESS_BUSINESS_DATE_SEQ_KEY);
+		BusinessSeq bs = businessSeqDao.findByHotelCodeAndSeqKey(hotelCode,seqKey);
+		bs.setCurrentSeq(bs.getCurrentSeq()+1);
+		StringBuilder sb = new StringBuilder();
+		String snf = "%0"+bs.getSnLength()+"d";
+		switch (bs.getType()) {
+		case Constants.Type.BUSINESS_SEQ_PDS:
+			sb.append(bs.getPrefix());
+			if(bs.getYearLength()==2) {				
+				sb.append(dbs.getCurrentSeq().toString().substring(2));
+			}else {
+				sb.append(dbs.getCurrentSeq());
+			}
+			sb.append(String.format(snf, bs.getCurrentSeq()));
+			break;
+		case Constants.Type.BUSINESS_SEQ_DS:
+			if(bs.getYearLength()==2) {				
+				sb.append(dbs.getCurrentSeq().toString().substring(2));
+			}else {
+				sb.append(dbs.getCurrentSeq());
+			}
+			sb.append(String.format(snf, bs.getCurrentSeq()));
+			break;
+		case Constants.Type.BUSINESS_SEQ_PS:
+			sb.append(bs.getPrefix());
+			sb.append(String.format(snf, bs.getCurrentSeq()));
+			break;
+		default:
+			break;
+		}
+		return sb.toString();
+	}
 	 
 	 
 	 
