@@ -36,8 +36,8 @@ public class BusinessSeq implements Serializable {
 	private String seqKey;
 	@Column(name = "current_seq")
 	private Integer currentSeq;
-	@Column(name = "current_date_")
-	private LocalDate currentDate;
+	@Column
+	private String seqResetType;
 	@Column
 	private String prefix;
 	@Column

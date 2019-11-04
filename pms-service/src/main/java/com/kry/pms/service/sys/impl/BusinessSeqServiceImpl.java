@@ -19,11 +19,11 @@ import com.kry.pms.model.persistence.sys.BusinessSeq;
 import com.kry.pms.service.sys.BusinessSeqService;
 
 @Service
-public class  BusinessSeqServiceImpl implements  BusinessSeqService{
+public class BusinessSeqServiceImpl implements BusinessSeqService {
 	@Autowired
-	 BusinessSeqDao businessSeqDao;
-	 
-	 @Override
+	BusinessSeqDao businessSeqDao;
+
+	@Override
 	public BusinessSeq add(BusinessSeq businessSeq) {
 		return businessSeqDao.saveAndFlush(businessSeq);
 	}
@@ -41,31 +41,49 @@ public class  BusinessSeqServiceImpl implements  BusinessSeqService{
 	public BusinessSeq modify(BusinessSeq businessSeq) {
 		return businessSeqDao.saveAndFlush(businessSeq);
 	}
+
 	@Override
 	public LocalDate getBuinessDate(String hotelCode) {
-		BusinessSeq bs = businessSeqDao.findByHotelCodeAndSeqKey(hotelCode, Constants.Key.BUSINESS_BUSINESS_DATE_SEQ_KEY);
-		if(bs!=null) {
-			return LocalDate.parse(bs.getCurrentSeq().toString(),DateTimeFormatter.ofPattern("yyyyMMdd"));
+		BusinessSeq bs = businessSeqDao.findByHotelCodeAndSeqKey(hotelCode,
+				Constants.Key.BUSINESS_BUSINESS_DATE_SEQ_KEY);
+		if (bs != null) {
+			return LocalDate.parse(bs.getCurrentSeq().toString(), DateTimeFormatter.ofPattern("yyyyMMdd"));
 		}
 		return null;
+	}
+	@Override
+	public void plusBuinessDate(String hotelCode) {
+		BusinessSeq bs = businessSeqDao.findByHotelCodeAndSeqKey(hotelCode,
+				Constants.Key.BUSINESS_BUSINESS_DATE_SEQ_KEY);
+		if (bs != null) {
+			LocalDate currentDate = LocalDate.parse(bs.getCurrentSeq().toString(),
+					DateTimeFormatter.ofPattern("yyyyMMdd"));
+			LocalDate nextDate = currentDate.plusDays(1);
+			String nextDateStr = nextDate.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+			Integer nextDateInt = Integer.parseInt(nextDateStr);
+			bs.setCurrentSeq(nextDateInt);
+			bs = modify(bs);
+			businessSeqDao.resetDailySeq(hotelCode);
+		}
 		
 	}
-	
+
 	@Override
 	public BusinessSeq findById(String id) {
 		return businessSeqDao.getOne(id);
 	}
+
 	@Override
-	public BusinessSeq fetchNextSeq(String hotelCode,String seqKey) {
-		BusinessSeq bs = businessSeqDao.findByHotelCodeAndSeqKey(hotelCode,seqKey);
-		bs.setCurrentSeq(bs.getCurrentSeq()+1);
+	public BusinessSeq fetchNextSeq(String hotelCode, String seqKey) {
+		BusinessSeq bs = businessSeqDao.findByHotelCodeAndSeqKey(hotelCode, seqKey);
+		bs.setCurrentSeq(bs.getCurrentSeq() + 1);
 		return modify(bs);
 	}
 
 	@Override
 	public List<BusinessSeq> getAllByHotelCode(String code) {
-		return null;//默认不实现
-		//return businessSeqDao.findByHotelCode(code);
+		return null;// 默认不实现
+		// return businessSeqDao.findByHotelCode(code);
 	}
 
 	@Override
@@ -83,25 +101,28 @@ public class  BusinessSeqServiceImpl implements  BusinessSeqService{
 
 	@Override
 	public String fetchNextSeqNum(String hotelCode, String seqKey) {
-		BusinessSeq dbs = businessSeqDao.findByHotelCodeAndSeqKey(hotelCode, Constants.Key.BUSINESS_BUSINESS_DATE_SEQ_KEY);
-		BusinessSeq bs = businessSeqDao.findByHotelCodeAndSeqKey(hotelCode,seqKey);
-		bs.setCurrentSeq(bs.getCurrentSeq()+1);
+		BusinessSeq dbs = businessSeqDao.findByHotelCodeAndSeqKey(hotelCode,
+				Constants.Key.BUSINESS_BUSINESS_DATE_SEQ_KEY);
+		BusinessSeq bs = businessSeqDao.findByHotelCodeAndSeqKey(hotelCode, seqKey);
+		bs.setCurrentSeq(bs.getCurrentSeq() + 1);
+		int seq = bs.getCurrentSeq();
+		modify(bs);
 		StringBuilder sb = new StringBuilder();
-		String snf = "%0"+bs.getSnLength()+"d";
+		String snf = "%0" + bs.getSnLength() + "d";
 		switch (bs.getType()) {
 		case Constants.Type.BUSINESS_SEQ_PDS:
 			sb.append(bs.getPrefix());
-			if(bs.getYearLength()==2) {				
+			if (bs.getYearLength() == 2) {
 				sb.append(dbs.getCurrentSeq().toString().substring(2));
-			}else {
+			} else {
 				sb.append(dbs.getCurrentSeq());
 			}
 			sb.append(String.format(snf, bs.getCurrentSeq()));
 			break;
 		case Constants.Type.BUSINESS_SEQ_DS:
-			if(bs.getYearLength()==2) {				
+			if (bs.getYearLength() == 2) {
 				sb.append(dbs.getCurrentSeq().toString().substring(2));
-			}else {
+			} else {
 				sb.append(dbs.getCurrentSeq());
 			}
 			sb.append(String.format(snf, bs.getCurrentSeq()));
@@ -115,8 +136,5 @@ public class  BusinessSeqServiceImpl implements  BusinessSeqService{
 		}
 		return sb.toString();
 	}
-	 
-	 
-	 
-	 
+
 }

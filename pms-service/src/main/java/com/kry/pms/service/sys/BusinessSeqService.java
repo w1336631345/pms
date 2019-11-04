@@ -13,4 +13,6 @@ public interface BusinessSeqService extends BaseService<BusinessSeq>{
 
 	LocalDate getBuinessDate(String hotelCode);
 
+	void plusBuinessDate(String hotelCode);
+
 }
