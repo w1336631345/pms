@@ -47,7 +47,6 @@
     	<module>pms-asyn-service</module>
     	<module>pms-auth</module>
 		<module>pms-quartz</module>
-        <module>pms-quartz</module>
     </modules>
 	<build>
 		<plugins>
