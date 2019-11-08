@@ -46,7 +46,9 @@
 		<module>pms-ext-api</module>
     	<module>pms-asyn-service</module>
     	<module>pms-auth</module>
-  </modules>
+		<module>pms-quartz</module>
+        <module>pms-quartz</module>
+    </modules>
 	<build>
 		<plugins>
 			<plugin>

@@ -15,7 +15,8 @@ spring:
     default-property-inclusion: non-null
   datasource:
     password: admin
-    url: jdbc:mysql://127.0.0.1:3306/pms_temp?useUnicode=true&characterEncoding=utf8&serverTimezone=Hongkong
+    url: jdbc:mysql://127.0.0.1:3306/pms_test?useUnicode=true&characterEncoding=utf8&serverTimezone=Hongkong
+#    url: jdbc:mysql://192.168.1.111:3306/pms_temp?useUnicode=true&characterEncoding=utf8&serverTimezone=Hongkong
     username: root
   jpa:
     database: mysql
@@ -33,3 +34,25 @@ spring:
         max-wait: -1
         min-idle: 0
     port: 6379
+  quartz:
+    #持久化到数据库方式
+    job-store-type: jdbc
+    initialize-schema: embedded
+    #相关属性配置
+    properties:
+      org:
+        quartz:
+          scheduler:
+            instanceId: AUTO
+          jobStore:
+            class: org.quartz.impl.jdbcjobstore.JobStoreTX
+            driverDelegateClass: org.quartz.impl.jdbcjobstore.StdJDBCDelegate
+            tablePrefix: qrtz_
+            isClustered: false
+            clusterCheckinInterval: 10000
+            useProperties: true
+          threadPool:
+            class: org.quartz.simpl.SimpleThreadPool
+            threadCount: 10
+            threadPriority: 5
+            threadsInheritContextClassLoaderOfInitializingThread: true

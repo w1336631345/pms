@@ -4,18 +4,20 @@ import com.kry.pms.api.BaseController;
 import com.kry.pms.base.HttpResponse;
 import com.kry.pms.base.PageResponse;
 import com.kry.pms.model.persistence.busi.CheckInRecord;
+import com.kry.pms.model.persistence.busi.RoomRecord;
 import com.kry.pms.model.persistence.sys.User;
+import com.kry.pms.service.busi.BillService;
 import com.kry.pms.service.busi.CheckInRecordService;
+import com.kry.pms.service.busi.RoomRecordService;
 import com.kry.pms.utils.ShiroUtils;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.session.UnknownSessionException;
 import org.apache.shiro.session.mgt.eis.SessionDAO;
+import org.apache.shiro.subject.SimplePrincipalCollection;
+import org.apache.shiro.subject.support.DefaultSubjectContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.Serializable;
 import java.util.*;
@@ -26,6 +28,12 @@ public class nightAuditController extends BaseController {
 
     @Autowired
     CheckInRecordService checkInRecordService;
+    @Autowired
+    RoomRecordService roomRecordService;
+    @Autowired
+    BillService billService;
+    @Autowired
+    SessionDAO sessionDAO;
 
     /**
      * 功能描述: <br>夜间稽核列表
@@ -65,6 +73,48 @@ public class nightAuditController extends BaseController {
     }
 
     /**
+     * 功能描述: <br>查询房租预审及入账列表（夜间稽核可入账的入住（I））
+     * 〈〉
+     * @Param: [pageNum, pageSize]
+     * @Return: com.kry.pms.base.HttpResponse<com.kry.pms.base.PageResponse<com.kry.pms.model.persistence.busi.CheckInRecord>>
+     * @Author: huanghaibin
+     * @Date: 2019/10/26 16:58
+     */
+    @GetMapping("/accountEntryList")
+    public HttpResponse<PageResponse<CheckInRecord>> accountEntryList(@RequestParam(value = "pageNum", defaultValue = "1")Integer pageNum,
+                                                            @RequestParam(value = "pageSize", defaultValue = "10")Integer pageSize) {
+        HttpResponse<PageResponse<CheckInRecord>> rep = new HttpResponse<>();
+        User user = getUser();
+        if(user == null){
+            rep.error(403, "未登录");
+        }
+        PageResponse<CheckInRecord> page = checkInRecordService.accountEntryList(pageNum, pageSize, user);
+        rep.addData(page);
+        return rep;
+    }
+
+    /**
+     * 功能描述: <br>查询房租预审及入账列表(roomRecord)
+     * 〈〉
+     * @Param: [pageNum, pageSize]
+     * @Return: com.kry.pms.base.HttpResponse<com.kry.pms.base.PageResponse<com.kry.pms.model.persistence.busi.RoomRecord>>
+     * @Author: huanghaibin
+     * @Date: 2019/10/30 18:17
+     */
+    @GetMapping("/accountEntryListTo")
+    public HttpResponse<PageResponse<RoomRecord>> accountEntryListTo(@RequestParam(value = "pageNum", defaultValue = "1")Integer pageNum,
+                                                                     @RequestParam(value = "pageSize", defaultValue = "10")Integer pageSize) {
+        HttpResponse<PageResponse<RoomRecord>> rep = new HttpResponse<>();
+        User user = getUser();
+        if(user == null){
+            return rep.error(403, "未登录");
+        }
+        PageResponse<RoomRecord> page = roomRecordService.accountEntryListTest(pageNum, pageSize, user);
+        rep.addData(page);
+        return rep;
+    }
+
+    /**
      * 功能描述: <br>夜间稽核各项状态数量统计
      * 〈〉
      * @Param: []
@@ -79,6 +129,47 @@ public class nightAuditController extends BaseController {
         List<Map<String, Object>> list = checkInRecordService.getStatistics(user);
         rep.addData(list);
         return rep;
+    }
+
+
+    /**
+     * 功能描述: <br>手动夜审入账
+     * 〈〉
+     * @Param: [ids]
+     * @Return: com.kry.pms.base.HttpResponse<java.lang.String>
+     * @Author: huanghaibin
+     * @Date: 2019/11/1 9:48
+     */
+    @PostMapping("/manualAdd")
+    public HttpResponse<String> manualAdd(@RequestBody String[] ids) {
+        if(ids != null){
+            System.out.println("传过来的id数："+ids.length);
+        }
+        HttpResponse<String> rep = getDefaultResponse();
+        User loginUser = getUser();
+        if(loginUser == null){
+            return rep.error(403, "未登录");
+        }
+        Collection<Session> sessions =  sessionDAO.getActiveSessions();
+        for (Session session : sessions) {
+            User user;
+            SimplePrincipalCollection principalCollection;
+            if(session.getAttribute(DefaultSubjectContext.PRINCIPALS_SESSION_KEY )== null){
+                continue;
+            }else {
+                principalCollection = (SimplePrincipalCollection) session.getAttribute(DefaultSubjectContext.PRINCIPALS_SESSION_KEY);
+                user = (User) principalCollection.getPrimaryPrincipal();
+                if(user != null){
+                    if(!user.getId().equals(loginUser.getId())){
+                        return rep.error(99999, "还有其他用户在线，不能入账");
+                    }
+                }
+            }
+        }
+        //默认手动点击入账为入账今日所有的账
+        List<RoomRecord> list = roomRecordService.accountEntryListAll(loginUser.getHotelCode());
+        billService.putAcount(list);
+        return rep.ok("入账成功");
     }
 
 }

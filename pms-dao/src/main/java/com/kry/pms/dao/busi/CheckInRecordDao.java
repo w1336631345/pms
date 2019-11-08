@@ -36,7 +36,7 @@ public interface CheckInRecordDao extends BaseDao<CheckInRecord>{
 	Page<Map<String, Object>> unreturnedGuests(Pageable page, @Param("status")String status, @Param("hotelCode")String hotelCode);
 
 	@Query(value = "select status, count(id) scount from t_checkin_record " +
-			" where id not in (select id from t_checkin_record where `status`='I' and leave_time < SYSDATE()) " +
+			" where id not in (select id from t_checkin_record where `status`='I' and leave_time > SYSDATE()) " +
 			" and if(:hotelCode is not null && :hotelCode != '', hotel_code=:hotelCode, 1=1 ) "+
 			" GROUP BY status ",nativeQuery = true)
 	List<Map<String, Object>> getStatistics(@Param("hotelCode")String hotelCode);

@@ -5,4 +5,6 @@ import com.kry.pms.model.persistence.goods.Product;
 
 public interface ProductDao extends BaseDao<Product>{
 
+    Product getById(String id);
+
 }

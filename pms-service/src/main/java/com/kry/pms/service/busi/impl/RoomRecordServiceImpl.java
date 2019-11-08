@@ -1,31 +1,39 @@
 package com.kry.pms.service.busi.impl;
 
-import java.time.LocalDate;
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Direction;
-import org.springframework.stereotype.Service;
-
 import com.kry.pms.base.Constants;
 import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
+import com.kry.pms.base.ParamSpecification;
 import com.kry.pms.dao.busi.RoomRecordDao;
 import com.kry.pms.model.persistence.busi.CheckInRecord;
 import com.kry.pms.model.persistence.busi.DailyVerify;
 import com.kry.pms.model.persistence.busi.RoomRecord;
-import com.kry.pms.service.busi.BillItemService;
+import com.kry.pms.model.persistence.sys.User;
 import com.kry.pms.service.busi.BillService;
 import com.kry.pms.service.busi.BookingRecordService;
 import com.kry.pms.service.busi.RoomRecordService;
 import com.kry.pms.service.guest.CustomerService;
 import com.kry.pms.service.room.GuestRoomService;
-import com.kry.pms.service.room.GuestRoomStatusService;
 import com.kry.pms.service.room.RoomStatisticsService;
-import com.kry.pms.service.room.RoomStatusQuantityService;
+import com.kry.pms.service.sys.BusinessSeqService;
 import com.kry.pms.service.sys.SystemConfigService;
+import com.kry.pms.util.DateTimeUtil;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
+import org.springframework.stereotype.Service;
+import java.time.LocalDate;
+import java.util.*;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.jpa.domain.Specification;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
+
 
 @Service
 public class RoomRecordServiceImpl implements RoomRecordService {
@@ -43,6 +51,8 @@ public class RoomRecordServiceImpl implements RoomRecordService {
 	CustomerService customerService;
 	@Autowired
 	BillService billService;
+	@Autowired
+	BusinessSeqService businessSeqService;
 
 	@Override
 	public RoomRecord add(RoomRecord roomRecord) {
@@ -117,6 +127,75 @@ public class RoomRecordServiceImpl implements RoomRecordService {
 	public void checkOut(List<CheckInRecord> crs) {
 		// TODO Auto-generated method stub
 
+	}
+
+	@Override
+	public PageResponse<RoomRecord> accountEntryList(int pageIndex, int pageSize, User user) {
+		Pageable page = org.springframework.data.domain.PageRequest.of(pageIndex-1, pageSize);
+		ParamSpecification<RoomRecord> psf = new ParamSpecification<RoomRecord>();
+		Map<String, Object> map = new HashMap<>();
+		Map<String, Object> emap = new HashMap<>();
+		emap.put("hotelCode", user.getHotelCode());
+		emap.put("isAccountEntry", "NO");
+		map.put("equals", emap);
+//		Map<String, String[]> omap = new HashMap<>();
+//		Map<String, Object> theSameMap = new HashMap<>();
+//		theSameMap.put("theSameKey", omap);
+//		String[] values = {"R","I"};
+//		omap.put("status", values);
+//		map.put("or", theSameMap);
+		Specification<RoomRecord> specification = psf.createSpecification(map);
+		Page<RoomRecord> p = roomRecordDao.findAll(specification,page);
+		return convent(p);
+	}
+	@Override
+	public PageResponse<RoomRecord> accountEntryListTest(int pageIndex, int pageSize, User user) {
+//		Date startTime = DateTimeUtil.toDayStartDate();
+//		Date endTime = DateTimeUtil.toDayEndDate();
+
+		Pageable page = org.springframework.data.domain.PageRequest.of(pageIndex-1, pageSize);
+		List<RoomRecord> resultList = null;
+		Specification<RoomRecord> querySpecifi = new Specification<RoomRecord>() {
+			@Override
+			public Predicate toPredicate(Root<RoomRecord> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder cb) {
+				List<Predicate> predicates = new ArrayList<>();
+				predicates.add(cb.equal(root.get("recordDate").as(LocalDate.class), LocalDate.now()));
+//				//大于或等于传入时间
+//				predicates.add(cb.greaterThanOrEqualTo(root.get("recordDate").as(Date.class), startTime));
+//				//小于或等于传入时间
+//				predicates.add(cb.lessThanOrEqualTo(root.get("recordDate").as(Date.class), endTime));
+				if (StringUtils.isNotBlank(user.getHotelCode())) {
+					//查询
+					predicates.add(cb.equal(root.get("hotelCode").as(String.class), user.getHotelCode()));
+				}
+				predicates.add(cb.equal(root.get("isAccountEntry").as(String.class), "NO"));
+				// and到一起的话所有条件就是且关系，or就是或关系
+				return cb.and(predicates.toArray(new Predicate[predicates.size()]));
+			}
+		};
+		Page<RoomRecord> p = roomRecordDao.findAll(querySpecifi,page);
+		return convent(p);
+	}
+
+	@Override
+	public List<RoomRecord> accountEntryListAll(String hotelCode) {
+		String startTime = DateTimeUtil.toDayStartStr();
+		String endTime = DateTimeUtil.toDayEndStr();
+		ParamSpecification<RoomRecord> psf = new ParamSpecification<RoomRecord>();
+		Map<String, Object> map = new HashMap<>();
+		Map<String, Object> emap = new HashMap<>();
+		Map<String, Object> gmap = new HashMap<>();
+		gmap.put("recordDate", startTime);
+		Map<String, Object> lmap = new HashMap<>();
+		lmap.put("recordDate", endTime);
+		emap.put("hotelCode", hotelCode);
+		emap.put("isAccountEntry", "NO");
+		map.put("equals", emap);
+		map.put(">=", gmap);
+		map.put("<=", lmap);
+		Specification<RoomRecord> specification = psf.createSpecification(map);
+		List<RoomRecord> list = roomRecordDao.findAll(specification);
+		return list;
 	}
 
 }

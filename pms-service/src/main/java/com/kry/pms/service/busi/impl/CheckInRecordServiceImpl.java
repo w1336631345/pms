@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -16,6 +17,8 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.transaction.Transactional;
 
+import com.kry.pms.base.*;
+import com.kry.pms.model.persistence.busi.RoomRecord;
 import org.aspectj.internal.lang.annotation.ajcDeclareAnnotation;
 import org.jboss.jandex.Main;
 import com.kry.pms.model.persistence.sys.User;
@@ -29,10 +32,6 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import com.kry.pms.base.Constants;
-import com.kry.pms.base.DtoResponse;
-import com.kry.pms.base.PageRequest;
-import com.kry.pms.base.PageResponse;
 import com.kry.pms.dao.busi.CheckInRecordDao;
 import com.kry.pms.model.http.request.busi.CheckInBo;
 import com.kry.pms.model.http.request.busi.CheckInItemBo;
@@ -360,10 +359,42 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 				parr = list.toArray(parr);
 				return criteriaBuilder.and(parr);
 			}
-
 		};
 		Page<CheckInRecord> p = checkInRecordDao.findAll(specification, page);
 		return convent(p);
+	}
+
+	@Override
+	public PageResponse<CheckInRecord> accountEntryList(int pageIndex, int pageSize, User user) {
+		Pageable page = org.springframework.data.domain.PageRequest.of(pageIndex-1, pageSize);
+		ParamSpecification<CheckInRecord> psf = new ParamSpecification<CheckInRecord>();
+		Map<String, Object> map = new HashMap<>();
+		Map<String, Object> emap = new HashMap<>();
+		emap.put("hotelCode", user.getHotelCode());
+        emap.put("status", "I");
+		map.put("equals", emap);
+//		Map<String, String[]> omap = new HashMap<>();
+//		Map<String, Object> theSameMap = new HashMap<>();
+//		theSameMap.put("theSameKey", omap);
+//		String[] values = {"R","I"};
+//		omap.put("status", values);
+//		map.put("or", theSameMap);
+		Specification<CheckInRecord> specification = psf.createSpecification(map);
+		Page<CheckInRecord> p = checkInRecordDao.findAll(specification,page);
+		return convent(p);
+	}
+
+	@Override
+	public List<CheckInRecord> accountEntryListAll(String hotelCode) {
+		ParamSpecification<CheckInRecord> psf = new ParamSpecification<CheckInRecord>();
+		Map<String, Object> map = new HashMap<>();
+		Map<String, Object> emap = new HashMap<>();
+		emap.put("hotelCode", hotelCode);
+		emap.put("status", "I");
+		map.put("equals", emap);
+		Specification<CheckInRecord> specification = psf.createSpecification(map);
+		List<CheckInRecord> list = checkInRecordDao.findAll(specification);
+		return list;
 	}
 
 	@Override
@@ -415,7 +446,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 					asv = asvm.get(acc.getRoomNum());
 				}
 				asv.getChildren().add(new AccountSummaryVo(acc));
-			}	
+			}
 		}
 		return asvm.values();
 	}

@@ -8,6 +8,8 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.springframework.scheduling.annotation.EnableScheduling;
+
 /**
  * 
  * @author Louis

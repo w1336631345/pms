@@ -41,7 +41,11 @@ public interface CheckInRecordService extends BaseService<CheckInRecord> {
 
     PageResponse<CheckInRecord> notYet(int pageCount, int pageSize,String status, User user);
 
-	PageResponse<Map<String, Object>> unreturnedGuests(int pageIndex, int pageSize, String status, User user);
+    PageResponse<CheckInRecord> accountEntryList(int pageIndex, int pageSize, User user);
+
+    List<CheckInRecord> accountEntryListAll(String hotelCode);
+
+    PageResponse<Map<String, Object>> unreturnedGuests(int pageIndex, int pageSize, String status, User user);
 
 	List<Map<String, Object>> getStatistics(User user);
 

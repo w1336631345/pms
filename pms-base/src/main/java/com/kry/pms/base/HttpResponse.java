@@ -38,6 +38,12 @@ public class HttpResponse<T> {
 		hr.setMessage(message);
 		return hr;
 	}
+	public HttpResponse<T> error(String message) {
+		HttpResponse<T> hr = new HttpResponse<T>();
+		hr.setStatus(9999);
+		hr.setMessage(message);
+		return hr;
+	}
 	
 	public HttpResponse<T> ok(String message) {
 //		HttpResponse<T> hr = new HttpResponse<T>();

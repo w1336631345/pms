@@ -43,6 +43,10 @@ public class  ProductServiceImpl implements  ProductService{
 	public Product findById(String id) {
 		return productDao.getOne(id);
 	}
+	@Override
+	public Product getById(String id) {
+		return productDao.getById(id);
+	}
 
 	@Override
 	public List<Product> getAllByHotelCode(String code) {

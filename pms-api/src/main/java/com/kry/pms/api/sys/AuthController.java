@@ -1,6 +1,7 @@
 package com.kry.pms.api.sys;
 
 import com.kry.pms.base.HttpResponse;
+import com.kry.pms.controller.SessionController;
 import com.kry.pms.model.http.response.sys.UserOnlineVO;
 import com.kry.pms.model.persistence.org.Hotel;
 import com.kry.pms.model.persistence.sys.User;
@@ -35,6 +36,8 @@ public class AuthController {
     HotelService hotelService;
 	@Autowired
     UserService userService;
+	@Autowired
+	SessionController sessionController;
 
 	@RequestMapping(path = "/admin/login", method = RequestMethod.POST)
 	public HttpResponse<String> loginTest(String username, String password) {
@@ -69,62 +72,35 @@ public class AuthController {
         return response.error(403, "未登录");
     }
 
-
+	/**
+	 * 功能描述: <br>查询所有在线用户
+	 * 〈〉
+	 * @Param: []
+	 * @Return: com.kry.pms.base.HttpResponse<java.util.List<com.kry.pms.model.http.response.sys.UserOnlineVO>>
+	 * @Author: huanghaibin
+	 * @Date: 2019/10/25 17:26
+	 */
 	@GetMapping("/sessionList")
 	@ResponseBody
 	public HttpResponse<List<UserOnlineVO>> sessionList(){
-        User loginUser = ShiroUtils.getUser();
-        Hotel hotel = hotelService.getByHotelCode(loginUser.getHotelCode());
-        List<User> listUser = userService.getAllByHotelCode(loginUser.getHotelCode());
-        boolean isHotelUser = false;
-		List<UserOnlineVO> list = new ArrayList<>();
+		List<UserOnlineVO> list = sessionController.getSysLoginUser();
 		HttpResponse<List<UserOnlineVO>> rep = new HttpResponse<>();
-		Collection<Session> sessions =  sessionDAO.getActiveSessions();
-		for (Session session : sessions) {
-			UserOnlineVO userOnlineVO = new UserOnlineVO();
-			User user;
-			SimplePrincipalCollection principalCollection;
-			if(session.getAttribute(DefaultSubjectContext.PRINCIPALS_SESSION_KEY )== null){
-				continue;
-			}else {
-				principalCollection = (SimplePrincipalCollection) session.getAttribute(DefaultSubjectContext.PRINCIPALS_SESSION_KEY);
-				user = (User) principalCollection.getPrimaryPrincipal();
-				//将同旅馆里的在线用户踢出，剩下全是离线用户，在add到List<UserOnlineVO>就是全部在线和离线用户
-//				if(listUser.contains(user)){
-//                    listUser.remove(user);
-//                }
-				if(loginUser.getHotelCode().equals(user.getHotelCode())){
-                    isHotelUser = true;
-                }
-				if(isHotelUser){
-				    if(loginUser.getId().equals(user.getId())){
-                        userOnlineVO.setIsMyself("本机");
-                    }
-                    userOnlineVO.setHotelName(hotel.getName());
-                    userOnlineVO.setUsername(user.getUsername());
-                    userOnlineVO.setUserId(user.getId());
-                    userOnlineVO.setPhone(user.getMobile());
-                    userOnlineVO.setNickename(user.getNickname());
-                }
-			}
-			if(isHotelUser){
-                userOnlineVO.setHost(session.getHost());
-                userOnlineVO.setSessionId((String) session.getId());
-                userOnlineVO.setStartAccessTime(session.getStartTimestamp());
-                userOnlineVO.setLastAccessTime(session.getLastAccessTime());
-                list.add(userOnlineVO);
-            }
-		}
 		rep.addData(list);
 		return rep;
 	}
 
+	/**
+	 * 功能描述: <br>下线在线用户
+	 * 〈〉
+	 * @Param: [sessionId]
+	 * @Return: com.kry.pms.base.HttpResponse
+	 * @Author: huanghaibin
+	 * @Date: 2019/10/25 17:26
+	 */
     @GetMapping("/sessionLoginOut")
     @ResponseBody
     public HttpResponse sessionLoginOut(String sessionId){
-        HttpResponse rep = new HttpResponse();
-        Session session = sessionDAO.readSession(sessionId);
-        sessionDAO.delete(session);
-        return rep.ok();
+        HttpResponse rep = sessionController.sessionLoginOut(sessionId);
+        return rep;
     }
 }

@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.kry.pms.service.busi.RoomRecordService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Sort;
@@ -43,6 +44,8 @@ public class BillServiceImpl implements BillService {
 	@Autowired
 	BusinessSeqService businessSeqService;
 	@Autowired
+	RoomRecordService roomRecordService;
+	@Autowired
 	AccountService accountService;
 
 	@Override
@@ -51,6 +54,10 @@ public class BillServiceImpl implements BillService {
 			Product p = productService.findById(bill.getProduct().getId());
 			if (p != null) {
 				if (1 == p.getDirection()) {
+		if(bill.getProduct()!=null&&bill.getProduct().getId()!=null) {
+			Product p = productService.getById(bill.getProduct().getId());
+			if(p!=null) {
+				if(1==p.getDirection()) {
 					bill.setCost(bill.getTotal());
 				} else {
 					bill.setPay(bill.getTotal());
@@ -166,7 +173,7 @@ public class BillServiceImpl implements BillService {
 		List<Bill> bills = billDao.findAllById(billIds);
 		return checkBills(bills, total, rep,recordNum);
 	}
-	
+
 	private List<Bill> checkBills(List<Bill> bills,double total,DtoResponse<Account> rep,String recordNum){
 		for (Bill b : bills) {
 			if (Constants.Status.BILL_NEED_SETTLED.equals(b.getStatus())) {
@@ -211,6 +218,26 @@ public class BillServiceImpl implements BillService {
 			accountService.modify(account);
 		}
 		return bills;
+	}
+
+	@Override
+	public void putAcount(List<RoomRecord> ids){
+		for(int i=0; i<ids.size(); i++){
+			String id = ids.get(i).getId();
+			RoomRecord rr = roomRecordService.findById(id);
+			Product p = new Product();
+			p.setId("10000");
+			Bill bill = new Bill();
+			bill.setProduct(p);
+			bill.setTotal(rr.getCost());
+			bill.setQuantity(1);
+			bill.setAccount(rr.getCheckInRecord().getAccount());
+			bill.setHotelCode(rr.getHotelCode());
+			bill.setOperationRemark("夜审自动入账");
+			add(bill);
+			rr.setIsAccountEntry("PAY");//入账成功后roomRecord里面入账状态改为pay
+			roomRecordService.modify(rr);
+		}
 	}
 
 }

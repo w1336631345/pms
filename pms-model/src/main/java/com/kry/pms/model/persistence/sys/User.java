@@ -33,4 +33,6 @@ public class User extends PersistenceModel {
 	private List<Role> roles;
 	@Column
 	private String avatar;
+	@Column(columnDefinition = "varchar(32) default 'normal' COMMENT '是否允许登录（normal：正常可登录状态，audit：夜审不可登录）'")
+	private String allowLogin;
 }

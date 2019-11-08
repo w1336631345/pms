@@ -38,6 +38,9 @@ public class UserRealm extends AuthorizingRealm {
 		if (user == null || user.isEmpty()) {
 			throw new UnknownAccountException("账号或密码不正确");
 		}
+		if(("audit").equals(user.get(0).getAllowLogin())){
+			throw new UnknownAccountException("夜审稽核中，禁止登录");
+		}
 		SimpleAuthenticationInfo info = new SimpleAuthenticationInfo(user, password, getName());
 		return info;
 	}

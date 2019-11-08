@@ -18,6 +18,7 @@ import com.kry.pms.model.persistence.room.GuestRoom;
 
 import lombok.Getter;
 import lombok.Setter;
+import net.bytebuddy.dynamic.scaffold.subclass.ConstructorStrategy;
 
 /**
  * 每人每天一个客房记录
@@ -44,4 +45,6 @@ public class RoomRecord extends PersistenceModel {
 	private Double costRatio;
 	@OneToOne
 	private DailyVerify dailyVerify;
+	@Column(columnDefinition = "varchar(32) default 'NO' COMMENT '是否入账（PAY：入账，NO：未入账）'")
+	private String isAccountEntry;//是否入账
 }
