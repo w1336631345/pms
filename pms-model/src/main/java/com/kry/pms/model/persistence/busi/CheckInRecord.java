@@ -25,6 +25,7 @@ import com.kry.pms.model.persistence.marketing.RoomPriceScheme;
 import com.kry.pms.model.persistence.marketing.RoomPriceSchemeItem;
 import com.kry.pms.model.persistence.org.Employee;
 import com.kry.pms.model.persistence.room.GuestRoom;
+import com.kry.pms.model.persistence.room.RoomTag;
 import com.kry.pms.model.persistence.room.RoomType;
 import com.kry.pms.model.persistence.sys.Account;
 
@@ -63,6 +64,8 @@ public class CheckInRecord extends PersistenceModel {
 	private Integer humanCount;
 	@Column
 	private Integer roomCount;
+	@OneToMany(cascade = CascadeType.PERSIST)
+	private List<RoomTag> demands;
 	@Column
 	private Integer chrildrenCount;
 	@Column
@@ -76,7 +79,7 @@ public class CheckInRecord extends PersistenceModel {
 	@Column
 	private Integer days;
 	@Column
-	private LocalDateTime holdTime;
+	private String holdTime;
 	@Column
 	private LocalDateTime leaveTime;
 	@Column(columnDefinition = "varchar(64) default '0000' COMMENT '入住编号'")
@@ -278,12 +281,6 @@ public class CheckInRecord extends PersistenceModel {
 	public void setDays(Integer days) {
 		this.days = days;
 	}
-	public LocalDateTime getHoldTime() {
-		return holdTime;
-	}
-	public void setHoldTime(LocalDateTime holdTime) {
-		this.holdTime = holdTime;
-	}
 	public LocalDateTime getLeaveTime() {
 		return leaveTime;
 	}
@@ -313,6 +310,18 @@ public class CheckInRecord extends PersistenceModel {
 	}
 	public void setAccount(Account account) {
 		this.account = account;
+	}
+	public String getHoldTime() {
+		return holdTime;
+	}
+	public void setHoldTime(String holdTime) {
+		this.holdTime = holdTime;
+	}
+	public List<RoomTag> getDemands() {
+		return demands;
+	}
+	public void setDemands(List<RoomTag> demands) {
+		this.demands = demands;
 	}
 	
 }

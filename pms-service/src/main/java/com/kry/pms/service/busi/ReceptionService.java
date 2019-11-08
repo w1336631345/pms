@@ -18,12 +18,6 @@ import com.kry.pms.model.persistence.busi.BookingRecord;
 import com.kry.pms.model.persistence.busi.CheckInRecord;
 
 public interface ReceptionService {
-	/**
-	 * 
-	 * @param book
-	 * @return
-	 */
-	public DtoResponse<BookingRecord> book(BookingBo book);
 
 	/**
 	 * 
@@ -38,14 +32,6 @@ public interface ReceptionService {
 	 * @return
 	 */
 	public DtoResponse<List<BillItem>> accountEntry(BillItemBo billItemBo);
-
-	/**
-	 * 简易退房&结账
-	 * 
-	 * @param checkOut
-	 * @return
-	 */
-	public DtoResponse<CheckOutVo> checkOut(CheckOutBo checkOut);
 
 	/**
 	 * 结账

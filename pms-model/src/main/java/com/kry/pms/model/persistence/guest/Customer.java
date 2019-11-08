@@ -29,6 +29,8 @@ public class Customer extends PersistenceModel {
 	@OneToOne
 	private User user;
 	@Column
+	private String mobile;
+	@Column
 	private String idCardNum;
 	@OneToOne(fetch = FetchType.EAGER)
 	private GuestInfo guestInfo;

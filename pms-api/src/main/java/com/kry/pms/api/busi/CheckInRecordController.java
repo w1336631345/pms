@@ -18,8 +18,11 @@ import com.kry.pms.api.BaseController;
 import com.kry.pms.base.HttpResponse;
 import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
+import com.kry.pms.model.http.response.busi.CheckInRecordListVo;
 import com.kry.pms.model.persistence.busi.CheckInRecord;
 import com.kry.pms.service.busi.CheckInRecordService;
+
+import net.sf.ehcache.util.FindBugsSuppressWarnings;
 
 @RestController
 @RequestMapping(path = "/api/v1/busi/checkInRecord")
@@ -66,7 +69,12 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
 		rep.addData(checkInRecordService.findById(id));
 		return rep;
 	}
-
+	@GetMapping(path="/orderNum/{orderNum}")
+	public HttpResponse<List<CheckInRecord>> findDetailByOrderNum(@PathVariable("orderNum") String orderNum){
+		HttpResponse<List<CheckInRecord>> rep = new HttpResponse<List<CheckInRecord>>();
+		rep.addData(checkInRecordService.findByOrderNum(orderNum));
+		return rep;
+	}
 	
 	
 	@GetMapping
@@ -74,6 +82,12 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
 		HttpResponse<PageResponse<CheckInRecord>> rep = new HttpResponse<PageResponse<CheckInRecord>>();
 		PageRequest<CheckInRecord> req = parse2PageRequest(request);
 		return rep.addData(checkInRecordService.listPage(req));
+	}
+	@GetMapping(path = "/summary")
+	public HttpResponse<PageResponse<CheckInRecordListVo>> querySummaryList(HttpServletRequest request) throws InstantiationException, IllegalAccessException{
+		HttpResponse<PageResponse<CheckInRecordListVo>> rep = new HttpResponse<PageResponse<CheckInRecordListVo>>();
+		PageRequest<CheckInRecord> req = parse2PageRequest(request);
+		return rep.addData(checkInRecordService.querySummaryList(req));
 	}
 
 }

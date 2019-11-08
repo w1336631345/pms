@@ -47,6 +47,7 @@ import com.kry.pms.service.marketing.RoomPriceSchemeItemService;
 import com.kry.pms.service.org.EmployeeService;
 import com.kry.pms.service.room.GuestRoomService;
 import com.kry.pms.service.room.GuestRoomStatusService;
+import com.kry.pms.service.room.RoomStatisticsService;
 import com.kry.pms.service.room.RoomTypeService;
 import com.kry.pms.service.sys.AccountService;
 import com.kry.pms.service.sys.BusinessSeqService;
@@ -80,51 +81,8 @@ public class ReceptionServiceImpl implements ReceptionService {
 	BusinessSeqService businessSeqService;
 	@Autowired
 	AccountService accountService;
-
-	@Transactional
-	@Override
-	public DtoResponse<BookingRecord> book(BookingBo book) {
-		DtoResponse<BookingRecord> rep = new DtoResponse<>();
-		BookingRecord br = new BookingRecord();
-		BeanUtils.copyProperties(book, br);
-		br.setArriveTime(LocalDateTime.of(book.getArriveDate(), LocalTime.parse("14:00:00")));
-		br.setLeaveTime(LocalDateTime.of(book.getLeaveDate(), LocalTime.parse("12:00:00")));
-		Employee oe = employeeService.findById(book.getOperationId());
-		if (oe == null) {
-			rep.setStatus(Constants.ErrorCode.REQUIRED_PARAMETER_INVALID);
-		}
-		Employee me = employeeService.findById(book.getMarketingId());
-		if (me == null) {
-			rep.setStatus(Constants.ErrorCode.REQUIRED_PARAMETER_INVALID);
-		}
-		if (book.getRoomTypeId() != null) {
-			RoomType rt = roomTypeService.findById(book.getRoomTypeId());
-			if (rt == null) {
-				rep.setStatus(Constants.ErrorCode.REQUIRED_PARAMETER_INVALID);
-			}
-			if (rep.getStatus() == 0) {
-				br.setHotelCode(book.getHotelCode());
-				br.setRoomType(rt);
-				br.setOperationEmployee(oe);
-				br.setMarketEmployee(me);
-				rep = bookingRecordService.book(br);
-			}
-		} else if (book.getItems() != null && !book.getItems().isEmpty()) {
-			if (book.getType().equals(Constants.Type.BOOK_GROUP)) {
-
-			} else {
-				br.setCheckInRecords(createBookingCheckInRecords(br, book.getItems()));
-			}
-			rep = bookingRecordService.book(br);
-		} else {
-			rep.setStatus(Constants.ErrorCode.REQUIRED_PARAMETER_INVALID);
-			rep.setMessage("请预留房间");
-		}
-		if (rep.getStatus() != 0) {
-			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-		}
-		return rep;
-	}
+	@Autowired
+	RoomStatisticsService roomStatisticsService;
 
 	@Override
 	public DtoResponse<BookingRecord> groupBook(BookingRecord br) {
@@ -230,16 +188,6 @@ public class ReceptionServiceImpl implements ReceptionService {
 		return result;
 	}
 
-	@Transactional
-	@Override
-	public DtoResponse<CheckOutVo> checkOut(@Valid CheckOutBo checkOut) {
-		String roomId = checkOut.getRoomId();
-		List<CheckInRecord> crs = checkInRecordService.checkOut(roomId);
-		billService.checkAndPayBill(crs, checkOut.getTatal());
-		roomRecordService.checkOut(crs);
-		guestRoomStatusService.checkOut(roomId);
-		return null;
-	}
 
 	@Transactional
 	@Override
@@ -251,7 +199,7 @@ public class ReceptionServiceImpl implements ReceptionService {
 
 	@Transactional
 	@Override
-	public DtoResponse<String> assignRoom(@Valid RoomAssignBo roomAssignBo) {
+	public DtoResponse<String> assignRoom(RoomAssignBo roomAssignBo) {
 		DtoResponse<String> response = new DtoResponse<String>();
 		String checkInRecordId = roomAssignBo.getCheckInRecordId();
 		CheckInRecord cir = checkInRecordService.findById(checkInRecordId);

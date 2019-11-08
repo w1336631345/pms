@@ -59,7 +59,7 @@ public class BookingRecord extends PersistenceModel {
 	@Column
 	private Integer humanCount;
 	@Column
-	private LocalDateTime holdTime;
+	private String holdTime;
 	@Column
 	private String remark;
 	@Column
@@ -155,12 +155,6 @@ public class BookingRecord extends PersistenceModel {
 	public void setHumanCount(Integer humanCount) {
 		this.humanCount = humanCount;
 	}
-	public LocalDateTime getHoldTime() {
-		return holdTime;
-	}
-	public void setHoldTime(LocalDateTime holdTime) {
-		this.holdTime = holdTime;
-	}
 	public String getRemark() {
 		return remark;
 	}
@@ -203,6 +197,12 @@ public class BookingRecord extends PersistenceModel {
 	}
 	public void setCheckInRecords(List<CheckInRecord> checkInRecords) {
 		this.checkInRecords = checkInRecords;
+	}
+	public String getHoldTime() {
+		return holdTime;
+	}
+	public void setHoldTime(String holdTime) {
+		this.holdTime = holdTime;
 	}
 	
 	

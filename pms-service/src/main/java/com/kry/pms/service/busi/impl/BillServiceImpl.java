@@ -58,7 +58,7 @@ public class BillServiceImpl implements BillService {
 				bill.setType(p.getType());
 				bill.setCreateDate(LocalDateTime.now());
 				bill.setBusinessDate(businessSeqService.getBuinessDate(p.getHotelCode()));
-				if(bill.getStatus()!=null) {
+				if(bill.getStatus()==null) {
 					bill.setStatus(Constants.Status.BILL_NEED_SETTLED);
 				}
 			}
@@ -171,10 +171,10 @@ public class BillServiceImpl implements BillService {
 		for (Bill b : bills) {
 			if (Constants.Status.BILL_NEED_SETTLED.equals(b.getStatus())) {
 				if(b.getCost()!=null) {
-					BigDecimalUtil.sub(total, b.getCost());
+					total = BigDecimalUtil.sub(total, b.getCost());
 				}
 				if(b.getPay()!=null) {
-					BigDecimalUtil.add(total, b.getPay());
+					total = BigDecimalUtil.add(total, b.getPay());
 				}
 				b.setStatus(Constants.Status.BILL_SETTLED);
 				b.setCurrentSettleAccountRecordNum(recordNum);
@@ -194,10 +194,10 @@ public class BillServiceImpl implements BillService {
 	@Override
 	public List<Bill> addFlatBills(List<Bill> list, Employee employee,String orderNum) {
 		for (Bill bill : list) {
-			bill = add(bill);
 			bill.setStatus(Constants.Status.BILL_SETTLED);
 			bill.setOperationEmployee(employee);
 			bill.setCurrentSettleAccountRecordNum(orderNum);
+			bill = add(bill);
 		}
 		return list;
 	}

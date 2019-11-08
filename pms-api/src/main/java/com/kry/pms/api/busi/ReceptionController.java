@@ -64,6 +64,20 @@ public class ReceptionController extends BaseController<String> {
 		return rep;
 	}
 	
+	/**
+	 * 入住
+	 * 
+	 * @param checkIn
+	 * @return
+	 */
+	@PostMapping(path = "/checkout")
+	public HttpResponse<String> checkOut(@RequestBody @Valid CheckOutBo checkOutIn) {
+		HttpResponse<String> rep = new HttpResponse<String>();
+		return rep;
+	}
+	
+	
+	
 	@GetMapping(path = "/checkIn/{id}")
 	public HttpResponse<String> checkIn(@PathVariable String id) {
 		HttpResponse<String> rep = new HttpResponse<String>();
@@ -78,18 +92,6 @@ public class ReceptionController extends BaseController<String> {
 		return rep;
 	}
 	
-	/**
-	 * 入住
-	 * 
-	 * @param checkIn
-	 * @return
-	 */
-	@PostMapping(path = "/out")
-	public HttpResponse<String> checkOut(@RequestBody @Valid CheckOutBo checkOut) {
-		HttpResponse<String> rep = new HttpResponse<String>();
-		BeanUtils.copyProperties(receptionService.checkOut(checkOut), rep);
-		return rep;
-	}
 	/**
 	 * 结账确认
 	 * @return
@@ -139,21 +141,7 @@ public class ReceptionController extends BaseController<String> {
 		return rep;
 	}
 
-	/**
-	 * 预定
-	 * 
-	 * @param book
-	 * @return
-	 */
-	@PostMapping(path = "/book")
-	public HttpResponse<String> apply(@RequestBody @Valid BookingBo book) {
-		book.setHotelCode(getCurrentHotleCode());
-		book.setOperationId(getCurrentEmployee().getId());
-		DtoResponse<BookingRecord> dtoRep = receptionService.book(book);
-		HttpResponse<String> rep = new HttpResponse<String>(dtoRep);
-		return rep;
-	}
-	
+
 	/**
 	 * 预定
 	 * 
@@ -178,47 +166,6 @@ public class ReceptionController extends BaseController<String> {
 	@PostMapping(path = "/renew")
 	public HttpResponse<String> renew(@RequestBody RenewBo renew) {
 		HttpResponse<String> rep = new HttpResponse<String>();
-		return rep;
-	}
-
-	/**
-	 * 入账
-	 * 
-	 * @param billItemBo
-	 * @return
-	 */
-	@PostMapping(path = "/account_entry")
-	public HttpResponse<String> accountEntry(@RequestBody BillItemBo billItemBo) {
-		HttpResponse<String> rep = new HttpResponse<String>();
-		return rep;
-	}
-
-	/**
-	 * 拆分账单
-	 * 
-	 * @return
-	 */
-	@PostMapping(path = "/split_bill")
-	public HttpResponse<String> splitBiil() {
-		HttpResponse<String> rep = new HttpResponse<String>();
-		return rep;
-	}
-
-	/**
-	 * 转移账单
-	 * 
-	 * @return
-	 */
-	@PostMapping(path = "/shift_bill")
-	public HttpResponse<String> shiftBill() {
-		HttpResponse<String> rep = new HttpResponse<String>();
-		return rep;
-	}
-
-	@PostMapping(path = "/settle_bill")
-	public HttpResponse<String> settleBill(BillSettleBo bsb) {
-		HttpResponse<String> rep = new HttpResponse<String>();
-		BeanUtils.copyProperties(receptionService.billSettle(bsb), rep);
 		return rep;
 	}
 

@@ -14,6 +14,7 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import javax.transaction.Transactional;
 
 import org.aspectj.internal.lang.annotation.ajcDeclareAnnotation;
 import org.jboss.jandex.Main;
@@ -36,11 +37,13 @@ import com.kry.pms.dao.busi.CheckInRecordDao;
 import com.kry.pms.model.http.request.busi.CheckInBo;
 import com.kry.pms.model.http.request.busi.CheckInItemBo;
 import com.kry.pms.model.http.response.busi.AccountSummaryVo;
+import com.kry.pms.model.http.response.busi.CheckInRecordListVo;
 import com.kry.pms.model.persistence.busi.BookingItem;
 import com.kry.pms.model.persistence.busi.BookingRecord;
 import com.kry.pms.model.persistence.busi.CheckInRecord;
 import com.kry.pms.model.persistence.guest.Customer;
 import com.kry.pms.model.persistence.room.GuestRoom;
+import com.kry.pms.model.persistence.room.RoomTag;
 import com.kry.pms.model.persistence.room.RoomUsage;
 import com.kry.pms.model.persistence.sys.Account;
 import com.kry.pms.model.persistence.sys.BusinessSeq;
@@ -259,6 +262,11 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 		}
 		List<CheckInRecord> data = new ArrayList<CheckInRecord>();
 		String tempName = cir.getName() + gr.getRoomNum();
+		List<RoomTag> tags = null;
+		if(cir.getDemands()!=null&&!cir.getDemands().isEmpty()) {
+			tags = new ArrayList<RoomTag>();
+			tags.addAll(cir.getDemands());
+		}
 		if (response.getStatus() == 0) {
 			for (int i = 1; i <= humanCount; i++) {
 				Customer customer = customerService.createTempCustomer(tempName + "#" + i);
@@ -268,6 +276,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 				} catch (CloneNotSupportedException e) {
 					e.printStackTrace();
 				}
+				ncir.setDemands(tags);
 				ncir.setId(null);
 				ncir.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION);
 				ncir.setCustomer(customer);
@@ -280,6 +289,8 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 				Account account = new Account();
 				account.setRoomNum(gr.getRoomNum());
 				account.setCustomer(customer);
+				account.setCode(businessSeqService.fetchNextSeqNum(gr.getHotelCode(),
+				Constants.Key.BUSINESS_BUSINESS_CUSTOMER_ACCOUNT_SEQ_KEY));
 				ncir.setCheckInCount(1);
 				ncir.setRoomCount(1);
 				account.setType(Constants.Type.ACCOUNT_CUSTOMER);
@@ -291,7 +302,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 		}
 		return data;
 	}
-
+	@Transactional
 	@Override
 	public CheckInRecord book(CheckInRecord checkInRecord) {
 		String orderNum = businessSeqService.fetchNextSeqNum(checkInRecord.getHotelCode(),
@@ -311,10 +322,16 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 			item.setDays(checkInRecord.getDays());
 			item.setRoomType(roomTypeService.findById(item.getRoomTypeId()));
 			item.setContactName(checkInRecord.getContactName());
+			item.setMarketEmployee(checkInRecord.getMarketEmployee());
+			item.setDistributionChannel(checkInRecord.getDistributionChannel());
 			item.setContactMobile(checkInRecord.getContactMobile());
 			item.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION);
 			item.setType(Constants.Type.CHECK_IN_RECORD_GROUP_CUSTOMER);
 			item.setProtocolCorpation(checkInRecord.getProtocolCorpation());
+			boolean bookResult = roomStatisticsService.booking(item.getRoomType(), item.getArriveTime(), item.getRoomCount(), item.getDays());
+			if(!bookResult) {
+				//房源不足
+			}
 		}
 		return add(checkInRecord);
 	}
@@ -401,6 +418,25 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 			}	
 		}
 		return asvm.values();
+	}
+
+	@Override
+	public PageResponse<CheckInRecordListVo> querySummaryList(PageRequest<CheckInRecord> prq) {
+		PageResponse<CheckInRecord> cirp = listPage(prq);
+		List<CheckInRecordListVo> data = new ArrayList<CheckInRecordListVo>();
+		for(CheckInRecord cir:cirp.getContent()) {
+			data.add(new CheckInRecordListVo(cir));
+		}
+		PageResponse<CheckInRecordListVo> rep = new PageResponse<>();
+		BeanUtils.copyProperties(cirp, rep);
+		rep.setContent(data);
+		return rep;
+	}
+
+	@Override
+	public List<CheckInRecord> findByOrderNum(String orderNum) {
+		checkInRecordDao.findByOrderNumAndDeleted(orderNum, Constants.DELETED_FALSE);
+		return null;
 	}
 
 }

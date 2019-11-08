@@ -146,24 +146,24 @@ public class AccountServiceImpl implements AccountService {
 		DtoResponse<Account> rep = new DtoResponse<Account>();
 		Account account = findById(billCheckBo.getAccountId());
 		List<Bill> bills = null;
-		double total = 0.0;
-		for(Bill b:billCheckBo.getBills()) {
-			if(b.getCost()!=null) {
-				BigDecimalUtil.sub(total, b.getCost());
-			}
-			if(b.getPay()!=null) {
-				BigDecimalUtil.add(total, b.getPay());
-			}
-		}
 		if (account != null) {
 			SettleAccountRecord settleAccountRecord = settleAccountRecordService.create(billCheckBo, account);
+			List<Bill> flatBills = billService.addFlatBills(billCheckBo.getBills(),billCheckBo.getOperationEmployee(),settleAccountRecord.getRecordNum());
+			double total = 0.0;
+			for(Bill b:flatBills) {
+				if(b.getCost()!=null) {
+					total= BigDecimalUtil.sub(total, b.getCost());
+				}
+				if(b.getPay()!=null) {
+					total = BigDecimalUtil.add(total, b.getPay());
+				}
+			}
 			if (Constants.Type.BILL_CHECK_TYPE_ALL.equals(billCheckBo.getCheckType())) {
 				bills = billService.checkAccountAllBill(account,total,rep,settleAccountRecord.getRecordNum());
 			} else {
 				bills = billService.checkBillIds(billCheckBo.getBillIds(),total, rep,settleAccountRecord.getRecordNum());
 			}
 			if (rep.getStatus() == 0) {
-				List<Bill> flatBills = billService.addFlatBills(billCheckBo.getBills(),billCheckBo.getOperationEmployee(),settleAccountRecord.getRecordNum());
 				if (rep.getStatus() == 0) {
 					settleAccountRecord.setBills(bills);
 					settleAccountRecord.setFlatBills(flatBills);

@@ -32,6 +32,8 @@ public class Product extends PersistenceModel {
 	@Column(name = "price")
 	private Double price;
 	@Column
+	private Double taxRate;
+	@Column
 	private String description;
 	@OneToOne
 	private ProductCategory category;

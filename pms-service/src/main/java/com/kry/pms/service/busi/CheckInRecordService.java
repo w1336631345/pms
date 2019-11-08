@@ -5,18 +5,21 @@ import java.util.List;
 import java.util.Map;
 
 import com.kry.pms.base.DtoResponse;
+import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
 import com.kry.pms.model.http.request.busi.CheckInBo;
 import com.kry.pms.model.http.response.busi.AccountSummaryVo;
+import com.kry.pms.model.http.response.busi.CheckInRecordListVo;
 import com.kry.pms.model.persistence.busi.BookingItem;
 import com.kry.pms.model.persistence.busi.BookingRecord;
 import com.kry.pms.model.persistence.busi.CheckInRecord;
 import com.kry.pms.model.persistence.room.GuestRoom;
 import com.kry.pms.model.persistence.sys.User;
 import com.kry.pms.service.BaseService;
-import org.springframework.data.domain.Page;
 
 public interface CheckInRecordService extends BaseService<CheckInRecord> {
+	
+	public PageResponse<CheckInRecordListVo> querySummaryList(PageRequest<CheckInRecord> req);
 
 	public void checkIn(CheckInBo checkInBo, DtoResponse<List<CheckInRecord>> rep);
 
@@ -43,4 +46,6 @@ public interface CheckInRecordService extends BaseService<CheckInRecord> {
 	List<Map<String, Object>> getStatistics(User user);
 
 	public Collection<AccountSummaryVo> getAccountSummaryByOrderNum(String orderNum, String accountCustomer);
+
+	public List<CheckInRecord> findByOrderNum(String orderNum);
 }
