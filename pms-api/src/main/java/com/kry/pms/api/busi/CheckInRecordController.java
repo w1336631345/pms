@@ -18,11 +18,10 @@ import com.kry.pms.api.BaseController;
 import com.kry.pms.base.HttpResponse;
 import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
+import com.kry.pms.model.http.request.busi.TogetherBo;
 import com.kry.pms.model.http.response.busi.CheckInRecordListVo;
 import com.kry.pms.model.persistence.busi.CheckInRecord;
 import com.kry.pms.service.busi.CheckInRecordService;
-
-import net.sf.ehcache.util.FindBugsSuppressWarnings;
 
 @RestController
 @RequestMapping(path = "/api/v1/busi/checkInRecord")
@@ -44,7 +43,13 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
 		checkInRecord.setHotelCode(getCurrentHotleCode());
 		return getDefaultResponse().addData(checkInRecordService.book(checkInRecord));
 	}
+	
+	@PostMapping(path = "/reserve")
+	public HttpResponse<List<CheckInRecord>> addReserve(@RequestBody List<CheckInRecord> checkInRecords){
+		HttpResponse<List<CheckInRecord>> rep = new HttpResponse();
+		return rep.addData(checkInRecordService.addReserve(checkInRecords));
 
+	}
 	@DeleteMapping
 	public HttpResponse<String> delete(String id) {
 		HttpResponse<String> rep = new HttpResponse<>();
@@ -74,6 +79,10 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
 		HttpResponse<List<CheckInRecord>> rep = new HttpResponse<List<CheckInRecord>>();
 		rep.addData(checkInRecordService.findByOrderNum(orderNum));
 		return rep;
+	}
+	@PostMapping(path="/together")
+	public HttpResponse<CheckInRecord> addCustomerTogether(@RequestBody TogetherBo togetherBo){
+		return getDefaultResponse().addData(checkInRecordService.addTogether(togetherBo));
 	}
 	
 	

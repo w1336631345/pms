@@ -8,6 +8,7 @@ import com.kry.pms.base.DtoResponse;
 import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
 import com.kry.pms.model.http.request.busi.CheckInBo;
+import com.kry.pms.model.http.request.busi.TogetherBo;
 import com.kry.pms.model.http.response.busi.AccountSummaryVo;
 import com.kry.pms.model.http.response.busi.CheckInRecordListVo;
 import com.kry.pms.model.persistence.busi.BookingItem;
@@ -52,4 +53,10 @@ public interface CheckInRecordService extends BaseService<CheckInRecord> {
 	public Collection<AccountSummaryVo> getAccountSummaryByOrderNum(String orderNum, String accountCustomer);
 
 	public List<CheckInRecord> findByOrderNum(String orderNum);
+
+	public CheckInRecord addReserve(CheckInRecord checkInRecord);
+
+	public List<CheckInRecord> addReserve(List<CheckInRecord> checkInRecords);
+
+	public CheckInRecord addTogether(TogetherBo togetherBo);
 }

@@ -6,8 +6,10 @@ import com.kry.pms.service.BaseService;
 
 public interface CustomerService extends BaseService<Customer>{
 	
-	public Customer createOrGetCustomer(GuestInfoBo guestInfoBo);
+	public Customer createOrGetCustomer(String hotelCode,GuestInfoBo guestInfoBo);
 
-	public Customer createTempCustomer(String tempName);
+	public Customer createTempCustomer(String hotelCode,String tempName);
+
+	public Customer createOrGetCustomer(String hotelCode,String name, String idCardNum, String mobile);
 
 }

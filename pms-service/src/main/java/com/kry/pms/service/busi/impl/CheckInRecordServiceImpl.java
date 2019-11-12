@@ -4,7 +4,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -17,11 +16,6 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.transaction.Transactional;
 
-import com.kry.pms.base.*;
-import com.kry.pms.model.persistence.busi.RoomRecord;
-import org.aspectj.internal.lang.annotation.ajcDeclareAnnotation;
-import org.jboss.jandex.Main;
-import com.kry.pms.model.persistence.sys.User;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
@@ -32,9 +26,15 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import com.kry.pms.base.Constants;
+import com.kry.pms.base.DtoResponse;
+import com.kry.pms.base.PageRequest;
+import com.kry.pms.base.PageResponse;
+import com.kry.pms.base.ParamSpecification;
 import com.kry.pms.dao.busi.CheckInRecordDao;
 import com.kry.pms.model.http.request.busi.CheckInBo;
 import com.kry.pms.model.http.request.busi.CheckInItemBo;
+import com.kry.pms.model.http.request.busi.TogetherBo;
 import com.kry.pms.model.http.response.busi.AccountSummaryVo;
 import com.kry.pms.model.http.response.busi.CheckInRecordListVo;
 import com.kry.pms.model.persistence.busi.BookingItem;
@@ -43,9 +43,9 @@ import com.kry.pms.model.persistence.busi.CheckInRecord;
 import com.kry.pms.model.persistence.guest.Customer;
 import com.kry.pms.model.persistence.room.GuestRoom;
 import com.kry.pms.model.persistence.room.RoomTag;
-import com.kry.pms.model.persistence.room.RoomUsage;
 import com.kry.pms.model.persistence.sys.Account;
 import com.kry.pms.model.persistence.sys.BusinessSeq;
+import com.kry.pms.model.persistence.sys.User;
 import com.kry.pms.service.busi.CheckInRecordService;
 import com.kry.pms.service.busi.RoomRecordService;
 import com.kry.pms.service.guest.CustomerService;
@@ -56,6 +56,7 @@ import com.kry.pms.service.room.RoomStatusQuantityService;
 import com.kry.pms.service.room.RoomTypeQuantityService;
 import com.kry.pms.service.room.RoomTypeService;
 import com.kry.pms.service.room.RoomUsageService;
+import com.kry.pms.service.sys.AccountService;
 import com.kry.pms.service.sys.BusinessSeqService;
 import com.kry.pms.service.sys.SystemConfigService;
 
@@ -85,6 +86,8 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 	BusinessSeqService businessSeqService;
 	@Autowired
 	RoomTypeService roomTypeService;
+	@Autowired
+	AccountService accountService;
 
 	@Override
 	public CheckInRecord add(CheckInRecord checkInRecord) {
@@ -165,7 +168,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 			cir.setArriveTime(time);
 			ciib.setHotelCode(gr.getHotelCode());
 			BeanUtils.copyProperties(ciib, cir);
-			customer = customerService.createOrGetCustomer(ciib.getGuests().get(i));
+			customer = customerService.createOrGetCustomer(gr.getHotelCode(), ciib.getGuests().get(i));
 			cir.setCustomer(customer);
 			cir.setGuestRoom(gr);
 			cir.setStartDate(startDate);
@@ -187,9 +190,9 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 
 	@Override
 	public CheckInRecord checkInByTempName(String tempName, String roomId, DtoResponse<String> response) {
-		Customer customer = customerService.createTempCustomer(tempName);
 		GuestRoom gr = guestRoomService.findById(roomId);
 		if (gr != null) {
+			Customer customer = customerService.createTempCustomer(gr.getHotelCode(), tempName);
 
 		} else {
 
@@ -215,12 +218,12 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 		if (response.getStatus() == 0) {
 			for (int i = 1; i <= humanCount; i++) {
 				tempName = br.getName() + gr.getRoomNum() + "#" + i;
-				Customer customer = customerService.createTempCustomer(tempName);
+				Customer customer = customerService.createTempCustomer(gr.getHotelCode(), tempName);
 				CheckInRecord cir = new CheckInRecord();
 				cir.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION);
 				cir.setCustomer(customer);
 				cir.setCheckInSn(checkInSn);
-				cir.setType(Constants.Type.CHECK_IN_RECORD_GROUP_CUSTOMER);
+				cir.setType(Constants.Type.CHECK_IN_RECORD_CUSTOMER);
 				cir.setGroup(br.getGroup());
 				cir.setArriveTime(br.getArriveTime());
 				cir.setLeaveTime(br.getLeaveTime());
@@ -229,6 +232,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 				cir.setGuestRoom(gr);
 				cir.setHotelCode(gr.getHotelCode());
 				Account account = new Account();
+				account.setName(tempName);
 				account.setCustomer(customer);
 				account.setType(Constants.Type.ACCOUNT_CUSTOMER);
 				cir.setAccount(account);
@@ -262,13 +266,13 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 		List<CheckInRecord> data = new ArrayList<CheckInRecord>();
 		String tempName = cir.getName() + gr.getRoomNum();
 		List<RoomTag> tags = null;
-		if(cir.getDemands()!=null&&!cir.getDemands().isEmpty()) {
+		if (cir.getDemands() != null && !cir.getDemands().isEmpty()) {
 			tags = new ArrayList<RoomTag>();
 			tags.addAll(cir.getDemands());
 		}
 		if (response.getStatus() == 0) {
 			for (int i = 1; i <= humanCount; i++) {
-				Customer customer = customerService.createTempCustomer(tempName + "#" + i);
+				Customer customer = customerService.createTempCustomer(gr.getHotelCode(), tempName + "#" + i);
 				CheckInRecord ncir = null;
 				try {
 					ncir = (CheckInRecord) cir.clone();
@@ -280,7 +284,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 				ncir.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION);
 				ncir.setCustomer(customer);
 				ncir.setName(customer.getName());
-				ncir.setType(Constants.Type.CHECK_IN_RECORD_GROUP_CUSTOMER);
+				ncir.setType(Constants.Type.CHECK_IN_RECORD_CUSTOMER);
 				ncir.setGuestRoom(gr);
 				ncir.setSubRecords(null);
 				ncir.setStartDate(startDate);
@@ -289,7 +293,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 				account.setRoomNum(gr.getRoomNum());
 				account.setCustomer(customer);
 				account.setCode(businessSeqService.fetchNextSeqNum(gr.getHotelCode(),
-				Constants.Key.BUSINESS_BUSINESS_CUSTOMER_ACCOUNT_SEQ_KEY));
+						Constants.Key.BUSINESS_BUSINESS_CUSTOMER_ACCOUNT_SEQ_KEY));
 				ncir.setCheckInCount(1);
 				ncir.setRoomCount(1);
 				account.setType(Constants.Type.ACCOUNT_CUSTOMER);
@@ -301,6 +305,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 		}
 		return data;
 	}
+
 	@Transactional
 	@Override
 	public CheckInRecord book(CheckInRecord checkInRecord) {
@@ -315,21 +320,23 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 		checkInRecord.setAccount(account);
 		for (CheckInRecord item : checkInRecord.getSubRecords()) {
 			item.setOrderNum(orderNum);
+			item.setGroupType(checkInRecord.getGroupType());
 			item.setHoldTime(checkInRecord.getHoldTime());
 			item.setArriveTime(checkInRecord.getArriveTime());
 			item.setLeaveTime(checkInRecord.getLeaveTime());
 			item.setDays(checkInRecord.getDays());
-			item.setRoomType(roomTypeService.findById(item.getRoomTypeId()));
 			item.setContactName(checkInRecord.getContactName());
 			item.setMarketEmployee(checkInRecord.getMarketEmployee());
 			item.setDistributionChannel(checkInRecord.getDistributionChannel());
 			item.setContactMobile(checkInRecord.getContactMobile());
+			item.setRoomType(roomTypeService.findById(item.getRoomTypeId()));
 			item.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION);
-			item.setType(Constants.Type.CHECK_IN_RECORD_GROUP_CUSTOMER);
+			item.setType(Constants.Type.CHECK_IN_RECORD_RESERVE);
 			item.setProtocolCorpation(checkInRecord.getProtocolCorpation());
-			boolean bookResult = roomStatisticsService.booking(item.getRoomType(), item.getArriveTime(), item.getRoomCount(), item.getDays());
-			if(!bookResult) {
-				//房源不足
+			boolean bookResult = roomStatisticsService.booking(item.getRoomType(), item.getArriveTime(),
+					item.getRoomCount(), item.getDays());
+			if (!bookResult) {
+				// 房源不足
 			}
 		}
 		return add(checkInRecord);
@@ -366,12 +373,12 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 
 	@Override
 	public PageResponse<CheckInRecord> accountEntryList(int pageIndex, int pageSize, User user) {
-		Pageable page = org.springframework.data.domain.PageRequest.of(pageIndex-1, pageSize);
+		Pageable page = org.springframework.data.domain.PageRequest.of(pageIndex - 1, pageSize);
 		ParamSpecification<CheckInRecord> psf = new ParamSpecification<CheckInRecord>();
 		Map<String, Object> map = new HashMap<>();
 		Map<String, Object> emap = new HashMap<>();
 		emap.put("hotelCode", user.getHotelCode());
-        emap.put("status", "I");
+		emap.put("status", "I");
 		map.put("equals", emap);
 //		Map<String, String[]> omap = new HashMap<>();
 //		Map<String, Object> theSameMap = new HashMap<>();
@@ -380,7 +387,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 //		omap.put("status", values);
 //		map.put("or", theSameMap);
 		Specification<CheckInRecord> specification = psf.createSpecification(map);
-		Page<CheckInRecord> p = checkInRecordDao.findAll(specification,page);
+		Page<CheckInRecord> p = checkInRecordDao.findAll(specification, page);
 		return convent(p);
 	}
 
@@ -426,15 +433,16 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 
 	@Override
 	public Collection<AccountSummaryVo> getAccountSummaryByOrderNum(String orderNum, String type) {
-		List<CheckInRecord> cirs = checkInRecordDao.findByOrderNumAndTypeAndDeleted(orderNum,type,Constants.DELETED_FALSE);
+		List<CheckInRecord> cirs = checkInRecordDao.findByOrderNumAndTypeAndDeleted(orderNum, type,
+				Constants.DELETED_FALSE);
 		Map<String, AccountSummaryVo> asvm = new HashMap<>();
 		for (CheckInRecord cir : cirs) {
 			AccountSummaryVo asv = null;
-			if (cir.getAccount()!=null) {
+			if (cir.getAccount() != null) {
 				Account acc = cir.getAccount();
 				acc.setRoomNum(cir.getGuestRoom().getRoomNum());
 				acc.setName(cir.getCustomer().getName());
-				if(!asvm.containsKey(cir.getGuestRoom().getRoomNum())) {
+				if (!asvm.containsKey(cir.getGuestRoom().getRoomNum())) {
 					asv = new AccountSummaryVo();
 					asv.setType("temp");
 					asv.setRoomNum(acc.getRoomNum());
@@ -455,7 +463,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 	public PageResponse<CheckInRecordListVo> querySummaryList(PageRequest<CheckInRecord> prq) {
 		PageResponse<CheckInRecord> cirp = listPage(prq);
 		List<CheckInRecordListVo> data = new ArrayList<CheckInRecordListVo>();
-		for(CheckInRecord cir:cirp.getContent()) {
+		for (CheckInRecord cir : cirp.getContent()) {
 			data.add(new CheckInRecordListVo(cir));
 		}
 		PageResponse<CheckInRecordListVo> rep = new PageResponse<>();
@@ -466,8 +474,67 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 
 	@Override
 	public List<CheckInRecord> findByOrderNum(String orderNum) {
-		checkInRecordDao.findByOrderNumAndDeleted(orderNum, Constants.DELETED_FALSE);
-		return null;
+		return checkInRecordDao.findByOrderNumAndDeleted(orderNum, Constants.DELETED_FALSE);
+	}
+
+	@Override
+	public CheckInRecord addReserve(CheckInRecord checkInRecord) {
+		if (checkInRecord.getMainRecordId() != null) {
+			CheckInRecord mainCheckInRecord = findById(checkInRecord.getMainRecordId());
+			checkInRecord.setHoldTime(mainCheckInRecord.getHoldTime());
+			checkInRecord.setDays(mainCheckInRecord.getDays());
+			checkInRecord.setContactName(mainCheckInRecord.getContactName());
+			checkInRecord.setMarketEmployee(mainCheckInRecord.getMarketEmployee());
+			checkInRecord.setDistributionChannel(mainCheckInRecord.getDistributionChannel());
+			checkInRecord.setContactMobile(mainCheckInRecord.getContactMobile());
+			checkInRecord.setOrderNum(mainCheckInRecord.getOrderNum());
+			checkInRecord.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION);
+			checkInRecord.setRoomType(roomTypeService.findById(checkInRecord.getRoomTypeId()));
+			checkInRecord = add(checkInRecord);
+			mainCheckInRecord.setRoomCount(mainCheckInRecord.getRoomCount() + checkInRecord.getRoomCount());
+			mainCheckInRecord.getSubRecords().add(checkInRecord);
+			modify(mainCheckInRecord);
+		}
+		return checkInRecord;
+	}
+
+	@Override
+	public List<CheckInRecord> addReserve(List<CheckInRecord> checkInRecords) {
+		for (CheckInRecord cir : checkInRecords) {
+			cir = addReserve(cir);
+		}
+		return checkInRecords;
+	}
+
+	@Transactional
+	@Override
+	public CheckInRecord addTogether(TogetherBo togetherBo) {
+		CheckInRecord cir = findById(togetherBo.getCurrentId());
+		CheckInRecord ncir = null;
+		if (cir != null) {
+			List<RoomTag> tags = null;
+			if (cir.getDemands() != null && !cir.getDemands().isEmpty()) {
+				tags = new ArrayList<RoomTag>();
+				tags.addAll(cir.getDemands());
+			}
+			try {
+				ncir = (CheckInRecord) cir.clone();
+			} catch (CloneNotSupportedException e) {
+				e.printStackTrace();
+			}
+			ncir.setDemands(tags);
+			ncir.setId(null);
+			ncir.setAccount(null);
+			ncir.setSubRecords(null);
+			ncir.setStatus(togetherBo.getStatus());
+			Customer customer = customerService.createOrGetCustomer(cir.getGuestRoom().getHotelCode(),
+					togetherBo.getName(), togetherBo.getIdCardNum(), togetherBo.getMobile());
+			Account account = accountService.createAccount(customer, cir.getGuestRoom().getRoomNum());
+			ncir.setAccount(account);
+			ncir.setCustomer(customer);
+			ncir = add(ncir);
+		}
+		return ncir;
 	}
 
 }

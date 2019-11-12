@@ -77,7 +77,7 @@ public class CustomerServiceImpl implements CustomerService {
 	}
 
 	@Override
-	public Customer createOrGetCustomer(GuestInfoBo guestInfoBo) {
+	public Customer createOrGetCustomer(String hotelCode,GuestInfoBo guestInfoBo) {
 		String idCardNum = guestInfoBo.getIdCardNum();
 		GuestInfo info = guestInfoService.findByIdCardNum(idCardNum);
 		Customer customer = null;
@@ -85,31 +85,60 @@ public class CustomerServiceImpl implements CustomerService {
 			info = new GuestInfo();
 			BeanUtils.copyProperties(guestInfoBo, info);
 			info = guestInfoService.add(info);
-			customer = initCustomerAndSave(info);
+			customer = initCustomerAndSave(hotelCode,info);
 		} else {
 			customer = new Customer();
 			customer.setGuestInfo(info);
 			Example<Customer> ex = Example.of(customer);
 			customer = customerDao.findOne(ex).get();
 			if (customer == null) {
-				customer = initCustomerAndSave(info);
+				customer = initCustomerAndSave(hotelCode,info);
 			}
 		}
 		return customer;
 	}
 
-	private Customer initCustomerAndSave(GuestInfo guestInfo) {
+	private Customer initCustomerAndSave(String hotelCode,GuestInfo guestInfo) {
 		Customer customer = new Customer();
 		customer.setGuestInfo(guestInfo);
+		customer.setHotelCode(hotelCode);
+		customer.setName(guestInfo.getName());
+		customer.setIdCardNum(guestInfo.getIdCardNum());
+		customer.setMobile(guestInfo.getMobile());
 		customer = add(customer);
 		return customer;
 	}
 
 	@Override
-	public Customer createTempCustomer(String tempName) {
+	public Customer createTempCustomer(String hotelCode,String tempName) {
 		Customer customer = new Customer();
 		customer.setName(tempName);
+		customer.setHotelCode(hotelCode);
 		customer = add(customer);
+		return customer;
+	}
+
+	@Override
+	public Customer createOrGetCustomer(String hotelCode,String name, String idCardNum, String mobile) {
+		GuestInfo info = guestInfoService.findByIdCardNum(idCardNum);
+		Customer customer = null;
+		if (info == null) {
+			info = new GuestInfo();
+			info.setName(name);
+			info.setHotelCode(hotelCode);
+			info.setMobile(mobile);
+			info.setIdCardNum(idCardNum);
+			info = guestInfoService.add(info);
+			customer = initCustomerAndSave(hotelCode,info);
+		} else {
+			customer = new Customer();
+			customer.setGuestInfo(info);
+			Example<Customer> ex = Example.of(customer);
+			customer = customerDao.findOne(ex).get();
+			if (customer == null) {
+				customer = initCustomerAndSave(hotelCode,info);
+			}
+		}
 		return customer;
 	}
 

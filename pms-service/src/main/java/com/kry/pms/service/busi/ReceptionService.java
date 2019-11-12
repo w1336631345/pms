@@ -51,4 +51,6 @@ public interface ReceptionService {
 
 	public DtoResponse<List<AccountSummaryVo>> groupCheckBillConfirm(String id);
 
+	public DtoResponse<String> checkIn(String[] ids);
+
 }

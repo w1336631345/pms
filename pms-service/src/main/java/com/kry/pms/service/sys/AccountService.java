@@ -8,6 +8,7 @@ import com.kry.pms.model.http.request.busi.BillCheckBo;
 import com.kry.pms.model.http.response.busi.AccountSummaryVo;
 import com.kry.pms.model.persistence.busi.Bill;
 import com.kry.pms.model.persistence.busi.RoomRecord;
+import com.kry.pms.model.persistence.guest.Customer;
 import com.kry.pms.model.persistence.sys.Account;
 import com.kry.pms.service.BaseService;
 
@@ -27,5 +28,7 @@ public interface AccountService extends BaseService<Account> {
 	Collection<Account> getAccountByOrderNumAndStatusAndCheckInType(String orderNum, String checkInType, String status);
 
 	DtoResponse<Account> checkCustomerBill(BillCheckBo billCheckBo);
+
+	Account createAccount(Customer customer,String roomNum);
 
 }

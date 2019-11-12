@@ -18,4 +18,5 @@ public interface RoomTypeQuantityService extends BaseService<RoomTypeQuantity>{
 	public boolean bookCheck(RoomType roomType,LocalDate quantityDate,int quantity);
 	public void checkIn(GuestRoom gr, LocalDate startDate, Integer days);
 	public List<RoomTypeQuantityPredictableVo> queryPredictable(String currentHotleCode, LocalDate startDate, LocalDate endDate);
+	public RoomTypeQuantityPredictableVo queryPredic(String currentHotleCode,String roomTypeId, LocalDate startDate, LocalDate endDate);
 }

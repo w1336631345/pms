@@ -1,16 +1,11 @@
 package com.kry.pms.service.busi.impl;
 
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 import javax.transaction.Transactional;
-import javax.validation.Valid;
 
-import org.aspectj.internal.lang.annotation.ajcDeclareAnnotation;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
@@ -19,23 +14,17 @@ import com.kry.pms.base.Constants;
 import com.kry.pms.base.DtoResponse;
 import com.kry.pms.model.http.request.busi.BillItemBo;
 import com.kry.pms.model.http.request.busi.BillSettleBo;
-import com.kry.pms.model.http.request.busi.BookingBo;
 import com.kry.pms.model.http.request.busi.BookingItemBo;
 import com.kry.pms.model.http.request.busi.CheckInBo;
 import com.kry.pms.model.http.request.busi.CheckInItemBo;
-import com.kry.pms.model.http.request.busi.CheckOutBo;
 import com.kry.pms.model.http.request.busi.RoomAssignBo;
 import com.kry.pms.model.http.response.busi.AccountSummaryVo;
-import com.kry.pms.model.http.response.busi.CheckOutVo;
 import com.kry.pms.model.persistence.busi.BillItem;
 import com.kry.pms.model.persistence.busi.BookingRecord;
 import com.kry.pms.model.persistence.busi.CheckInRecord;
-import com.kry.pms.model.persistence.org.Employee;
 import com.kry.pms.model.persistence.room.GuestRoom;
 import com.kry.pms.model.persistence.room.GuestRoomStatus;
-import com.kry.pms.model.persistence.room.RoomType;
 import com.kry.pms.model.persistence.sys.Account;
-import com.kry.pms.model.persistence.sys.BusinessSeq;
 import com.kry.pms.model.persistence.sys.SystemConfig;
 import com.kry.pms.service.busi.BillService;
 import com.kry.pms.service.busi.BookingItemService;
@@ -118,6 +107,7 @@ public class ReceptionServiceImpl implements ReceptionService {
 		List<CheckInRecord> sub = new ArrayList<CheckInRecord>();
 		CheckInRecord mcir = new CheckInRecord();
 		mcir.setType(Constants.Type.CHECK_IN_RECORD_GROUP);
+		mcir.setGroupType(Constants.Type.CHECK_IN_RECORD_GROUP_TYPE_YES);
 		mcir.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION);
 		mcir.setArriveTime(br.getArriveTime());
 		mcir.setLeaveTime(br.getLeaveTime());
@@ -133,6 +123,7 @@ public class ReceptionServiceImpl implements ReceptionService {
 			cir.setOrderNum(checkInSn);
 			cir.setName(tempName);
 			cir.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION);
+			cir.setType(Constants.Type.CHECK_IN_RECORD_RESERVE);
 			cir.setArriveTime(br.getArriveTime());
 			cir.setLeaveTime(br.getLeaveTime());
 			cir.setDays(br.getDays());
@@ -247,9 +238,9 @@ public class ReceptionServiceImpl implements ReceptionService {
 	public AccountSummaryVo getAccountSummaryByCheckRecordId(String id) {
 		CheckInRecord cir = checkInRecordService.findById(id);
 		AccountSummaryVo asv = null;
-		if (cir != null && cir.getType() != null) {
-			switch (cir.getType()) {
-			case Constants.Type.CHECK_IN_RECORD_GROUP:
+		if (cir != null && cir.getGroupType() != null) {
+			switch (cir.getGroupType()) {
+			case Constants.Type.CHECK_IN_RECORD_GROUP_TYPE_YES:
 				asv = new AccountSummaryVo();
 				asv.setName("团队所有账务");
 				asv.setType("temp");
@@ -258,39 +249,40 @@ public class ReceptionServiceImpl implements ReceptionService {
 				AccountSummaryVo group = new AccountSummaryVo(account);
 				asv.getChildren().add(group);
 				asv.getChildren().addAll((checkInRecordService.getAccountSummaryByOrderNum(cir.getOrderNum(),
-						Constants.Type.CHECK_IN_RECORD_GROUP_CUSTOMER)));
+						Constants.Type.CHECK_IN_RECORD_CUSTOMER)));
 				break;
-			case Constants.Type.CHECK_IN_RECORD_GROUP_CUSTOMER:
+			case Constants.Type.CHECK_IN_RECORD_GROUP_TYPE_NO:
 
 				break;
-			case Constants.Type.CHECK_IN_RECORD_LINK:
 
-				break;
-			case Constants.Type.CHECK_IN_RECORD_LINK_CUSTOMER:
-
-				break;
-			case Constants.Type.CHECK_IN_RECORD_CUSTOMER:
-				break;
 			default:
 				break;
 			}
+		}else {
+			// 散客
 		}
 		return asv;
 	}
-
+	 
 	@Override
 	public DtoResponse<List<AccountSummaryVo>> groupCheckBillConfirm(String id) {
 		DtoResponse<List<AccountSummaryVo>> rep = new DtoResponse<List<AccountSummaryVo>>();
 		CheckInRecord cir = checkInRecordService.findById(id);
 		if(cir!=null) {
 			String orderNum = cir.getOrderNum();
-			Collection<Account> asvs = accountService.getAccountByOrderNumAndStatusAndCheckInType(orderNum, Constants.Type.CHECK_IN_RECORD_GROUP_CUSTOMER, Constants.Status.ACCOUNT_IN);
+			Collection<Account> asvs = accountService.getAccountByOrderNumAndStatusAndCheckInType(orderNum, Constants.Type.CHECK_IN_RECORD_CUSTOMER, Constants.Status.ACCOUNT_IN);
 			if(asvs!=null&&!asvs.isEmpty()) {
 				rep.setStatus(Constants.BusinessCode.CODE_ILLEGAL_OPERATION);
 				rep.setMessage("有未结账的客房，请先结客房帐");
 			}
 		}
 		return rep;
+	}
+
+	@Override
+	public DtoResponse<String> checkIn(String[] ids) {
+		
+		return null;
 	}
 
 }

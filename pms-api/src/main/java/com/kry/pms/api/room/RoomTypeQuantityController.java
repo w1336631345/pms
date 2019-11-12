@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.kry.pms.api.BaseController;
+import com.kry.pms.base.Constants;
 import com.kry.pms.base.HttpResponse;
 import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
@@ -49,9 +51,39 @@ public class RoomTypeQuantityController extends BaseController<RoomTypeQuantity>
 	@GetMapping(path = "/predictable")
 	public HttpResponse<List<RoomTypeQuantityPredictableVo>> queryPredictable(String startDate, String endDate) {
 		HttpResponse<List<RoomTypeQuantityPredictableVo>> response = new HttpResponse<List<RoomTypeQuantityPredictableVo>>();
-		List<RoomTypeQuantityPredictableVo> data = roomTypeQuantityService.queryPredictable(getCurrentHotleCode(),
-				LocalDate.parse(startDate), LocalDate.parse(endDate));
-		response.addData(data);
+		LocalDate sDate = LocalDate.parse(startDate);
+		LocalDate eDate = LocalDate.parse(endDate);
+		if (sDate.isBefore(LocalDate.now())) {
+			sDate = LocalDate.now();
+		}
+		if (!eDate.isAfter(sDate)) {
+			response.setStatus(Constants.BusinessCode.CODE_PARAMETER_INVALID);
+			response.setMessage("到离店时间错误，请重新选择");
+		} else {
+			List<RoomTypeQuantityPredictableVo> data = roomTypeQuantityService.queryPredictable(getCurrentHotleCode(),
+					sDate, eDate);
+			response.addData(data);
+		}
+		return response;
+	}
+
+	@GetMapping(path = "/predic/{id}")
+	public HttpResponse<RoomTypeQuantityPredictableVo> queryPredic(@PathVariable("id") String roomTypeId,
+			String startDate, String endDate) {
+		HttpResponse<RoomTypeQuantityPredictableVo> response = new HttpResponse<RoomTypeQuantityPredictableVo>();
+		LocalDate sDate = LocalDate.parse(startDate);
+		LocalDate eDate = LocalDate.parse(endDate);
+		if (sDate.isBefore(LocalDate.now())) {
+			sDate = LocalDate.now();
+		}
+		if (!eDate.isAfter(sDate)) {
+			response.setStatus(Constants.BusinessCode.CODE_PARAMETER_INVALID);
+			response.setMessage("到离店时间错误，请重新选择");
+		} else {
+			RoomTypeQuantityPredictableVo data = roomTypeQuantityService.queryPredic(getCurrentHotleCode(), roomTypeId,
+					sDate, eDate);
+			response.addData(data);
+		}
 		return response;
 	}
 

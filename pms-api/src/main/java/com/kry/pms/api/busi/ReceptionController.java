@@ -75,6 +75,12 @@ public class ReceptionController extends BaseController<String> {
 		HttpResponse<String> rep = new HttpResponse<String>();
 		return rep;
 	}
+	@PostMapping(path = "/batch/checkIn")
+	public HttpResponse checkIn(@RequestBody String[] ids) {
+		HttpResponse<String> rep = new HttpResponse<String>();
+		BeanUtils.copyProperties(receptionService.checkIn(ids), rep);
+		return rep;
+	}
 	
 	
 	

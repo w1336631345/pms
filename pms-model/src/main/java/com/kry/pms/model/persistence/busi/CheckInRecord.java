@@ -75,7 +75,7 @@ public class CheckInRecord extends PersistenceModel {
 	@Column
 	private Double purchasePrice;
 	@Column
-	private Integer checkInCount = 0;
+	private Integer checkInCount;
 	@Column
 	private Integer days;
 	@Column
@@ -86,6 +86,8 @@ public class CheckInRecord extends PersistenceModel {
 	private String checkInSn;
 	@Column(name = "type_")
 	private String type;
+	@Column
+	private String groupType;
 	@ManyToOne
 	private Group group;
 	@OneToOne(cascade = CascadeType.ALL)
@@ -108,8 +110,23 @@ public class CheckInRecord extends PersistenceModel {
 	private Employee marketEmployee;
 	@Column
 	private String remark;
+	@Transient
+	private String mainRecordId;
 	
 	
+	
+	public String getGroupType() {
+		return groupType;
+	}
+	public void setGroupType(String groupType) {
+		this.groupType = groupType;
+	}
+	public String getMainRecordId() {
+		return mainRecordId;
+	}
+	public void setMainRecordId(String mainRecordId) {
+		this.mainRecordId = mainRecordId;
+	}
 	public String getRemark() {
 		return remark;
 	}

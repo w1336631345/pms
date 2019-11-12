@@ -26,11 +26,13 @@ import com.kry.pms.model.persistence.busi.Bill;
 import com.kry.pms.model.persistence.busi.CreditGrantingRecord;
 import com.kry.pms.model.persistence.busi.RoomRecord;
 import com.kry.pms.model.persistence.busi.SettleAccountRecord;
+import com.kry.pms.model.persistence.guest.Customer;
 import com.kry.pms.model.persistence.sys.Account;
 import com.kry.pms.service.busi.BillService;
 import com.kry.pms.service.busi.CreditGrantingRecordService;
 import com.kry.pms.service.busi.SettleAccountRecordService;
 import com.kry.pms.service.sys.AccountService;
+import com.kry.pms.service.sys.BusinessSeqService;
 import com.kry.pms.util.BigDecimalUtil;
 
 @Service
@@ -43,6 +45,8 @@ public class AccountServiceImpl implements AccountService {
 	CreditGrantingRecordService creditGrantingRecordService;
 	@Autowired
 	SettleAccountRecordService settleAccountRecordService;
+	@Autowired
+	BusinessSeqService businessSeqService;
 
 	@Override
 	public Account add(Account account) {
@@ -179,6 +183,17 @@ public class AccountServiceImpl implements AccountService {
 		}
 		rep.setData(account);
 		return rep;
+	}
+
+	@Override
+	public Account createAccount(Customer customer,String roomNum) {
+		Account account = new Account();
+		account.setCode(businessSeqService.fetchNextSeqNum(customer.getHotelCode(),Constants.Key.BUSINESS_BUSINESS_CUSTOMER_ACCOUNT_SEQ_KEY));
+		account.setCustomer(customer);
+		account.setName(customer.getName());
+		account.setType(Constants.Type.ACCOUNT_CUSTOMER);
+		account.setRoomNum(roomNum);
+		return add(account);
 	}
 
 }

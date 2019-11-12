@@ -109,8 +109,7 @@ public class RoomTypeQuantityServiceImpl implements RoomTypeQuantityService {
 		rtq.setRoomCount(roomType.getRoomCount());
 		return rtq;
 	}
-	
-	
+
 	@Override
 	public boolean bookCheck(RoomType roomType, LocalDate quantityDate, int quantity) {
 		RoomTypeQuantity rtq = findByRoomTypeAndQuantityDateForUpdate(roomType, quantityDate);
@@ -129,12 +128,12 @@ public class RoomTypeQuantityServiceImpl implements RoomTypeQuantityService {
 		RoomTypeQuantity rtq = null;
 		for (int i = 0; i < days; i++) {
 			rtq = findByRoomTypeAndQuantityDateForUpdate(gr.getRoomType(), startDate.plusDays(i));
-			rtq.setUsedTotal(rtq.getUsedTotal()+1);
-			rtq.setPredictableTotal(rtq.getPredictableTotal()-1);
+			rtq.setUsedTotal(rtq.getUsedTotal() + 1);
+			rtq.setPredictableTotal(rtq.getPredictableTotal() - 1);
 			modify(rtq);
 		}
 		rtq = findByRoomTypeAndQuantityDateForUpdate(gr.getRoomType(), startDate.plusDays(days));
-		rtq.setWillLeaveTotal(rtq.getWillLeaveTotal()+1);
+		rtq.setWillLeaveTotal(rtq.getWillLeaveTotal() + 1);
 		modify(rtq);
 	}
 
@@ -143,10 +142,10 @@ public class RoomTypeQuantityServiceImpl implements RoomTypeQuantityService {
 			LocalDate endDate) {
 		List<RoomType> types = roomTypeService.getAllByHotelCode(hotelCode, Constants.DELETED_FALSE);
 		List<RoomTypeQuantityPredictableVo> data = new ArrayList<>();
-		RoomTypeQuantityPredictableVo rtpv= null;
-		for(RoomType type:types) {
-			RoomTypeQuantity rtq = roomTypeQuantityDao.queryPredictable(type.getId(), startDate,endDate);
-			if(rtq!=null) {
+		RoomTypeQuantityPredictableVo rtpv = null;
+		for (RoomType type : types) {
+			RoomTypeQuantity rtq = roomTypeQuantityDao.queryPredictable(type.getId(), startDate, endDate);
+			if (rtq != null) {
 				rtpv = new RoomTypeQuantityPredictableVo();
 				rtpv.setPrice(type.getPrice());
 				rtpv.setRoomTypeName(type.getName());
@@ -158,5 +157,25 @@ public class RoomTypeQuantityServiceImpl implements RoomTypeQuantityService {
 			}
 		}
 		return data;
+	}
+
+	@Override
+	public RoomTypeQuantityPredictableVo queryPredic(String currentHotleCode, String roomTypeId,
+			LocalDate startDate, LocalDate endDate) {
+		RoomType roomType = roomTypeService.findById(roomTypeId);
+		RoomTypeQuantityPredictableVo rtpv = null;
+		if (roomType != null) {
+			RoomTypeQuantity rtq = roomTypeQuantityDao.queryPredictable(roomTypeId, startDate, endDate);
+			if (rtq != null) {
+				rtpv = new RoomTypeQuantityPredictableVo();
+				rtpv.setPrice(roomType.getPrice());
+				rtpv.setRoomTypeName(roomType.getName());
+				rtpv.setRoomTypeId(roomType.getId());
+				rtpv.setStartDate(startDate);
+				rtpv.setEndDate(endDate);
+				rtpv.setAvailableTotal(rtq.getPredictableTotal());
+			}
+		}
+		return rtpv;
 	}
 }
