@@ -38,6 +38,12 @@ public class HttpResponse<T> {
 		hr.setMessage(message);
 		return hr;
 	}
+	public HttpResponse<T> loginError() {
+		HttpResponse<T> hr = new HttpResponse<T>();
+		hr.setStatus(403);
+		hr.setMessage("登录过期，请重新登录");
+		return hr;
+	}
 	public HttpResponse<T> error(String message) {
 		HttpResponse<T> hr = new HttpResponse<T>();
 		hr.setStatus(9999);
