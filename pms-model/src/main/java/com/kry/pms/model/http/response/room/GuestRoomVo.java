@@ -17,6 +17,7 @@ public class GuestRoomVo implements Serializable {
 	public GuestRoomVo(GuestRoom gr) {
 		this.id = gr.getId();
 		this.roomNum = gr.getRoomNum();
+		this.roomTypeName = gr.getRoomType().getName();
 		this.mainPicture = gr.getMainPicture();
 		this.bedCount = gr.getBedCount();
 		this.occupantCapacity = gr.getOccupantCapacity();

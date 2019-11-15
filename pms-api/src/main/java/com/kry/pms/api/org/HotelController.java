@@ -39,12 +39,10 @@ public class HotelController extends BaseController<Hotel> {
 		hotelService.delete(id);
 		return rep;
 	}
-
-	@GetMapping
-	public HttpResponse<PageResponse<Hotel>> query(HttpServletRequest request) throws InstantiationException, IllegalAccessException{
-		HttpResponse<PageResponse<Hotel>> rep = new HttpResponse<PageResponse<Hotel>>();
-		PageRequest<Hotel> req = parse2PageRequest(request);
-		return rep.addData(hotelService.listPage(req));
+	@GetMapping(path="/my")
+	public HttpResponse<Hotel> my() {
+		return getDefaultResponse().addData(hotelService.getByHotelCode(getCurrentHotleCode()));
 	}
+
 
 }

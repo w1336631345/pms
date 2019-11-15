@@ -489,6 +489,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 			checkInRecord.setContactMobile(mainCheckInRecord.getContactMobile());
 			checkInRecord.setOrderNum(mainCheckInRecord.getOrderNum());
 			checkInRecord.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION);
+			checkInRecord.setType(Constants.Type.CHECK_IN_RECORD_RESERVE);
 			checkInRecord.setRoomType(roomTypeService.findById(checkInRecord.getRoomTypeId()));
 			checkInRecord = add(checkInRecord);
 			mainCheckInRecord.setRoomCount(mainCheckInRecord.getRoomCount() + checkInRecord.getRoomCount());

@@ -59,9 +59,9 @@ public class RoomUsageController extends BaseController<RoomUsage> {
 		return rep;
 	}
 	@GetMapping(path = "/checkInRecord/{id}")
-	public HttpResponse<List<RoomUsageVo>> queryUsableGuestRoomsByCheckInRecordId(@PathVariable("id")String bookItemId) {
+	public HttpResponse<List<RoomUsageVo>> queryUsableGuestRoomsByCheckInRecordId(@PathVariable("id")String checkInRecordId,String roomTypeId,String roomNum) {
 		HttpResponse<List<RoomUsageVo>> rep = new HttpResponse<List<RoomUsageVo>>();
-		rep.addData(roomUsageService.queryUsableGuestRoomsByCheckInRecordId(bookItemId));
+		rep.addData(roomUsageService.queryUsableGuestRoomsByCheckInRecordId(checkInRecordId,roomTypeId,roomNum));
 		return rep;
 	}
 

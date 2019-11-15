@@ -10,6 +10,7 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import com.kry.pms.model.persistence.PersistenceModel;
+import com.kry.pms.model.persistence.busi.CheckInRecord;
 import com.kry.pms.model.persistence.sys.User;
 
 import lombok.Getter;
@@ -32,6 +33,14 @@ public class Customer extends PersistenceModel {
 	private String mobile;
 	@Column
 	private String idCardNum;
-	@OneToOne(fetch = FetchType.EAGER)
-	private GuestInfo guestInfo;
+	@Column
+	private Integer checkInCount;
+	@Column
+	private String currentStatus;
+	@OneToOne
+	private CheckInRecord currentRecord;
+	@Column
+	private Double costTotal;
+	@Column
+	private String certificateType;
 }
