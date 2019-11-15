@@ -46,6 +46,10 @@ public class ScheduleJobService {
         List<ScheduleJobModel> list = scheduleJobDaoRepository.findByHotelCode(hotelCode);
         return list;
     }
+    public List<ScheduleJobModel> getJobByHotelAndStatus(String hotelCode) {
+        List<ScheduleJobModel> list = scheduleJobDaoRepository.findByHotelCodeAndStatus(hotelCode, 0);
+        return list;
+    }
 
     public HttpResponse save(ScheduleJobModel scheduleJobModel){
         HttpResponse hr = new HttpResponse();
