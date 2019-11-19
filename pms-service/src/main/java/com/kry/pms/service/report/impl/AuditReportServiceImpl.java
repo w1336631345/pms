@@ -19,7 +19,7 @@ public class AuditReportServiceImpl implements AuditReportService {
 
     @Override
     public List<Map<String, Object>> auditNight(User user, String businessDate){
-        List<Map<String, Object>> list = auditReportDao.auditNights(user.getHotelCode(), businessDate);
+        List<Map<String, Object>> list = auditReportDao.auditNights();
         List<Map<String, Object>> totalType = auditReportDao.totalCostType(user.getHotelCode(), businessDate);
         List<Map<String, Object>> relist = new ArrayList<>();
         //MC主营，SE服务费，RE Rebate，OT其它，TR税收
