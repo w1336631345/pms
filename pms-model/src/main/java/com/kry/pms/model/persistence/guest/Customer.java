@@ -33,6 +33,8 @@ public class Customer extends PersistenceModel {
 	private String mobile;
 	@Column
 	private String idCardNum;
+	@OneToOne
+	private GuestInfo guestInfo;
 	@Column
 	private Integer checkInCount;
 	@Column
