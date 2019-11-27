@@ -5,10 +5,12 @@ import com.kry.pms.base.HttpResponse;
 import com.kry.pms.controller.SessionController;
 import com.kry.pms.model.http.response.sys.UserOnlineVO;
 import com.kry.pms.model.persistence.org.Hotel;
+import com.kry.pms.model.persistence.sys.Shift;
 import com.kry.pms.model.persistence.sys.User;
 import com.kry.pms.service.org.HotelService;
 import com.kry.pms.service.sys.AccountService;
 import com.kry.pms.service.sys.BusinessSeqService;
+import com.kry.pms.service.sys.ShiftService;
 import com.kry.pms.service.sys.UserService;
 import com.kry.pms.utils.MD5Utils;
 import com.kry.pms.utils.ShiroUtils;
@@ -39,9 +41,9 @@ public class AuthController {
 	@Autowired
     UserService userService;
 	@Autowired
-	BusinessSeqService businessSeqService;
-	@Autowired
 	SessionController sessionController;
+	@Autowired
+	ShiftService shiftService;
 
 	@RequestMapping(path = "/admin/login", method = RequestMethod.POST)
 	public HttpResponse<String> loginTest(String username, String password,String hotleCode,String shift) {
@@ -52,7 +54,8 @@ public class AuthController {
 		try {
 			subject.login(token);
 			String hotelCode = ShiroUtils.getUser().getHotelCode();
-			subject.getSession().setAttribute(Constants.Key.SESSION_ATTR_SHIFT_CODE, businessSeqService.getBuinessString(hotelCode)+"-"+shift);
+			Shift newShift = shiftService.createOrUpdate(shift,ShiroUtils.getUser());
+			subject.getSession().setAttribute(Constants.Key.SESSION_ATTR_SHIFT_CODE,newShift.getShiftCode());
 			String id = (String)subject.getSession().getId();
 			response.addData(id);
 			return response.ok("登录成功");

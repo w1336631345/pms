@@ -23,6 +23,8 @@ import lombok.Setter;
 @Table(name = "t_settle_account_record")
 public class SettleAccountRecord extends PersistenceModel {
 	@Column
+	private String shiftCode;
+	@Column
 	private String recordNum;
 	@OneToOne
 	private Account account;

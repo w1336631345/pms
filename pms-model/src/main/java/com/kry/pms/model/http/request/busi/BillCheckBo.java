@@ -8,6 +8,7 @@ import com.kry.pms.model.persistence.org.Employee;
 import lombok.Data;
 @Data
 public class BillCheckBo {
+	private String shiftCode;
 	private String checkType;
 	private String accountId;
 	private List<String>  billIds;

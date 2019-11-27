@@ -16,6 +16,7 @@ import com.kry.pms.model.persistence.PersistenceModel;
 import com.kry.pms.model.persistence.goods.Product;
 import com.kry.pms.model.persistence.org.Employee;
 import com.kry.pms.model.persistence.sys.Account;
+import com.kry.pms.model.persistence.sys.Shift;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -25,6 +26,8 @@ import lombok.Setter;
 @Setter
 @Table(name = "t_bill")
 public class Bill extends PersistenceModel {
+	@Column
+	private String shiftCode;
 	@OneToOne
 	private Account account;
 	@Column

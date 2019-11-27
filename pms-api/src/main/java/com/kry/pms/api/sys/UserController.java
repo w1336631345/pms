@@ -2,7 +2,6 @@ package com.kry.pms.api.sys;
 
 import javax.servlet.http.HttpServletRequest;
 
-import com.kry.pms.utils.MD5Utils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -17,20 +16,32 @@ import com.kry.pms.api.BaseController;
 import com.kry.pms.base.HttpResponse;
 import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
+import com.kry.pms.model.http.response.org.EmployeeSummaryVo;
+import com.kry.pms.model.http.response.org.HotelSummaryVo;
 import com.kry.pms.model.http.response.sys.UserInfoVo;
 import com.kry.pms.model.persistence.org.Employee;
+import com.kry.pms.model.persistence.org.Hotel;
 import com.kry.pms.model.persistence.sys.User;
 import com.kry.pms.service.org.EmployeeService;
+import com.kry.pms.service.org.HotelService;
+import com.kry.pms.service.sys.BusinessSeqService;
+import com.kry.pms.service.sys.ShiftService;
 import com.kry.pms.service.sys.UserService;
+import com.kry.pms.utils.MD5Utils;
 
 @RestController
 @RequestMapping(path = "/api/v1/sys/user")
 public class UserController extends BaseController<User> {
 	@Autowired
 	UserService userService;
-
+	@Autowired
+	ShiftService shiftService;
+	@Autowired
+	HotelService hotelService;
 	@Autowired
 	EmployeeService employeeService;
+	@Autowired
+	BusinessSeqService businessSeqService;
 
 	@PostMapping
 	public HttpResponse<User> add(@RequestBody User user) {
@@ -69,9 +80,17 @@ public class UserController extends BaseController<User> {
 		UserInfoVo userInfoVo = new UserInfoVo();
 		User user = userService.findById(userid);
 		BeanUtils.copyProperties(user, userInfoVo);
-		Employee employee = employeeService.findByUser(user);
+		Employee employee = getCurrentEmployee();
+		userInfoVo.setShiftCode(getShiftCode());
 		employee.setUser(user);
-		userInfoVo.setEmployee(employee);
+		EmployeeSummaryVo esv = new EmployeeSummaryVo();
+		BeanUtils.copyProperties(employee, esv);
+		Hotel hotel = hotelService.getByHotelCode(user.getHotelCode());
+		HotelSummaryVo hsv = new HotelSummaryVo();
+		BeanUtils.copyProperties(hotel, hsv);
+		userInfoVo.setHotel(hsv);
+		userInfoVo.setEmployee(esv);
+		userInfoVo.setBusinessDate(businessSeqService.getBuinessDate(user.getHotelCode()));
 		userInfoVo.setRole(user.getRoles().get(0));
 		return rep.addData(userInfoVo);
 	}

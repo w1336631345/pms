@@ -20,13 +20,13 @@ import com.kry.pms.service.busi.SettleAccountRecordService;
 import com.kry.pms.service.sys.BusinessSeqService;
 
 @Service
-public class  SettleAccountRecordServiceImpl implements  SettleAccountRecordService{
+public class SettleAccountRecordServiceImpl implements SettleAccountRecordService {
 	@Autowired
-	 SettleAccountRecordDao settleAccountRecordDao;
+	SettleAccountRecordDao settleAccountRecordDao;
 	@Autowired
 	BusinessSeqService businessSeqService;
-	 
-	 @Override
+
+	@Override
 	public SettleAccountRecord add(SettleAccountRecord settleAccountRecord) {
 		return settleAccountRecordDao.saveAndFlush(settleAccountRecord);
 	}
@@ -52,8 +52,8 @@ public class  SettleAccountRecordServiceImpl implements  SettleAccountRecordServ
 
 	@Override
 	public List<SettleAccountRecord> getAllByHotelCode(String code) {
-		return null;//默认不实现
-		//return settleAccountRecordDao.findByHotelCode(code);
+		return null;// 默认不实现
+		// return settleAccountRecordDao.findByHotelCode(code);
 	}
 
 	@Override
@@ -72,14 +72,13 @@ public class  SettleAccountRecordServiceImpl implements  SettleAccountRecordServ
 	@Override
 	public SettleAccountRecord create(BillCheckBo billCheckBo, Account account) {
 		SettleAccountRecord scr = new SettleAccountRecord();
-		scr.setRecordNum(businessSeqService.fetchNextSeqNum(billCheckBo.getHotelCode(),Constants.Key.BUSINESS_BUSINESS_SETTLE_SEQ_KEY));
+		scr.setRecordNum(businessSeqService.fetchNextSeqNum(billCheckBo.getHotelCode(),
+				Constants.Key.BUSINESS_BUSINESS_SETTLE_SEQ_KEY));
+		scr.setShiftCode(billCheckBo.getShiftCode());
 		scr.setAccount(account);
 		scr.setOperationEmployee(billCheckBo.getOperationEmployee());
 		scr.setSettleTime(LocalDateTime.now());
 		return add(scr);
 	}
-	 
-	 
-	 
-	 
+
 }
