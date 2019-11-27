@@ -27,11 +27,15 @@ public class BaseController<T> {
 	EmployeeService employeeService;
 	
 	public String getCurrentUserId() {
-		return "1";
+		return getUserId();
 	}
 	
 	public String getUserId() {
 		return ShiroUtils.getUserId();
+	}
+	
+	public String getShiftCode() {
+		return ShiroUtils.getSubjct().getSession().getAttribute(Constants.Key.SESSION_ATTR_SHIFT_CODE).toString();
 	}
 	
 	public User getUser() {
@@ -43,7 +47,7 @@ public class BaseController<T> {
 	}
 	
 	public String getCurrentHotleCode() {
-		return "0000";
+		return getUser().getHotelCode();
 	}
 	public HttpResponse<T> getDefaultResponse(){
 		return new HttpResponse<T>();
@@ -70,6 +74,14 @@ public class BaseController<T> {
 			cls = (Class<T>) p[0];
 		}
 		T t = cls.newInstance();
+		try {
+			Method codeMethod = cls.getMethod("setHotelCode",String.class);
+			codeMethod.invoke(t, getCurrentHotleCode());
+		} catch (NoSuchMethodException e2) {
+		} catch (SecurityException e2) {
+		} catch (IllegalArgumentException e) {
+		} catch (InvocationTargetException e) {
+		}
 		Field f = null;
 		Method m = null;
 		Method g = null;
@@ -184,6 +196,7 @@ public class BaseController<T> {
 				}
 			}
 		}
+		
 		return t;
 	}
 }

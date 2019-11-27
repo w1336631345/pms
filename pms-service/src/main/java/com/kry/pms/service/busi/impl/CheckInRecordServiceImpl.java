@@ -311,35 +311,67 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 	public CheckInRecord book(CheckInRecord checkInRecord) {
 		String orderNum = businessSeqService.fetchNextSeqNum(checkInRecord.getHotelCode(),
 				Constants.Key.BUSINESS_ORDER_NUM_SEQ_KEY);
-		checkInRecord.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION);
-		checkInRecord.setType(Constants.Type.CHECK_IN_RECORD_GROUP);
 		checkInRecord.setOrderNum(orderNum);
+		if (checkInRecord.getGroupType() != null
+				&& checkInRecord.getGroupType().equals(Constants.Type.CHECK_IN_RECORD_GROUP_TYPE_YES)) {
+			checkInRecord.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION);
+			checkInRecord.setType(Constants.Type.CHECK_IN_RECORD_GROUP);
+			initGroup(checkInRecord);
+			initGroupAccount(checkInRecord);
+			for (CheckInRecord item : checkInRecord.getSubRecords()) {
+				item.setOrderNum(orderNum);
+				item.setGroupType(checkInRecord.getGroupType());
+				item.setHoldTime(checkInRecord.getHoldTime());
+				item.setArriveTime(checkInRecord.getArriveTime());
+				item.setLeaveTime(checkInRecord.getLeaveTime());
+				item.setDays(checkInRecord.getDays());
+				item.setContactName(checkInRecord.getContactName());
+				item.setMarketEmployee(checkInRecord.getMarketEmployee());
+				item.setDistributionChannel(checkInRecord.getDistributionChannel());
+				item.setContactMobile(checkInRecord.getContactMobile());
+				item.setRoomType(roomTypeService.findById(item.getRoomTypeId()));
+				item.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION);
+				item.setType(Constants.Type.CHECK_IN_RECORD_RESERVE);
+				item.setGroupType(checkInRecord.getGroupType());
+				item.setProtocolCorpation(checkInRecord.getProtocolCorpation());
+				boolean bookResult = roomStatisticsService.booking(item.getRoomType(), item.getArriveTime(),
+						item.getRoomCount(), item.getDays());
+				if (!bookResult) {
+					// 房源不足
+				}
+			}
+			checkInRecord = add(checkInRecord);
+		}else {
+			Customer customer = checkInRecord.getCustomer();
+			if(customer!=null&&customer.getId()==null) {
+				customer =customerService.add(customer);
+			}
+			checkInRecord.setCustomer(customer);
+			checkInRecord.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION);
+			checkInRecord.setType(Constants.Type.CHECK_IN_RECORD_CUSTOMER);
+			roomStatisticsService.booking(checkInRecord.getRoomType(), checkInRecord.getArriveTime(),
+					1, checkInRecord.getDays());
+			checkInRecord = add(checkInRecord);
+			Account account = accountService.createAccount(checkInRecord.getCustomer(), null);
+			checkInRecord.setAccount(account);
+			modify(checkInRecord);
+			
+		}
+		return checkInRecord;
+	}
+
+	private void initGroup(CheckInRecord checkInRecord) {
+
+	}
+
+	private void initGroupAccount(CheckInRecord checkInRecord) {
 		Account account = new Account();
+		if(checkInRecord.getGroup()!=null) {
+			account.setGroup(checkInRecord.getGroup());
+		}
 		account.setType(Constants.Type.ACCOUNT_GROUP);
 		account.setName(checkInRecord.getName());
 		checkInRecord.setAccount(account);
-		for (CheckInRecord item : checkInRecord.getSubRecords()) {
-			item.setOrderNum(orderNum);
-			item.setGroupType(checkInRecord.getGroupType());
-			item.setHoldTime(checkInRecord.getHoldTime());
-			item.setArriveTime(checkInRecord.getArriveTime());
-			item.setLeaveTime(checkInRecord.getLeaveTime());
-			item.setDays(checkInRecord.getDays());
-			item.setContactName(checkInRecord.getContactName());
-			item.setMarketEmployee(checkInRecord.getMarketEmployee());
-			item.setDistributionChannel(checkInRecord.getDistributionChannel());
-			item.setContactMobile(checkInRecord.getContactMobile());
-			item.setRoomType(roomTypeService.findById(item.getRoomTypeId()));
-			item.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION);
-			item.setType(Constants.Type.CHECK_IN_RECORD_RESERVE);
-			item.setProtocolCorpation(checkInRecord.getProtocolCorpation());
-			boolean bookResult = roomStatisticsService.booking(item.getRoomType(), item.getArriveTime(),
-					item.getRoomCount(), item.getDays());
-			if (!bookResult) {
-				// 房源不足
-			}
-		}
-		return add(checkInRecord);
 	}
 
 	@Override
@@ -536,6 +568,20 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 			ncir = add(ncir);
 		}
 		return ncir;
+	}
+
+	@Override
+	public List<CheckInRecord> findRoomTogetherRecord(CheckInRecord cir, String status) {
+		CheckInRecord exCir = new CheckInRecord();
+		exCir.setGuestRoom(cir.getGuestRoom());
+		exCir.setOrderNum(cir.getOrderNum());
+		exCir.setHotelCode(cir.getHotelCode());
+		if (status != null) {
+			exCir.setStatus(status);
+		}
+		exCir.setType(Constants.Type.CHECK_IN_RECORD_CUSTOMER);
+		Example<CheckInRecord> ex = Example.of(exCir);
+		return checkInRecordDao.findAll(ex);
 	}
 
 }

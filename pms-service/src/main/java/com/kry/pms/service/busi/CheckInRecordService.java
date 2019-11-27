@@ -59,4 +59,6 @@ public interface CheckInRecordService extends BaseService<CheckInRecord> {
 	public List<CheckInRecord> addReserve(List<CheckInRecord> checkInRecords);
 
 	public CheckInRecord addTogether(TogetherBo togetherBo);
+
+	public List<CheckInRecord> findRoomTogetherRecord(CheckInRecord cir,String status);
 }

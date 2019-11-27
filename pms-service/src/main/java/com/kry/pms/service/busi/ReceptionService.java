@@ -43,7 +43,7 @@ public interface ReceptionService {
 
 	public DtoResponse<String> assignRoom(@Valid RoomAssignBo roomAssignBo);
 
-	DtoResponse<BookingRecord> groupBook(BookingRecord br);
+	public DtoResponse<BookingRecord> groupBook(BookingRecord br);
 
 	public DtoResponse<String> checkIn(String id);
 

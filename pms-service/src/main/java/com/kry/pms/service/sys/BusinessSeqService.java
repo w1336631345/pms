@@ -15,4 +15,6 @@ public interface BusinessSeqService extends BaseService<BusinessSeq>{
 
 	void plusBuinessDate(String hotelCode);
 
+	String getBuinessString(String hotelCode);
+
 }

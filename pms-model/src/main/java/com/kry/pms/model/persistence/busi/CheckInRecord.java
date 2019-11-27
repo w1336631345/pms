@@ -113,8 +113,6 @@ public class CheckInRecord extends PersistenceModel {
 	@Transient
 	private String mainRecordId;
 	
-	
-	
 	public String getGroupType() {
 		return groupType;
 	}

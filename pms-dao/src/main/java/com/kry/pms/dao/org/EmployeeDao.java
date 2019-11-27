@@ -8,5 +8,7 @@ import com.kry.pms.model.persistence.org.Employee;
 public interface EmployeeDao extends BaseDao<Employee>{
 
 	List<Employee> findByDepartmentCodeAndHotelCode(String deptMarketingDefaultCode,String hotelCode);
+	
+	Employee findByUserId(String userId);
 
 }

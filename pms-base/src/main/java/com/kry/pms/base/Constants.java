@@ -64,6 +64,7 @@ public class Constants {
 	
 	public interface Key{
 		public static final String BUSINESS_SEQ_KEY="CHECKIN_SN";
+		public static final String SESSION_ATTR_SHIFT_CODE="SHIFT";
 		public static final String BUSINESS_ORDER_NUM_SEQ_KEY="ORDER_NUM";
 		public static final String BUSINESS_BUSINESS_DATE_SEQ_KEY="BUINESS_DATE";
 		public static final String BUSINESS_BUSINESS_SETTLE_SEQ_KEY="SETTLE_NUM";

@@ -62,6 +62,7 @@ public class UserController extends BaseController<User> {
 		HttpResponse<UserInfoVo> rep = new HttpResponse<UserInfoVo>();
 		String userId = getCurrentUserId();
 		String userid = getUserId();
+		System.out.println(getShiftCode());
 		if(userid == null) {
 			return rep.error(403, "登录过期，请重新登录");
 		}
@@ -94,11 +95,11 @@ public class UserController extends BaseController<User> {
 		if(oldPassword == null || newPassword == null){
 			return rep.error(400, "密码不能为空");
 		}
-		String pwd = MD5Utils.encrypt(user.getUsername(), oldPassword);
+		String pwd = MD5Utils.encrypt(user.getUsername(),getCurrentHotleCode(), oldPassword);
 		if(!pwd.equals(user.getPassword())){
 			return rep.error(400, "原密码错误");
 		}
-		user.setPassword(MD5Utils.encrypt(user.getUsername(), newPassword));
+		user.setPassword(MD5Utils.encrypt(user.getUsername(),getCurrentHotleCode(), newPassword));
 		userService.modify(user);
 		return rep.ok("密码修改成功");
 	}

@@ -227,6 +227,10 @@ public class ReceptionServiceImpl implements ReceptionService {
 		if (cir != null) {
 			cir.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN);
 			checkInRecordService.modify(cir);
+			List<CheckInRecord> togetherRecord = checkInRecordService.findRoomTogetherRecord(cir,Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION);
+			if(togetherRecord!=null&&!togetherRecord.isEmpty()) {
+				rep.setCode(1);
+			}
 		} else {
 			rep.setStatus(Constants.BusinessCode.CODE_PARAMETER_INVALID);
 			rep.setMessage("没有找到对应的入住记录");

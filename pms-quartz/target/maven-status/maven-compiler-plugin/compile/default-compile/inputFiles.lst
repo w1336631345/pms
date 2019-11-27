@@ -3,5 +3,6 @@ E:\kry\src\pms-server\pms-quartz\src\main\java\com\kry\pms\controller\SessionCon
 E:\kry\src\pms-server\pms-quartz\src\main\java\com\kry\pms\model\ScheduleJobModel.java
 E:\kry\src\pms-server\pms-quartz\src\main\java\com\kry\pms\service\ScheduleJobService.java
 E:\kry\src\pms-server\pms-quartz\src\main\java\com\kry\pms\job\ScheduleQuartzJob.java
+E:\kry\src\pms-server\pms-quartz\src\main\java\com\kry\pms\controller\ScheduleJobController.java
 E:\kry\src\pms-server\pms-quartz\src\main\java\com\kry\pms\job\AutomaticNightTrial.java
 E:\kry\src\pms-server\pms-quartz\src\main\java\com\kry\pms\util\DateUtil.java

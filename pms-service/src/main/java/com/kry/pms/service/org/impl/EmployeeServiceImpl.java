@@ -75,10 +75,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
 	@Override
 	public Employee findByUser(User user) {
-		Employee employee = new Employee();
-		employee.setUser(user);
-		Example<Employee> ex = Example.of(employee);
-		return employeeDao.findOne(ex).orElse(null);
+		return employeeDao.findByUserId(user.getId());
 	}
 
 	@Override

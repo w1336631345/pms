@@ -52,6 +52,15 @@ public class BusinessSeqServiceImpl implements BusinessSeqService {
 		return null;
 	}
 	@Override
+	public String getBuinessString(String hotelCode) {
+		BusinessSeq bs = businessSeqDao.findByHotelCodeAndSeqKey(hotelCode,
+				Constants.Key.BUSINESS_BUSINESS_DATE_SEQ_KEY);
+		if (bs != null) {
+			return bs.getCurrentSeq().toString();
+		}
+		return null;
+	}
+	@Override
 	public void plusBuinessDate(String hotelCode) {
 		BusinessSeq bs = businessSeqDao.findByHotelCodeAndSeqKey(hotelCode,
 				Constants.Key.BUSINESS_BUSINESS_DATE_SEQ_KEY);

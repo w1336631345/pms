@@ -4,7 +4,7 @@ import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.OneToMany;
+import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -29,7 +29,7 @@ public class User extends PersistenceModel {
 	private String password;
 	@Column(name = "type_")
 	private String type;
-	@OneToMany
+	@ManyToMany
 	private List<Role> roles;
 	@Column
 	private String avatar;
