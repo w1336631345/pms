@@ -149,4 +149,47 @@ public class Constants {
 		public static final String CODE_CUSTOMER_GROUP_BOOKING_VERIFY = "customer_group_booking_verify";
 		public static final String CODE_CUSTOMER_PERSONAL_BOOKING_VERIFY = "customer_personal_booking_verify";
 	}
+
+	public interface ReportSort {
+		public static final String REPORT_ROOM_RATE = "0";//营业日报表排序-房费账务统计
+		public static final String REPORT_ROOM_CHECKIN_A = "1";//营业日报表排序-a、客房总数统计
+		public static final String REPORT_ROOM_CHECKIN_B = "2";//营业日报表排序-房间入住（b、出租总数）统计
+		public static final String REPORT_ROOM_CHECKIN_C = "3";//营业日报表排序-房间入住（c、出售率）统计
+		public static final String REPORT_ROOM_CHECKIN_D = "4";//营业日报表排序-房间入住（d、房租收入）统计
+		public static final String REPORT_ROOM_CHECKIN_E = "5";//营业日报表排序-房间入住（e、平均房价）统计
+		public static final String REPORT_ROOM_CHECKIN_F = "6";//营业日报表排序-房间入住（f、人数统计）统计
+		public static final String REPORT_ROOM_CHECKIN_G = "7";//营业日报表排序-房间入住（g、客房其他收入）统计
+	}
+	public interface ReportType {
+		public static final String REPORT_ROOM_RATE = "RATE";//营业日报表项目类型-房费账务统计
+		public static final String REPORT_ROOM_NUM = "NUM";//营业日报表项目类型-房间数量统计
+		public static final String REPORT_ROOM_CHECKIN = "CHECKIN";//营业日报表项目类型-房间数量统计
+	}
+	public interface ReportProject {
+		public static final String REPORT_ROOM_RATE = "客房房费";//营业日报表项目-房费相关统计
+		public static final String REPORT_ROOM_OTHER = "其他";//营业日报表项目-房费其它统计
+		public static final String REPORT_ROOM_TOTAL = "营业状况统计"; //营业日报表项目-房费总和统计
+		public static final String REPORT_ROOM_CHECKIN_A = "a、客房总数"; //营业日报表项目-统计-a、客房总数
+		public static final String REPORT_ROOM_CHECKIN_B = "b、出租总数"; //营业日报表项目-统计-b、出租总数
+		public static final String REPORT_ROOM_CHECKIN_C = "c、售卖率"; //营业日报表项目-统计-c、售卖率
+		public static final String REPORT_ROOM_CHECKIN_D = "d、房租收入"; //营业日报表项目-统计-d、房租收入
+		public static final String REPORT_ROOM_CHECKIN_E = "e、平均房价"; //营业日报表项目-统计-e、平均房价
+		public static final String REPORT_ROOM_CHECKIN_F = "f、人数统计"; //营业日报表项目-统计-f、人数统计
+		public static final String REPORT_ROOM_CHECKIN_G = "g、客房其他收入"; //营业日报表项目-统计-g、客房其他收入
+	}
+	public interface ReportProjectType {
+		public static final String REPORT_ROOM_RATE = "roomrate";//营业日报表项目类型-房费统计
+		public static final String REPORT_ROOM_NUM_A = "room_a";//营业日报表项目-房间统计 a、客房总数
+		public static final String REPORT_ROOM_NUM_B = "room_b"; //营业日报表项目-房间统计 b、出租总数
+		public static final String REPORT_ROOM_NUM_C = "room_c"; //营业日报表项目-房间统计 c、出售率
+		public static final String REPORT_ROOM_NUM_D = "room_d"; //营业日报表项目-房间统计 d、房租收入
+		public static final String REPORT_ROOM_NUM_E = "room_e"; //营业日报表项目-房间统计 e、平均房价
+		public static final String REPORT_ROOM_NUM_F = "room_f"; //营业日报表项目-房间统计 f、人数统计
+		public static final String REPORT_ROOM_NUM_G = "room_g"; //营业日报表项目-房间统计 g、客房其他收入
+	}
+
+	public interface auditNightMode {
+		public static final String NIGHT_AUDIT_AUTO = "AUTO";//夜审入账方式-自动入账
+		public static final String NIGHT_AUDIT_MANUAL = "MANUAL";//夜审入账方式-手动入账
+	}
 }

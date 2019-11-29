@@ -22,18 +22,18 @@ public class BusinessReport {
     @Column(columnDefinition = "varchar(50) COMMENT '项目类型'")
     private String projectType;
 
-    @Column(columnDefinition = "double COMMENT '本日发生'")
-    private double totalDay;
-    @Column(columnDefinition = "double COMMENT '日rebate'")
-    private double rebateDay;
-    @Column(columnDefinition = "double COMMENT '本月发生'")
-    private double totalMonth;
-    @Column(columnDefinition = "double COMMENT '本日发生'")
-    private double rebateMonth;
-    @Column(columnDefinition = "double COMMENT '月度rebate'")
-    private double totalYear;
-    @Column(columnDefinition = "double COMMENT '年度rebate'")
-    private double rebateYear;
+    @Column(columnDefinition = "varchar(50) COMMENT '本日发生'")
+    private String totalDay;
+    @Column(columnDefinition = "varchar(50) COMMENT '日rebate'")
+    private String rebateDay;
+    @Column(columnDefinition = "varchar(50) COMMENT '本月发生'")
+    private String totalMonth;
+    @Column(columnDefinition = "varchar(50) COMMENT '本日发生'")
+    private String rebateMonth;
+    @Column(columnDefinition = "varchar(50) COMMENT '月度rebate'")
+    private String totalYear;
+    @Column(columnDefinition = "varchar(50) COMMENT '年度rebate'")
+    private String rebateYear;
 
     @Column(columnDefinition = "varchar(100) COMMENT '酒店代码'")
     private String hotelCode;

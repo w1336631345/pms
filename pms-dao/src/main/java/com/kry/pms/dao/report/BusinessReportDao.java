@@ -14,7 +14,8 @@ public interface BusinessReportDao extends BaseDao<BusinessReport> {
             " where 1=1 " +
             "  and if(:hotelCode is not null && :hotelCode != '', hotel_code=:hotelCode, 1=1 ) " +
             "  and if(:businessDate is not null && :businessDate != '', DATE_FORMAT(business_date, '%Y-%m-%d') =:businessDate, 1=1 ) " +
+            "  and if(:projectType is not null && :projectType != '', project_type =:projectType, 1=1 ) " +
             " order by sort, number_ desc ")
-    List<BusinessReport> getByBusinessDate(@Param("businessDate") String businessDate, @Param("hotelCode") String hotelCode);
+    List<BusinessReport> getByBusinessDate(@Param("businessDate") String businessDate, @Param("hotelCode") String hotelCode, @Param("projectType") String projectType);
 
 }

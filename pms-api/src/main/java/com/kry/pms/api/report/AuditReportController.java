@@ -33,7 +33,7 @@ public class AuditReportController extends BaseController {
         if(user == null){
             return hr.loginError();
         }
-        List<Map<String, Object>> list = auditReportService.auditNight(user, null);
+        List<Map<String, Object>> list = auditReportService.auditNight(user, businessDate);
         hr.setData(list);
         return hr;
     }
@@ -53,7 +53,7 @@ public class AuditReportController extends BaseController {
         if(user == null){
             return hr.loginError();
         }
-        List<Map<String, Object>> list = auditReportService.receivables(user, null);
+        List<Map<String, Object>> list = auditReportService.receivables(user, businessDate);
         hr.setData(list);
         return hr;
     }

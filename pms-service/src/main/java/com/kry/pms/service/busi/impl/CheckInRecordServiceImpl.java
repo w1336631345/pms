@@ -412,12 +412,6 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 		emap.put("hotelCode", user.getHotelCode());
 		emap.put("status", "I");
 		map.put("equals", emap);
-//		Map<String, String[]> omap = new HashMap<>();
-//		Map<String, Object> theSameMap = new HashMap<>();
-//		theSameMap.put("theSameKey", omap);
-//		String[] values = {"R","I"};
-//		omap.put("status", values);
-//		map.put("or", theSameMap);
 		Specification<CheckInRecord> specification = psf.createSpecification(map);
 		Page<CheckInRecord> p = checkInRecordDao.findAll(specification, page);
 		return convent(p);

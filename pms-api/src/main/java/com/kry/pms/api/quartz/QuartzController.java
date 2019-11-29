@@ -12,7 +12,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping(value = "/api/v1/quartz")
-public class TestController {
+public class QuartzController {
 
     @Autowired
     private ScheduleJobService scheduleJobService;

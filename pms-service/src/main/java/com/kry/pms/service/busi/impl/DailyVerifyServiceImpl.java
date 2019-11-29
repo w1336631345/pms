@@ -38,6 +38,11 @@ public class DailyVerifyServiceImpl implements DailyVerifyService {
 	}
 
 	@Override
+	public DailyVerify findByHotelCodeAndBusinessDate(String hotelCode, LocalDate businessDate) {
+		return dailyVerifyDao.findByHotelCodeAndBusinessDate(hotelCode,businessDate);
+	}
+
+	@Override
 	public void delete(String id) {
 		DailyVerify dailyVerify = dailyVerifyDao.findById(id).get();
 		if (dailyVerify != null) {

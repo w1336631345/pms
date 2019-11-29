@@ -5,7 +5,9 @@ import com.kry.pms.model.persistence.report.BusinessReport;
 import com.kry.pms.model.persistence.report.RoomReport;
 import com.kry.pms.model.persistence.sys.User;
 import com.kry.pms.service.BaseService;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -13,7 +15,14 @@ public interface RoomReportService extends BaseService<RoomReport> {
 
     HttpResponse copyData(String businessDate);
 
-    List<RoomReport> getByHotelCodeAndBusinessDate(User user, String businessDate);
+    List<RoomReport> getByHotelCodeAndBusinessDate(User user, LocalDate businessDate);
 
-    List<Map<String, Object>> getRoomStatus(User user, String businessDate);
+    HttpResponse saveRoomStatus(User user, String businessDate);
+
+    HttpResponse totalRoomStatusAll(User user, String businessDate);
+
+    HttpResponse totalCheckInType(User user, String businessDate);
+
+    @Transactional(rollbackFor=Exception.class)
+    HttpResponse availableTotal(User user, String businessDate);
 }

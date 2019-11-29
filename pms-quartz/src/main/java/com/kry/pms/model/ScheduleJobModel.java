@@ -45,4 +45,6 @@ public class ScheduleJobModel {
 
     @Column(columnDefinition = "varchar(64) COMMENT '酒店编码'")
     private String hotelCode;
+    @Column(columnDefinition = "varchar(32) default 'AUDIT' COMMENT 'ALL全部执行  AUDIT夜审入账 NORMAL平常的'")
+    private String type_;
 }

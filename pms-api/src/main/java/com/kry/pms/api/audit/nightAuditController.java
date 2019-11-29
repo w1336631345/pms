@@ -6,20 +6,24 @@ import com.kry.pms.base.PageResponse;
 import com.kry.pms.model.persistence.busi.CheckInRecord;
 import com.kry.pms.model.persistence.busi.RoomRecord;
 import com.kry.pms.model.persistence.sys.User;
+import com.kry.pms.service.audit.NightAuditService;
 import com.kry.pms.service.busi.BillService;
 import com.kry.pms.service.busi.CheckInRecordService;
 import com.kry.pms.service.busi.RoomRecordService;
+import com.kry.pms.service.sys.BusinessSeqService;
 import com.kry.pms.utils.ShiroUtils;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.session.UnknownSessionException;
 import org.apache.shiro.session.mgt.eis.SessionDAO;
 import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.apache.shiro.subject.support.DefaultSubjectContext;
+import org.apache.tomcat.jni.Local;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.*;
 
 @RestController
@@ -34,6 +38,10 @@ public class nightAuditController extends BaseController {
     BillService billService;
     @Autowired
     SessionDAO sessionDAO;
+    @Autowired
+    BusinessSeqService businessSeqService;
+    @Autowired
+    NightAuditService nightAuditService;
 
     /**
      * 功能描述: <br>夜间稽核列表
@@ -86,7 +94,7 @@ public class nightAuditController extends BaseController {
         HttpResponse<PageResponse<CheckInRecord>> rep = new HttpResponse<>();
         User user = getUser();
         if(user == null){
-            rep.error(403, "未登录");
+            return rep.error(403, "未登录");
         }
         PageResponse<CheckInRecord> page = checkInRecordService.accountEntryList(pageNum, pageSize, user);
         rep.addData(page);
@@ -94,7 +102,7 @@ public class nightAuditController extends BaseController {
     }
 
     /**
-     * 功能描述: <br>查询房租预审及入账列表(roomRecord)
+     * 功能描述: <br>查询房租预审及入账列表(roomRecord)停用
      * 〈〉
      * @Param: [pageNum, pageSize]
      * @Return: com.kry.pms.base.HttpResponse<com.kry.pms.base.PageResponse<com.kry.pms.model.persistence.busi.RoomRecord>>
@@ -166,10 +174,27 @@ public class nightAuditController extends BaseController {
                 }
             }
         }
-        //默认手动点击入账为入账今日所有的账
-        List<RoomRecord> list = roomRecordService.accountEntryListAll(loginUser.getHotelCode());
-        billService.putAcount(list);
-        return rep.ok("入账成功");
+        rep = nightAuditService.manualAdd(loginUser, ids);
+        return rep;
+    }
+
+    /**
+     * 功能描述: <br>夜审入账后生产报表（下一步）
+     * 〈〉
+     * @Param: []
+     * @Return: com.kry.pms.base.HttpResponse<java.lang.String>
+     * @Author: huanghaibin
+     * @Date: 2019/11/25 10:18
+     */
+    @PostMapping("/addReportAll")
+    public HttpResponse<String> addReportAll() {
+        HttpResponse<String> rep = getDefaultResponse();
+        User loginUser = getUser();
+        if(loginUser == null){
+            return rep.error(403, "未登录");
+        }
+        rep = nightAuditService.addReportAll(loginUser);
+        return rep;
     }
 
 }

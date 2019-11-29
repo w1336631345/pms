@@ -178,21 +178,14 @@ public class RoomRecordServiceImpl implements RoomRecordService {
 	}
 
 	@Override
-	public List<RoomRecord> accountEntryListAll(String hotelCode) {
-		String startTime = DateTimeUtil.toDayStartStr();
-		String endTime = DateTimeUtil.toDayEndStr();
+	public List<RoomRecord> accountEntryListAll(String hotelCode, LocalDate businessDate) {
 		ParamSpecification<RoomRecord> psf = new ParamSpecification<RoomRecord>();
 		Map<String, Object> map = new HashMap<>();
 		Map<String, Object> emap = new HashMap<>();
-		Map<String, Object> gmap = new HashMap<>();
-		gmap.put("recordDate", startTime);
-		Map<String, Object> lmap = new HashMap<>();
-		lmap.put("recordDate", endTime);
+		emap.put("recordDate", businessDate);
 		emap.put("hotelCode", hotelCode);
-		emap.put("isAccountEntry", "NO");
+//		emap.put("isAccountEntry", "NO");
 		map.put("equals", emap);
-		map.put(">=", gmap);
-		map.put("<=", lmap);
 		Specification<RoomRecord> specification = psf.createSpecification(map);
 		List<RoomRecord> list = roomRecordDao.findAll(specification);
 		return list;

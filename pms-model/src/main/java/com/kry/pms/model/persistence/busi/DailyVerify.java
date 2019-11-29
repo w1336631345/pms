@@ -23,4 +23,6 @@ public class DailyVerify extends PersistenceModel{
 	private String type;
 	@OneToOne
 	private Employee operationEmployee;
+	@Column
+	private LocalDate businessDate;
 }

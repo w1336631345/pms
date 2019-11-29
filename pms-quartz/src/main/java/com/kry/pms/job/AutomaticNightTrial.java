@@ -15,11 +15,13 @@ import com.kry.pms.service.busi.CheckInRecordService;
 import com.kry.pms.service.busi.RoomRecordService;
 import com.kry.pms.service.goods.ProductService;
 import com.kry.pms.service.quratz.impl.QuartzSetService;
+import com.kry.pms.service.sys.BusinessSeqService;
 import com.kry.pms.service.sys.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Date;
 import java.util.List;
@@ -49,6 +51,8 @@ public class AutomaticNightTrial {
     UserService userService;
     @Autowired
     ScheduleJobDaoRepository scheduleJobDaoRepository;
+    @Autowired
+    BusinessSeqService businessSeqService;
 
     //查询所有开启自动夜审的酒店
     public List<QuartzSet> getAll(){
@@ -80,9 +84,10 @@ public class AutomaticNightTrial {
                 user.setAllowLogin("audit");//normal：正常可登录状态，audit：夜审不可登录
                 userService.modify(user);
             }
+            LocalDate businessDate = businessSeqService.getBuinessDate(hotelCode);
             //查询需要自动入账的记录（注：自动入账为最近营业日期的账，入账后营业日期+1，下面是查询的所有记录，后期整改）
             //同时添加入账记录（t_daily_verify）
-            List<RoomRecord> list = roomRecordService.accountEntryListAll(listQ.get(i).getHotelCode());
+            List<RoomRecord> list = roomRecordService.accountEntryListAll(listQ.get(i).getHotelCode(), businessDate);
             for(int j=0; j<list.size(); j++){
                 RoomRecord rr = list.get(j);
                 Product p = new Product();

@@ -1,14 +1,16 @@
 package com.kry.pms.service.report.impl;
 
+import com.kry.pms.base.Constants;
 import com.kry.pms.base.HttpResponse;
 import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
 import com.kry.pms.dao.report.BusinessReportDao;
+import com.kry.pms.dao.report.ReportDao;
 import com.kry.pms.model.persistence.report.BusinessReport;
 import com.kry.pms.model.persistence.sys.User;
 import com.kry.pms.service.report.BusinessReportService;
+import com.kry.pms.service.report.RoomReportService;
 import org.hibernate.SQLQuery;
-import org.hibernate.query.internal.QueryImpl;
 import org.hibernate.transform.Transformers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,7 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import java.time.LocalDate;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -28,7 +29,10 @@ public class BusinessReportServiceImpl implements BusinessReportService {
     BusinessReportDao businessReportDao;
     @Autowired
     EntityManager entityManager;
-
+    @Autowired
+    RoomReportService roomReportService;
+    @Autowired
+    ReportDao reportDao;
 
     @Override
     public BusinessReport add(BusinessReport entity) {
@@ -61,9 +65,28 @@ public class BusinessReportServiceImpl implements BusinessReportService {
     }
 
     @Override
+    public HttpResponse saveReportAll(User user, String projectType, String businessDate) {
+        HttpResponse hr = new HttpResponse();
+        try {
+            //保存房间费用统计信息
+            saveReport(user,null, businessDate);
+            //保存客房数量统计
+            roomReportService.saveRoomStatus(user, businessDate);
+        }catch (Exception e) {
+            //这里保存夜审记录信息是否成功
+        }
+        return hr;
+    }
+
+    @Override
     @Transactional(rollbackFor=Exception.class)
     public HttpResponse saveReport(User user, String projectType, String businessDate){
         HttpResponse hr = new HttpResponse();
+        List<BusinessReport> list = businessReportDao.getByBusinessDate(businessDate, user.getHotelCode(), Constants.ReportProjectType.REPORT_ROOM_RATE);
+        if(list != null && !list.isEmpty()){
+            //如果不为空，表明今日已经入报表
+            return hr.ok("今日已完成");
+        }
         String year = "%Y";
         String month = "%Y-%m";
         String day = "%Y-%m-%d";
@@ -82,71 +105,69 @@ public class BusinessReportServiceImpl implements BusinessReportService {
         List<Map<String, Object>> listYear = queryYear.getResultList();
         List<Map<String, Object>> listMonth = queryMonth.getResultList();
         List<Map<String, Object>> listDay = queryDay.getResultList();
-        List<BusinessReport> list = businessReportDao.getByBusinessDate(businessDate, user.getHotelCode());
+
         double totalDay = 0;
         double totalDayRe = 0;
         double totalMonth = 0;
         double totalMonthRe = 0;
         double totalYear = 0;
         double totalYearRe = 0;
-        if(list != null && !list.isEmpty()){
-            //如果不为空，表明今日已经入报表
-        }else {
-            for(int i=0; i<listYear.size(); i++){//有日必会有月和有年数据。反推循环
-                Map<String, Object> map =listYear.get(i);
-                String categoryId = map.get("category_id").toString();
+        for(int i=0; i<listYear.size(); i++){//有日必会有月和有年数据。反推循环
+            Map<String, Object> map =listYear.get(i);
+            String categoryId = map.get("category_id").toString();
 
-                    totalYear = totalYear + (double)map.get("total_cost");
-                    totalYearRe = totalYearRe + (double)map.get("RE");
-                    BusinessReport br = new BusinessReport();
-                    br.setHotelCode(user.getHotelCode());
-                    br.setBusinessDate(LocalDate.parse(businessDate));
-                    br.setSort("1");
-                    br.setProject(map.get("code_name").toString());
-                    br.setTotalYear((double)map.get("total_cost"));
-                    br.setRebateYear((double)map.get("RE"));
-                    for(int j=0; j<listMonth.size(); j++){
-                        Map<String, Object> mapM = listMonth.get(j);
-                        String categoryIdM = mapM.get("category_id").toString();
-                        if(categoryIdM.equals(categoryId)){
-                            br.setTotalMonth((double)mapM.get("total_cost"));
-                            br.setRebateMonth((double)mapM.get("RE"));
-                            totalMonth = totalMonth + (double)mapM.get("total_cost");
-                            totalMonthRe = totalMonthRe + (double)mapM.get("RE");
-                        }
+                totalYear = totalYear + (double)map.get("total_cost");
+                totalYearRe = totalYearRe + (double)map.get("RE");
+                BusinessReport br = new BusinessReport();
+                br.setHotelCode(user.getHotelCode());
+                br.setBusinessDate(LocalDate.parse(businessDate));
+                br.setSort(Constants.ReportSort.REPORT_ROOM_RATE);
+                br.setProject(map.get("code_name").toString());
+                br.setTotalYear(map.get("total_cost").toString());
+                br.setRebateYear(map.get("RE").toString());
+                for(int j=0; j<listMonth.size(); j++){
+                    Map<String, Object> mapM = listMonth.get(j);
+                    String categoryIdM = mapM.get("category_id").toString();
+                    if(categoryIdM.equals(categoryId)){
+                        br.setTotalMonth(mapM.get("total_cost").toString());
+                        br.setRebateMonth(mapM.get("RE").toString());
+                        totalMonth = totalMonth + (double)mapM.get("total_cost");
+                        totalMonthRe = totalMonthRe + (double)mapM.get("RE");
                     }
-                    for(int j=0; j<listDay.size(); j++){
-                        Map<String, Object> mapD = listDay.get(j);
-                        String categoryIdD = mapD.get("category_id").toString();
-                        if(categoryIdD.equals(categoryId)){
-                            br.setTotalDay((double)mapD.get("total_cost"));
-                            br.setRebateDay((double)mapD.get("RE"));
-                            totalDay = totalDay + (double)mapD.get("total_cost");
-                            totalDayRe = totalDayRe + (double)mapD.get("RE");
-                        }
+                }
+                for(int j=0; j<listDay.size(); j++){
+                    Map<String, Object> mapD = listDay.get(j);
+                    String categoryIdD = mapD.get("category_id").toString();
+                    if(categoryIdD.equals(categoryId)){
+                        br.setTotalDay(mapD.get("total_cost").toString());
+                        br.setRebateDay(mapD.get("RE").toString());
+                        totalDay = totalDay + (double)mapD.get("total_cost");
+                        totalDayRe = totalDayRe + (double)mapD.get("RE");
                     }
-                    businessReportDao.save(br);
-            }
-            BusinessReport brTotal = new BusinessReport();
-            brTotal.setHotelCode(user.getHotelCode());
-            brTotal.setBusinessDate(LocalDate.parse(businessDate));
-            brTotal.setSort("1");
-            brTotal.setNumber_("一");
-            brTotal.setProject("营业状况统计");
-            brTotal.setTotalDay(totalDay);
-            brTotal.setRebateDay(totalDayRe);
-            brTotal.setTotalMonth(totalMonth);
-            brTotal.setRebateMonth(totalMonthRe);
-            brTotal.setTotalYear(totalYear);
-            brTotal.setRebateYear(totalYearRe);
-            businessReportDao.save(brTotal);
+                }
+                br.setProjectType(Constants.ReportProjectType.REPORT_ROOM_RATE);
+                businessReportDao.save(br);
         }
+        BusinessReport brTotal = new BusinessReport();
+        brTotal.setHotelCode(user.getHotelCode());
+        brTotal.setBusinessDate(LocalDate.parse(businessDate));
+        brTotal.setSort(Constants.ReportSort.REPORT_ROOM_RATE);
+        brTotal.setProjectType(Constants.ReportProjectType.REPORT_ROOM_RATE);
+        brTotal.setNumber_("一");
+        brTotal.setProject("营业状况统计");
+        brTotal.setTotalDay(totalDay+"");
+        brTotal.setRebateDay(totalDayRe+"");
+        brTotal.setTotalMonth(totalMonth+"");
+        brTotal.setRebateMonth(totalMonthRe+"");
+        brTotal.setTotalYear(totalYear+"");
+        brTotal.setRebateYear(totalYearRe+"");
+        businessReportDao.save(brTotal);
         return hr.ok();
     }
 
     @Override
     public List<BusinessReport> getByBusinessDate(User user, String businessDate) {
-        List<BusinessReport> list = businessReportDao.getByBusinessDate(businessDate, user.getHotelCode());
+        List<BusinessReport> list = businessReportDao.getByBusinessDate(businessDate, user.getHotelCode(), null);
         return list;
     }
 
@@ -176,5 +197,87 @@ public class BusinessReportServiceImpl implements BusinessReportService {
                 "   GROUP BY t.category_id ";
 
         return qlString;
+    }
+
+    //稽核报表-营业日报表-d房租收入
+    @Override
+    public HttpResponse costByGroupType(User user, String businessDate) {
+        HttpResponse hr = new HttpResponse();
+        List<BusinessReport> listReport = businessReportDao.getByBusinessDate(businessDate, user.getHotelCode(), Constants.ReportProjectType.REPORT_ROOM_NUM_D);
+        if(listReport != null && !listReport.isEmpty()){
+            //如果不为空，表明今日已经入报表
+            return hr.ok("今日已完成");
+        }
+        String month = businessDate.substring(0,7);
+        String year = businessDate.substring(0,4);
+        List<Map<String, Object>> list = reportDao.costByGroupType(user.getHotelCode(),businessDate, month, year);
+
+        for(int i=0; i<list.size(); i++){
+            Map<String, Object> map = list.get(i);
+            BusinessReport br = new BusinessReport();
+            Object name = map.get("name");
+            if(name == null){
+                br.setProjectType(Constants.ReportProjectType.REPORT_ROOM_NUM_D);
+                br.setHotelCode(user.getHotelCode());
+                br.setBusinessDate(LocalDate.parse(businessDate));
+                br.setProject(Constants.ReportProject.REPORT_ROOM_CHECKIN_D);
+                br.setTotalDay(map.get("totalDay").toString());
+                br.setTotalMonth(map.get("totalMonth").toString());
+                br.setTotalYear(map.get("totalYear").toString());
+                br.setSort(Constants.ReportSort.REPORT_ROOM_CHECKIN_D);
+            }else {
+                br.setProjectType(Constants.ReportProjectType.REPORT_ROOM_NUM_D);
+                br.setHotelCode(user.getHotelCode());
+                br.setBusinessDate(LocalDate.parse(businessDate));
+                br.setProject(map.get("name").toString());
+                br.setTotalDay(map.get("totalDay").toString());
+                br.setTotalMonth(map.get("totalMonth").toString());
+                br.setTotalYear(map.get("totalYear").toString());
+                br.setSort(Constants.ReportSort.REPORT_ROOM_CHECKIN_D);
+            }
+            businessReportDao.save(br);
+        }
+        return hr;
+    }
+
+    //稽核报表-营业日报表-e、平均房价
+    @Override
+    public HttpResponse costByGroupTypeAvg(User user, String businessDate) {
+        HttpResponse hr = new HttpResponse();
+        List<BusinessReport> listReport = businessReportDao.getByBusinessDate(businessDate, user.getHotelCode(), Constants.ReportProjectType.REPORT_ROOM_NUM_E);
+        if(listReport != null && !listReport.isEmpty()){
+            //如果不为空，表明今日已经入报表
+            return hr.ok("今日已完成");
+        }
+        String month = businessDate.substring(0,7);
+        String year = businessDate.substring(0,4);
+        List<Map<String, Object>> list = reportDao.costByGroupTypeAvg(user.getHotelCode(),businessDate, month, year);
+
+        for(int i=0; i<list.size(); i++){
+            Map<String, Object> map = list.get(i);
+            BusinessReport br = new BusinessReport();
+            Object name = map.get("name");
+            if(name == null){
+                br.setProjectType(Constants.ReportProjectType.REPORT_ROOM_NUM_E);
+                br.setHotelCode(user.getHotelCode());
+                br.setBusinessDate(LocalDate.parse(businessDate));
+                br.setProject(Constants.ReportProject.REPORT_ROOM_CHECKIN_E);
+                br.setTotalDay(map.get("totalDay").toString());
+                br.setTotalMonth(map.get("totalMonth").toString());
+                br.setTotalYear(map.get("totalYear").toString());
+                br.setSort(Constants.ReportSort.REPORT_ROOM_CHECKIN_E);
+            }else {
+                br.setProjectType(Constants.ReportProjectType.REPORT_ROOM_NUM_E);
+                br.setHotelCode(user.getHotelCode());
+                br.setBusinessDate(LocalDate.parse(businessDate));
+                br.setProject(map.get("name").toString());
+                br.setTotalDay(map.get("totalDay").toString());
+                br.setTotalMonth(map.get("totalMonth").toString());
+                br.setTotalYear(map.get("totalYear").toString());
+                br.setSort(Constants.ReportSort.REPORT_ROOM_CHECKIN_E);
+            }
+            businessReportDao.save(br);
+        }
+        return hr;
     }
 }

@@ -69,4 +69,6 @@ public class Bill extends PersistenceModel {
 	private Bill sourceBill;
 	@Column
 	private String currentSettleAccountRecordNum;
+	@Column
+	private String roomRecordId;
 }

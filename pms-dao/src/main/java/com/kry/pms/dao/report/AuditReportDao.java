@@ -73,7 +73,7 @@ public interface AuditReportDao extends BaseDao<Bill> {
     @Query(nativeQuery = true,
             value = " select  " +
                     " t.category_id, " +
-                    " t.code_name, " +
+                    " t.code_name, t.code_, " +
                     " sum(if(t.type_='MC', cost, 0)) as 'MC', " +
                     " sum(if(t.type_='RE', cost, 0)) as 'RE', " +
                     " sum(if(t.type_='SE', cost, 0)) as 'SE', " +
@@ -93,13 +93,15 @@ public interface AuditReportDao extends BaseDao<Bill> {
                     "  left join t_product_type tpt on tp.id = tpt.product_id  " +
                     "  left join t_product_category tpc on tpt.category_id = tpc.id  " +
                     "where tb.cost is not null  " +
+                    "  and if(:hotelCode is not null && :hotelCode != '', tb.hotel_code=:hotelCode, 1=1 ) " +
+                    "  and if(:businessDate is not null && :businessDate != '', DATE_FORMAT(tb.business_date, '%Y-%m-%d') =:businessDate, 1=1 ) " +
                     "  group by tb.product_id,  " +
                     "  tp.`name`,  tpt.code_,  " +
                     "  tpt.code_name,  " +
                     "  tpt.category_id,  " +
                     "  tpt.type_ ) t " +
                     "  GROUP BY t.code_name  " )
-    List<Map<String, Object>> auditNights();
+    List<Map<String, Object>> auditNights(@Param("hotelCode")String hotelCode, @Param("businessDate") String businessDate);
 
     @Query(nativeQuery = true,
             value = " select   " +

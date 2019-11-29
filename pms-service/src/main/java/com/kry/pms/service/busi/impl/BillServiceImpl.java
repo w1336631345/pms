@@ -217,7 +217,7 @@ public class BillServiceImpl implements BillService {
     }
 
     @Override
-    public void putAcount(List<RoomRecord> ids) {
+    public void putAcount(List<RoomRecord> ids, LocalDate businessDate) {
         for (int i = 0; i < ids.size(); i++) {
             String id = ids.get(i).getId();
             RoomRecord rr = roomRecordService.findById(id);
@@ -226,10 +226,13 @@ public class BillServiceImpl implements BillService {
             Bill bill = new Bill();
             bill.setProduct(p);
             bill.setTotal(rr.getCost());
+            bill.setCost(rr.getCost());
             bill.setQuantity(1);
             bill.setAccount(rr.getCheckInRecord().getAccount());
             bill.setHotelCode(rr.getHotelCode());
             bill.setOperationRemark("夜审自动入账");
+            bill.setRoomRecordId(rr.getId());
+            bill.setBusinessDate(businessDate);
             add(bill);
             rr.setIsAccountEntry("PAY");//入账成功后roomRecord里面入账状态改为pay
             roomRecordService.modify(rr);
