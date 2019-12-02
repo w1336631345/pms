@@ -5,6 +5,6 @@ import com.kry.pms.model.persistence.guest.Customer;
 
 public interface CustomerDao extends BaseDao<Customer>{
 	
-	Customer findByIdCardNum(String idCardNum);
+	Customer findByHotelCodeAndIdCardNum(String hotelCode,String idCardNum);
 
 }

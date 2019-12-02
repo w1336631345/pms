@@ -62,6 +62,12 @@ public class  DistributionChannelServiceImpl implements  DistributionChannelServ
 		}
 		return convent(distributionChannelDao.findAll(ex, req));
 	}
+
+	@Override
+	public List<DistributionChannel> getAllByHotelCode(String currentHotleCode, int deleted) {
+		// TODO Auto-generated method stub
+		return distributionChannelDao.findByHotelCodeAndDeleted(currentHotleCode,deleted);
+	}
 	 
 	 
 	 

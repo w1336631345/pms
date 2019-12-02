@@ -12,15 +12,33 @@ import com.kry.pms.base.Constants;
 import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
 import com.kry.pms.dao.org.HotelDao;
+import com.kry.pms.model.http.response.org.HotelInfoVo;
+import com.kry.pms.model.persistence.marketing.DiscountScheme;
+import com.kry.pms.model.persistence.marketing.MarketingSources;
 import com.kry.pms.model.persistence.org.Hotel;
+import com.kry.pms.service.marketing.DiscountSchemeService;
+import com.kry.pms.service.marketing.DistributionChannelService;
+import com.kry.pms.service.marketing.MarketingSourcesService;
 import com.kry.pms.service.org.HotelService;
+import com.kry.pms.service.room.RoomTagService;
+import com.kry.pms.service.room.RoomTypeService;
 
 @Service
-public class  HotelServiceImpl implements  HotelService{
+public class HotelServiceImpl implements HotelService {
 	@Autowired
-	 HotelDao hotelDao;
-	 
-	 @Override
+	HotelDao hotelDao;
+	@Autowired
+	RoomTypeService roomTypeService;
+	@Autowired
+	DiscountSchemeService discountSchemeService;
+	@Autowired
+	MarketingSourcesService marketingSourcesService;
+	@Autowired
+	DistributionChannelService distributionChannelService;
+	@Autowired
+	RoomTagService roomTagService;
+
+	@Override
 	public Hotel add(Hotel hotel) {
 		return hotelDao.saveAndFlush(hotel);
 	}
@@ -46,8 +64,8 @@ public class  HotelServiceImpl implements  HotelService{
 
 	@Override
 	public List<Hotel> getAllByHotelCode(String code) {
-		return null;//默认不实现
-		//return hotelDao.findByHotelCode(code);
+		return null;// 默认不实现
+		// return hotelDao.findByHotelCode(code);
 	}
 
 	@Override
@@ -68,8 +86,17 @@ public class  HotelServiceImpl implements  HotelService{
 		}
 		return convent(hotelDao.findAll(ex, req));
 	}
-	 
-	 
-	 
-	 
+
+	@Override
+	public HotelInfoVo getHotelInfo(String currentHotleCode) {
+		Hotel hotel = getByHotelCode(currentHotleCode);
+		HotelInfoVo hv = new HotelInfoVo();
+		hv.setRoomTypes(roomTypeService.getAllByHotelCode(currentHotleCode, Constants.DELETED_FALSE));
+		hv.setMarketingSources(marketingSourcesService.getAllByHotelCode(currentHotleCode,Constants.DELETED_FALSE));
+		hv.setDiscountSchemes(discountSchemeService.getAllByHotelCode(currentHotleCode,Constants.DELETED_FALSE));
+		hv.setRoomTags(roomTagService.getAllByHotelCode(currentHotleCode,Constants.DELETED_FALSE));
+		hv.setDistributionChannels(distributionChannelService.getAllByHotelCode(currentHotleCode,Constants.DELETED_FALSE));
+		return hv;
+	}
+	
 }

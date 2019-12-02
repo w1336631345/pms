@@ -62,8 +62,10 @@ public class  MarketingSourcesServiceImpl implements  MarketingSourcesService{
 		}
 		return convent(marketingSourcesDao.findAll(ex, req));
 	}
-	 
-	 
-	 
+
+	@Override
+	public List<MarketingSources> getAllByHotelCode(String currentHotleCode, int deleted) {
+		return marketingSourcesDao.findByHotelCodeAndDeleted(currentHotleCode,deleted);
+	}
 	 
 }

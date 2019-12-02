@@ -17,6 +17,7 @@ import com.kry.pms.base.HttpResponse;
 import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
 import com.kry.pms.model.http.response.org.EmployeeSummaryVo;
+import com.kry.pms.model.http.response.org.HotelInfoVo;
 import com.kry.pms.model.http.response.org.HotelSummaryVo;
 import com.kry.pms.model.http.response.sys.UserInfoVo;
 import com.kry.pms.model.persistence.org.Employee;
@@ -94,7 +95,14 @@ public class UserController extends BaseController<User> {
 		userInfoVo.setRole(user.getRoles().get(0));
 		return rep.addData(userInfoVo);
 	}
-
+	@GetMapping(path = "/admin/hotelInfo")
+	public HttpResponse<HotelInfoVo> hotelInfo(){
+		HttpResponse<HotelInfoVo> rep = new HttpResponse<HotelInfoVo>();
+		rep.setData(hotelService.getHotelInfo(getCurrentHotleCode()));
+		return rep;
+		
+	}
+	
 	/**
 	 * 功能描述: 修改密码
 	 * 〈〉

@@ -62,8 +62,9 @@ public class  DiscountSchemeServiceImpl implements  DiscountSchemeService{
 		}
 		return convent(discountSchemeDao.findAll(ex, req));
 	}
-	 
-	 
-	 
-	 
+
+	@Override
+	public List<DiscountScheme> getAllByHotelCode(String currentHotleCode, int deleted) {
+		return discountSchemeDao.findByHotelCodeAndDeleted(currentHotleCode,deleted);
+	}
 }

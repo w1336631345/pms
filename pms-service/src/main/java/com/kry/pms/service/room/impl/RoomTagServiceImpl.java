@@ -62,6 +62,11 @@ public class  RoomTagServiceImpl implements  RoomTagService{
 		}
 		return convent(roomTagDao.findAll(ex, req));
 	}
+
+	@Override
+	public List<RoomTag> getAllByHotelCode(String currentHotleCode, int deleted) {
+		return roomTagDao.findByHotelCodeAndDeleted(currentHotleCode,deleted);
+	}
 	 
 	 
 	 

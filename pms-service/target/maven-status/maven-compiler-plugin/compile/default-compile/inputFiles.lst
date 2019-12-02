@@ -1,5 +1,6 @@
 E:\kry\src\pms-server\pms-service\src\main\java\com\kry\pms\service\marketing\MarketingSourcesService.java
 E:\kry\src\pms-server\pms-service\src\main\java\com\kry\pms\service\room\RoomTypeService.java
+E:\kry\src\pms-server\pms-service\src\main\java\com\kry\pms\service\sys\ShiftService.java
 E:\kry\src\pms-server\pms-service\src\main\java\com\kry\pms\service\busi\impl\ChangeRoomRecordServiceImpl.java
 E:\kry\src\pms-server\pms-service\src\main\java\com\kry\pms\service\marketing\impl\DistributionChannelServiceImpl.java
 E:\kry\src\pms-server\pms-service\src\main\java\com\kry\pms\service\busi\BillItemService.java
@@ -38,6 +39,7 @@ E:\kry\src\pms-server\pms-service\src\main\java\com\kry\pms\service\report\impl\
 E:\kry\src\pms-server\pms-service\src\main\java\com\kry\pms\service\audit\impl\NightAuditServiceImpl.java
 E:\kry\src\pms-server\pms-service\src\main\java\com\kry\pms\service\guest\impl\CustomerLevelServiceImpl.java
 E:\kry\src\pms-server\pms-service\src\main\java\com\kry\pms\service\org\impl\DepartmentServiceImpl.java
+E:\kry\src\pms-server\pms-service\src\main\java\com\kry\pms\service\sys\impl\ShiftServiceImpl.java
 E:\kry\src\pms-server\pms-service\src\main\java\com\kry\pms\service\audit\NightAuditService.java
 E:\kry\src\pms-server\pms-service\src\main\java\com\kry\pms\service\room\impl\RoomUsageServiceImpl.java
 E:\kry\src\pms-server\pms-service\src\main\java\com\kry\pms\service\room\impl\RoomTypeServiceImpl.java
