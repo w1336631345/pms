@@ -84,7 +84,10 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
 	public HttpResponse<CheckInRecord> addCustomerTogether(@RequestBody TogetherBo togetherBo){
 		return getDefaultResponse().addData(checkInRecordService.addTogether(togetherBo));
 	}
-	
+	public HttpResponse<PageResponse<CheckInRecordListVo>> queryHistory(){
+		HttpResponse<PageResponse<CheckInRecordListVo>> rep = new HttpResponse<PageResponse<CheckInRecordListVo>>();
+		return rep;
+	}
 	
 	@GetMapping
 	public HttpResponse<PageResponse<CheckInRecord>> query(HttpServletRequest request) throws InstantiationException, IllegalAccessException{

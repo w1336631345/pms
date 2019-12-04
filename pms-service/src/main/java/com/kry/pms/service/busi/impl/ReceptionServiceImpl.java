@@ -179,7 +179,6 @@ public class ReceptionServiceImpl implements ReceptionService {
 		return result;
 	}
 
-
 	@Transactional
 	@Override
 	public DtoResponse<String> billSettle(BillSettleBo bsb) {
@@ -194,28 +193,35 @@ public class ReceptionServiceImpl implements ReceptionService {
 		DtoResponse<String> response = new DtoResponse<String>();
 		String checkInRecordId = roomAssignBo.getCheckInRecordId();
 		CheckInRecord cir = checkInRecordService.findById(checkInRecordId);
-		if (cir != null) {
-			if (roomAssignBo.getRoomId().length <= (cir.getRoomCount() - cir.getCheckInCount())) {
-				for (String roomId : roomAssignBo.getRoomId()) {
-					GuestRoom gr = guestRoomService.findById(roomId);
-					checkInRecordService.checkInByTempName(roomAssignBo.getHumanCountPreRoom(), cir, gr, response);
+		if (cir.getType().equals(Constants.Type.CHECK_IN_RECORD_RESERVE)) {
+			if (cir != null) {
+				if (roomAssignBo.getRoomId().length <= (cir.getRoomCount() - cir.getCheckInCount())) {
+					for (String roomId : roomAssignBo.getRoomId()) {
+						GuestRoom gr = guestRoomService.findById(roomId);
+						checkInRecordService.checkInByTempName(roomAssignBo.getHumanCountPreRoom(), cir, gr, response);
+					}
+				} else {
+					response.setStatus(Constants.BusinessCode.CODE_RESOURCE_NOT_ENOUGH);
+					response.setMessage("选择房间数过多，请重新选择");
 				}
 			} else {
-				response.setStatus(Constants.BusinessCode.CODE_RESOURCE_NOT_ENOUGH);
-				response.setMessage("选择房间数过多，请重新选择");
+				response.setStatus(Constants.BusinessCode.CODE_PARAMETER_INVALID);
+				response.setMessage("找不到预定信息，请重新选择");
 			}
-		} else {
-			response.setStatus(Constants.BusinessCode.CODE_PARAMETER_INVALID);
-			response.setMessage("找不到预定信息，请重新选择");
-		}
-		if (response.getStatus() == 0) {
-			cir.setCheckInCount(cir.getCheckInCount() + roomAssignBo.getRoomId().length);
-			if (cir.getRoomCount() == cir.getCheckInCount()) {
-				cir.setDeleted(Constants.DELETED_TRUE);
+			if (response.getStatus() == 0) {
+				cir.setCheckInCount(cir.getCheckInCount() + roomAssignBo.getRoomId().length);
+				if (cir.getRoomCount() == cir.getCheckInCount()) {
+					cir.setDeleted(Constants.DELETED_TRUE);
+				}
+				checkInRecordService.modify(cir);
+			} else {
+				TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 			}
+		}else {
+			GuestRoom gr = guestRoomService.findById(roomAssignBo.getRoomId()[0]);
+			cir.setGuestRoom(gr);
+			cir.setCheckInCount(cir.getRoomCount());
 			checkInRecordService.modify(cir);
-		} else {
-			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 		}
 		return response;
 	}
@@ -227,8 +233,9 @@ public class ReceptionServiceImpl implements ReceptionService {
 		if (cir != null) {
 			cir.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN);
 			checkInRecordService.modify(cir);
-			List<CheckInRecord> togetherRecord = checkInRecordService.findRoomTogetherRecord(cir,Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION);
-			if(togetherRecord!=null&&!togetherRecord.isEmpty()) {
+			List<CheckInRecord> togetherRecord = checkInRecordService.findRoomTogetherRecord(cir,
+					Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION);
+			if (togetherRecord != null && !togetherRecord.isEmpty()) {
 				rep.setCode(1);
 			}
 		} else {
@@ -256,26 +263,31 @@ public class ReceptionServiceImpl implements ReceptionService {
 						Constants.Type.CHECK_IN_RECORD_CUSTOMER)));
 				break;
 			case Constants.Type.CHECK_IN_RECORD_GROUP_TYPE_NO:
-
+				Collection<AccountSummaryVo> data = checkInRecordService.getAccountSummaryByOrderNum(cir.getOrderNum(),
+						Constants.Type.CHECK_IN_RECORD_CUSTOMER);
+				if(data!=null&&!data.isEmpty()) {
+					asv = (AccountSummaryVo) data.toArray()[0];
+				}
 				break;
 
 			default:
 				break;
 			}
-		}else {
+		} else {
 			// 散客
 		}
 		return asv;
 	}
-	 
+
 	@Override
 	public DtoResponse<List<AccountSummaryVo>> groupCheckBillConfirm(String id) {
 		DtoResponse<List<AccountSummaryVo>> rep = new DtoResponse<List<AccountSummaryVo>>();
 		CheckInRecord cir = checkInRecordService.findById(id);
-		if(cir!=null) {
+		if (cir != null) {
 			String orderNum = cir.getOrderNum();
-			Collection<Account> asvs = accountService.getAccountByOrderNumAndStatusAndCheckInType(orderNum, Constants.Type.CHECK_IN_RECORD_CUSTOMER, Constants.Status.ACCOUNT_IN);
-			if(asvs!=null&&!asvs.isEmpty()) {
+			Collection<Account> asvs = accountService.getAccountByOrderNumAndStatusAndCheckInType(orderNum,
+					Constants.Type.CHECK_IN_RECORD_CUSTOMER, Constants.Status.ACCOUNT_IN);
+			if (asvs != null && !asvs.isEmpty()) {
 				rep.setStatus(Constants.BusinessCode.CODE_ILLEGAL_OPERATION);
 				rep.setMessage("有未结账的客房，请先结客房帐");
 			}
@@ -285,7 +297,7 @@ public class ReceptionServiceImpl implements ReceptionService {
 
 	@Override
 	public DtoResponse<String> checkIn(String[] ids) {
-		
+
 		return null;
 	}
 

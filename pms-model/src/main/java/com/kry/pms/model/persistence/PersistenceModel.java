@@ -45,7 +45,7 @@ public class PersistenceModel implements Serializable,Cloneable {
 	@Column(columnDefinition = "varchar(64) default '0000' COMMENT '企业编码'")
 	protected String corporationCode;
 	@Column(columnDefinition = "varchar(64) default '0000' COMMENT '酒店编码'")
-	protected String hotelCode = "0000";
+	protected String hotelCode;
     @Override
 	public Object clone() throws CloneNotSupportedException {
         return super.clone();

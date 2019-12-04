@@ -5,6 +5,8 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.util.List;
 
+import javax.transaction.Transactional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Sort;
@@ -61,6 +63,7 @@ public class BusinessSeqServiceImpl implements BusinessSeqService {
 		return null;
 	}
 	@Override
+	@Transactional
 	public void plusBuinessDate(String hotelCode) {
 		BusinessSeq bs = businessSeqDao.findByHotelCodeAndSeqKey(hotelCode,
 				Constants.Key.BUSINESS_BUSINESS_DATE_SEQ_KEY);
@@ -72,7 +75,7 @@ public class BusinessSeqServiceImpl implements BusinessSeqService {
 			Integer nextDateInt = Integer.parseInt(nextDateStr);
 			bs.setCurrentSeq(nextDateInt);
 			bs = modify(bs);
-			businessSeqDao.resetDailySeq(hotelCode);
+			businessSeqDao.resetDailySeq(hotelCode,1);
 		}
 		
 	}

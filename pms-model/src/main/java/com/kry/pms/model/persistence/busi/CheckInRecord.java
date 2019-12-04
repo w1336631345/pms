@@ -9,6 +9,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
@@ -18,6 +19,7 @@ import javax.persistence.Transient;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.kry.pms.model.persistence.PersistenceModel;
 import com.kry.pms.model.persistence.guest.Customer;
+import com.kry.pms.model.persistence.marketing.DiscountScheme;
 import com.kry.pms.model.persistence.marketing.DistributionChannel;
 import com.kry.pms.model.persistence.marketing.MarketingSources;
 import com.kry.pms.model.persistence.marketing.ProtocolCorpation;
@@ -29,13 +31,10 @@ import com.kry.pms.model.persistence.room.RoomTag;
 import com.kry.pms.model.persistence.room.RoomType;
 import com.kry.pms.model.persistence.sys.Account;
 
-import lombok.Getter;
-import lombok.Setter;
-
 @Entity
 @Table(name = "t_checkin_record")
 public class CheckInRecord extends PersistenceModel {
-	@OneToOne
+	@OneToOne(cascade = CascadeType.DETACH)
 	private Customer customer;
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name="booking_record_id")
@@ -61,10 +60,14 @@ public class CheckInRecord extends PersistenceModel {
 	@Column
 	private String orderNum;
 	@Column
+	private Double regularPrice;
+	@Column
+	private Double discount;
+	@Column
 	private Integer humanCount;
 	@Column
 	private Integer roomCount;
-	@OneToMany(cascade = CascadeType.PERSIST)
+	@ManyToMany(cascade = CascadeType.PERSIST)
 	private List<RoomTag> demands;
 	@Column
 	private Integer chrildrenCount;
@@ -90,7 +93,7 @@ public class CheckInRecord extends PersistenceModel {
 	private String groupType;
 	@ManyToOne
 	private Group group;
-	@OneToOne(cascade = CascadeType.ALL)
+	@OneToOne(cascade = CascadeType.PERSIST)
 	private Account account;
 	@Transient
 	private String roomTypeId;
@@ -112,7 +115,27 @@ public class CheckInRecord extends PersistenceModel {
 	private String remark;
 	@Transient
 	private String mainRecordId;
+	@OneToOne
+	private DiscountScheme discountScheme;
 	
+	public DiscountScheme getDiscountScheme() {
+		return discountScheme;
+	}
+	public void setDiscountScheme(DiscountScheme discountScheme) {
+		this.discountScheme = discountScheme;
+	}
+	public Double getRegularPrice() {
+		return regularPrice;
+	}
+	public void setRegularPrice(Double regularPrice) {
+		this.regularPrice = regularPrice;
+	}
+	public Double getDiscount() {
+		return discount;
+	}
+	public void setDiscount(Double discount) {
+		this.discount = discount;
+	}
 	public String getGroupType() {
 		return groupType;
 	}

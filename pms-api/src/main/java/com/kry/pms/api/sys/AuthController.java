@@ -1,34 +1,30 @@
 package com.kry.pms.api.sys;
 
+import java.util.List;
+
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authc.AuthenticationException;
+import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.session.mgt.eis.SessionDAO;
+import org.apache.shiro.subject.Subject;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.kry.pms.base.Constants;
 import com.kry.pms.base.HttpResponse;
 import com.kry.pms.controller.SessionController;
 import com.kry.pms.model.http.response.sys.UserOnlineVO;
-import com.kry.pms.model.persistence.org.Hotel;
 import com.kry.pms.model.persistence.sys.Shift;
-import com.kry.pms.model.persistence.sys.User;
 import com.kry.pms.service.org.HotelService;
 import com.kry.pms.service.sys.AccountService;
-import com.kry.pms.service.sys.BusinessSeqService;
 import com.kry.pms.service.sys.ShiftService;
 import com.kry.pms.service.sys.UserService;
 import com.kry.pms.utils.MD5Utils;
 import com.kry.pms.utils.ShiroUtils;
-import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.authc.AuthenticationException;
-import org.apache.shiro.authc.UsernamePasswordToken;
-import org.apache.shiro.session.Session;
-import org.apache.shiro.session.mgt.eis.SessionDAO;
-import org.apache.shiro.subject.SimplePrincipalCollection;
-import org.apache.shiro.subject.Subject;
-import org.apache.shiro.subject.support.DefaultSubjectContext;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
 @RestController
 @RequestMapping(path="/auth")
 public class AuthController {

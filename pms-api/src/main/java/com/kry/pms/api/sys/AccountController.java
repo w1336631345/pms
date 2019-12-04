@@ -37,7 +37,7 @@ public class AccountController extends BaseController<Account> {
 		return getDefaultResponse().addData(accountService.modify(account));
 	}
 
-	@DeleteMapping
+	@DeleteMapping	
 	public HttpResponse<String> delete(String id) {
 		HttpResponse<String> rep = new HttpResponse<>();
 		accountService.delete(id);
