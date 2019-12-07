@@ -15,7 +15,6 @@ public class TempTest {
 	@Test
 	public void t1() {
 		try {
-			
 			businessSeqService.plusBuinessDate("0000");
 		} catch (Exception e) {
 			e.printStackTrace();

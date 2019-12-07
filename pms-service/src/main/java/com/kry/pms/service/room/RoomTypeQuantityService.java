@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 
 import com.kry.pms.model.http.response.busi.RoomTypeQuantityPredictableVo;
+import com.kry.pms.model.http.response.room.RoomTypeQuantityVo;
 import com.kry.pms.model.persistence.room.GuestRoom;
 import com.kry.pms.model.persistence.room.RoomType;
 import com.kry.pms.model.persistence.room.RoomTypeQuantity;
@@ -19,4 +20,5 @@ public interface RoomTypeQuantityService extends BaseService<RoomTypeQuantity>{
 	public void checkIn(GuestRoom gr, LocalDate startDate, Integer days);
 	public List<RoomTypeQuantityPredictableVo> queryPredictable(String currentHotleCode, LocalDate startDate, LocalDate endDate);
 	public RoomTypeQuantityPredictableVo queryPredic(String currentHotleCode,String roomTypeId, LocalDate startDate, LocalDate endDate);
+	public List<RoomTypeQuantityVo> queryByDay( String currentHotleCode,LocalDate parse, LocalDate parse2);
 }

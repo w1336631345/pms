@@ -6,7 +6,6 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,6 +21,7 @@ import com.kry.pms.base.HttpResponse;
 import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
 import com.kry.pms.model.http.response.busi.RoomTypeQuantityPredictableVo;
+import com.kry.pms.model.http.response.room.RoomTypeQuantityVo;
 import com.kry.pms.model.persistence.room.RoomTypeQuantity;
 import com.kry.pms.service.room.RoomTypeQuantityService;
 
@@ -35,7 +35,12 @@ public class RoomTypeQuantityController extends BaseController<RoomTypeQuantity>
 	public HttpResponse<RoomTypeQuantity> add(@RequestBody RoomTypeQuantity roomTypeQuantity) {
 		return getDefaultResponse().addData(roomTypeQuantityService.add(roomTypeQuantity));
 	}
-
+	@GetMapping(path="/day")
+	public HttpResponse<List<RoomTypeQuantityVo>> query(String startDate,String endDate){
+		HttpResponse<List<RoomTypeQuantityVo>> rep = new HttpResponse<>();
+		List<RoomTypeQuantityVo> data = roomTypeQuantityService.queryByDay(getCurrentHotleCode(),LocalDate.parse(startDate),LocalDate.parse(endDate));
+		return rep.addData(data);
+	}
 	@PutMapping
 	public HttpResponse<RoomTypeQuantity> modify(@RequestBody RoomTypeQuantity roomTypeQuantity) {
 		return getDefaultResponse().addData(roomTypeQuantityService.modify(roomTypeQuantity));

@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Sort;
@@ -15,6 +16,7 @@ import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
 import com.kry.pms.dao.room.RoomTypeQuantityDao;
 import com.kry.pms.model.http.response.busi.RoomTypeQuantityPredictableVo;
+import com.kry.pms.model.http.response.room.RoomTypeQuantityVo;
 import com.kry.pms.model.persistence.room.GuestRoom;
 import com.kry.pms.model.persistence.room.RoomType;
 import com.kry.pms.model.persistence.room.RoomTypeQuantity;
@@ -160,8 +162,8 @@ public class RoomTypeQuantityServiceImpl implements RoomTypeQuantityService {
 	}
 
 	@Override
-	public RoomTypeQuantityPredictableVo queryPredic(String currentHotleCode, String roomTypeId,
-			LocalDate startDate, LocalDate endDate) {
+	public RoomTypeQuantityPredictableVo queryPredic(String currentHotleCode, String roomTypeId, LocalDate startDate,
+			LocalDate endDate) {
 		RoomType roomType = roomTypeService.findById(roomTypeId);
 		RoomTypeQuantityPredictableVo rtpv = null;
 		if (roomType != null) {
@@ -177,5 +179,18 @@ public class RoomTypeQuantityServiceImpl implements RoomTypeQuantityService {
 			}
 		}
 		return rtpv;
+	}
+
+	@Override
+	public List<RoomTypeQuantityVo> queryByDay(String currentHotleCode, LocalDate startDate, LocalDate endDate) {
+		List<RoomTypeQuantityVo> data = new ArrayList<RoomTypeQuantityVo>();
+		RoomTypeQuantityVo rv = null;
+		for(RoomTypeQuantity r :roomTypeQuantityDao.queryByDay(currentHotleCode, startDate, endDate)) {
+			rv = new RoomTypeQuantityVo();
+			BeanUtils.copyProperties(r, rv);
+			rv.setRoomTypeId(r.getRoomType().getId());
+			data.add(rv);
+		}
+		return data;
 	}
 }

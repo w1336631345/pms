@@ -187,12 +187,13 @@ public class AccountServiceImpl implements AccountService {
 
 	@Override
 	public Account createAccount(Customer customer,String roomNum) {
-		Account account = new Account();
+		Account account = new Account(0,0);
 		account.setCode(businessSeqService.fetchNextSeqNum(customer.getHotelCode(),Constants.Key.BUSINESS_BUSINESS_CUSTOMER_ACCOUNT_SEQ_KEY));
 		account.setCustomer(customer);
 		account.setName(customer.getName());
 		account.setType(Constants.Type.ACCOUNT_CUSTOMER);
 		account.setRoomNum(roomNum);
+		
 		return add(account);
 	}
 

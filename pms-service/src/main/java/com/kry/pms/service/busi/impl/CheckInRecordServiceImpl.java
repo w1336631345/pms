@@ -231,7 +231,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 				cir.setDays(br.getDays());
 				cir.setGuestRoom(gr);
 				cir.setHotelCode(gr.getHotelCode());
-				Account account = new Account();
+				Account account = new Account(0,0);
 				account.setName(tempName);
 				account.setCustomer(customer);
 				account.setType(Constants.Type.ACCOUNT_CUSTOMER);
@@ -289,7 +289,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 				ncir.setSubRecords(null);
 				ncir.setStartDate(startDate);
 				ncir.setHotelCode(gr.getHotelCode());
-				Account account = new Account();
+				Account account = new Account(0,0);
 				account.setRoomNum(gr.getRoomNum());
 				account.setCustomer(customer);
 				account.setCode(businessSeqService.fetchNextSeqNum(gr.getHotelCode(),
@@ -365,7 +365,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 	}
 
 	private void initGroupAccount(CheckInRecord checkInRecord) {
-		Account account = new Account();
+		Account account = new Account(0,0);
 		if(checkInRecord.getGroup()!=null) {
 			account.setGroup(checkInRecord.getGroup());
 		}

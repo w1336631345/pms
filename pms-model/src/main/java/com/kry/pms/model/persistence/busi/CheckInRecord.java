@@ -60,6 +60,10 @@ public class CheckInRecord extends PersistenceModel {
 	@Column
 	private String orderNum;
 	@Column
+	private Boolean linked;
+	@Column
+	private String linkNum;
+	@Column
 	private Double regularPrice;
 	@Column
 	private Double discount;

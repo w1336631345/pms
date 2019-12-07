@@ -11,6 +11,7 @@ import com.kry.pms.model.persistence.busi.Group;
 import com.kry.pms.model.persistence.guest.Customer;
 import com.kry.pms.model.persistence.marketing.ProtocolCorpation;
 import com.kry.pms.model.persistence.org.Employee;
+import com.kry.pms.util.BigDecimalUtil;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -48,4 +49,15 @@ public class Account extends PersistenceModel {
 	private ProtocolCorpation ProtocolCorpation;
 	@Column
 	private Integer currentBillSeq;
+	
+	public Account() {
+		super();
+	}
+	public Account(double cost,double pay) {
+		super();
+		this.cost = cost;
+		this.pay = pay;
+		this.total = BigDecimalUtil.sub(this.cost, this.pay);
+		this.currentBillSeq = 0;
+	}
 }
