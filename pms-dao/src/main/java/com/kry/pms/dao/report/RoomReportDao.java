@@ -80,7 +80,7 @@ public interface RoomReportDao extends BaseDao<RoomReport> {
 
     @Query(nativeQuery = true,
     value = " select ty.totalYear, IFNULL(tm.totalMonth,0) totalMonth,  " +
-            " IFNULL(td.totalDay,0) totalDay, ty.name " +
+            " IFNULL(td.totalDay,0) totalDay, IFNULL(ty.name ,'其他') name " +
             " from  " +
             " ( select count(trr.id) totalYear, tms.id, tms.name " +
             " from t_room_record trr " +

@@ -11,7 +11,9 @@ public interface EmployeeService extends BaseService<Employee> {
 
 	DtoResponse<Employee> createEmployee(Employee employee);
 
-	Employee findByUser(User user);
+    List<Employee> getByHotelCodeAndDelete(String code);
+
+    Employee findByUser(User user);
 
 	List<Employee> findEmployeeByDeptCode(String deptMarketingDefaultCode, String currentHotleCode);
 

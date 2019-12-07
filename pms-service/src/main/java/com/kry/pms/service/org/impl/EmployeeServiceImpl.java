@@ -56,8 +56,13 @@ public class EmployeeServiceImpl implements EmployeeService {
 
 	@Override
 	public List<Employee> getAllByHotelCode(String code) {
-		return null;// 默认不实现
-		// return employeeDao.findByHotelCode(code);
+//		return null;// 默认不实现
+		 return employeeDao.findByHotelCode(code);
+	}
+
+	@Override
+	public List<Employee> getByHotelCodeAndDelete(String code) {
+		return employeeDao.findByHotelCodeAndDeleted(code, Constants.DELETED_FALSE);
 	}
 
 	@Override

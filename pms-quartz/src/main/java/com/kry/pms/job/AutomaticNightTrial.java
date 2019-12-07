@@ -1,10 +1,12 @@
 package com.kry.pms.job;
 
+import com.kry.pms.base.Constants;
 import com.kry.pms.base.HttpResponse;
 import com.kry.pms.controller.SessionController;
 import com.kry.pms.dao.ScheduleJobDaoRepository;
 import com.kry.pms.model.ScheduleJobModel;
 import com.kry.pms.model.persistence.busi.Bill;
+import com.kry.pms.model.persistence.busi.DailyVerify;
 import com.kry.pms.model.persistence.busi.RoomRecord;
 import com.kry.pms.model.persistence.goods.Product;
 import com.kry.pms.model.persistence.quartz.QuartzSet;
@@ -12,6 +14,7 @@ import com.kry.pms.model.persistence.sys.User;
 import com.kry.pms.service.ScheduleJobService;
 import com.kry.pms.service.busi.BillService;
 import com.kry.pms.service.busi.CheckInRecordService;
+import com.kry.pms.service.busi.DailyVerifyService;
 import com.kry.pms.service.busi.RoomRecordService;
 import com.kry.pms.service.goods.ProductService;
 import com.kry.pms.service.quratz.impl.QuartzSetService;
@@ -22,6 +25,7 @@ import org.springframework.stereotype.Component;
 
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Date;
 import java.util.List;
@@ -53,6 +57,8 @@ public class AutomaticNightTrial {
     ScheduleJobDaoRepository scheduleJobDaoRepository;
     @Autowired
     BusinessSeqService businessSeqService;
+    @Autowired
+    DailyVerifyService dailyVerifyService;
 
     //查询所有开启自动夜审的酒店
     public List<QuartzSet> getAll(){
@@ -69,6 +75,7 @@ public class AutomaticNightTrial {
         List<ScheduleJobModel> list = scheduleJobDaoRepository.findByHotelCodeAndStatus(hotelCode, 0);
         return list;
     }
+    //自动夜审入账
     public void accountEntryListAll(String hotelCode) {
         List<ScheduleJobModel> listQ = getStartByHotelCode(hotelCode);
         for(int i=0; i<listQ.size(); i++){
@@ -86,24 +93,17 @@ public class AutomaticNightTrial {
             }
             LocalDate businessDate = businessSeqService.getBuinessDate(hotelCode);
             //查询需要自动入账的记录（注：自动入账为最近营业日期的账，入账后营业日期+1，下面是查询的所有记录，后期整改）
-            //同时添加入账记录（t_daily_verify）
             List<RoomRecord> list = roomRecordService.accountEntryListAll(listQ.get(i).getHotelCode(), businessDate);
-            for(int j=0; j<list.size(); j++){
-                RoomRecord rr = list.get(j);
-                Product p = new Product();
-                p.setId("10000");
-                System.out.println(p.getDirection());
-                Bill bill = new Bill();
-                bill.setProduct(p);
-                bill.setTotal(rr.getCost());
-                bill.setQuantity(1);
-                bill.setAccount(rr.getCheckInRecord().getAccount());
-                bill.setHotelCode(rr.getHotelCode());
-                bill.setOperationRemark("夜审自动入账");
-                billService.add(bill);
-                rr.setIsAccountEntry("PAY");
-                roomRecordService.modify(rr);
-            }
+            billService.putAcountAUTO(list, businessDate);//保存到bill
+            //同时添加入账记录（t_daily_verify）
+            DailyVerify dv = new DailyVerify();
+            dv.setBusinessDate(businessDate);
+            dv.setType(Constants.auditNightMode.NIGHT_AUDIT_AUTO);//夜审方式，自动
+            dv.setHotelCode(listQ.get(i).getHotelCode());
+            dv.setVerifyDate(LocalDate.now());
+            dv.setCreateDate(LocalDateTime.now());
+            dv.setStatus("success");
+            dailyVerifyService.add(dv);
             //一个酒店夜审入账完毕后将用户登录禁止状态修改为正常
             for(int u=0; u<users.size(); u++){
                 User user = users.get(i);

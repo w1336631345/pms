@@ -174,7 +174,8 @@ public class nightAuditController extends BaseController {
                 }
             }
         }
-        rep = nightAuditService.manualAdd(loginUser, ids);
+        String shiftCode = getShiftCode();
+        rep = nightAuditService.manualAdd(loginUser, ids, shiftCode);
         return rep;
     }
 

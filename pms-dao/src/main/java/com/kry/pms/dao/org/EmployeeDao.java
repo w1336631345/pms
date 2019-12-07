@@ -11,4 +11,7 @@ public interface EmployeeDao extends BaseDao<Employee>{
 	
 	Employee findByUserId(String userId);
 
+    List<Employee> findByHotelCode(String code);
+
+	List<Employee> findByHotelCodeAndDeleted(String code, Integer deleted);
 }

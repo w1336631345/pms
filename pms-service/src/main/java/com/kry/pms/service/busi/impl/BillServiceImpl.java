@@ -216,8 +216,34 @@ public class BillServiceImpl implements BillService {
         return bills;
     }
 
+    //夜审手动入账
     @Override
-    public void putAcount(List<RoomRecord> ids, LocalDate businessDate) {
+    public void putAcount(List<RoomRecord> ids, LocalDate businessDate, Employee emp, String shiftCode) {
+        for (int i = 0; i < ids.size(); i++) {
+            String id = ids.get(i).getId();
+            RoomRecord rr = roomRecordService.findById(id);
+            Product p = new Product();
+            p.setId("10000");
+            Bill bill = new Bill();
+            bill.setProduct(p);
+            bill.setTotal(rr.getCost());
+            bill.setCost(rr.getCost());
+            bill.setQuantity(1);
+            bill.setAccount(rr.getCheckInRecord().getAccount());
+            bill.setHotelCode(rr.getHotelCode());
+            bill.setOperationRemark("夜审手动入账");
+//            bill.setOperationEmployee(emp);
+            bill.setShiftCode(shiftCode);
+            bill.setRoomRecordId(rr.getId());
+            bill.setBusinessDate(businessDate);
+            add(bill);
+            rr.setIsAccountEntry("PAY");//入账成功后roomRecord里面入账状态改为pay
+            roomRecordService.modify(rr);
+        }
+    }
+    //夜审自动入账
+    @Override
+    public void putAcountAUTO(List<RoomRecord> ids, LocalDate businessDate) {
         for (int i = 0; i < ids.size(); i++) {
             String id = ids.get(i).getId();
             RoomRecord rr = roomRecordService.findById(id);

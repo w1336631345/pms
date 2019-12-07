@@ -10,4 +10,5 @@ public interface UserDao extends BaseDao<User>{
 
 	List<User> getByUsernameAndPassword(String username, String password);
 
+    List<User> findByHotelCode(String code);
 }

@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.kry.pms.model.persistence.sys.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -60,6 +61,26 @@ public class EmployeeController extends BaseController<Employee> {
 		HttpResponse<PageResponse<Employee>> rep = new HttpResponse<PageResponse<Employee>>();
 		PageRequest<Employee> req = parse2PageRequest(request);
 		return rep.addData(employeeService.listPage(req));
+	}
+
+	/**
+	 * 功能描述: <br>查询未被删除的员工
+	 * 〈〉
+	 * @Param: []
+	 * @Return: com.kry.pms.base.HttpResponse
+	 * @Author: huanghaibin
+	 * @Date: 2019/12/7 14:38
+	 */
+	@GetMapping(path="/getEmpList")
+	public HttpResponse getByHotelCodeAndDelete(){
+		HttpResponse<List<Employee>> rep = new HttpResponse<List<Employee>>();
+		User user = getUser();
+		if(user == null){
+			return rep.loginError();
+		}
+		List<Employee> list = employeeService.getByHotelCodeAndDelete(user.getHotelCode());
+		rep.setData(list);
+		return rep;
 	}
 
 }

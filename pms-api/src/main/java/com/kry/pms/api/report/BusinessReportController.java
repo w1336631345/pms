@@ -59,7 +59,7 @@ public class BusinessReportController extends BaseController {
         if(user == null){
             return hr.loginError();
         }
-        hr = businessReportService.saveReport(user, null, businessDate);
+        hr = businessReportService.saveReport(user.getHotelCode(), null, businessDate);
         return hr;
     }
 
@@ -90,7 +90,7 @@ public class BusinessReportController extends BaseController {
         if(user == null){
             return hr.loginError();
         }
-        hr = businessReportService.costByGroupType(user, businessDate);
+        hr = businessReportService.costByGroupType(user.getHotelCode(), businessDate);
         return hr;
     }
 

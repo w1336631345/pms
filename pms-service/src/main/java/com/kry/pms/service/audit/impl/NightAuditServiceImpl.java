@@ -14,12 +14,11 @@ import com.kry.pms.service.busi.BillService;
 import com.kry.pms.service.busi.DailyVerifyService;
 import com.kry.pms.service.busi.RoomRecordService;
 import com.kry.pms.service.org.EmployeeService;
-import com.kry.pms.service.report.BusinessReportService;
-import com.kry.pms.service.report.GenerateReportsLogService;
-import com.kry.pms.service.report.RoomReportService;
+import com.kry.pms.service.report.*;
 import com.kry.pms.service.sys.BusinessSeqService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -44,6 +43,12 @@ public class NightAuditServiceImpl implements NightAuditService {
     RoomReportService roomReportService;
     @Autowired
     GenerateReportsLogService generateReportsLogService;
+    @Autowired
+    ReceivablesReportService receivablesReportService;
+    @Autowired
+    FrontEntryReportService frontEntryReportService;
+    @Autowired
+    FrontReceiveReportService frontReceiveReportService;
 
     @Override
     public RoomRecord add(RoomRecord entity) {
@@ -84,7 +89,7 @@ public class NightAuditServiceImpl implements NightAuditService {
      * @Date: 2019/11/23 15:20
      */
     @Override
-    public HttpResponse manualAdd(User loginUser, String[] ids) {
+    public HttpResponse manualAdd(User loginUser, String[] ids, String shiftCode) {
         HttpResponse hr = new HttpResponse();
         //入账只入当前营业日期的账
         LocalDate businessDate = businessSeqService.getBuinessDate(loginUser.getHotelCode());
@@ -98,9 +103,9 @@ public class NightAuditServiceImpl implements NightAuditService {
         }
         //默认手动点击入账为当前营业日期的账
         List<RoomRecord> list = roomRecordService.accountEntryListAll(loginUser.getHotelCode(), businessDate);
-        billService.putAcount(list, businessDate);
-        //入账完成，记录入账记录
         Employee emp = employeeService.findByUser(loginUser);
+        billService.putAcount(list, businessDate, emp, shiftCode);
+        //入账完成，记录入账记录
         DailyVerify dv = new DailyVerify();
         dv.setOperationEmployee(emp);
         dv.setBusinessDate(businessDate);
@@ -131,18 +136,63 @@ public class NightAuditServiceImpl implements NightAuditService {
         grl.setType(Constants.auditNightMode.NIGHT_AUDIT_MANUAL);
         //入账只入当前营业日期的账
         try {
-            businessReportService.saveReport(loginUser, null, businessDate.toString());//保存到报表-房费
-            roomReportService.totalRoomStatusAll(loginUser, businessDate.toString());//保存到报表-a、客房总数
-            roomReportService.totalCheckInType(loginUser, businessDate.toString());//保存到报表-b、出租总数
-            roomReportService.availableTotal(loginUser, businessDate.toString());//保存到报表-c、售卖率
-            businessReportService.costByGroupType(loginUser, businessDate.toString());//保存到报表-d、房租收入
-            businessReportService.costByGroupTypeAvg(loginUser, businessDate.toString());//保存到报表-e、平均房价
+            hr = businessReportService.saveReport(loginUser.getHotelCode(), null, businessDate.toString());//保存到报表-房费
+            roomReportService.totalRoomStatusAll(loginUser.getHotelCode(), businessDate.toString());//保存到报表-a、客房总数
+            roomReportService.totalCheckInType(loginUser.getHotelCode(), businessDate.toString());//保存到报表-b、出租总数
+            roomReportService.availableTotal(loginUser.getHotelCode(), businessDate.toString());//保存到报表-c、售卖率
+            businessReportService.costByGroupType(loginUser.getHotelCode(), businessDate.toString());//保存到报表-d、房租收入
+            businessReportService.costByGroupTypeAvg(loginUser.getHotelCode(), businessDate.toString());//保存到报表-e、平均房价
+
+            receivablesReportService.totalByTypeName(loginUser.getHotelCode(), businessDate.toString());//收款汇总
+            frontEntryReportService.frontEntryList2(loginUser.getHotelCode(), businessDate.toString());//前台入账报表
+            frontReceiveReportService.receiveList(loginUser.getHotelCode(), businessDate.toString());//前台收款汇总
             //后续继续添加添...
             //...
             grl.setAuditStatus("success");
             generateReportsLogService.add(grl);
             businessSeqService.plusBuinessDate(loginUser.getHotelCode());//营业日期+1
         } catch (Exception e) {
+            e.printStackTrace();
+            grl.setAuditStatus("error");
+            grl.setReason(e.getMessage());
+            generateReportsLogService.add(grl);
+        }
+        return hr.ok("报表导入成功");
+    }
+
+    //报表导入各个统计-自动
+    @Override
+    public HttpResponse addReportAllAuto(String hotelCode) {
+        HttpResponse hr = new HttpResponse();
+        LocalDate businessDate = businessSeqService.getBuinessDate(hotelCode);
+        DailyVerify dailyVerify = dailyVerifyService.findByHotelCodeAndBusinessDate(hotelCode, businessDate);
+        if(dailyVerify == null){
+            return hr.error(99999, "请先夜审入账");
+        }
+        GenerateReportsLog grl = new GenerateReportsLog();
+        grl.setHotelCode(hotelCode);
+        grl.setAuditDate(LocalDateTime.now());
+        grl.setBusinessDate(businessDate);
+        grl.setType(Constants.auditNightMode.NIGHT_AUDIT_AUTO);
+        //入账只入当前营业日期的账
+        try {
+            hr = businessReportService.saveReport(hotelCode, null, businessDate.toString());//保存到报表-房费
+            roomReportService.totalRoomStatusAll(hotelCode, businessDate.toString());//保存到报表-a、客房总数
+            roomReportService.totalCheckInType(hotelCode, businessDate.toString());//保存到报表-b、出租总数
+            roomReportService.availableTotal(hotelCode, businessDate.toString());//保存到报表-c、售卖率
+            businessReportService.costByGroupType(hotelCode, businessDate.toString());//保存到报表-d、房租收入
+            businessReportService.costByGroupTypeAvg(hotelCode, businessDate.toString());//保存到报表-e、平均房价
+
+            receivablesReportService.totalByTypeName(hotelCode, businessDate.toString());//收款汇总
+            frontEntryReportService.frontEntryList2(hotelCode, businessDate.toString());//前台入账报表
+            frontReceiveReportService.receiveList(hotelCode, businessDate.toString());//前台收款汇总
+            //后续继续添加添...
+            //...
+            grl.setAuditStatus("success");
+            generateReportsLogService.add(grl);
+            businessSeqService.plusBuinessDate(hotelCode);//营业日期+1
+        } catch (Exception e) {
+            e.printStackTrace();
             grl.setAuditStatus("error");
             grl.setReason(e.getMessage());
             generateReportsLogService.add(grl);

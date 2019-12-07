@@ -19,10 +19,10 @@ public interface RoomReportService extends BaseService<RoomReport> {
 
     HttpResponse saveRoomStatus(User user, String businessDate);
 
-    HttpResponse totalRoomStatusAll(User user, String businessDate);
+    HttpResponse totalRoomStatusAll(String hotelCode, String businessDate);
 
-    HttpResponse totalCheckInType(User user, String businessDate);
+    HttpResponse totalCheckInType(String hotelCode, String businessDate);
 
     @Transactional(rollbackFor=Exception.class)
-    HttpResponse availableTotal(User user, String businessDate);
+    HttpResponse availableTotal(String hotelCode, String businessDate);
 }

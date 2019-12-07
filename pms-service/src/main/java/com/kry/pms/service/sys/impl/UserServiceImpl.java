@@ -46,8 +46,8 @@ public class  UserServiceImpl implements  UserService{
 
 	@Override
 	public List<User> getAllByHotelCode(String code) {
-		return null;//默认不实现
-		//return userDao.findByHotelCode(code);
+//		return null;//默认不实现
+		return userDao.findByHotelCode(code);
 	}
 
 	@Override

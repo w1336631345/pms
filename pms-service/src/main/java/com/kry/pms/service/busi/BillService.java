@@ -28,7 +28,11 @@ public interface BillService extends BaseService<Bill> {
 
 	public List<Bill> findByAccountId(String id);
 
-	void putAcount(List<RoomRecord> ids, LocalDate businessDate);
+	//夜审手动入账
+	void putAcount(List<RoomRecord> ids, LocalDate businessDate, Employee emp, String shiftCode);
+	//夜审自动入账
+	void putAcountAUTO(List<RoomRecord> ids, LocalDate businessDate);
+
 	public List<Bill> checkAccountAllBill(Account account,double total,DtoResponse<Account> rep, String orderNum);
 
 	public List<Bill> checkBillIds(List<String> billIds, double total, DtoResponse<Account> rep, String recordNum);

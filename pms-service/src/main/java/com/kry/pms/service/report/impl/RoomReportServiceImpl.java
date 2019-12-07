@@ -15,6 +15,7 @@ import com.kry.pms.model.persistence.sys.User;
 import com.kry.pms.service.busi.RoomRecordService;
 import com.kry.pms.service.report.BusinessReportService;
 import com.kry.pms.service.report.RoomReportService;
+import org.apache.commons.collections4.MapUtils;
 import org.hibernate.SQLQuery;
 import org.hibernate.transform.Transformers;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -104,11 +105,11 @@ public class RoomReportServiceImpl implements RoomReportService {
             Map<String, Object> mapYear = listYear.get(i);
             Map<String, Object> mapDay = new HashMap<>();
             Map<String, Object> mapMonth = new HashMap<>();
-            List<Map<String, Object>> listMonth = roomReportDao.getTotalRoomStatus(user.getHotelCode(), month, mapYear.get("project").toString());
+            List<Map<String, Object>> listMonth = roomReportDao.getTotalRoomStatus(user.getHotelCode(), month, MapUtils.getString(mapYear,"project"));
             if(listMonth != null && !listMonth.isEmpty()){
                 mapMonth = listMonth.get(0);
             }
-            List<Map<String, Object>> listDay = roomReportDao.getTotalRoomStatus(user.getHotelCode(), businessDate, mapYear.get("project").toString());
+            List<Map<String, Object>> listDay = roomReportDao.getTotalRoomStatus(user.getHotelCode(), businessDate, MapUtils.getString(mapYear,"project"));
             if(listMonth != null && !listDay.isEmpty()){
                 mapDay = listMonth.get(0);
             }
@@ -117,10 +118,10 @@ public class RoomReportServiceImpl implements RoomReportService {
             brTotal.setBusinessDate(LocalDate.parse(businessDate));
             brTotal.setSort("2");
 //            brTotal.setNumber_("二");
-            brTotal.setProject(mapYear.get("project").toString());
-            brTotal.setTotalDay(mapDay.get("totalDay").toString());
-            brTotal.setTotalMonth(mapMonth.get("totalMonth").toString());
-            brTotal.setTotalYear(mapYear.get("totalYear").toString());
+            brTotal.setProject(MapUtils.getString(mapYear,"project"));
+            brTotal.setTotalDay(MapUtils.getString(mapDay,"totalDay"));
+            brTotal.setTotalMonth(MapUtils.getString(mapMonth,"totalMonth"));
+            brTotal.setTotalYear(MapUtils.getString(mapYear,"totalYear"));
             businessReportDao.save(brTotal);
         }
 
@@ -129,17 +130,17 @@ public class RoomReportServiceImpl implements RoomReportService {
     //导入报表 a、客房总数
     @Override
     @Transactional(rollbackFor=Exception.class)
-    public HttpResponse totalRoomStatusAll(User user, String businessDate){
+    public HttpResponse totalRoomStatusAll(String hotelCode, String businessDate){
         HttpResponse hr = new HttpResponse();
-        List<BusinessReport> isNull = businessReportDao.getByBusinessDate(businessDate, user.getHotelCode(),Constants.ReportProjectType.REPORT_ROOM_NUM_A);
+        List<BusinessReport> isNull = businessReportDao.getByBusinessDate(businessDate, hotelCode,Constants.ReportProjectType.REPORT_ROOM_NUM_A);
         if(isNull != null && !isNull.isEmpty()){
             return hr.ok("今日已完成");
         }
         String month = businessDate.substring(0,7);
         String year = businessDate.substring(0,4);
-        List<Map<String, Object>> list = roomReportDao.totalRoomStatusAll(user.getHotelCode(),businessDate, month, year);
+        List<Map<String, Object>> list = roomReportDao.totalRoomStatusAll(hotelCode,businessDate, month, year);
         BusinessReport otatlAll = new BusinessReport();
-        otatlAll.setHotelCode(user.getHotelCode());
+        otatlAll.setHotelCode(hotelCode);
         otatlAll.setBusinessDate(LocalDate.parse(businessDate));
         otatlAll.setSort(Constants.ReportSort.REPORT_ROOM_CHECKIN_A);
         otatlAll.setProjectType(Constants.ReportProjectType.REPORT_ROOM_NUM_A);
@@ -151,48 +152,48 @@ public class RoomReportServiceImpl implements RoomReportService {
         BusinessReport locked = new BusinessReport();
         total.setSort(Constants.ReportSort.REPORT_ROOM_CHECKIN_A);
         total.setProjectType(Constants.ReportProjectType.REPORT_ROOM_NUM_A);
-        total.setHotelCode(user.getHotelCode());
+        total.setHotelCode(hotelCode);
         total.setProject(Constants.ReportProject.REPORT_ROOM_CHECKIN_A);
         total.setBusinessDate(LocalDate.parse(businessDate));
         available.setSort(Constants.ReportSort.REPORT_ROOM_CHECKIN_A);
         available.setProjectType(Constants.ReportProjectType.REPORT_ROOM_NUM_A);
-        available.setHotelCode(user.getHotelCode());
+        available.setHotelCode(hotelCode);
         available.setProject("可用房");
         available.setBusinessDate(LocalDate.parse(businessDate));
         repair.setSort(Constants.ReportSort.REPORT_ROOM_CHECKIN_A);
         repair.setProjectType(Constants.ReportProjectType.REPORT_ROOM_NUM_A);
-        repair.setHotelCode(user.getHotelCode());
+        repair.setHotelCode(hotelCode);
         repair.setProject("维修房");
         repair.setBusinessDate(LocalDate.parse(businessDate));
         locked.setSort(Constants.ReportSort.REPORT_ROOM_CHECKIN_A);
         locked.setProjectType(Constants.ReportProjectType.REPORT_ROOM_NUM_A);
-        locked.setHotelCode(user.getHotelCode());
+        locked.setHotelCode(hotelCode);
         locked.setProject("锁房");
         locked.setBusinessDate(LocalDate.parse(businessDate));
         int totalDay = 0, totalMonth = 0, totalYear = 0;
         for(int i=0; i<list.size(); i++){
             Map<String, Object> map = list.get(i);
-            String timeType = map.get("timeType").toString();
+            String timeType = (String)map.get("timeType");
             if(("day").equals(timeType)){
-                available.setTotalDay(map.get("available_total").toString());
-                repair.setTotalDay(map.get("repair_total").toString());
-                locked.setTotalDay(map.get("locked_total").toString());
-                totalDay = Integer.parseInt(map.get("available_total").toString()) +
-                        Integer.parseInt(map.get("repair_total").toString()) + Integer.parseInt(map.get("locked_total").toString()) ;
+                available.setTotalDay(MapUtils.getString(map,"available_total"));
+                repair.setTotalDay(MapUtils.getString(map,"repair_total"));
+                locked.setTotalDay(MapUtils.getString(map,"locked_total"));
+                totalDay = MapUtils.getInteger(map,"available_total") +
+                        MapUtils.getInteger(map,"repair_total") + MapUtils.getInteger(map,"locked_total");
             }
             if(("month").equals(timeType)){
-                available.setTotalMonth(map.get("available_total").toString());
-                repair.setTotalMonth(map.get("repair_total").toString());
-                locked.setTotalMonth(map.get("locked_total").toString());
-                totalMonth = Integer.parseInt(map.get("available_total").toString()) +
-                        Integer.parseInt(map.get("repair_total").toString()) + Integer.parseInt(map.get("locked_total").toString()) ;
+                available.setTotalMonth(MapUtils.getString(map,"available_total"));
+                repair.setTotalMonth(MapUtils.getString(map,"repair_total"));
+                locked.setTotalMonth(MapUtils.getString(map,"locked_total"));
+                totalMonth = MapUtils.getInteger(map,"available_total") +
+                        MapUtils.getInteger(map,"repair_total") + MapUtils.getInteger(map,"locked_total");
             }
             if(("year").equals(timeType)){
-                available.setTotalYear(map.get("available_total").toString());
-                repair.setTotalYear(map.get("repair_total").toString());
-                locked.setTotalYear(map.get("locked_total").toString());
-                totalYear = Integer.parseInt(map.get("available_total").toString()) +
-                        Integer.parseInt(map.get("repair_total").toString()) + Integer.parseInt(map.get("locked_total").toString()) ;
+                available.setTotalYear(MapUtils.getString(map,"available_total"));
+                repair.setTotalYear(MapUtils.getString(map,"repair_total"));
+                locked.setTotalYear(MapUtils.getString(map,"locked_total"));
+                totalYear = MapUtils.getInteger(map,"available_total") +
+                        MapUtils.getInteger(map,"repair_total") + MapUtils.getInteger(map,"locked_total");
             }
         }
         total.setTotalDay(totalDay+"");
@@ -209,9 +210,9 @@ public class RoomReportServiceImpl implements RoomReportService {
     //导入报表 b、出租总数
     @Override
     @Transactional(rollbackFor=Exception.class)
-    public HttpResponse totalCheckInType(User user, String businessDate){
+    public HttpResponse totalCheckInType(String hotelCode, String businessDate){
         HttpResponse hr = new HttpResponse();
-        List<BusinessReport> isNull = businessReportDao.getByBusinessDate(businessDate, user.getHotelCode(),Constants.ReportProjectType.REPORT_ROOM_NUM_B);
+        List<BusinessReport> isNull = businessReportDao.getByBusinessDate(businessDate, hotelCode,Constants.ReportProjectType.REPORT_ROOM_NUM_B);
         if(isNull != null && !isNull.isEmpty()){
             return hr.ok("今日已完成");
         }
@@ -220,21 +221,21 @@ public class RoomReportServiceImpl implements RoomReportService {
         BusinessReport total = new BusinessReport();
         total.setSort(Constants.ReportSort.REPORT_ROOM_CHECKIN_B);
         total.setProjectType(Constants.ReportProjectType.REPORT_ROOM_NUM_B);
-        total.setHotelCode(user.getHotelCode());
+        total.setHotelCode(hotelCode);
         total.setProject(Constants.ReportProject.REPORT_ROOM_CHECKIN_B);
         total.setBusinessDate(LocalDate.parse(businessDate));
         businessReportDao.save(total);
-        List<Map<String, Object>> list = roomReportDao.totalCheckInType(user.getHotelCode(),businessDate, month, year);
+        List<Map<String, Object>> list = roomReportDao.totalCheckInType(hotelCode,businessDate, month, year);
         for(int i=0; i<list.size(); i++){
             Map<String, Object> map = list.get(i);
             BusinessReport br = new BusinessReport();
             br.setProjectType(Constants.ReportProjectType.REPORT_ROOM_NUM_B);
-            br.setHotelCode(user.getHotelCode());
+            br.setHotelCode(hotelCode);
             br.setBusinessDate(LocalDate.parse(businessDate));
-            br.setProject(map.get("name").toString());
-            br.setTotalDay(map.get("totalDay").toString());
-            br.setTotalMonth(map.get("totalMonth").toString());
-            br.setTotalYear(map.get("totalYear").toString());
+            br.setProject(MapUtils.getString(map, "name"));
+            br.setTotalDay(MapUtils.getString(map, "totalDay"));
+            br.setTotalMonth(MapUtils.getString(map,"totalMonth"));
+            br.setTotalYear(MapUtils.getString(map,"totalYear"));
             br.setSort(Constants.ReportSort.REPORT_ROOM_CHECKIN_B);
             businessReportDao.save(br);
         }
@@ -243,9 +244,9 @@ public class RoomReportServiceImpl implements RoomReportService {
     //导入报表 c、售卖率
     @Override
     @Transactional(rollbackFor=Exception.class)
-    public HttpResponse availableTotal(User user, String businessDate){
+    public HttpResponse availableTotal(String hotelCode, String businessDate){
         HttpResponse hr = new HttpResponse();
-        List<BusinessReport> isNull = businessReportDao.getByBusinessDate(businessDate, user.getHotelCode(),Constants.ReportProjectType.REPORT_ROOM_NUM_C);
+        List<BusinessReport> isNull = businessReportDao.getByBusinessDate(businessDate, hotelCode,Constants.ReportProjectType.REPORT_ROOM_NUM_C);
         if(isNull != null && !isNull.isEmpty()){
             return hr.ok("今日已完成");
         }
@@ -254,31 +255,31 @@ public class RoomReportServiceImpl implements RoomReportService {
         BusinessReport total = new BusinessReport();
         total.setSort(Constants.ReportSort.REPORT_ROOM_CHECKIN_C);
         total.setProjectType(Constants.ReportProjectType.REPORT_ROOM_NUM_C);
-        total.setHotelCode(user.getHotelCode());
+        total.setHotelCode(hotelCode);
         total.setProject(Constants.ReportProject.REPORT_ROOM_CHECKIN_C);
         total.setBusinessDate(LocalDate.parse(businessDate));
         businessReportDao.save(total);
-        Map<String, Object> mapTotal = roomReportDao.availableTotal(user.getHotelCode(),businessDate, month, year);
+        Map<String, Object> mapTotal = roomReportDao.availableTotal(hotelCode,businessDate, month, year);
         if(mapTotal == null){
             return hr.error("房间可用数统计出错");
         }
-        double dayTotal = Double.parseDouble(mapTotal.get("totalDay").toString());
-        double monthTotal = Double.parseDouble(mapTotal.get("totalMonth").toString());
-        double yearTotal = Double.parseDouble(mapTotal.get("totalYear").toString());
+        double dayTotal = MapUtils.getDouble(mapTotal, "totalDay");
+        double monthTotal = MapUtils.getDouble(mapTotal,"totalMonth");
+        double yearTotal = MapUtils.getDouble(mapTotal,"totalYear");
         String dayP = "0",monthP = "0",yearP = "0";
-        List<Map<String, Object>> list = roomReportDao.totalCheckInType(user.getHotelCode(),businessDate, month, year);
+        List<Map<String, Object>> list = roomReportDao.totalCheckInType(hotelCode,businessDate, month, year);
         DecimalFormat df = new DecimalFormat("##0.00");
         for(int i=0; i<list.size(); i++){
             Map<String, Object> map = list.get(i);
             BusinessReport br = new BusinessReport();
             br.setProjectType(Constants.ReportProjectType.REPORT_ROOM_NUM_C);
-            br.setHotelCode(user.getHotelCode());
+            br.setHotelCode(hotelCode);
             br.setBusinessDate(LocalDate.parse(businessDate));
             br.setProject(map.get("name").toString());
             if(dayTotal != 0){
-                dayP = df.format(Double.parseDouble(map.get("totalDay").toString())/dayTotal *100) + "%";
-                monthP = df.format(Double.parseDouble(map.get("totalMonth").toString())/monthTotal *100) + "%";
-                yearP = df.format(Double.parseDouble(map.get("totalYear").toString())/yearTotal *100) + "%";
+                dayP = df.format(MapUtils.getDouble(map,"totalDay")/dayTotal *100) + "%";
+                monthP = df.format(MapUtils.getDouble(map,"totalMonth")/monthTotal *100) + "%";
+                yearP = df.format(MapUtils.getDouble(map,"totalYear")/yearTotal *100) + "%";
             }
             br.setTotalDay(dayP);
             br.setTotalMonth(monthP);
