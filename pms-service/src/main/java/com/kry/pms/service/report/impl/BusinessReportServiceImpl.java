@@ -10,6 +10,7 @@ import com.kry.pms.model.persistence.report.BusinessReport;
 import com.kry.pms.model.persistence.sys.User;
 import com.kry.pms.service.report.BusinessReportService;
 import com.kry.pms.service.report.RoomReportService;
+import org.apache.commons.collections4.MapUtils;
 import org.hibernate.SQLQuery;
 import org.hibernate.transform.Transformers;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,7 +70,7 @@ public class BusinessReportServiceImpl implements BusinessReportService {
         HttpResponse hr = new HttpResponse();
         try {
             //保存房间费用统计信息
-            saveReport(user,null, businessDate);
+            saveReport(user.getHotelCode(),null, businessDate);
             //保存客房数量统计
             roomReportService.saveRoomStatus(user, businessDate);
         }catch (Exception e) {
@@ -80,9 +81,9 @@ public class BusinessReportServiceImpl implements BusinessReportService {
 
     @Override
     @Transactional(rollbackFor=Exception.class)
-    public HttpResponse saveReport(User user, String projectType, String businessDate){
+    public HttpResponse saveReport(String hotelCode, String projectType, String businessDate){
         HttpResponse hr = new HttpResponse();
-        List<BusinessReport> list = businessReportDao.getByBusinessDate(businessDate, user.getHotelCode(), Constants.ReportProjectType.REPORT_ROOM_RATE);
+        List<BusinessReport> list = businessReportDao.getByBusinessDate(businessDate, hotelCode, Constants.ReportProjectType.REPORT_ROOM_RATE);
         if(list != null && !list.isEmpty()){
             //如果不为空，表明今日已经入报表
             return hr.ok("今日已完成");
@@ -93,9 +94,9 @@ public class BusinessReportServiceImpl implements BusinessReportService {
         String yearTime = businessDate.substring(0,4);
         String monthTime = businessDate.substring(0,7);
         String dayTime = businessDate;
-        String yearSql = getSql(user.getHotelCode(), year, yearTime);
-        String monthSql = getSql(user.getHotelCode(), month, monthTime);
-        String daySql = getSql(user.getHotelCode(), day, dayTime);
+        String yearSql = getSql(hotelCode, year, yearTime);
+        String monthSql = getSql(hotelCode, month, monthTime);
+        String daySql = getSql(hotelCode, day, dayTime);
         Query queryYear = entityManager.createNativeQuery(yearSql);
         queryYear.unwrap(SQLQuery.class).setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
         Query queryMonth = entityManager.createNativeQuery(monthSql);
@@ -114,42 +115,42 @@ public class BusinessReportServiceImpl implements BusinessReportService {
         double totalYearRe = 0;
         for(int i=0; i<listYear.size(); i++){//有日必会有月和有年数据。反推循环
             Map<String, Object> map =listYear.get(i);
-            String categoryId = map.get("category_id").toString();
+            String categoryId = MapUtils.getString(map,"category_id");
 
-                totalYear = totalYear + (double)map.get("total_cost");
-                totalYearRe = totalYearRe + (double)map.get("RE");
+                totalYear = totalYear + MapUtils.getDouble(map,"total_cost");
+                totalYearRe = totalYearRe + MapUtils.getDouble(map,"RE");
                 BusinessReport br = new BusinessReport();
-                br.setHotelCode(user.getHotelCode());
+                br.setHotelCode(hotelCode);
                 br.setBusinessDate(LocalDate.parse(businessDate));
                 br.setSort(Constants.ReportSort.REPORT_ROOM_RATE);
-                br.setProject(map.get("code_name").toString());
-                br.setTotalYear(map.get("total_cost").toString());
-                br.setRebateYear(map.get("RE").toString());
+                br.setProject(MapUtils.getString(map,"code_name"));
+                br.setTotalYear(MapUtils.getString(map,"total_cost"));
+                br.setRebateYear(MapUtils.getString(map,"RE"));
                 for(int j=0; j<listMonth.size(); j++){
                     Map<String, Object> mapM = listMonth.get(j);
-                    String categoryIdM = mapM.get("category_id").toString();
+                    String categoryIdM = MapUtils.getString(mapM,"category_id");
                     if(categoryIdM.equals(categoryId)){
-                        br.setTotalMonth(mapM.get("total_cost").toString());
-                        br.setRebateMonth(mapM.get("RE").toString());
-                        totalMonth = totalMonth + (double)mapM.get("total_cost");
-                        totalMonthRe = totalMonthRe + (double)mapM.get("RE");
+                        br.setTotalMonth(MapUtils.getString(mapM,"total_cost"));
+                        br.setRebateMonth(MapUtils.getString(mapM,"RE"));
+                        totalMonth = totalMonth + MapUtils.getDouble(mapM,"total_cost");
+                        totalMonthRe = totalMonthRe + MapUtils.getDouble(mapM,"RE");
                     }
                 }
                 for(int j=0; j<listDay.size(); j++){
                     Map<String, Object> mapD = listDay.get(j);
-                    String categoryIdD = mapD.get("category_id").toString();
+                    String categoryIdD = (String)mapD.get("category_id");
                     if(categoryIdD.equals(categoryId)){
-                        br.setTotalDay(mapD.get("total_cost").toString());
-                        br.setRebateDay(mapD.get("RE").toString());
-                        totalDay = totalDay + (double)mapD.get("total_cost");
-                        totalDayRe = totalDayRe + (double)mapD.get("RE");
+                        br.setTotalDay(MapUtils.getString(mapD,"total_cost"));
+                        br.setRebateDay(MapUtils.getString(mapD,"RE"));
+                        totalDay = totalDay + MapUtils.getDouble(mapD,"total_cost");
+                        totalDayRe = totalDayRe + MapUtils.getDouble(mapD,"RE");
                     }
                 }
                 br.setProjectType(Constants.ReportProjectType.REPORT_ROOM_RATE);
                 businessReportDao.save(br);
         }
         BusinessReport brTotal = new BusinessReport();
-        brTotal.setHotelCode(user.getHotelCode());
+        brTotal.setHotelCode(hotelCode);
         brTotal.setBusinessDate(LocalDate.parse(businessDate));
         brTotal.setSort(Constants.ReportSort.REPORT_ROOM_RATE);
         brTotal.setProjectType(Constants.ReportProjectType.REPORT_ROOM_RATE);
@@ -201,16 +202,16 @@ public class BusinessReportServiceImpl implements BusinessReportService {
 
     //稽核报表-营业日报表-d房租收入
     @Override
-    public HttpResponse costByGroupType(User user, String businessDate) {
+    public HttpResponse costByGroupType(String hotelCode, String businessDate) {
         HttpResponse hr = new HttpResponse();
-        List<BusinessReport> listReport = businessReportDao.getByBusinessDate(businessDate, user.getHotelCode(), Constants.ReportProjectType.REPORT_ROOM_NUM_D);
+        List<BusinessReport> listReport = businessReportDao.getByBusinessDate(businessDate, hotelCode, Constants.ReportProjectType.REPORT_ROOM_NUM_D);
         if(listReport != null && !listReport.isEmpty()){
             //如果不为空，表明今日已经入报表
             return hr.ok("今日已完成");
         }
         String month = businessDate.substring(0,7);
         String year = businessDate.substring(0,4);
-        List<Map<String, Object>> list = reportDao.costByGroupType(user.getHotelCode(),businessDate, month, year);
+        List<Map<String, Object>> list = reportDao.costByGroupType(hotelCode,businessDate, month, year);
 
         for(int i=0; i<list.size(); i++){
             Map<String, Object> map = list.get(i);
@@ -218,21 +219,21 @@ public class BusinessReportServiceImpl implements BusinessReportService {
             Object name = map.get("name");
             if(name == null){
                 br.setProjectType(Constants.ReportProjectType.REPORT_ROOM_NUM_D);
-                br.setHotelCode(user.getHotelCode());
+                br.setHotelCode(hotelCode);
                 br.setBusinessDate(LocalDate.parse(businessDate));
                 br.setProject(Constants.ReportProject.REPORT_ROOM_CHECKIN_D);
-                br.setTotalDay(map.get("totalDay").toString());
-                br.setTotalMonth(map.get("totalMonth").toString());
-                br.setTotalYear(map.get("totalYear").toString());
+                br.setTotalDay(MapUtils.getString(map,"totalDay"));
+                br.setTotalMonth(MapUtils.getString(map,"totalMonth"));
+                br.setTotalYear(MapUtils.getString(map,"totalYear"));
                 br.setSort(Constants.ReportSort.REPORT_ROOM_CHECKIN_D);
             }else {
                 br.setProjectType(Constants.ReportProjectType.REPORT_ROOM_NUM_D);
-                br.setHotelCode(user.getHotelCode());
+                br.setHotelCode(hotelCode);
                 br.setBusinessDate(LocalDate.parse(businessDate));
-                br.setProject(map.get("name").toString());
-                br.setTotalDay(map.get("totalDay").toString());
-                br.setTotalMonth(map.get("totalMonth").toString());
-                br.setTotalYear(map.get("totalYear").toString());
+                br.setProject(MapUtils.getString(map,"name"));
+                br.setTotalDay(MapUtils.getString(map,"totalDay"));
+                br.setTotalMonth(MapUtils.getString(map,"totalMonth"));
+                br.setTotalYear(MapUtils.getString(map,"totalYear"));
                 br.setSort(Constants.ReportSort.REPORT_ROOM_CHECKIN_D);
             }
             businessReportDao.save(br);
@@ -242,16 +243,16 @@ public class BusinessReportServiceImpl implements BusinessReportService {
 
     //稽核报表-营业日报表-e、平均房价
     @Override
-    public HttpResponse costByGroupTypeAvg(User user, String businessDate) {
+    public HttpResponse costByGroupTypeAvg(String hotelCode, String businessDate) {
         HttpResponse hr = new HttpResponse();
-        List<BusinessReport> listReport = businessReportDao.getByBusinessDate(businessDate, user.getHotelCode(), Constants.ReportProjectType.REPORT_ROOM_NUM_E);
+        List<BusinessReport> listReport = businessReportDao.getByBusinessDate(businessDate, hotelCode, Constants.ReportProjectType.REPORT_ROOM_NUM_E);
         if(listReport != null && !listReport.isEmpty()){
             //如果不为空，表明今日已经入报表
             return hr.ok("今日已完成");
         }
         String month = businessDate.substring(0,7);
         String year = businessDate.substring(0,4);
-        List<Map<String, Object>> list = reportDao.costByGroupTypeAvg(user.getHotelCode(),businessDate, month, year);
+        List<Map<String, Object>> list = reportDao.costByGroupTypeAvg(hotelCode,businessDate, month, year);
 
         for(int i=0; i<list.size(); i++){
             Map<String, Object> map = list.get(i);
@@ -259,21 +260,21 @@ public class BusinessReportServiceImpl implements BusinessReportService {
             Object name = map.get("name");
             if(name == null){
                 br.setProjectType(Constants.ReportProjectType.REPORT_ROOM_NUM_E);
-                br.setHotelCode(user.getHotelCode());
+                br.setHotelCode(hotelCode);
                 br.setBusinessDate(LocalDate.parse(businessDate));
                 br.setProject(Constants.ReportProject.REPORT_ROOM_CHECKIN_E);
-                br.setTotalDay(map.get("totalDay").toString());
-                br.setTotalMonth(map.get("totalMonth").toString());
-                br.setTotalYear(map.get("totalYear").toString());
+                br.setTotalDay(MapUtils.getString(map,"totalDay"));
+                br.setTotalMonth(MapUtils.getString(map,"totalMonth"));
+                br.setTotalYear(MapUtils.getString(map,"totalYear"));
                 br.setSort(Constants.ReportSort.REPORT_ROOM_CHECKIN_E);
             }else {
                 br.setProjectType(Constants.ReportProjectType.REPORT_ROOM_NUM_E);
-                br.setHotelCode(user.getHotelCode());
+                br.setHotelCode(hotelCode);
                 br.setBusinessDate(LocalDate.parse(businessDate));
-                br.setProject(map.get("name").toString());
-                br.setTotalDay(map.get("totalDay").toString());
-                br.setTotalMonth(map.get("totalMonth").toString());
-                br.setTotalYear(map.get("totalYear").toString());
+                br.setProject(MapUtils.getString(map,"name"));
+                br.setTotalDay(MapUtils.getString(map,"totalDay"));
+                br.setTotalMonth(MapUtils.getString(map,"totalMonth"));
+                br.setTotalYear(MapUtils.getString(map,"totalYear"));
                 br.setSort(Constants.ReportSort.REPORT_ROOM_CHECKIN_E);
             }
             businessReportDao.save(br);

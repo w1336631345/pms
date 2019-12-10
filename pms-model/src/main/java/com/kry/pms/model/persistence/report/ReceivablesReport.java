@@ -13,6 +13,8 @@ import java.time.LocalDateTime;
 @Table(name = "t_report_receivables")
 public class ReceivablesReport extends ReportBase {
 
+    @Column(columnDefinition = "varchar(64) COMMENT '部门id'")
+    private String dempId;
     @Column(columnDefinition = "varchar(100) COMMENT '部门'")
     private String demp;
     @Column(columnDefinition = "varchar(50) COMMENT '班组'")

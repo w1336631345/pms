@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Data
-@Table(name = "t_generate_reports_log")
+@Table(name = "t_reports_generate_log")
 public class GenerateReportsLog {
     @Id
     @GeneratedValue(generator = "uuid")

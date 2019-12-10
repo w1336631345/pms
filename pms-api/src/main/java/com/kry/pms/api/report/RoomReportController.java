@@ -65,7 +65,7 @@ public class RoomReportController extends BaseController {
         if(user == null){
             return hr.loginError();
         }
-        hr = roomReportService.totalRoomStatusAll(user, businessDate);
+        hr = roomReportService.totalRoomStatusAll(user.getHotelCode(), businessDate);
         return hr.ok();
     }
     /**
@@ -83,7 +83,7 @@ public class RoomReportController extends BaseController {
         if(user == null){
             return hr.loginError();
         }
-        hr = roomReportService.totalCheckInType(user, businessDate);
+        hr = roomReportService.totalCheckInType(user.getHotelCode(), businessDate);
         return hr.ok();
     }
     /**
@@ -101,7 +101,7 @@ public class RoomReportController extends BaseController {
         if(user == null){
             return hr.loginError();
         }
-        hr = roomReportService.availableTotal(user, businessDate);
+        hr = roomReportService.availableTotal(user.getHotelCode(), businessDate);
         return hr.ok();
     }
 

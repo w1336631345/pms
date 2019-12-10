@@ -1,5 +1,6 @@
 package com.kry.pms.model.persistence.report;
 
+import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.Column;
@@ -10,6 +11,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @MappedSuperclass
+@Data
 public class ReportBase  {
     @Id
     @GeneratedValue(generator = "uuid")

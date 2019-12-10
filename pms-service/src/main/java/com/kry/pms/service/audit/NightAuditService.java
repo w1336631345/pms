@@ -7,7 +7,10 @@ import com.kry.pms.service.BaseService;
 
 public interface NightAuditService extends BaseService<RoomRecord> {
 
-    HttpResponse manualAdd(User user, String[] ids);
+    HttpResponse manualAdd(User user, String[] ids, String shiftCode);
 
     HttpResponse addReportAll(User loginUser);
+
+    //报表导入各个统计-自动
+    HttpResponse addReportAllAuto(String hotelCode);
 }
