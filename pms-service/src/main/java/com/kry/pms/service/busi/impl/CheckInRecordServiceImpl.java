@@ -16,6 +16,9 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.transaction.Transactional;
 
+import com.kry.pms.base.*;
+import com.kry.pms.model.http.request.busi.CheckUpdateItemTestBo;
+import com.kry.pms.service.util.UpdateUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
@@ -26,11 +29,6 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import com.kry.pms.base.Constants;
-import com.kry.pms.base.DtoResponse;
-import com.kry.pms.base.PageRequest;
-import com.kry.pms.base.PageResponse;
-import com.kry.pms.base.ParamSpecification;
 import com.kry.pms.dao.busi.CheckInRecordDao;
 import com.kry.pms.model.http.request.busi.CheckInBo;
 import com.kry.pms.model.http.request.busi.CheckInItemBo;
@@ -115,6 +113,28 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 			return checkInRecordDao.saveAndFlush(checkInRecord);
 		}
 		return null;
+	}
+
+	@Override
+	public CheckInRecord updateAll(CheckUpdateItemTestBo checkUpdateItemTestBo) {
+		String[] ids = checkUpdateItemTestBo.getIds();
+		for(int i=0; i<ids.length; i++){
+			CheckInRecord cir = findById(ids[i]);
+			UpdateUtil.copyNullProperties(checkUpdateItemTestBo, cir);
+//			modify(cir);
+			checkInRecordDao.save(cir);
+		}
+		return null;
+	}
+	@Override
+	public HttpResponse cancelIn(String[] ids) {
+		HttpResponse hr = new HttpResponse();
+		for(int i=0; i<ids.length; i++){
+			CheckInRecord cir = findById(ids[i]);
+			cir.setStatus("R");
+			checkInRecordDao.save(cir);
+		}
+		return hr;
 	}
 
 	@Override

@@ -4,6 +4,9 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.kry.pms.model.http.request.busi.CheckUpdateItemBo;
+import com.kry.pms.model.http.request.busi.CheckUpdateItemTestBo;
+import com.kry.pms.model.persistence.sys.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -83,6 +86,43 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
 	@PostMapping(path="/together")
 	public HttpResponse<CheckInRecord> addCustomerTogether(@RequestBody TogetherBo togetherBo){
 		return getDefaultResponse().addData(checkInRecordService.addTogether(togetherBo));
+	}
+
+	/**
+	 * 功能描述: <br>批量修改
+	 * 〈〉
+	 * @Param: [checkUpdateItemBo]
+	 * @Return: com.kry.pms.base.HttpResponse
+	 * @Author: huanghaibin
+	 * @Date: 2019/12/11 15:44
+	 */
+	@PostMapping(path="/updateItem")
+	public HttpResponse updateItem(@RequestBody CheckUpdateItemTestBo checkUpdateItemTestBo){
+		HttpResponse hr = new HttpResponse();
+		User user = getUser();
+		if(user == null){
+			return hr.loginError();
+		}
+		checkInRecordService.updateAll(checkUpdateItemTestBo);
+		return hr.ok();
+	}
+	/**
+	 * 功能描述: <br>取消入住
+	 * 〈〉
+	 * @Param: [ids]
+	 * @Return: com.kry.pms.base.HttpResponse
+	 * @Author: huanghaibin
+	 * @Date: 2019/12/12 18:15
+	 */
+	@PostMapping(path="/cancelIn")
+	public HttpResponse cancelIn(@RequestBody String[] ids){
+		HttpResponse hr = new HttpResponse();
+		User user = getUser();
+		if(user == null){
+			return hr.loginError();
+		}
+		checkInRecordService.cancelIn(ids);
+		return hr.ok();
 	}
 	public HttpResponse<PageResponse<CheckInRecordListVo>> queryHistory(){
 		HttpResponse<PageResponse<CheckInRecordListVo>> rep = new HttpResponse<PageResponse<CheckInRecordListVo>>();
