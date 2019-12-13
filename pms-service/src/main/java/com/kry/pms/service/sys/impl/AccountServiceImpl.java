@@ -152,7 +152,7 @@ public class AccountServiceImpl implements AccountService {
 		List<Bill> bills = null;
 		if (account != null) {
 			SettleAccountRecord settleAccountRecord = settleAccountRecordService.create(billCheckBo, account);
-			List<Bill> flatBills = billService.addFlatBills(billCheckBo.getBills(),billCheckBo.getOperationEmployee(),settleAccountRecord.getRecordNum());
+			List<Bill> flatBills = billService.addFlatBills(billCheckBo.getBills(),billCheckBo.getOperationEmployee(),billCheckBo.getShiftCode(),settleAccountRecord.getRecordNum());
 			double total = 0.0;
 			for(Bill b:flatBills) {
 				if(b.getCost()!=null) {

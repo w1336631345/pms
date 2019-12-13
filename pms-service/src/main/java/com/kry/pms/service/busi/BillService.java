@@ -37,6 +37,6 @@ public interface BillService extends BaseService<Bill> {
 
 	public List<Bill> checkBillIds(List<String> billIds, double total, DtoResponse<Account> rep, String recordNum);
 
-	public List<Bill> addFlatBills(List<Bill> bills, Employee employee, String recordNum);
+	public List<Bill> addFlatBills(List<Bill> bills, Employee employee,String shiftCode, String recordNum);
 
 }

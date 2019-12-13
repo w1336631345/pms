@@ -127,6 +127,7 @@ public class ReceptionController extends BaseController<String> {
 	@PostMapping(path="/bill/check")
 	public HttpResponse<Account> customerCheckBill(@RequestBody BillCheckBo	billCheckBo){
 		billCheckBo.setHotelCode(getCurrentHotleCode());
+		billCheckBo.setShiftCode(getShiftCode());
 		billCheckBo.setOperationEmployee(getCurrentEmployee());
 		HttpResponse<Account> rep = new HttpResponse<Account>();
 		DtoResponse<Account> data = accountService.checkCustomerBill(billCheckBo);

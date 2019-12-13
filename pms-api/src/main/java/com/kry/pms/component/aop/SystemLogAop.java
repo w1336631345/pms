@@ -21,7 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 public class SystemLogAop {
 	
 	@Around("execution(* com.kry.pms.api.*.*Controller.add(..))")
-	public void beforeAdd(ProceedingJoinPoint joinpoint) {
+	public Object beforeAdd(ProceedingJoinPoint joinpoint) {
 		PersistenceModel model = (PersistenceModel) joinpoint.getArgs()[0];
 		User user = ShiroUtils.getUser();
 		model.setHotelCode(user.getHotelCode());
@@ -36,9 +36,10 @@ public class SystemLogAop {
 		}
 		RequestAttributes ra = RequestContextHolder.getRequestAttributes();
 		try {
-			joinpoint.proceed();
+			return joinpoint.proceed();
 		} catch (Throwable e) {
 			e.printStackTrace();
 		}
+		return null;
 	}
 }
