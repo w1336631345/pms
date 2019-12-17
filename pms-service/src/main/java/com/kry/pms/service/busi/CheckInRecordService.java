@@ -5,9 +5,11 @@ import java.util.List;
 import java.util.Map;
 
 import com.kry.pms.base.DtoResponse;
+import com.kry.pms.base.HttpResponse;
 import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
 import com.kry.pms.model.http.request.busi.CheckInBo;
+import com.kry.pms.model.http.request.busi.CheckUpdateItemTestBo;
 import com.kry.pms.model.http.request.busi.TogetherBo;
 import com.kry.pms.model.http.response.busi.AccountSummaryVo;
 import com.kry.pms.model.http.response.busi.CheckInRecordListVo;
@@ -21,6 +23,10 @@ import com.kry.pms.service.BaseService;
 public interface CheckInRecordService extends BaseService<CheckInRecord> {
 	
 	public PageResponse<CheckInRecordListVo> querySummaryList(PageRequest<CheckInRecord> req);
+
+    CheckInRecord updateAll(CheckUpdateItemTestBo checkUpdateItemTestBo);
+
+	HttpResponse cancelIn(String[] ids);
 
 	public void checkIn(CheckInBo checkInBo, DtoResponse<List<CheckInRecord>> rep);
 
