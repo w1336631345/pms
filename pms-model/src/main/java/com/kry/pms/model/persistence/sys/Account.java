@@ -34,6 +34,10 @@ public class Account extends PersistenceModel {
 	@Column
 	private Double cost;
 	@Column
+	private String contactName;
+	@Column
+	private String contactMobile;
+	@Column
 	private Double pay;
 	@Column
 	private Double creditLimit ;
@@ -46,7 +50,7 @@ public class Account extends PersistenceModel {
 	@OneToOne
 	private Group group;
 	@OneToOne
-	private ProtocolCorpation ProtocolCorpation;
+	private ProtocolCorpation protocolCorpation;
 	@Column
 	private Integer currentBillSeq;
 	

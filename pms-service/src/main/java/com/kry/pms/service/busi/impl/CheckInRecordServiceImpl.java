@@ -578,4 +578,22 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 		return checkInRecordDao.findAll(ex);
 	}
 
+	@Override
+	public DtoResponse<String> hangUp(String id) {
+		CheckInRecord cir = findById(id);
+		DtoResponse<String> rep = new DtoResponse<String>();
+		cir.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_OUT_UNSETTLED);
+		modify(cir);
+		return rep;
+	}
+
+	@Override
+	public DtoResponse<String> hangUpByAccountId(String id) {
+		CheckInRecord cir  = checkInRecordDao.findByAccountId(id);
+		DtoResponse<String> rep = new DtoResponse<String>();
+		cir.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_OUT_UNSETTLED);
+		modify(cir);
+		return rep;
+	}
+
 }

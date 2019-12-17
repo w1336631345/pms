@@ -48,6 +48,8 @@ public class Constants {
 		public static final String CHECKIN_RECORD_STATUS_CANCLE_BOOK = "X";//取消
 		public static final String BILL_SETTLED = "SETTLED";
 		public static final String BILL_NEED_SETTLED = "NEED_SETTLED";
+		public static final String BILL_CANCLE_SETTLED = "CANCLE_SETTLED";
+		public static final String BILL_INVALID = "INVALID";
 		public static final String BILL_TRANSFER = "TRANSFER";
 		
 		public static final String ROOM_USAGE_FREE="F";
@@ -60,6 +62,9 @@ public class Constants {
 		public static final String ACCOUNT_SETTLE="S";
 		public static final String ACCOUNT_HOLD="H";
 
+		public static final String SETTLE_ACCOUNT_CANCLE = "C";
+
+		
 	}
 	
 	public interface Key{

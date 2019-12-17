@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import javax.persistence.Transient;
+import javax.transaction.Transactional;
 
 import com.kry.pms.service.busi.RoomRecordService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +35,8 @@ import com.kry.pms.service.goods.ProductService;
 import com.kry.pms.service.sys.AccountService;
 import com.kry.pms.service.sys.BusinessSeqService;
 import com.kry.pms.util.BigDecimalUtil;
+
+import antlr.CppCodeGenerator;
 
 @Service
 public class BillServiceImpl implements BillService {
@@ -86,9 +89,12 @@ public class BillServiceImpl implements BillService {
 		billDao.saveAndFlush(bill);
 	}
 
+	@Deprecated
 	@Override
 	public Bill modify(Bill bill) {
-		return billDao.saveAndFlush(bill);
+//		return billDao.saveAndFlush(bill);
+		// 暂不支持直接修改入账记录,请勿实现
+		return null;
 	}
 
 	@Override
@@ -198,7 +204,7 @@ public class BillServiceImpl implements BillService {
 	}
 
 	@Override
-	public List<Bill> addFlatBills(List<Bill> list, Employee employee,String shiftCode, String orderNum) {
+	public List<Bill> addFlatBills(List<Bill> list, Employee employee, String shiftCode, String orderNum) {
 		for (Bill bill : list) {
 			bill.setStatus(Constants.Status.BILL_SETTLED);
 			bill.setOperationEmployee(employee);
@@ -270,4 +276,81 @@ public class BillServiceImpl implements BillService {
 		}
 	}
 
+	@Transactional
+	@Override
+	public DtoResponse<Bill> adjust(String id, Double val) {
+		DtoResponse<Bill> rep = new DtoResponse<Bill>();
+		Bill bill = findById(id);
+		if (bill != null) {
+			if (val == null) {
+				val = -bill.getTotal();
+			}
+			Bill offsetBill = null;
+			offsetBill = copyBill(bill);
+			offsetBill.setId(null);
+			offsetBill.setProduct(bill.getProduct());
+			offsetBill.setAccount(bill.getAccount());
+			if (bill.getCost() != null && bill.getCost() != 0) {
+				offsetBill.setCost(val);
+			}
+			if (bill.getPay() != null && bill.getPay() != 0) {
+				offsetBill.setPay(val);
+			}
+			offsetBill = add(offsetBill);
+			rep.setData(offsetBill);
+
+		} else {
+			rep.setStatus(Constants.BusinessCode.CODE_PARAMETER_INVALID);
+			rep.setMessage("找不到对应的订单");
+		}
+		return rep;
+	}
+
+	@Transactional
+	@Override
+	public DtoResponse<Bill> offset(String id) {
+		return adjust(id, null);
+	}
+
+	@Transactional
+	@Override
+	public DtoResponse<Bill> split(String id, Double val1, Double val2) {
+		DtoResponse<Bill> rep = new DtoResponse<Bill>();
+		rep = adjust(id, null);
+		if (rep.getStatus() == 0) {
+			Bill bill = findById(id);
+			Bill newBill1= null;
+			Bill newBill2 = null;
+			Double total = BigDecimalUtil.add(val1, val2);
+			if (bill.getTotal() == total) {
+				newBill1 = copyBill(bill);
+				newBill2 = copyBill(bill);
+				if (bill.getCost() != null && bill.getCost() != 0) {
+					newBill1.setCost(val1);
+					newBill2.setCost(val2);
+				}
+				if (bill.getPay() != null && bill.getPay() != 0) {
+					newBill1.setPay(val1);
+					newBill2.setPay(val2);
+				}
+				add(newBill1);
+				add(newBill2);
+			}
+		}
+		return rep;
+	}
+
+	private Bill copyBill(Bill src) {
+		Bill bill = null;
+		try {
+			bill = (Bill) src.clone();
+			bill.setId(null);
+			bill.setProduct(src.getProduct());
+			bill.setAccount(src.getAccount());
+		} catch (CloneNotSupportedException e) {
+			e.printStackTrace();
+		}
+		return bill;
+
+	}
 }

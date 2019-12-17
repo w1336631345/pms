@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.kry.pms.api.BaseController;
+import com.kry.pms.base.DtoResponse;
 import com.kry.pms.base.HttpResponse;
 import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
@@ -88,7 +90,13 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
 		HttpResponse<PageResponse<CheckInRecordListVo>> rep = new HttpResponse<PageResponse<CheckInRecordListVo>>();
 		return rep;
 	}
-	
+	@GetMapping("/hangUp/account/{accountId}")
+	public HttpResponse<String> hangUp(@PathVariable("accountId") String id){
+		HttpResponse<String> rep = new HttpResponse<>();
+		DtoResponse<String> response = checkInRecordService.hangUpByAccountId(id);
+		BeanUtils.copyProperties(response, rep);
+		return rep;
+	}
 	@GetMapping
 	public HttpResponse<PageResponse<CheckInRecord>> query(HttpServletRequest request) throws InstantiationException, IllegalAccessException{
 		HttpResponse<PageResponse<CheckInRecord>> rep = new HttpResponse<PageResponse<CheckInRecord>>();

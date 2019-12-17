@@ -46,4 +46,6 @@ public interface CheckInRecordDao extends BaseDao<CheckInRecord>{
 	List<CheckInRecord> findByOrderNumAndDeleted(String orderNum, int deletedFalse);
 
 	List<CheckInRecord> findByHotelCodeAndOrderNumAndGuestRoomId(String hotelCode, String orderNum, String id);
+
+	CheckInRecord findByAccountId(String id);
 }

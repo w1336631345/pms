@@ -20,8 +20,8 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 public class SystemLogAop {
 	
-	@Around("execution(* com.kry.pms.api.*.*Controller.add(..))")
-	public Object beforeAdd(ProceedingJoinPoint joinpoint) {
+	@Around("execution(* com.kry.pms.service.*.impl.*ServiceImpl.add(..))")
+	public Object aroundAdd(ProceedingJoinPoint joinpoint) {
 		PersistenceModel model = (PersistenceModel) joinpoint.getArgs()[0];
 		User user = ShiroUtils.getUser();
 		model.setHotelCode(user.getHotelCode());

@@ -61,4 +61,8 @@ public interface CheckInRecordService extends BaseService<CheckInRecord> {
 	public CheckInRecord addTogether(TogetherBo togetherBo);
 
 	public List<CheckInRecord> findRoomTogetherRecord(CheckInRecord cir,String status);
+
+	public DtoResponse<String> hangUp(String id);
+
+	public DtoResponse<String> hangUpByAccountId(String id);
 }

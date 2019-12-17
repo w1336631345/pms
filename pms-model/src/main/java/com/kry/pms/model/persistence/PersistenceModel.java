@@ -23,7 +23,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @MappedSuperclass
-@JsonIgnoreProperties(value = { "hibernateLazyInitializer", "handler","createDate","updateDate","createUser","updateUser" })
+@JsonIgnoreProperties(value = { "hibernateLazyInitializer", "handler","updateDate","createUser","updateUser" })
 public class PersistenceModel implements Serializable,Cloneable {
 	@Id
 	@GeneratedValue(generator = "uuid")
