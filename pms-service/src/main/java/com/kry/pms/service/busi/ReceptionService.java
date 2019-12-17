@@ -45,12 +45,13 @@ public interface ReceptionService {
 
 	public DtoResponse<BookingRecord> groupBook(BookingRecord br);
 
-	public DtoResponse<String> checkIn(String id);
+	DtoResponse<String> checkInM(String id);
 
-	public AccountSummaryVo getAccountSummaryByCheckRecordId(String id);
+	DtoResponse<String> checkIn(CheckInRecord cir);
+
+    public AccountSummaryVo getAccountSummaryByCheckRecordId(String id);
 
 	public DtoResponse<List<AccountSummaryVo>> groupCheckBillConfirm(String id);
 
-	public DtoResponse<String> checkIn(String[] ids);
-
+    DtoResponse<String> checkInAll(String[] ids);
 }

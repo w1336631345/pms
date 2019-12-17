@@ -107,7 +107,18 @@ public class CheckInRecord extends PersistenceModel {
 	private String mainRecordId;
 	@OneToOne
 	private DiscountScheme discountScheme;
-	
+	//预留记录id
+	@Column
+	private String reserveId;
+
+	public String getReserveId() {
+		return reserveId;
+	}
+
+	public void setReserveId(String reserveId) {
+		this.reserveId = reserveId;
+	}
+
 	public DiscountScheme getDiscountScheme() {
 		return discountScheme;
 	}

@@ -4,13 +4,10 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
-<<<<<<< HEAD
 import org.springframework.beans.BeanUtils;
-=======
 import com.kry.pms.model.http.request.busi.CheckUpdateItemBo;
 import com.kry.pms.model.http.request.busi.CheckUpdateItemTestBo;
 import com.kry.pms.model.persistence.sys.User;
->>>>>>> fde1ae28a2091a97e2d3b8dd5a8666c8a021035b
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -129,6 +126,35 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
 		checkInRecordService.cancelIn(ids);
 		return hr.ok();
 	}
+	/**
+	 * 功能描述: <br>批量取消排房
+	 * 〈〉
+	 * @Param: [roomAssignBo]
+	 * @Return: com.kry.pms.base.HttpResponse
+	 * @Author: huanghaibin
+	 * @Date: 2019/12/16 11:09
+	 */
+	@PostMapping(path = "/callOffAssignRoom")
+	public HttpResponse callOffAssignRoom(@RequestBody String[] ids) {
+		HttpResponse rep = new HttpResponse();
+		rep = checkInRecordService.callOffAssignRoom(ids);
+		return rep;
+	}
+	/**
+	 * 功能描述: <br>批量取消预订
+	 * 〈〉
+	 * @Param: [ids]
+	 * @Return: com.kry.pms.base.HttpResponse
+	 * @Author: huanghaibin
+	 * @Date: 2019/12/17 11:59
+	 */
+	@PostMapping(path = "/callOffReserve")
+	public HttpResponse callOffReserve(@RequestBody String[] ids) {
+		HttpResponse rep = new HttpResponse();
+		rep = checkInRecordService.callOffReserve(ids);
+		return rep;
+	}
+
 	public HttpResponse<PageResponse<CheckInRecordListVo>> queryHistory(){
 		HttpResponse<PageResponse<CheckInRecordListVo>> rep = new HttpResponse<PageResponse<CheckInRecordListVo>>();
 		return rep;

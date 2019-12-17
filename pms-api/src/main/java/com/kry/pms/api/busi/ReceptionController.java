@@ -1,30 +1,9 @@
-
 package com.kry.pms.api.busi;
-
-import java.util.List;
-
-import javax.validation.Valid;
-
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 
 import com.kry.pms.api.BaseController;
 import com.kry.pms.base.DtoResponse;
 import com.kry.pms.base.HttpResponse;
-import com.kry.pms.model.http.request.busi.BillCheckBo;
-import com.kry.pms.model.http.request.busi.BillItemBo;
-import com.kry.pms.model.http.request.busi.BillSettleBo;
-import com.kry.pms.model.http.request.busi.BookingBo;
-import com.kry.pms.model.http.request.busi.CheckInBo;
-import com.kry.pms.model.http.request.busi.CheckOutBo;
-import com.kry.pms.model.http.request.busi.RenewBo;
-import com.kry.pms.model.http.request.busi.RoomAssignBo;
+import com.kry.pms.model.http.request.busi.*;
 import com.kry.pms.model.http.response.busi.AccountSummaryVo;
 import com.kry.pms.model.persistence.busi.BookingRecord;
 import com.kry.pms.model.persistence.sys.Account;
@@ -32,10 +11,16 @@ import com.kry.pms.service.busi.ReceptionService;
 import com.kry.pms.service.org.EmployeeService;
 import com.kry.pms.service.room.GuestRoomService;
 import com.kry.pms.service.sys.AccountService;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+import java.util.List;
 
 /**
  * 预定接待
- * 
+ *
  * @author Louis
  *
  */
@@ -53,7 +38,7 @@ public class ReceptionController extends BaseController<String> {
 
 	/**
 	 * 入住
-	 * 
+	 *
 	 * @param checkIn
 	 * @return
 	 */
@@ -63,11 +48,11 @@ public class ReceptionController extends BaseController<String> {
 		BeanUtils.copyProperties(receptionService.checkIn(checkIn), rep);
 		return rep;
 	}
-	
+
 	/**
 	 * 入住
-	 * 
-	 * @param checkIn
+	 *
+	 * @param
 	 * @return
 	 */
 	@PostMapping(path = "/checkout")
@@ -75,35 +60,25 @@ public class ReceptionController extends BaseController<String> {
 		HttpResponse<String> rep = new HttpResponse<String>();
 		return rep;
 	}
-	@PostMapping(path = "/batch/checkIn")
-	public HttpResponse checkIn(@RequestBody String[] ids) {
-		HttpResponse<String> rep = new HttpResponse<String>();
-		BeanUtils.copyProperties(receptionService.checkIn(ids), rep);
-		return rep;
-	}
-	
-	
-	
-	@GetMapping(path = "/checkIn/{id}")
-	public HttpResponse<String> checkIn(@PathVariable String id) {
-		HttpResponse<String> rep = new HttpResponse<String>();
-		BeanUtils.copyProperties(receptionService.checkIn(id), rep);
-		return rep;
-	}
+
 	/**
 	 * 功能描述: <br>批量入住
 	 * 〈〉
 	 * @Param: [ids]
 	 * @Return: com.kry.pms.base.HttpResponse
 	 * @Author: huanghaibin
-	 * @Date: 2019/12/13 15:02
+	 * @Date: 2019/12/17 15:52
 	 */
-	@GetMapping(path = "/checkInAll/{id}")
-	public HttpResponse checkInAll(@PathVariable String[] ids) {
-		HttpResponse rep = new HttpResponse();
-		for(int i=0; i<ids.length; i++){
-			receptionService.checkIn(ids[i]);
-		}
+	@PostMapping(path = "/checkInAll")
+	public HttpResponse checkIn(@RequestBody String[] ids) {
+		HttpResponse<String> rep = new HttpResponse<String>();
+		BeanUtils.copyProperties(receptionService.checkInAll(ids), rep);
+		return rep;
+	}
+	@GetMapping(path = "/checkIn/{id}")
+	public HttpResponse<String> checkIn(@PathVariable String id) {
+		HttpResponse<String> rep = new HttpResponse<String>();
+		BeanUtils.copyProperties(receptionService.checkInM(id), rep);
 		return rep;
 	}
 
@@ -114,7 +89,7 @@ public class ReceptionController extends BaseController<String> {
 		rep.setData(accountSummaryVo);
 		return rep;
 	}
-	
+
 	/**
 	 * 结账确认
 	 * @return
@@ -138,7 +113,7 @@ public class ReceptionController extends BaseController<String> {
 	}
 	/**
 	 * 宾客结账
-	 * 
+	 *
 	 * @return
 	 */
 	@PostMapping(path="/bill/check")
@@ -153,9 +128,9 @@ public class ReceptionController extends BaseController<String> {
 	}
 
 	/**
-	 * 入住
-	 * 
-	 * @param checkIn
+	 * 排房
+	 *
+	 * @param
 	 * @return
 	 */
 	@PostMapping(path = "/assign")
@@ -165,11 +140,10 @@ public class ReceptionController extends BaseController<String> {
 		return rep;
 	}
 
-
 	/**
 	 * 预定
-	 * 
-	 * @param book
+	 *
+	 * @param
 	 * @return
 	 */
 	@PostMapping(path = "/newBook")
@@ -183,7 +157,7 @@ public class ReceptionController extends BaseController<String> {
 
 	/**
 	 * 续住
-	 * 
+	 *
 	 * @param renew
 	 * @return
 	 */

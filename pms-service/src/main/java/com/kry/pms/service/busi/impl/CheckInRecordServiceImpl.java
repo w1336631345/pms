@@ -318,6 +318,8 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 				ncir.setRoomCount(1);
 				account.setType(Constants.Type.ACCOUNT_CUSTOMER);
 				ncir.setAccount(account);
+				ncir.setGroupType(cir.getGroupType());//设置分组类型（团队/散客）
+				ncir.setReserveId(cir.getId());//添加预留记录id
 				ncir = add(ncir);
 				data.add(ncir);
 				roomRecordService.createRoomRecord(ncir);
@@ -536,6 +538,8 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 			checkInRecord.setOrderNum(mainCheckInRecord.getOrderNum());
 			checkInRecord.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION);
 			checkInRecord.setType(Constants.Type.CHECK_IN_RECORD_RESERVE);
+			checkInRecord.setHotelCode(mainCheckInRecord.getHotelCode());
+			checkInRecord.setGroupType(mainCheckInRecord.getGroupType());
 			checkInRecord.setRoomType(roomTypeService.findById(checkInRecord.getRoomTypeId()));
 			checkInRecord = add(checkInRecord);
 			mainCheckInRecord.setRoomCount(mainCheckInRecord.getRoomCount() + checkInRecord.getRoomCount());
@@ -614,6 +618,105 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 		cir.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_OUT_UNSETTLED);
 		modify(cir);
 		return rep;
+	}
+
+	@Override
+	public List<CheckInRecord> findByOrderNumAndGuestRoomAndDeleted(String orderNum, GuestRoom guestRoom, int delete){
+		List<CheckInRecord> list = checkInRecordDao.findByOrderNumAndGuestRoomAndDeleted(orderNum, guestRoom, delete);
+		return list;
+	}
+
+	//取消排房
+	@Override
+	public HttpResponse callOffAssignRoom(String[] ids){
+		HttpResponse hr = new HttpResponse();
+		List<String> reserveIds = new ArrayList<>();
+		String mainRecordId = null;
+		for(int i=0; i<ids.length; i++){
+			CheckInRecord cir = findById(ids[i]);
+			if(cir.getMainRecord() != null){
+				mainRecordId = cir.getMainRecord().getId();
+			}
+			if(("G").equals(cir.getType())){
+				return hr.error("主单不能修改");
+			}
+			cir.setDeleted(Constants.DELETED_TRUE);
+			//修改选中的数据状态，排房记录改为删除
+			modify(cir);
+			//取消排房成功，修改房间状态
+			//修改排放记录状态为删除后，查询此房间是否还有其他人在住
+			List<CheckInRecord> list = checkInRecordDao.findByOrderNumAndGuestRoomAndDeleted(cir.getOrderNum(), cir.getGuestRoom(), Constants.DELETED_FALSE);
+			//如果该房间没有人在住了，则修改房间状态
+			if(list == null || list.isEmpty()){
+				//...修改房间状态代码
+			}
+			//查出所有的预留记录id，放入集合
+			if(cir.getReserveId() != null){
+				if(!reserveIds.contains(cir.getReserveId())){
+					reserveIds.add(cir.getReserveId());
+				}
+			}
+		}
+		updateCount(reserveIds, mainRecordId);
+		return hr;
+	}
+
+	//取消预订
+	@Override
+	public HttpResponse callOffReserve(String[] ids){
+		HttpResponse hr = new HttpResponse();
+		List<String> reserveIds = new ArrayList<>();
+		String mainRecordId = null;
+		for(int i=0; i<ids.length; i++){
+			CheckInRecord cir = checkInRecordDao.getOne(ids[i]);
+			if(cir.getMainRecord() != null){
+				mainRecordId = cir.getMainRecord().getId();
+			}
+			//如果是主单
+			if(("G").equals(cir.getType())){
+				return hr.error("此处不能取消主单");
+			}
+			//如果是预留单，取消预留单下的所有排房/预定
+			if(("R").equals(cir.getType())){
+				List<CheckInRecord> list = checkInRecordDao.findByReserveIdAndDeleted(cir.getId(), Constants.DELETED_FALSE);
+				for(int j=0; j<list.size(); j++){
+					CheckInRecord cird = list.get(j);
+					cird.setDeleted(Constants.DELETED_TRUE);
+					cird.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_CANCLE_BOOK);
+					modify(cird);
+				}
+			}
+			cir.setDeleted(Constants.DELETED_TRUE);
+			cir.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_CANCLE_BOOK);
+			modify(cir);
+			//查出所有的预留记录id，放入集合
+			if(cir.getReserveId() != null){
+				if(!reserveIds.contains(cir.getReserveId())){
+					reserveIds.add(cir.getReserveId());
+				}
+			}
+
+		}
+		updateCount(reserveIds, mainRecordId);
+		return hr.ok();
+	}
+
+	@Override
+	public HttpResponse updateCount(List<String> reserveIds, String mainRecordId){
+		HttpResponse hr = new HttpResponse();
+		//修改预留记录的已排房数量
+		for(int i=0; i<reserveIds.size(); i++){
+			int count = checkInRecordDao.getReserveIdCount(reserveIds.get(i), Constants.DELETED_FALSE);
+			CheckInRecord cir = findById(reserveIds.get(i));
+			cir.setCheckInCount(count);
+			modify(cir);
+		}
+		//修改主单已排房数量
+		CheckInRecord cir = findById(mainRecordId);
+		int count = checkInRecordDao.getMainRecordIdCount(mainRecordId, Constants.DELETED_FALSE);
+		cir.setCheckInCount(count);
+		modify(cir);
+		return hr.ok();
 	}
 
 }

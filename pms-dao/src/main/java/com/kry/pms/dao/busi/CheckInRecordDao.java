@@ -3,6 +3,7 @@ package com.kry.pms.dao.busi;
 import java.util.List;
 import java.util.Map;
 
+import com.kry.pms.model.persistence.room.GuestRoom;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
@@ -48,4 +49,25 @@ public interface CheckInRecordDao extends BaseDao<CheckInRecord>{
 	List<CheckInRecord> findByHotelCodeAndOrderNumAndGuestRoomId(String hotelCode, String orderNum, String id);
 
 	CheckInRecord findByAccountId(String id);
+
+	List<CheckInRecord> findByOrderNumAndGuestRoomAndDeleted(String orderNum, GuestRoom guestRoom, int delete);
+
+	@Query(nativeQuery = true, value = " select IFNULL(count(1),0) from ( " +
+			" select guest_room_id, count(guest_room_id) " +
+			" from t_checkin_record " +
+			" where reserve_id = :reserveId " +
+			" and deleted = :deleted " +
+			" group by guest_room_id ) t ")
+	int getReserveIdCount(@Param("reserveId")String reserveId, @Param("deleted")int deleted);
+
+	@Query(nativeQuery = true, value = " select IFNULL(count(1),0) from (  " +
+			" select guest_room_id, count(guest_room_id)  " +
+			" from t_checkin_record  " +
+			" where guest_room_id is not null " +
+			" and main_record_id = :mainRecordId " +
+			" and deleted = :deleted " +
+			" group by guest_room_id ) t ")
+	int getMainRecordIdCount(@Param("mainRecordId")String mainRecordId, @Param("deleted")int deleted);
+
+	List<CheckInRecord> findByReserveIdAndDeleted(String reserveId, int deleted);
 }

@@ -6,6 +6,7 @@ import java.util.List;
 
 import javax.transaction.Transactional;
 
+import com.kry.pms.base.HttpResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
@@ -227,20 +228,41 @@ public class ReceptionServiceImpl implements ReceptionService {
 	}
 
 	@Override
-	public DtoResponse<String> checkIn(String id) {
+	public DtoResponse<String> checkInM(String id){
 		DtoResponse<String> rep = new DtoResponse<>();
 		CheckInRecord cir = checkInRecordService.findById(id);
-		if (cir != null) {
-			cir.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN);
-			checkInRecordService.modify(cir);
-			List<CheckInRecord> togetherRecord = checkInRecordService.findRoomTogetherRecord(cir,
-					Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION);
-			if (togetherRecord != null && !togetherRecord.isEmpty()) {
-				rep.setCode(1);
+		if(cir != null){
+			//预留单不能入住
+			if((Constants.Type.CHECK_IN_RECORD_RESERVE).equals(cir.getType())){
+				rep.setStatus(Constants.BusinessCode.CODE_PARAMETER_INVALID);
+				rep.setMessage("预留单不能入住");
+				return rep;
+			}
+			rep = checkIn(cir);
+			//是主单
+			if(!(Constants.Type.CHECK_IN_RECORD_GROUP).equals(cir.getType())){
+				String mainRecordId = cir.getMainRecord().getId();
+				CheckInRecord cirMain = checkInRecordService.findById(mainRecordId);
+				if(!(Constants.Status.ACCOUNT_IN).equals(cirMain.getStatus())){
+					rep = checkIn(cirMain);
+				}
 			}
 		} else {
 			rep.setStatus(Constants.BusinessCode.CODE_PARAMETER_INVALID);
 			rep.setMessage("没有找到对应的入住记录");
+		}
+		return rep;
+	}
+
+	@Override
+	public DtoResponse<String> checkIn(CheckInRecord cir) {
+		DtoResponse<String> rep = new DtoResponse<>();
+		cir.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN);
+		checkInRecordService.modify(cir);
+		List<CheckInRecord> togetherRecord = checkInRecordService.findRoomTogetherRecord(cir,
+				Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION);
+		if (togetherRecord != null && !togetherRecord.isEmpty()) {
+			rep.setCode(1);
 		}
 		return rep;
 	}
@@ -296,9 +318,27 @@ public class ReceptionServiceImpl implements ReceptionService {
 	}
 
 	@Override
-	public DtoResponse<String> checkIn(String[] ids) {
-
-		return null;
+	public DtoResponse<String> checkInAll(String[] ids) {
+		DtoResponse<String> rep = new DtoResponse<>();
+		for(int i=0; i<ids.length; i++){
+			CheckInRecord cir = checkInRecordService.findById(ids[i]);
+			//预留单不能入住R
+			if((Constants.Type.CHECK_IN_RECORD_RESERVE).equals(cir.getType())){
+				rep.setStatus(Constants.BusinessCode.CODE_PARAMETER_INVALID);
+				rep.setMessage("预留单不能入住");
+				return rep;
+			}
+			rep = checkIn(cir);
+			//是主单G
+			if(!(Constants.Type.CHECK_IN_RECORD_GROUP).equals(cir.getType())){
+				String mainRecordId = cir.getMainRecord().getId();
+				CheckInRecord cirMain = checkInRecordService.findById(mainRecordId);
+				if(!(Constants.Status.ACCOUNT_IN).equals(cirMain.getStatus())){
+					rep = checkIn(cirMain);
+				}
+			}
+		}
+		return rep;
 	}
 
 }

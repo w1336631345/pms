@@ -71,4 +71,13 @@ public interface CheckInRecordService extends BaseService<CheckInRecord> {
 	public DtoResponse<String> hangUp(String id);
 
 	public DtoResponse<String> hangUpByAccountId(String id);
+
+	List<CheckInRecord> findByOrderNumAndGuestRoomAndDeleted(String orderNum, GuestRoom guestRoom, int delete);
+
+	HttpResponse callOffAssignRoom(String[] ids);
+
+	//取消预订
+	HttpResponse callOffReserve(String[] ids);
+
+	HttpResponse updateCount(List<String> reserveIds, String mainRecordId);
 }
