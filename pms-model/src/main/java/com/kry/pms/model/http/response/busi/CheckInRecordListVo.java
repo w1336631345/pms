@@ -28,6 +28,8 @@ public class CheckInRecordListVo {
 	private String contactName;
 	private ProtocolCorpation protocolCorpation;
 	private String remark;
+	private String groupType;
+	private String roomLinkId;
 	public CheckInRecordListVo(){
 		
 	}
@@ -49,5 +51,7 @@ public class CheckInRecordListVo {
 		this.contactMobile = cir.getContactMobile();
 		this.protocolCorpation = cir.getProtocolCorpation();
 		this.remark = cir.getRemark();
+		this.groupType = cir.getGroupType();
+		this.roomLinkId = cir.getRoomLinkId();
 	}
 }

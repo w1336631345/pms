@@ -24,7 +24,9 @@ public interface CheckInRecordService extends BaseService<CheckInRecord> {
 	
 	public PageResponse<CheckInRecordListVo> querySummaryList(PageRequest<CheckInRecord> req);
 
-    CheckInRecord updateAll(CheckUpdateItemTestBo checkUpdateItemTestBo);
+	CheckInRecord update(CheckInRecord checkInRecord);
+
+	CheckInRecord updateAll(CheckUpdateItemTestBo checkUpdateItemTestBo);
 
 	HttpResponse cancelIn(String[] ids);
 
@@ -80,4 +82,12 @@ public interface CheckInRecordService extends BaseService<CheckInRecord> {
 	HttpResponse callOffReserve(String[] ids);
 
 	HttpResponse updateCount(List<String> reserveIds, String mainRecordId);
+
+    PageResponse<CheckInRecord> getNRoomLink(int pageIndex, int pageSize, String name, String roomNum, String hotelCode, String groupType);
+
+    List<CheckInRecord> getRoomLinkList(String roomLinkId);
+
+    void deleteRoomLink(String[] ids);
+
+    List<CheckInRecord> getByRoomNum(String roomNum, String hotelCode, String groupType);
 }

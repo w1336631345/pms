@@ -110,14 +110,15 @@ public class CheckInRecord extends PersistenceModel {
 	//预留记录id
 	@Column
 	private String reserveId;
+	//联房id
+	@Column
+	private String roomLinkId;
 
-	public String getReserveId() {
-		return reserveId;
-	}
 
-	public void setReserveId(String reserveId) {
-		this.reserveId = reserveId;
-	}
+	public String getReserveId() { return reserveId; }
+	public void setReserveId(String reserveId) { this.reserveId = reserveId; }
+	public String getRoomLinkId() { return roomLinkId; }
+	public void setRoomLinkId(String roomLinkId) { this.roomLinkId = roomLinkId; }
 
 	public DiscountScheme getDiscountScheme() {
 		return discountScheme;

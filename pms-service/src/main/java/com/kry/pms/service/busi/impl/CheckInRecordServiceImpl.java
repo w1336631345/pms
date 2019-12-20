@@ -116,6 +116,11 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 	}
 
 	@Override
+	public CheckInRecord update(CheckInRecord checkInRecord) {
+		return checkInRecordDao.save(checkInRecord);
+	}
+
+	@Override
 	public CheckInRecord updateAll(CheckUpdateItemTestBo checkUpdateItemTestBo) {
 		String[] ids = checkUpdateItemTestBo.getIds();
 		for(int i=0; i<ids.length; i++){
@@ -718,5 +723,79 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 		modify(cir);
 		return hr.ok();
 	}
+
+	//查询可联房的数据
+	@Override
+	public PageResponse<CheckInRecord> getNRoomLink(int pageIndex, int pageSize, String name, String roomNum, String hotelCode, String groupType){
+		Pageable page = org.springframework.data.domain.PageRequest.of(pageIndex - 1, pageSize);
+		Page<CheckInRecord> pageList = checkInRecordDao.findAll(new Specification<CheckInRecord>() {
+			@Override
+			public Predicate toPredicate(Root<CheckInRecord> root, CriteriaQuery<?> query,
+										 CriteriaBuilder criteriaBuilder) {
+				List<Predicate> list = new ArrayList<Predicate>();
+				if(hotelCode!=null) {
+					list.add(criteriaBuilder.equal(root.get("hotelCode"), hotelCode));
+				}
+				if(groupType!=null) {
+					list.add(criteriaBuilder.equal(root.get("groupType"), groupType));
+				}
+				if(roomNum!=null) {
+					list.add(criteriaBuilder.equal(root.get("roomNum"), roomNum));
+				}
+				if(name!=null) {
+					//外键对象的属性，要用join再get
+					list.add(criteriaBuilder.like(root.join("customer").get("name"), "%"+name+"%"));
+				}
+				list.add(criteriaBuilder.isNull(root.get("roomLinkId")));
+				Predicate[] array = new Predicate[list.size()];
+				return criteriaBuilder.and(list.toArray(array));
+			}
+		},page);
+		return convent(pageList);
+	}
+
+	//根据roomlinkId查询已经联房的数据
+	@Override
+	public List<CheckInRecord> getRoomLinkList(String roomLinkId){
+		List<CheckInRecord> list = new ArrayList<>();
+		if(roomLinkId != null){
+			list = checkInRecordDao.findByRoomLinkId(roomLinkId);
+		}
+		return list;
+	}
+	//删除联房
+	@Override
+	public void deleteRoomLink(String[] ids) {
+		for(int i=0; i<ids.length; i++){
+			CheckInRecord cir = checkInRecordDao.getOne(ids[i]);
+			cir.setRoomLinkId(null);
+			update(cir);
+		}
+	}
+
+	@Override
+	public List<CheckInRecord> getByRoomNum(String roomNum, String hotelCode, String groupType){
+		List<CheckInRecord> list = checkInRecordDao.findAll(new Specification<CheckInRecord>() {
+			@Override
+			public Predicate toPredicate(Root<CheckInRecord> root, CriteriaQuery<?> query,
+										 CriteriaBuilder criteriaBuilder) {
+				List<Predicate> list = new ArrayList<Predicate>();
+				if(roomNum!=null) {
+					list.add(criteriaBuilder.equal(root.join("guestRoom").get("roomNum"), roomNum));
+				}
+				if(hotelCode!=null) {
+					list.add(criteriaBuilder.equal(root.get("hotelCode"), hotelCode));
+				}
+				if(groupType!=null) {
+					list.add(criteriaBuilder.equal(root.get("groupType"), groupType));
+				}
+				list.add(criteriaBuilder.isNull(root.get("roomLinkId")));
+				Predicate[] array = new Predicate[list.size()];
+				return criteriaBuilder.and(list.toArray(array));
+			}
+		});
+		return list;
+	}
+
 
 }
