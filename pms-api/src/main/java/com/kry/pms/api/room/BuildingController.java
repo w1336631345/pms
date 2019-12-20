@@ -47,5 +47,6 @@ public class BuildingController extends BaseController<Building> {
 		PageRequest<Building> req = parse2PageRequest(request);
 		return rep.addData(buildingService.listPage(req));
 	}
+	
 
 }

@@ -41,6 +41,8 @@ public class Account extends PersistenceModel {
 	private Double pay;
 	@Column
 	private Double creditLimit ;
+	@Column
+	private Double availableCreditLimit;
 	@OneToOne
 	private Employee operationEmployee;
 	@Column(columnDefinition = "varchar(255) COMMENT '操作员备注'")

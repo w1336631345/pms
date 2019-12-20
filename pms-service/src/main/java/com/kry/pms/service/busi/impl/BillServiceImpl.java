@@ -20,6 +20,7 @@ import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
 import com.kry.pms.dao.busi.BillDao;
 import com.kry.pms.model.http.request.busi.BillBo;
+import com.kry.pms.model.http.request.busi.BillOperationBo;
 import com.kry.pms.model.http.request.busi.BillSettleBo;
 import com.kry.pms.model.persistence.busi.Bill;
 import com.kry.pms.model.persistence.busi.BillItem;
@@ -40,6 +41,11 @@ import antlr.CppCodeGenerator;
 
 @Service
 public class BillServiceImpl implements BillService {
+
+	private static final String BILL_OP_ADJUST = "adjust";
+	private static final String BILL_OP_OFFSET = "offset";
+	private static final String BILL_OP_SPLIT = "split";
+
 	@Autowired
 	BillDao billDao;
 	@Autowired
@@ -89,12 +95,11 @@ public class BillServiceImpl implements BillService {
 		billDao.saveAndFlush(bill);
 	}
 
-	@Deprecated
 	@Override
 	public Bill modify(Bill bill) {
-//		return billDao.saveAndFlush(bill);
+		return billDao.saveAndFlush(bill);
 		// 暂不支持直接修改入账记录,请勿实现
-		return null;
+//		return null;
 	}
 
 	@Override
@@ -278,26 +283,22 @@ public class BillServiceImpl implements BillService {
 
 	@Transactional
 	@Override
-	public DtoResponse<Bill> adjust(String id, Double val) {
-		DtoResponse<Bill> rep = new DtoResponse<Bill>();
+	public DtoResponse<String> adjust(String id, Double val) {
+		DtoResponse<String> rep = new DtoResponse<String>();
 		Bill bill = findById(id);
 		if (bill != null) {
-			if (val == null) {
-				val = -bill.getTotal();
-			}
 			Bill offsetBill = null;
 			offsetBill = copyBill(bill);
 			offsetBill.setId(null);
 			offsetBill.setProduct(bill.getProduct());
 			offsetBill.setAccount(bill.getAccount());
-			if (bill.getCost() != null && bill.getCost() != 0) {
-				offsetBill.setCost(val);
-			}
-			if (bill.getPay() != null && bill.getPay() != 0) {
-				offsetBill.setPay(val);
+			offsetBill.setTotal(val != null ? val : -bill.getTotal());
+			if (val == null) {
+				offsetBill.setStatus(Constants.Status.BILL_INVALID);
+				bill.setStatus(Constants.Status.BILL_INVALID);
+				modify(bill);
 			}
 			offsetBill = add(offsetBill);
-			rep.setData(offsetBill);
 
 		} else {
 			rep.setStatus(Constants.BusinessCode.CODE_PARAMETER_INVALID);
@@ -308,34 +309,27 @@ public class BillServiceImpl implements BillService {
 
 	@Transactional
 	@Override
-	public DtoResponse<Bill> offset(String id) {
+	public DtoResponse<String> offset(String id) {
 		return adjust(id, null);
 	}
 
 	@Transactional
 	@Override
-	public DtoResponse<Bill> split(String id, Double val1, Double val2) {
-		DtoResponse<Bill> rep = new DtoResponse<Bill>();
+	public DtoResponse<String> split(String id, Double val1, Double val2) {
+		DtoResponse<String> rep = new DtoResponse<String>();
 		rep = adjust(id, null);
 		if (rep.getStatus() == 0) {
 			Bill bill = findById(id);
-			Bill newBill1= null;
+			Bill newBill1 = null;
 			Bill newBill2 = null;
-			Double total = BigDecimalUtil.add(val1, val2);
-			if (bill.getTotal() == total) {
-				newBill1 = copyBill(bill);
-				newBill2 = copyBill(bill);
-				if (bill.getCost() != null && bill.getCost() != 0) {
-					newBill1.setCost(val1);
-					newBill2.setCost(val2);
-				}
-				if (bill.getPay() != null && bill.getPay() != 0) {
-					newBill1.setPay(val1);
-					newBill2.setPay(val2);
-				}
-				add(newBill1);
-				add(newBill2);
-			}
+			newBill1 = copyBill(bill);
+			newBill2 = copyBill(bill);
+			newBill1.setStatus(Constants.Status.BILL_NEED_SETTLED);
+			newBill2.setStatus(Constants.Status.BILL_NEED_SETTLED);
+			newBill1.setTotal(val1);
+			newBill2.setTotal(val2);
+			add(newBill1);
+			add(newBill2);
 		}
 		return rep;
 	}
@@ -347,10 +341,26 @@ public class BillServiceImpl implements BillService {
 			bill.setId(null);
 			bill.setProduct(src.getProduct());
 			bill.setAccount(src.getAccount());
+			bill.setItems(null);
 		} catch (CloneNotSupportedException e) {
 			e.printStackTrace();
 		}
 		return bill;
 
+	}
+
+	@Override
+	public DtoResponse<String> operation(BillOperationBo bob) {
+		switch (bob.getOp()) {
+		case BILL_OP_ADJUST:
+			return adjust(bob.getId(), bob.getVal1());
+		case BILL_OP_OFFSET:
+			return offset(bob.getId());
+		case BILL_OP_SPLIT:
+			return split(bob.getId(), bob.getVal1(), bob.getVal2());
+		default:
+			break;
+		}
+		return null;
 	}
 }

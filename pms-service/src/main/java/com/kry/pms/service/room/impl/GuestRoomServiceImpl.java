@@ -18,6 +18,7 @@ import com.kry.pms.base.DtoResponse;
 import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
 import com.kry.pms.dao.room.GuestRoomDao;
+import com.kry.pms.model.http.request.busi.GuestRoomOperation;
 import com.kry.pms.model.http.request.busi.RoomLockBo;
 import com.kry.pms.model.persistence.room.Floor;
 import com.kry.pms.model.persistence.room.GuestRoom;
@@ -198,7 +199,7 @@ public class GuestRoomServiceImpl implements GuestRoomService {
 				result = false;
 			}
 		}
-		return true;
+		return result;
 	}
 	/**
 	 * 锁房确认
@@ -230,6 +231,12 @@ public class GuestRoomServiceImpl implements GuestRoomService {
 			}
 		}
 		return result;
+	}
+
+	@Override
+	public DtoResponse<String> statusOperation(GuestRoomOperation operation) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

@@ -1,10 +1,14 @@
 package com.kry.pms.api.busi;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -25,9 +29,11 @@ public class CreditGrantingRecordController extends BaseController<CreditGrantin
 	CreditGrantingRecordService creditGrantingRecordService;
 	@PostMapping
 	public HttpResponse<CreditGrantingRecord> add(@RequestBody CreditGrantingRecord creditGrantingRecord) {
-		return getDefaultResponse().addData(creditGrantingRecordService.add(creditGrantingRecord));
+		HttpResponse<CreditGrantingRecord> rep = new HttpResponse<CreditGrantingRecord>();
+		BeanUtils.copyProperties(creditGrantingRecordService.createRecord(creditGrantingRecord), rep);
+		return rep;
 	}
-
+	
 	@PutMapping
 	public HttpResponse<CreditGrantingRecord> modify(@RequestBody CreditGrantingRecord creditGrantingRecord) {
 		return getDefaultResponse().addData(creditGrantingRecordService.modify(creditGrantingRecord));
@@ -46,5 +52,14 @@ public class CreditGrantingRecordController extends BaseController<CreditGrantin
 		PageRequest<CreditGrantingRecord> req = parse2PageRequest(request);
 		return rep.addData(creditGrantingRecordService.listPage(req));
 	}
-
+	@GetMapping(path="/account/{id}")
+	public HttpResponse<List<CreditGrantingRecord>> queryByAccountId(@PathVariable("id") String id) throws InstantiationException, IllegalAccessException{
+		HttpResponse<List<CreditGrantingRecord>> rep = new HttpResponse<List<CreditGrantingRecord>>();
+		return rep.addData(creditGrantingRecordService.queryByAccountId(id));
+	}
+	@GetMapping(path="/grantingAccount/{id}")
+	public HttpResponse<List<CreditGrantingRecord>> queryByGrantingAccountId(@PathVariable("id") String id) throws InstantiationException, IllegalAccessException{
+		HttpResponse<List<CreditGrantingRecord>> rep = new HttpResponse<List<CreditGrantingRecord>>();
+		return rep.addData(creditGrantingRecordService.queryByGrantingAccountId(id));
+	}
 }

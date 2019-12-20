@@ -194,8 +194,8 @@ public class ReceptionServiceImpl implements ReceptionService {
 		DtoResponse<String> response = new DtoResponse<String>();
 		String checkInRecordId = roomAssignBo.getCheckInRecordId();
 		CheckInRecord cir = checkInRecordService.findById(checkInRecordId);
-		if (cir.getType().equals(Constants.Type.CHECK_IN_RECORD_RESERVE)) {
-			if (cir != null) {
+		if (cir != null) {
+			if (cir.getType().equals(Constants.Type.CHECK_IN_RECORD_RESERVE)) {
 				if (roomAssignBo.getRoomId().length <= (cir.getRoomCount() - cir.getCheckInCount())) {
 					for (String roomId : roomAssignBo.getRoomId()) {
 						GuestRoom gr = guestRoomService.findById(roomId);
@@ -205,45 +205,46 @@ public class ReceptionServiceImpl implements ReceptionService {
 					response.setStatus(Constants.BusinessCode.CODE_RESOURCE_NOT_ENOUGH);
 					response.setMessage("选择房间数过多，请重新选择");
 				}
-			} else {
-				response.setStatus(Constants.BusinessCode.CODE_PARAMETER_INVALID);
-				response.setMessage("找不到预定信息，请重新选择");
-			}
-			if (response.getStatus() == 0) {
-				cir.setCheckInCount(cir.getCheckInCount() + roomAssignBo.getRoomId().length);
-				if (cir.getRoomCount() == cir.getCheckInCount()) {
-					cir.setDeleted(Constants.DELETED_TRUE);
+
+				if (response.getStatus() == 0) {
+					cir.setCheckInCount(cir.getCheckInCount() + roomAssignBo.getRoomId().length);
+					if (cir.getRoomCount() == cir.getCheckInCount()) {
+						cir.setDeleted(Constants.DELETED_TRUE);
+					}
+					checkInRecordService.modify(cir);
+				} else {
+					TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 				}
-				checkInRecordService.modify(cir);
 			} else {
-				TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+				GuestRoom gr = guestRoomService.findById(roomAssignBo.getRoomId()[0]);
+				cir.setGuestRoom(gr);
+				cir.setCheckInCount(cir.getRoomCount());
+				checkInRecordService.modify(cir);
 			}
-		}else {
-			GuestRoom gr = guestRoomService.findById(roomAssignBo.getRoomId()[0]);
-			cir.setGuestRoom(gr);
-			cir.setCheckInCount(cir.getRoomCount());
-			checkInRecordService.modify(cir);
+		} else {
+			response.setStatus(Constants.BusinessCode.CODE_PARAMETER_INVALID);
+			response.setMessage("找不到预定信息，请重新选择");
 		}
 		return response;
 	}
 
 	@Override
-	public DtoResponse<String> checkInM(String id){
+	public DtoResponse<String> checkInM(String id) {
 		DtoResponse<String> rep = new DtoResponse<>();
 		CheckInRecord cir = checkInRecordService.findById(id);
-		if(cir != null){
-			//预留单不能入住
-			if((Constants.Type.CHECK_IN_RECORD_RESERVE).equals(cir.getType())){
+		if (cir != null) {
+			// 预留单不能入住
+			if ((Constants.Type.CHECK_IN_RECORD_RESERVE).equals(cir.getType())) {
 				rep.setStatus(Constants.BusinessCode.CODE_PARAMETER_INVALID);
 				rep.setMessage("预留单不能入住");
 				return rep;
 			}
 			rep = checkIn(cir);
-			//是主单
-			if(!(Constants.Type.CHECK_IN_RECORD_GROUP).equals(cir.getType())){
+			// 是主单
+			if (!(Constants.Type.CHECK_IN_RECORD_GROUP).equals(cir.getType())) {
 				String mainRecordId = cir.getMainRecord().getId();
 				CheckInRecord cirMain = checkInRecordService.findById(mainRecordId);
-				if(!(Constants.Status.ACCOUNT_IN).equals(cirMain.getStatus())){
+				if (!(Constants.Status.ACCOUNT_IN).equals(cirMain.getStatus())) {
 					rep = checkIn(cirMain);
 				}
 			}
@@ -287,7 +288,7 @@ public class ReceptionServiceImpl implements ReceptionService {
 			case Constants.Type.CHECK_IN_RECORD_GROUP_TYPE_NO:
 				Collection<AccountSummaryVo> data = checkInRecordService.getAccountSummaryByOrderNum(cir.getOrderNum(),
 						Constants.Type.CHECK_IN_RECORD_CUSTOMER);
-				if(data!=null&&!data.isEmpty()) {
+				if (data != null && !data.isEmpty()) {
 					asv = (AccountSummaryVo) data.toArray()[0];
 				}
 				break;
@@ -320,20 +321,20 @@ public class ReceptionServiceImpl implements ReceptionService {
 	@Override
 	public DtoResponse<String> checkInAll(String[] ids) {
 		DtoResponse<String> rep = new DtoResponse<>();
-		for(int i=0; i<ids.length; i++){
+		for (int i = 0; i < ids.length; i++) {
 			CheckInRecord cir = checkInRecordService.findById(ids[i]);
-			//预留单不能入住R
-			if((Constants.Type.CHECK_IN_RECORD_RESERVE).equals(cir.getType())){
+			// 预留单不能入住R
+			if ((Constants.Type.CHECK_IN_RECORD_RESERVE).equals(cir.getType())) {
 				rep.setStatus(Constants.BusinessCode.CODE_PARAMETER_INVALID);
 				rep.setMessage("预留单不能入住");
 				return rep;
 			}
 			rep = checkIn(cir);
-			//是主单G
-			if(!(Constants.Type.CHECK_IN_RECORD_GROUP).equals(cir.getType())){
+			// 是主单G
+			if (!(Constants.Type.CHECK_IN_RECORD_GROUP).equals(cir.getType())) {
 				String mainRecordId = cir.getMainRecord().getId();
 				CheckInRecord cirMain = checkInRecordService.findById(mainRecordId);
-				if(!(Constants.Status.ACCOUNT_IN).equals(cirMain.getStatus())){
+				if (!(Constants.Status.ACCOUNT_IN).equals(cirMain.getStatus())) {
 					rep = checkIn(cirMain);
 				}
 			}

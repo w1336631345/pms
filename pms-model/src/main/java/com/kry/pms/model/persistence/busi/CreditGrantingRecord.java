@@ -25,11 +25,15 @@ public class CreditGrantingRecord extends PersistenceModel{
 	@Column
 	private String type;
 	@OneToOne
+	private Account grantingAccount;
+	@OneToOne
 	private Employee grantingEmployee;
 	@OneToOne
 	private Employee operationEmployee;
 	@Column
 	private LocalDate periodOfValidity;
+	@Column
+	private Double grantingLimit;
 	@Column
 	private String cardNum;
 	@Column

@@ -21,6 +21,7 @@ import com.kry.pms.base.DtoResponse;
 import com.kry.pms.base.HttpResponse;
 import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
+import com.kry.pms.model.http.request.busi.BillOperationBo;
 import com.kry.pms.model.persistence.busi.Bill;
 import com.kry.pms.service.busi.BillService;
 
@@ -77,23 +78,30 @@ public class BillController extends BaseController<Bill> {
 		return rep.addData(billService.listPage(req));
 	}
 	@GetMapping(path = "/offset/{id}")
-	public HttpResponse<Bill> offset(@PathVariable String id) throws InstantiationException, IllegalAccessException{
-		HttpResponse<Bill> rep = new HttpResponse<Bill>();
-		DtoResponse<Bill> response = billService.offset(id);
+	public HttpResponse<String> offset(@PathVariable String id) throws InstantiationException, IllegalAccessException{
+		HttpResponse<String> rep = new HttpResponse<String>();
+		DtoResponse<String> response = billService.offset(id);
 		BeanUtils.copyProperties(response, rep);
 		return rep;
 	}
 	@GetMapping(path = "/adjust/{id}")
-	public HttpResponse<Bill> adjust(@PathVariable String id,Double val) throws InstantiationException, IllegalAccessException{
-		HttpResponse<Bill> rep = new HttpResponse<Bill>();
-		DtoResponse<Bill> response = billService.offset(id);
+	public HttpResponse<String> adjust(@PathVariable String id,Double val) throws InstantiationException, IllegalAccessException{
+		HttpResponse<String> rep = new HttpResponse<String>();
+		DtoResponse<String> response = billService.offset(id);
 		BeanUtils.copyProperties(response, rep);
 		return rep;
 	}
 	@GetMapping(path = "/split/{id}")
-	public HttpResponse<Bill> split(@PathVariable String id,double val1,double val2) throws InstantiationException, IllegalAccessException{
-		HttpResponse<Bill> rep = new HttpResponse<Bill>();
-		DtoResponse<Bill> response = billService.offset(id);
+	public HttpResponse<String> split(@PathVariable String id,double val1,double val2) throws InstantiationException, IllegalAccessException{
+		HttpResponse<String> rep = new HttpResponse<String>();
+		DtoResponse<String> response = billService.offset(id);
+		BeanUtils.copyProperties(response, rep);
+		return rep;
+	}
+	@PostMapping(path="/item/operation")
+	public HttpResponse<String> itemOp(@RequestBody BillOperationBo bob){
+		DtoResponse<String> response =  billService.operation(bob);
+		HttpResponse<String> rep = new HttpResponse<String>();
 		BeanUtils.copyProperties(response, rep);
 		return rep;
 	}

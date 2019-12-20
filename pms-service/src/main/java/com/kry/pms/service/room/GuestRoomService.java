@@ -3,6 +3,7 @@ package com.kry.pms.service.room;
 import java.util.List;
 
 import com.kry.pms.base.DtoResponse;
+import com.kry.pms.model.http.request.busi.GuestRoomOperation;
 import com.kry.pms.model.http.request.busi.RoomLockBo;
 import com.kry.pms.model.persistence.busi.RoomLockRecord;
 import com.kry.pms.model.persistence.room.Floor;
@@ -20,5 +21,7 @@ public interface GuestRoomService extends BaseService<GuestRoom> {
 	long findCountByFloor(Floor floor);
 
 	DtoResponse<String> locked(RoomLockBo rlb);
+
+	DtoResponse<String> statusOperation(GuestRoomOperation operation);
 
 }

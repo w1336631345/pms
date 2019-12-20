@@ -16,9 +16,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.kry.pms.api.BaseController;
+import com.kry.pms.base.DtoResponse;
 import com.kry.pms.base.HttpResponse;
 import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
+import com.kry.pms.model.http.request.busi.GuestRoomOperation;
 import com.kry.pms.model.http.request.busi.RoomLockBo;
 import com.kry.pms.model.persistence.room.GuestRoom;
 import com.kry.pms.service.room.GuestRoomService;
@@ -58,6 +60,13 @@ public class GuestRoomController extends BaseController<GuestRoom> {
 		BeanUtils.copyProperties(guestRoomService.locked(rlb), rep);
 		return rep;
 	}
+	@PostMapping(path = "/status/op")
+	public HttpResponse<String> statusOperation(@RequestBody GuestRoomOperation operation){
+		HttpResponse<String> rep = new HttpResponse<String>();
+		DtoResponse<String> response = guestRoomService.statusOperation(operation);
+		return rep;
+	}
+	
 	
 	@GetMapping
 	public HttpResponse<PageResponse<GuestRoom>> query(HttpServletRequest request) throws InstantiationException, IllegalAccessException{
