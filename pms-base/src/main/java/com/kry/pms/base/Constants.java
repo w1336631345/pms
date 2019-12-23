@@ -75,6 +75,7 @@ public class Constants {
 		public static final String BUSINESS_BUSINESS_SETTLE_SEQ_KEY="SETTLE_NUM";
 		public static final String BUSINESS_BUSINESS_CUSTOMER_ACCOUNT_SEQ_KEY="CUSTOMER_ACCOUNT_NUM";
 		public static final String BUSINESS_BUSINESS_GROUP_ACCOUNT_SEQ_KEY="GROUP_ACCOUNT_NUM";
+		public static final String TOGETHER_NUM_KEY="TOGETHER_NUM";
 	}
 
 	public interface Type {

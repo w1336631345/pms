@@ -179,4 +179,54 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
 		return rep.addData(checkInRecordService.querySummaryList(req));
 	}
 
+	/**
+	 * 功能描述: <br>同住列表
+	 * 〈〉
+	 * @Param: [roomLinkId]
+	 * @Return: com.kry.pms.base.HttpResponse
+	 * @Author: huanghaibin
+	 * @Date: 2019/12/23 14:38
+	 */
+	@GetMapping(value = "/checkInTogether")
+	public HttpResponse checkInTogether(String orderNum){
+		HttpResponse hr = new HttpResponse();
+		User user = getUser();
+		List<CheckInRecord> list = checkInRecordService.checkInTogether(user.getHotelCode(),orderNum);
+		hr.setData(list);
+		return hr;
+	}
+
+	/**
+	 * 功能描述: <br>同住列表（根据同住编码查询）暂时没用
+	 * 〈〉
+	 * @Param: [orderNum]
+	 * @Return: com.kry.pms.base.HttpResponse
+	 * @Author: huanghaibin
+	 * @Date: 2019/12/23 16:34
+	 */
+	@GetMapping(value = "/togetherByCode")
+	public HttpResponse togetherByCode(String orderNum){
+		HttpResponse hr = new HttpResponse();
+		User user = getUser();
+//		List<CheckInRecord> list = checkInRecordService.checkInTogether(user.getHotelCode(),orderNum);
+//		hr.setData(list);
+		return hr;
+	}
+
+	/**
+	 * 功能描述: <br>添加同住
+	 * 〈〉
+	 * @Param: [orderNum, customerId]
+	 * @Return: com.kry.pms.base.HttpResponse
+	 * @Author: huanghaibin
+	 * @Date: 2019/12/23 17:38
+	 */
+	@GetMapping(value = "/addTogether")
+	public HttpResponse addTogether(String orderNum, String customerId){
+		HttpResponse hr = new HttpResponse();
+		User user = getUser();
+		checkInRecordService.addTogether(user.getHotelCode(), orderNum, customerId);
+		return hr.ok();
+	}
+
 }

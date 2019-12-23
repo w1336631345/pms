@@ -90,4 +90,8 @@ public interface CheckInRecordService extends BaseService<CheckInRecord> {
     void deleteRoomLink(String[] ids);
 
     List<CheckInRecord> getByRoomNum(String roomNum, String hotelCode, String groupType);
+
+    List<CheckInRecord> checkInTogether(String hotelCode, String orderNum);
+
+    void addTogether(String hotelCode, String orderNum, String customerId);
 }

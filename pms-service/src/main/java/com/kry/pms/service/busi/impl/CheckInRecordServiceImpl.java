@@ -797,5 +797,75 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 		return list;
 	}
 
+	@Override
+	public List<CheckInRecord> checkInTogether(String hotelCode, String orderNum){
+		List<CheckInRecord> list = checkInRecordDao.findAll(new Specification<CheckInRecord>() {
+			@Override
+			public Predicate toPredicate(Root<CheckInRecord> root, CriteriaQuery<?> query,
+										 CriteriaBuilder criteriaBuilder) {
+				List<Predicate> list = new ArrayList<Predicate>();
+				if(hotelCode!=null) {
+					list.add(criteriaBuilder.equal(root.get("hotelCode"), hotelCode));
+				}
+				if(orderNum!=null) {
+					list.add(criteriaBuilder.equal(root.get("orderNum"), orderNum));
+				}
+				list.add(criteriaBuilder.equal(root.get("deleted"), Constants.DELETED_FALSE));
+				list.add(criteriaBuilder.isNotNull(root.get("guestRoom")));
+				Predicate[] array = new Predicate[list.size()];
+				return criteriaBuilder.and(list.toArray(array));
+			}
+		});
+		return list;
+	}
+
+
+
+	public List<CheckInRecord> findByTogetherCode(String hotelCode, String togetherCod){
+		List<CheckInRecord> list = checkInRecordDao.findAll(new Specification<CheckInRecord>() {
+			@Override
+			public Predicate toPredicate(Root<CheckInRecord> root, CriteriaQuery<?> query,
+										 CriteriaBuilder criteriaBuilder) {
+				List<Predicate> list = new ArrayList<Predicate>();
+				if(hotelCode != null){
+					list.add(criteriaBuilder.equal(root.get("hotelCode"), hotelCode));
+				}
+				if(togetherCod!=null) {
+					list.add(criteriaBuilder.equal(root.get("togetherCode"), togetherCod));
+				}
+				list.add(criteriaBuilder.equal(root.get("deleted"), Constants.DELETED_FALSE));
+				list.add(criteriaBuilder.isNotNull(root.get("guestRoom")));
+				Predicate[] array = new Predicate[list.size()];
+				return criteriaBuilder.and(list.toArray(array));
+			}
+		});
+		return list;
+	}
+
+
+	@Override
+	@org.springframework.transaction.annotation.Transactional(rollbackFor=Exception.class)
+	public void addTogether(String hotelCode, String orderNum, String customerId){
+		List<CheckInRecord> list = checkInTogether(hotelCode, orderNum);
+		CheckInRecord cir = list.get(0);
+		CheckInRecord checkInRecord = new CheckInRecord();
+		BeanUtils.copyProperties(cir, checkInRecord);
+		Customer customer = customerService.findById(customerId);
+		checkInRecord.setId(null);
+		checkInRecord.setCustomer(customer);
+		if(cir.getTogetherCode() == null){
+			String togetherNum = businessSeqService.fetchNextSeqNum(hotelCode, Constants.Key.TOGETHER_NUM_KEY);
+			for(int i=0; i<list.size(); i++){
+				CheckInRecord cirT = list.get(i);
+				cirT.setTogetherCode(togetherNum);
+				update(cirT);
+			}
+			checkInRecord.setTogetherCode(togetherNum);
+		}else {
+			checkInRecord.setTogetherCode(cir.getTogetherCode());
+		}
+		checkInRecordDao.save(checkInRecord);
+	}
+
 
 }

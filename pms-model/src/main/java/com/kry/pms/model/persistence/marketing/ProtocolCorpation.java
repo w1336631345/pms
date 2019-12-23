@@ -19,7 +19,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * 协议用户
+ * 协议用户（协议单位）
  * 
  * @author Louis
  *

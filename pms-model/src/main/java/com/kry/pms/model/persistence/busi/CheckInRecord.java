@@ -11,6 +11,7 @@ import com.kry.pms.model.persistence.room.RoomType;
 import com.kry.pms.model.persistence.sys.Account;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -111,8 +112,11 @@ public class CheckInRecord extends PersistenceModel {
 	@Column
 	private String reserveId;
 	//联房id
-	@Column
+	@Column(columnDefinition = "varchar(64) COMMENT '联房id'")
 	private String roomLinkId;
+	//同住
+	@Column(columnDefinition = "varchar(64) COMMENT '同住编号'")
+	private String togetherCode;
 
 
 	public String getReserveId() { return reserveId; }
@@ -363,5 +367,7 @@ public class CheckInRecord extends PersistenceModel {
 	public void setDemands(List<RoomTag> demands) {
 		this.demands = demands;
 	}
+	public String getTogetherCode(){ return togetherCode; }
+	public void setTogetherCode(String togetherCode){ this.togetherCode = togetherCode; }
 	
 }
