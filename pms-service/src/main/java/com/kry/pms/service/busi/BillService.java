@@ -57,6 +57,8 @@ public interface BillService extends BaseService<Bill> {
 	 * @return
 	 */
 	DtoResponse<String> split(String id, Double val1,Double val2);
+	
+	
 
 	public DtoResponse<String> operation(BillOperationBo bob);
 

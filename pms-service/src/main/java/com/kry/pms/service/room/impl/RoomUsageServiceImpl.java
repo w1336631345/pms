@@ -70,8 +70,7 @@ public class RoomUsageServiceImpl implements RoomUsageService {
 	
 	@Override
 	public List<RoomUsage> queryUsableGuestRooms(String roomTypeId,LocalDateTime startTime,LocalDateTime endDateTime) {
-		return roomUsageDao.queryUsableGuestRooms(roomTypeId, startTime, endDateTime);// 默认不实现
-		// return roomUsageDao.findByHotelCode(code);
+		return roomUsageDao.queryUsableGuestRooms(roomTypeId, startTime, endDateTime);
 	}
 
 	@Override

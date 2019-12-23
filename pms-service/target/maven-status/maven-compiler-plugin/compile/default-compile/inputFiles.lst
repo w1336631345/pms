@@ -111,6 +111,7 @@ E:\kry\src\pms-server\pms-service\src\main\java\com\kry\pms\service\busi\SettleA
 E:\kry\src\pms-server\pms-service\src\main\java\com\kry\pms\service\goods\impl\SetMealServiceImpl.java
 E:\kry\src\pms-server\pms-service\src\main\java\com\kry\pms\service\report\impl\BusinessReportServiceImpl.java
 E:\kry\src\pms-server\pms-service\src\main\java\com\kry\pms\service\room\RoomUsageService.java
+E:\kry\src\pms-server\pms-service\src\main\java\com\kry\pms\service\busi\RoomLinkService.java
 E:\kry\src\pms-server\pms-service\src\main\java\com\kry\pms\service\org\CorporationService.java
 E:\kry\src\pms-server\pms-service\src\main\java\com\kry\pms\service\busi\RoomRecordService.java
 E:\kry\src\pms-server\pms-service\src\main\java\com\kry\pms\service\guest\impl\CustomerPointsServiceImpl.java
@@ -129,3 +130,4 @@ E:\kry\src\pms-server\pms-service\src\main\java\com\kry\pms\service\busi\impl\Se
 E:\kry\src\pms-server\pms-service\src\main\java\com\kry\pms\service\marketing\RoomPriceSchemeItemService.java
 E:\kry\src\pms-server\pms-service\src\main\java\com\kry\pms\service\org\impl\HotelServiceImpl.java
 E:\kry\src\pms-server\pms-service\src\main\java\com\kry\pms\service\marketing\ProtocolCorpationService.java
+E:\kry\src\pms-server\pms-service\src\main\java\com\kry\pms\service\busi\impl\RoomLinkServiceImpl.java

@@ -45,8 +45,8 @@ public class RoomUsageController extends BaseController<RoomUsage> {
 		roomUsageService.delete(id);
 		return rep;
 	}
-
-	public HttpResponse<List<RoomUsage>> queryUsableGuestRooms(String roomTypeId, String startTime, String endTime) {
+	@GetMapping(path="/roomType/{id}")
+	public HttpResponse<List<RoomUsage>> queryUsableGuestRooms(@PathVariable("id")String roomTypeId, String startTime, String endTime) {
 		HttpResponse<List<RoomUsage>> rep = new HttpResponse<List<RoomUsage>>();
 		rep.addData(roomUsageService.queryUsableGuestRooms(roomTypeId, DateTimeUtil.parse(startTime),
 				DateTimeUtil.parse(endTime)));

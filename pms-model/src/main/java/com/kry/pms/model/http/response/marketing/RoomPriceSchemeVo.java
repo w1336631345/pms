@@ -11,38 +11,33 @@ import com.kry.pms.model.persistence.marketing.RoomPriceScheme;
 import com.kry.pms.model.persistence.marketing.RoomPriceSchemeItem;
 
 import lombok.Data;
+
 @Data
-public class RoomPriceSchemeVo{
+public class RoomPriceSchemeVo {
 	private String id;
 	private String name;
 	private String code;
 	private List<SchemeItemVo> items;
-	
-	public RoomPriceSchemeVo(RoomPriceScheme rps){
+
+	public RoomPriceSchemeVo(RoomPriceScheme rps) {
 		this.name = rps.getName();
 		this.code = rps.getCode();
 		this.id = rps.getId();
-		SchemeItemVo item ;
-		SetMealVo smv ;
-		List<SetMealVo> smvs ;
-		if(rps.getItems()!=null) {
-			this.items= new ArrayList<SchemeItemVo>();
-			for(RoomPriceSchemeItem i:rps.getItems()) {
+		SchemeItemVo item;
+		SetMealVo smv;
+		if (rps.getItems() != null) {
+			this.items = new ArrayList<SchemeItemVo>();
+			for (RoomPriceSchemeItem i : rps.getItems()) {
 				item = new SchemeItemVo();
 				BeanUtils.copyProperties(i, item);
 				item.setRoomTypeId(i.getRoomType().getId());
-				if(i.getExtra()!=null&&!i.getExtra().isEmpty()) {
-					smvs = new ArrayList<SetMealVo>();
-					for(SetMeal sm : i.getExtra()) {
-						smv = new SetMealVo();
-						BeanUtils.copyProperties(sm, smv);
-					}
-					item.setExtrs(smvs);
+				if (i.getExtra() != null) {
+					smv = new SetMealVo();
+					BeanUtils.copyProperties(i.getExtra(),smv);
+					item.setExtrs(smv);
 				}
 				this.items.add(item);
 			}
-			
 		}
-		
 	}
 }

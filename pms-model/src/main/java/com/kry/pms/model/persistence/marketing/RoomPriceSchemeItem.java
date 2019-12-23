@@ -1,14 +1,8 @@
 package com.kry.pms.model.persistence.marketing;
 
-import java.util.List;
-
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
@@ -34,6 +28,6 @@ public class RoomPriceSchemeItem extends PersistenceModel {
 	private String code;
 	@Column
 	private String description;
-	@ManyToMany
-	private List<SetMeal> extra;
+	@OneToOne
+	private SetMeal extra;
 }
