@@ -845,13 +845,30 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 
 	@Override
 	@org.springframework.transaction.annotation.Transactional(rollbackFor=Exception.class)
-	public void addTogether(String hotelCode, String orderNum, String customerId){
+	public void addTogether(String hotelCode, String orderNum, String customerId, String status){
 		List<CheckInRecord> list = checkInTogether(hotelCode, orderNum);
 		CheckInRecord cir = list.get(0);
 		CheckInRecord checkInRecord = new CheckInRecord();
 		BeanUtils.copyProperties(cir, checkInRecord);
+		if(null != cir.getDemands() && !cir.getDemands().isEmpty()){
+			List<RoomTag> demands = new ArrayList<>();
+			for(int i=0; i<demands.size(); i++){
+				RoomTag rt = new RoomTag();
+				BeanUtils.copyProperties(demands.get(i), rt);
+				demands.add(rt);
+			}
+			checkInRecord.setDemands(demands);
+		}else{
+			checkInRecord.setDemands(null);
+		}
+		checkInRecord.setSubRecords(null);
 		Customer customer = customerService.findById(customerId);
 		checkInRecord.setId(null);
+		if(status != null && status != ""){
+			checkInRecord.setStatus(status);
+		}
+		//新增同住默认房价为零
+		checkInRecord.setPurchasePrice(0.00);
 		checkInRecord.setCustomer(customer);
 		if(cir.getTogetherCode() == null){
 			String togetherNum = businessSeqService.fetchNextSeqNum(hotelCode, Constants.Key.TOGETHER_NUM_KEY);
@@ -867,5 +884,22 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 		checkInRecordDao.save(checkInRecord);
 	}
 
+	//独单房价
+	@Override
+	@org.springframework.transaction.annotation.Transactional(rollbackFor=Exception.class)
+	public void roomPriceAllocation(String hotelCode, String orderNum, String customerId){
+		List<CheckInRecord> list = checkInTogether(hotelCode, orderNum);
+		double priceCount = 0;
+		for(int i=0; i<list.size(); i++){
+			CheckInRecord cir = list.get(i);
+			String custId = cir.getCustomer().getId();
+			if(!customerId.equals(custId)){
+				cir.setPurchasePrice(0.0);
+				update(cir);
+			}else{
+//				cir.setPurchasePrice();
 
+			}
+		}
+	}
 }

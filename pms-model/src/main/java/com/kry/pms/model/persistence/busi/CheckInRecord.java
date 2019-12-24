@@ -67,7 +67,11 @@ public class CheckInRecord extends PersistenceModel {
 	@Column
 	private LocalDate startDate;
 	@Column
-	private Double purchasePrice;
+	private Double purchasePrice;//成交价格
+	@Column
+	private Double personalPrice;//个人承担价格
+	@Column
+	private Double personalPercentage;//个人承担价格占比
 	@Column
 	private Integer checkInCount;
 	@Column
@@ -369,5 +373,10 @@ public class CheckInRecord extends PersistenceModel {
 	}
 	public String getTogetherCode(){ return togetherCode; }
 	public void setTogetherCode(String togetherCode){ this.togetherCode = togetherCode; }
+
+	public Double getPersonalPrice() { return personalPrice; }
+	public void setPersonalPrice(Double personalPrice) { this.personalPrice = personalPrice; }
+	public Double getPersonalPercentage() { return personalPercentage; }
+	public void setPersonalPercentage(Double personalPercentage) { this.personalPercentage = personalPercentage; }
 	
 }
