@@ -1,5 +1,6 @@
 package com.kry.pms.service.busi.impl;
 
+import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -894,16 +895,36 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 	@org.springframework.transaction.annotation.Transactional(rollbackFor=Exception.class)
 	public void roomPriceAllocation(String hotelCode, String orderNum, String customerId){
 		List<CheckInRecord> list = checkInTogether(hotelCode, orderNum);
-		double priceCount = 0;
 		for(int i=0; i<list.size(); i++){
 			CheckInRecord cir = list.get(i);
 			String custId = cir.getCustomer().getId();
 			if(!customerId.equals(custId)){
-				cir.setPurchasePrice(0.0);
+				cir.setPersonalPrice(0.0);
+				cir.setPersonalPercentage(1.0);
 				update(cir);
 			}else{
-//				cir.setPurchasePrice();
+				cir.setPersonalPrice(cir.getPurchasePrice());
+				cir.setPersonalPercentage(1.0);//因为是独单房价，占比1
+			}
+		}
+	}
 
+	//平均房价
+	@Override
+	@org.springframework.transaction.annotation.Transactional(rollbackFor=Exception.class)
+	public void roomPriceAvg(String hotelCode, String orderNum){
+		List<CheckInRecord> list = checkInTogether(hotelCode, orderNum);
+		if(list != null && !list.isEmpty()){
+			int peopleCount = list.size();
+			Double roomPrice = list.get(0).getPurchasePrice();
+			DecimalFormat df = new DecimalFormat("####0.00");
+			Double avg = roomPrice/peopleCount;
+			Double personalPrice = Double.parseDouble(df.format(avg));
+			Double personalPercentage = Double.parseDouble(df.format(1/peopleCount));
+			for(int i=0; i<list.size(); i++){
+				CheckInRecord cir = list.get(i);
+				cir.setPersonalPrice(personalPrice);
+				update(cir);
 			}
 		}
 	}

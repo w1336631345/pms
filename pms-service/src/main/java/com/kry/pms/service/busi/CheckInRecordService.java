@@ -99,5 +99,9 @@ public interface CheckInRecordService extends BaseService<CheckInRecord> {
 	@org.springframework.transaction.annotation.Transactional(rollbackFor=Exception.class)
 	void roomPriceAllocation(String hotelCode, String orderNum, String customerId);
 
+    //平均房价
+    @org.springframework.transaction.annotation.Transactional(rollbackFor=Exception.class)
+    void roomPriceAvg(String hotelCode, String orderNum);
+
 	public CheckInRecord queryByAccountId(String id);
 }
