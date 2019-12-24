@@ -93,7 +93,11 @@ public interface CheckInRecordService extends BaseService<CheckInRecord> {
 
     List<CheckInRecord> checkInTogether(String hotelCode, String orderNum);
 
-    void addTogether(String hotelCode, String orderNum, String customerId);
+    void addTogether(String hotelCode, String orderNum, String customerId, String status);
+
+	//独单房价
+	@org.springframework.transaction.annotation.Transactional(rollbackFor=Exception.class)
+	void roomPriceAllocation(String hotelCode, String orderNum, String customerId);
 
 	public CheckInRecord queryByAccountId(String id);
 }

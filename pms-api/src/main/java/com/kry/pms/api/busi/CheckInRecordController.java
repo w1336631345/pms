@@ -222,10 +222,10 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
 	 * @Date: 2019/12/23 17:38
 	 */
 	@GetMapping(value = "/addTogether")
-	public HttpResponse addTogether(String orderNum, String customerId){
+	public HttpResponse addTogether(String orderNum, String customerId, String status){
 		HttpResponse hr = new HttpResponse();
 		User user = getUser();
-		checkInRecordService.addTogether(user.getHotelCode(), orderNum, customerId);
+		checkInRecordService.addTogether(user.getHotelCode(), orderNum, customerId, status);
 		return hr.ok();
 	}
 
