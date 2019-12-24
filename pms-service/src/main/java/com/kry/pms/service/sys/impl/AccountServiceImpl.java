@@ -209,7 +209,7 @@ public class AccountServiceImpl implements AccountService {
 		DtoResponse<Double> rep = new DtoResponse<Double>();
 		CheckInRecord cir = checkInRecordService.queryByAccountId(id);
 		if (cir != null) {
-			return rep.addData(cir.getPurchasePrice());
+			return rep.addData(cir.getPurchasePrice()==null?0.0:cir.getPurchasePrice());
 		}else {
 			rep.setStatus(Constants.BusinessCode.CODE_ILLEGAL_OPERATION);
 			rep.setMessage("找不到对应的订单");
