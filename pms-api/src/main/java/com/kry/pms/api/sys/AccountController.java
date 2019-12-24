@@ -2,6 +2,7 @@ package com.kry.pms.api.sys;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.kry.pms.api.BaseController;
+import com.kry.pms.base.DtoResponse;
 import com.kry.pms.base.HttpResponse;
 import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
@@ -41,6 +43,13 @@ public class AccountController extends BaseController<Account> {
 	public HttpResponse<String> delete(String id) {
 		HttpResponse<String> rep = new HttpResponse<>();
 		accountService.delete(id);
+		return rep;
+	}
+	@GetMapping(path = "/personPrice")
+	public HttpResponse<Double> queryRoomPrice(String id){
+		HttpResponse<Double> rep = new HttpResponse<>();
+		DtoResponse<Double> response = accountService.queryRoomPrice(id);
+		BeanUtils.copyProperties(response, rep);
 		return rep;
 	}
 

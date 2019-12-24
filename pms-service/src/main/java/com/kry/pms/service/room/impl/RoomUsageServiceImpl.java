@@ -39,6 +39,7 @@ public class RoomUsageServiceImpl implements RoomUsageService {
 	BookingRecordService bookingRecordService;
 	@Autowired
 	CheckInRecordService checkInRecordService;
+
 	@Override
 	public RoomUsage add(RoomUsage roomUsage) {
 		return roomUsageDao.saveAndFlush(roomUsage);
@@ -67,10 +68,19 @@ public class RoomUsageServiceImpl implements RoomUsageService {
 		return null;// 默认不实现
 		// return roomUsageDao.findByHotelCode(code);
 	}
-	
+
 	@Override
-	public List<RoomUsage> queryUsableGuestRooms(String roomTypeId,LocalDateTime startTime,LocalDateTime endDateTime) {
-		return roomUsageDao.queryUsableGuestRooms(roomTypeId, startTime, endDateTime);
+	public List<RoomUsageVo> queryUsableGuestRooms(String roomTypeId, LocalDateTime startTime,
+			LocalDateTime endDateTime) {
+		List<RoomUsage> list = roomUsageDao.queryUsableGuestRooms(roomTypeId, startTime, endDateTime);
+		List<RoomUsageVo> data = new ArrayList<RoomUsageVo>();
+		if (list != null && !list.isEmpty()) {
+			for (RoomUsage ru : list) {
+				data.add(new RoomUsageVo(ru));
+			}
+			return data;
+		}
+		return null;
 	}
 
 	@Override
@@ -88,10 +98,10 @@ public class RoomUsageServiceImpl implements RoomUsageService {
 
 	@Override
 	public RoomUsage use(GuestRoom gr, String status, LocalDateTime startTime, LocalDateTime endTime,
-			String businesskey, String businessInfo,DtoResponse<String> response) {
+			String businesskey, String businessInfo, DtoResponse<String> response) {
 		Duration d = Duration.between(startTime, endTime);
-		long duration = d.get(ChronoUnit.SECONDS)/3600;
-		RoomUsage ru = roomUsageDao.queryGuestRoomUsable(gr.getId(),startTime, endTime);
+		long duration = d.get(ChronoUnit.SECONDS) / 3600;
+		RoomUsage ru = roomUsageDao.queryGuestRoomUsable(gr.getId(), startTime, endTime);
 		RoomUsage data = null;
 		if (ru != null) {
 			if (ru.getStartDateTime().isEqual(startTime)) {
@@ -148,12 +158,12 @@ public class RoomUsageServiceImpl implements RoomUsageService {
 					ru = modify(ru);
 					cru.setPreRoomUsage(ru);
 					cru = add(cru);
-					
+
 					ru.setEndDateTime(startTime);
 					updateDuration(ru);
 					ru.setPostRoomUsage(cru);
 					modify(ru);
-					
+
 					pru.setId(null);
 					pru.setStartDateTime(endTime);
 					pru.setPreRoomUsage(cru);
@@ -165,19 +175,21 @@ public class RoomUsageServiceImpl implements RoomUsageService {
 			}
 		} else {
 			response.setStatus(Constants.BusinessCode.CODE_RESOURCE_NOT_ENOUGH);
-			response.setMessage("房间号："+gr.getRoomNum()+"在该时段无法办理入住");
+			response.setMessage("房间号：" + gr.getRoomNum() + "在该时段无法办理入住");
 		}
 		return data;
 	}
+
 	@Override
-	public RoomUsage use(GuestRoom gr, String status, LocalDateTime startTime, int days,
-			String businesskey, String businessInfo,DtoResponse<String> response) {
-				return null;
-		
+	public RoomUsage use(GuestRoom gr, String status, LocalDateTime startTime, int days, String businesskey,
+			String businessInfo, DtoResponse<String> response) {
+		return null;
+
 	}
+
 	private void updateDuration(RoomUsage ru) {
 		long d = Duration.between(ru.getStartDateTime(), ru.getEndDateTime()).get(ChronoUnit.SECONDS);
-		ru.setDuration(d/3600);
+		ru.setDuration(d / 3600);
 	}
 
 	@Override
@@ -185,59 +197,44 @@ public class RoomUsageServiceImpl implements RoomUsageService {
 		BookingRecord br = bookingRecordService.findByBookingItemId(bookItemId);
 		CheckInRecord cir = checkInRecordService.findById(bookItemId);
 		List<RoomUsageVo> data = new ArrayList<RoomUsageVo>();
-		if(br!=null&&cir!=null) {
-			List<RoomUsage> list = queryUsableGuestRooms(cir.getRoomType().getId(), br.getArriveTime(), br.getLeaveTime());
-			if(list!=null&&!list.isEmpty()) {
-				for(RoomUsage ru:list) {
-					data.add(new RoomUsageVo(ru));
-				}
-				return data;
-			}
-		}
-		return null;
+		return queryUsableGuestRooms(cir.getRoomType().getId(), br.getArriveTime(), br.getLeaveTime());
 	}
 
 	@Override
 	public List<RoomUsageVo> queryUsableGuestRoomsByCheckInRecordId(String cid) {
 		CheckInRecord cir = checkInRecordService.findById(cid);
 		List<RoomUsageVo> data = new ArrayList<RoomUsageVo>();
-		if(cir!=null) {
-			List<RoomUsage> list = queryUsableGuestRooms(cir.getRoomType().getId(), cir.getArriveTime(), cir.getLeaveTime());
-			if(list!=null&&!list.isEmpty()) {
-				for(RoomUsage ru:list) {
-					data.add(new RoomUsageVo(ru));
-				}
-				return data;
-			}
+		if (cir != null) {
+			return queryUsableGuestRooms(cir.getRoomType().getId(), cir.getArriveTime(), cir.getLeaveTime());
 		}
 		return null;
 	}
 
 	@Override
-	public List<RoomUsageVo> queryUsableGuestRoomsByCheckInRecordId(String cid, String roomTypeId,
-			String roomNum) {
+	public List<RoomUsageVo> queryUsableGuestRoomsByCheckInRecordId(String cid, String roomTypeId, String roomNum) {
 		CheckInRecord cir = checkInRecordService.findById(cid);
 		List<RoomUsageVo> data = new ArrayList<RoomUsageVo>();
-		if(cir!=null) {
+		if (cir != null) {
 			LocalDateTime startTime = LocalDateTime.now();
-			if(cir.getArriveTime().isAfter(startTime)) {
+			if (cir.getArriveTime().isAfter(startTime)) {
 				startTime = cir.getArriveTime();
 			}
-			List<RoomUsage> list =null;
-			if(roomNum!=null) {
-				 list = roomUsageDao.queryRoomUsable(roomNum, startTime);
-			}else {
-				if(roomTypeId==null) {
+			List<RoomUsage> list = null;
+			if (roomNum != null) {
+				list = roomUsageDao.queryRoomUsable(roomNum, startTime);
+				if (list != null && !list.isEmpty()) {
+					for (RoomUsage ru : list) {
+						data.add(new RoomUsageVo(ru));
+					}
+					return data;
+				}
+			} else {
+				if (roomTypeId == null) {
 					roomTypeId = cir.getRoomType().getId();
 				}
-				list = queryUsableGuestRooms(roomTypeId, startTime, cir.getLeaveTime());
+				return queryUsableGuestRooms(roomTypeId, startTime, cir.getLeaveTime());
 			}
-			if(list!=null&&!list.isEmpty()) {
-				for(RoomUsage ru:list) {
-					data.add(new RoomUsageVo(ru));
-				}
-				return data;
-			}
+
 		}
 		return null;
 	}

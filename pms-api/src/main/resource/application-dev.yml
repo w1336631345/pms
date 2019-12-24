@@ -8,6 +8,9 @@ server:
   port: 8090
   servlet:
     context-path: /pms
+management:  endpoint:
+    shutdown:
+      enabled: true
 spring:
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss

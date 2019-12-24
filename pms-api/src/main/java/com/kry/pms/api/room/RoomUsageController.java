@@ -46,8 +46,8 @@ public class RoomUsageController extends BaseController<RoomUsage> {
 		return rep;
 	}
 	@GetMapping(path="/roomType/{id}")
-	public HttpResponse<List<RoomUsage>> queryUsableGuestRooms(@PathVariable("id")String roomTypeId, String startTime, String endTime) {
-		HttpResponse<List<RoomUsage>> rep = new HttpResponse<List<RoomUsage>>();
+	public HttpResponse<List<RoomUsageVo>> queryUsableGuestRooms(@PathVariable("id")String roomTypeId, String startTime, String endTime) {
+		HttpResponse<List<RoomUsageVo>> rep = new HttpResponse<List<RoomUsageVo>>();
 		rep.addData(roomUsageService.queryUsableGuestRooms(roomTypeId, DateTimeUtil.parse(startTime),
 				DateTimeUtil.parse(endTime)));
 		return rep;

@@ -94,4 +94,6 @@ public interface CheckInRecordService extends BaseService<CheckInRecord> {
     List<CheckInRecord> checkInTogether(String hotelCode, String orderNum);
 
     void addTogether(String hotelCode, String orderNum, String customerId);
+
+	public CheckInRecord queryByAccountId(String id);
 }

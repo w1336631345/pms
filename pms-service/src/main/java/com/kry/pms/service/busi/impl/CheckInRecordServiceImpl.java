@@ -867,5 +867,10 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 		checkInRecordDao.save(checkInRecord);
 	}
 
+	@Override
+	public CheckInRecord queryByAccountId(String id) {
+		return checkInRecordDao.findByAccountId(id);
+	}
+
 
 }

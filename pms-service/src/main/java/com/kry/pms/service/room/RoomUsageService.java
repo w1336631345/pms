@@ -17,7 +17,7 @@ public interface RoomUsageService extends BaseService<RoomUsage> {
 	RoomUsage use(GuestRoom gr, String status, LocalDateTime startTime, int days, String businesskey,
 			String businessInfo, DtoResponse<String> response);
 
-	List<RoomUsage> queryUsableGuestRooms(String roomTypeId, LocalDateTime startTime, LocalDateTime endDateTime);
+	List<RoomUsageVo> queryUsableGuestRooms(String roomTypeId, LocalDateTime startTime, LocalDateTime endDateTime);
 
 	public List<RoomUsageVo> queryUsableGuestRoomsByBookItemId(String bookItemId);
 

@@ -23,12 +23,14 @@ import com.kry.pms.dao.sys.AccountDao;
 import com.kry.pms.model.http.request.busi.BillCheckBo;
 import com.kry.pms.model.http.response.busi.AccountSummaryVo;
 import com.kry.pms.model.persistence.busi.Bill;
+import com.kry.pms.model.persistence.busi.CheckInRecord;
 import com.kry.pms.model.persistence.busi.CreditGrantingRecord;
 import com.kry.pms.model.persistence.busi.RoomRecord;
 import com.kry.pms.model.persistence.busi.SettleAccountRecord;
 import com.kry.pms.model.persistence.guest.Customer;
 import com.kry.pms.model.persistence.sys.Account;
 import com.kry.pms.service.busi.BillService;
+import com.kry.pms.service.busi.CheckInRecordService;
 import com.kry.pms.service.busi.CreditGrantingRecordService;
 import com.kry.pms.service.busi.SettleAccountRecordService;
 import com.kry.pms.service.sys.AccountService;
@@ -45,6 +47,8 @@ public class AccountServiceImpl implements AccountService {
 	CreditGrantingRecordService creditGrantingRecordService;
 	@Autowired
 	SettleAccountRecordService settleAccountRecordService;
+	@Autowired
+	CheckInRecordService checkInRecordService;
 	@Autowired
 	BusinessSeqService businessSeqService;
 
@@ -110,8 +114,8 @@ public class AccountServiceImpl implements AccountService {
 			account.setTotal(BigDecimalUtil.sub(account.getCost(), account.getPay()));
 		}
 		account.setCurrentBillSeq(account.getCurrentBillSeq() + 1);
-		if(Constants.Status.BILL_NEED_SETTLED.equals(bill.getStatus())) {
-			
+		if (Constants.Status.BILL_NEED_SETTLED.equals(bill.getStatus())) {
+
 		}
 		return modify(account);
 	}
@@ -152,20 +156,22 @@ public class AccountServiceImpl implements AccountService {
 		List<Bill> bills = null;
 		if (account != null) {
 			SettleAccountRecord settleAccountRecord = settleAccountRecordService.create(billCheckBo, account);
-			List<Bill> flatBills = billService.addFlatBills(billCheckBo.getBills(),billCheckBo.getOperationEmployee(),billCheckBo.getShiftCode(),settleAccountRecord.getRecordNum());
+			List<Bill> flatBills = billService.addFlatBills(billCheckBo.getBills(), billCheckBo.getOperationEmployee(),
+					billCheckBo.getShiftCode(), settleAccountRecord.getRecordNum());
 			double total = 0.0;
-			for(Bill b:flatBills) {
-				if(b.getCost()!=null) {
-					total= BigDecimalUtil.sub(total, b.getCost());
+			for (Bill b : flatBills) {
+				if (b.getCost() != null) {
+					total = BigDecimalUtil.sub(total, b.getCost());
 				}
-				if(b.getPay()!=null) {
+				if (b.getPay() != null) {
 					total = BigDecimalUtil.add(total, b.getPay());
 				}
 			}
 			if (Constants.Type.BILL_CHECK_TYPE_ALL.equals(billCheckBo.getCheckType())) {
-				bills = billService.checkAccountAllBill(account,total,rep,settleAccountRecord.getRecordNum());
+				bills = billService.checkAccountAllBill(account, total, rep, settleAccountRecord.getRecordNum());
 			} else {
-				bills = billService.checkBillIds(billCheckBo.getBillIds(),total, rep,settleAccountRecord.getRecordNum());
+				bills = billService.checkBillIds(billCheckBo.getBillIds(), total, rep,
+						settleAccountRecord.getRecordNum());
 			}
 			if (rep.getStatus() == 0) {
 				if (rep.getStatus() == 0) {
@@ -186,15 +192,29 @@ public class AccountServiceImpl implements AccountService {
 	}
 
 	@Override
-	public Account createAccount(Customer customer,String roomNum) {
-		Account account = new Account(0,0);
-		account.setCode(businessSeqService.fetchNextSeqNum(customer.getHotelCode(),Constants.Key.BUSINESS_BUSINESS_CUSTOMER_ACCOUNT_SEQ_KEY));
+	public Account createAccount(Customer customer, String roomNum) {
+		Account account = new Account(0, 0);
+		account.setCode(businessSeqService.fetchNextSeqNum(customer.getHotelCode(),
+				Constants.Key.BUSINESS_BUSINESS_CUSTOMER_ACCOUNT_SEQ_KEY));
 		account.setCustomer(customer);
 		account.setHotelCode(customer.getHotelCode());
 		account.setName(customer.getName());
 		account.setType(Constants.Type.ACCOUNT_CUSTOMER);
 		account.setRoomNum(roomNum);
 		return add(account);
+	}
+
+	@Override
+	public DtoResponse<Double> queryRoomPrice(String id) {
+		DtoResponse<Double> rep = new DtoResponse<Double>();
+		CheckInRecord cir = checkInRecordService.queryByAccountId(id);
+		if (cir != null) {
+			return rep.addData(cir.getPurchasePrice());
+		}else {
+			rep.setStatus(Constants.BusinessCode.CODE_ILLEGAL_OPERATION);
+			rep.setMessage("找不到对应的订单");
+		}
+		return rep;
 	}
 
 }
