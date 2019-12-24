@@ -229,4 +229,36 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
 		return hr.ok();
 	}
 
+	/**
+	 * 功能描述: <br>独担房价
+	 * 〈〉
+	 * @Param: [orderNum, customerId, status]
+	 * @Return: com.kry.pms.base.HttpResponse
+	 * @Author: huanghaibin
+	 * @Date: 2019/12/24 17:40
+	 */
+	@GetMapping(value = "/roomPriceAllocation")
+	public HttpResponse roomPriceAllocation(String orderNum, String customerId){
+		HttpResponse hr = new HttpResponse();
+		User user = getUser();
+		checkInRecordService.roomPriceAllocation(user.getHotelCode(), orderNum, customerId);
+		return hr.ok();
+	}
+
+	/**
+	 * 功能描述: <br>平均房价
+	 * 〈〉
+	 * @Param: [orderNum, customerId, status]
+	 * @Return: com.kry.pms.base.HttpResponse
+	 * @Author: huanghaibin
+	 * @Date: 2019/12/24 17:40
+	 */
+	@GetMapping(value = "/roomPriceAvg")
+	public HttpResponse roomPriceAvg(String orderNum){
+		HttpResponse hr = new HttpResponse();
+		User user = getUser();
+		checkInRecordService.roomPriceAvg(user.getHotelCode(), orderNum);
+		return hr.ok();
+	}
+
 }
