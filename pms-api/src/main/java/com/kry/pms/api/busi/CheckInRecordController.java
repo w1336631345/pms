@@ -51,7 +51,7 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
 	
 	@PostMapping(path = "/reserve")
 	public HttpResponse<List<CheckInRecord>> addReserve(@RequestBody List<CheckInRecord> checkInRecords){
-		HttpResponse<List<CheckInRecord>> rep = new HttpResponse();
+		HttpResponse<List<CheckInRecord>> rep = new HttpResponse<List<CheckInRecord>>();
 		return rep.addData(checkInRecordService.addReserve(checkInRecords));
 
 	}

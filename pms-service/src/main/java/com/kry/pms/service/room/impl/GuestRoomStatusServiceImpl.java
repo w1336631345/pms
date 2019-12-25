@@ -149,10 +149,6 @@ public class GuestRoomStatusServiceImpl implements GuestRoomStatusService {
 	@Override
 	public GuestRoomStatus findGuestRoomStatusByGuestRoom(GuestRoom gr) {
 		return guestRoomStatusDao.findByGuestRoomId(gr.getId());
-//		GuestRoomStatus grs = new GuestRoomStatus();
-//		grs.setGuestRoom(gr);
-//		Example<GuestRoomStatus> ex = Example.of(grs);
-//		return guestRoomStatusDao.findOne(ex).orElse(null);
 	}
 
 	@Override
