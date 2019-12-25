@@ -73,6 +73,7 @@ public class RoomUsageServiceImpl implements RoomUsageService {
 	public List<RoomUsageVo> queryUsableGuestRooms(String roomTypeId, LocalDateTime startTime,
 			LocalDateTime endDateTime) {
 		List<RoomUsage> list = roomUsageDao.queryUsableGuestRooms(roomTypeId, startTime, endDateTime);
+		System.out.println("牛逼的房价"+list.get(0).getGuestRoom().getRoomType().getPrice());
 		List<RoomUsageVo> data = new ArrayList<RoomUsageVo>();
 		if (list != null && !list.isEmpty()) {
 			for (RoomUsage ru : list) {

@@ -13,6 +13,7 @@ public class GuestRoomVo implements Serializable {
 	private String mainPicture;
 	private Integer bedCount;
 	private Integer occupantCapacity;
+	private Double price;
 
 	public GuestRoomVo(GuestRoom gr) {
 		this.id = gr.getId();
@@ -21,5 +22,6 @@ public class GuestRoomVo implements Serializable {
 		this.mainPicture = gr.getMainPicture();
 		this.bedCount = gr.getBedCount();
 		this.occupantCapacity = gr.getOccupantCapacity();
+		this.price = gr.getRoomType().getPrice();
 	}
 }
