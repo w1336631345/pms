@@ -93,6 +93,8 @@ public interface CheckInRecordService extends BaseService<CheckInRecord> {
 
     List<CheckInRecord> checkInTogether(String hotelCode, String orderNum);
 
+    List<CheckInRecord> findByTogetherCode(String hotelCode, String togetherCod);
+
     void addTogether(String hotelCode, String orderNum, String customerId, String status);
 
 	//独单房价

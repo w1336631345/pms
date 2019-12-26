@@ -64,7 +64,8 @@ public class Constants {
 
 		public static final String SETTLE_ACCOUNT_CANCLE = "C";
 
-		
+		public static final String SETTLEMENT_OK = "0";//换房记录差价结清状态，结清
+		public static final String SETTLEMENT_NO = "1";//换房记录差价结清状态，未结清
 	}
 	
 	public interface Key{
@@ -122,6 +123,9 @@ public class Constants {
 		public static final String PRODUCT_GOODS = "GOODS";
 		// 服务（虚拟商品）
 		public static final String PRODUCT_SERVICE = "SERVICE";
+
+		public static final String CHANGE_ROOM_PAY_B = "B";//换房记录差价处理方式，补差价
+		public static final String CHANGE_ROOM_PAY_F = "F";//换房记录差价处理方式，免费升级
 
 	}
 

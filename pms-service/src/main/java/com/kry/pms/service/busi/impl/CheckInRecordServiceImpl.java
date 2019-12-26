@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.persistence.OneToOne;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Path;
@@ -821,7 +822,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 	}
 
 
-
+	@Override
 	public List<CheckInRecord> findByTogetherCode(String hotelCode, String togetherCod){
 		List<CheckInRecord> list = checkInRecordDao.findAll(new Specification<CheckInRecord>() {
 			@Override
@@ -870,6 +871,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 		}
 		//新增同住默认房价为零
 		checkInRecord.setPurchasePrice(0.00);
+		checkInRecord.setPersonalPercentage(0.0);
 		checkInRecord.setCustomer(customer);
 		if(cir.getTogetherCode() == null){
 			String togetherNum = businessSeqService.fetchNextSeqNum(hotelCode, Constants.Key.TOGETHER_NUM_KEY);
@@ -924,6 +926,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 			for(int i=0; i<list.size(); i++){
 				CheckInRecord cir = list.get(i);
 				cir.setPersonalPrice(personalPrice);
+				cir.setPersonalPercentage(personalPercentage);
 				update(cir);
 			}
 		}

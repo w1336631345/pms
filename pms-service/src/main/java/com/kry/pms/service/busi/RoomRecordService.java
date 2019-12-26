@@ -21,4 +21,6 @@ public interface RoomRecordService extends BaseService<RoomRecord> {
     PageResponse<RoomRecord> accountEntryListTest(int pageIndex, int pageSize, User user);
 
     List<RoomRecord> accountEntryListAll(String hotelCode, LocalDate businessDate);
+
+    List<RoomRecord> findByHotelCodeAndCheckInRecord(String hotelCode, String checkInRecordId);
 }

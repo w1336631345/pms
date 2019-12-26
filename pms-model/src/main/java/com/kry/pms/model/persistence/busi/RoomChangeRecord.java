@@ -29,6 +29,10 @@ public class RoomChangeRecord {
     private GuestRoom newGuestRoom;
     @Column(columnDefinition = "varchar(64) COMMENT '新换房'")
     private String newRoomNum;
+    @Column(columnDefinition = "double(8,2) COMMENT '原房价'")
+    private Double oldPrice;
+    @Column(columnDefinition = "double(8,2) COMMENT '新房价'")
+    private Double newPrice;
     @Column(columnDefinition = "varchar(64) COMMENT '处理方式：B补差价，F免费升级'")
     private String handleType;
     @Column(columnDefinition = "double(8,2) COMMENT '房价差'")
@@ -45,6 +49,7 @@ public class RoomChangeRecord {
     @Column(columnDefinition = "datetime NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间'")
     private LocalDateTime createDate;
 
-
+    @Transient
+    private String checkInRecordId;
 
 }

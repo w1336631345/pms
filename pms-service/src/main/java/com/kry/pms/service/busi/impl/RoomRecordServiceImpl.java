@@ -11,6 +11,7 @@ import com.kry.pms.model.persistence.busi.RoomRecord;
 import com.kry.pms.model.persistence.sys.User;
 import com.kry.pms.service.busi.BillService;
 import com.kry.pms.service.busi.BookingRecordService;
+import com.kry.pms.service.busi.CheckInRecordService;
 import com.kry.pms.service.busi.RoomRecordService;
 import com.kry.pms.service.guest.CustomerService;
 import com.kry.pms.service.room.GuestRoomService;
@@ -53,6 +54,8 @@ public class RoomRecordServiceImpl implements RoomRecordService {
 	BillService billService;
 	@Autowired
 	BusinessSeqService businessSeqService;
+	@Autowired
+	CheckInRecordService checkInRecordService;
 
 	@Override
 	public RoomRecord add(RoomRecord roomRecord) {
@@ -188,6 +191,13 @@ public class RoomRecordServiceImpl implements RoomRecordService {
 		map.put("equals", emap);
 		Specification<RoomRecord> specification = psf.createSpecification(map);
 		List<RoomRecord> list = roomRecordDao.findAll(specification);
+		return list;
+	}
+
+	@Override
+	public List<RoomRecord> findByHotelCodeAndCheckInRecord(String hotelCode, String checkInRecordId){
+		CheckInRecord cir = checkInRecordService.findById(checkInRecordId);
+		List<RoomRecord> list = roomRecordDao.findByHotelCodeAndCheckInRecord(hotelCode, cir);
 		return list;
 	}
 
