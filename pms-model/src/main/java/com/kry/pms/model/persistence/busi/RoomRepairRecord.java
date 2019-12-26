@@ -30,5 +30,7 @@ public class RoomRepairRecord extends PersistenceModel{
 	@Column
 	private String remark;
 	@Column
+	private String endToStatus;
+	@Column
 	private Boolean autoReOpen;
 }

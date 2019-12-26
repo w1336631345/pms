@@ -25,7 +25,7 @@ public interface GuestRoomStatusService extends BaseService<GuestRoomStatus> {
 
 	public RoomStatusTableVo table(String currentHotleCode);
 
-	public DtoResponse<String> changeRoomStatus(String id, String status);
+	public DtoResponse<String> changeRoomStatus(String id, String status,int quantity);
 
 	public void deleteByRoomId(String id);
 }

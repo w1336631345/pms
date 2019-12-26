@@ -1,6 +1,5 @@
 package com.kry.pms.service.room.impl;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,11 +18,15 @@ import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
 import com.kry.pms.dao.room.GuestRoomDao;
 import com.kry.pms.model.http.request.busi.GuestRoomOperation;
-import com.kry.pms.model.http.request.busi.RoomLockBo;
+import com.kry.pms.model.persistence.dict.RoomLockReason;
+import com.kry.pms.model.persistence.dict.RoomRepairReason;
 import com.kry.pms.model.persistence.room.Floor;
 import com.kry.pms.model.persistence.room.GuestRoom;
-import com.kry.pms.model.persistence.room.GuestRoomStatus;
+import com.kry.pms.service.busi.RoomLockRecordService;
 import com.kry.pms.service.busi.RoomRecordService;
+import com.kry.pms.service.busi.RoomRepairRecordService;
+import com.kry.pms.service.dict.RoomLockReasonService;
+import com.kry.pms.service.dict.RoomRepairReasonService;
 import com.kry.pms.service.room.GuestRoomService;
 import com.kry.pms.service.room.GuestRoomStatusService;
 
@@ -35,6 +38,14 @@ public class GuestRoomServiceImpl implements GuestRoomService {
 	GuestRoomStatusService guestRoomStatusService;
 	@Autowired
 	RoomRecordService roomRecordService;
+	@Autowired
+	RoomLockRecordService roomLockRecordService;
+	@Autowired
+	RoomRepairReasonService roomRepairReasonService;
+	@Autowired
+	RoomRepairRecordService  roomRepairRecordService;
+	@Autowired
+	RoomLockReasonService roomLockReasonService;
 
 	@Override
 	public GuestRoom add(GuestRoom guestRoom) {
@@ -144,99 +155,48 @@ public class GuestRoomServiceImpl implements GuestRoomService {
 	}
 
 	@Override
-	public DtoResponse<String> locked(RoomLockBo rlb) {
-		DtoResponse<String> rep = new DtoResponse<String>();
-		String roomIds = rlb.getRoomIds();
-		if (roomIds != null && !roomIds.isEmpty()) {
-			if (roomIds.contains(Constants.KEY_DEFAULT_SEPARATOR)) {
-				if (roomIds.endsWith(Constants.KEY_DEFAULT_SEPARATOR)) {
-					roomIds = roomIds.substring(0, roomIds.length() - 2);
+	public DtoResponse<String> statusOperation(GuestRoomOperation op) {
+		DtoResponse<String> rep = new DtoResponse<>();
+		rep.setMessage("");
+		String[] ids = op.getRoomIds();
+		for (String id : ids) {
+			GuestRoom gr = findById(id);
+			if (gr != null) {
+				switch (op.getOp()) {
+				case Constants.Status.ROOM_STATUS_OUT_OF_ORDER:
+					if (op.getReasonId() != null && op.getEndToStatus() != null) {
+						RoomRepairReason rpr = roomRepairReasonService.findById(op.getReasonId());
+						roomRepairRecordService.add(roomRepairRecordService.createRecord(gr, op.getStartTime(),
+								op.getEndTime(), rpr, op.getEndToStatus()));
+					} else {
+						rep.setStatus(Constants.BusinessCode.CODE_PARAMETER_INVALID);
+						rep.setMessage("必要参数不足：原因或者结束状态未选");
+					}
+					break;
+				case  Constants.Status.ROOM_STATUS_OUT_OF_SERVCIE:
+					if (op.getReasonId() != null && op.getEndToStatus() != null) {
+						RoomLockReason rlr = roomLockReasonService.findById(op.getReasonId());
+						roomLockRecordService.add(roomLockRecordService.createRecord(gr, op.getStartTime(),
+								op.getEndTime(), rlr, op.getEndToStatus()));
+					} else {
+						rep.setStatus(Constants.BusinessCode.CODE_PARAMETER_INVALID);
+						rep.setMessage("必要参数不足：原因或者结束状态未选");
+					}
+					break;
+				default:
+					break;
 				}
-				String[] ids = roomIds.split(Constants.KEY_DEFAULT_SEPARATOR);
-				if(lockedCheck(ids,rlb.getStartTime(),rlb.getEndTime(),rep)) {
-					locked(ids, rlb);
+				DtoResponse<String> r = guestRoomStatusService.changeRoomStatus(id, op.getOp(), 1);
+				if (r.getStatus() != 0) {
+					rep.setStatus(r.getStatus());
+					rep.setMessage(rep.getMessage() + r.getMessage());
 				}
-			} else {
-				if(lockedCheck(roomIds,rlb.getStartTime(),rlb.getEndTime(), rep)) {
-					locked(roomIds, rlb);
-				}
+			}else {
+				rep.setStatus(Constants.BusinessCode.CODE_PARAMETER_INVALID);
+				rep.setMessage("必要参数错误：房间找不到");
 			}
 		}
 		return rep;
-	}
-	/**
-	 * 锁定房间
-	 * @param ids
-	 * @param rlb
-	 * @return
-	 */
-	private boolean locked(String id, RoomLockBo rlb) {
-		GuestRoom gr = findById(id);
-		GuestRoomStatus grs = guestRoomStatusService.findGuestRoomStatusByGuestRoom(gr);
-		grs.setRoomStatus(Constants.Status.ROOM_STATUS_OUT_OF_SERVCIE);
-		return true;
-	}
-	/**
-	 * 锁房确认
-	 * @param id
-	 * @param rep
-	 * @return
-	 */
-	private boolean lockedCheck(String id,LocalDateTime startTime,LocalDateTime endTime,DtoResponse<String> rep) {
-		GuestRoom gr = findById(id);
-		boolean result = true;
-		if(gr==null) {
-			rep.setStatus(Constants.BusinessCode.CODE_PARAMETER_INVALID);
-			rep.setMessage("没有找到您选择的");
-			result = false;
-		}else {
-			GuestRoomStatus grs = guestRoomStatusService.findGuestRoomStatusByGuestRoom(gr);
-			String status = grs.getRoomStatus();
-			if(Constants.Status.ROOM_STATUS_OCCUPY_CLEAN.equals(status)||Constants.Status.ROOM_STATUS_OCCUPY_DIRTY.equals(status)) {
-				// TODO  还应该考虑锁定时间问题，如果锁定开始时间为有顾客为在住状态，客房将不能被锁定
-				rep.setStatus(Constants.BusinessCode.CODE_PARAMETER_INVALID);
-				rep.setMessage(grs.getRoomNum()+"  有客人入住无法锁定");
-				result = false;
-			}
-		}
-		return result;
-	}
-	/**
-	 * 锁房确认
-	 * @param id
-	 * @param rep
-	 * @return
-	 */
-	private boolean lockedCheck(String[] ids,LocalDateTime startTime,LocalDateTime endTime,DtoResponse<String> rep) {
-		boolean result = true;
-		for (String id : ids) {
-			if(!lockedCheck(id,startTime,endTime,rep)) {
-				result = false;
-			}
-		}
-		return result;
-	}
-	/**
-	 * 锁定房间
-	 * @param ids
-	 * @param rlb
-	 * @return
-	 */
-	private boolean locked(String[] ids, RoomLockBo rlb) {
-		boolean result = true;
-		for (String id : ids) {
-			if (!locked(id, rlb)) {
-				result = false;
-				break;
-			}
-		}
-		return result;
-	}
-
-	@Override
-	public DtoResponse<String> statusOperation(GuestRoomOperation operation) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 }

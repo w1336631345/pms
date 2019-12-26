@@ -54,7 +54,7 @@ public class GuestRoomStatusController extends BaseController<GuestRoomStatus> {
 	@PostMapping(path = "/roomStatus/{id}/{status}")
 	public HttpResponse<GuestRoomStatus> change(@PathVariable("id") String id, @PathVariable("status") String status) {
 		HttpResponse<GuestRoomStatus> response = new HttpResponse<GuestRoomStatus>();
-		BeanUtils.copyProperties(guestRoomStatusService.changeRoomStatus(id, status), response);
+		BeanUtils.copyProperties(guestRoomStatusService.changeRoomStatus(id, status,1), response);
 		return response;
 	}
 

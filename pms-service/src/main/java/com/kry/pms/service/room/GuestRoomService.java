@@ -20,8 +20,6 @@ public interface GuestRoomService extends BaseService<GuestRoom> {
 
 	long findCountByFloor(Floor floor);
 
-	DtoResponse<String> locked(RoomLockBo rlb);
-
 	DtoResponse<String> statusOperation(GuestRoomOperation operation);
 
 }

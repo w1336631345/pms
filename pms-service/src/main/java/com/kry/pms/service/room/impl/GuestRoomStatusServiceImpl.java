@@ -212,14 +212,52 @@ public class GuestRoomStatusServiceImpl implements GuestRoomStatusService {
 		return roomStatusTableVo;
 	}
 
+	public boolean statusChangeSure(String oldStatus, String newStatus) {
+		switch (newStatus) {
+		case Constants.Status.ROOM_STATUS_OCCUPY_CLEAN:
+			if (oldStatus.equals(Constants.Status.ROOM_STATUS_OCCUPY_CLEAN)
+					|| oldStatus.equals(Constants.Status.ROOM_STATUS_OCCUPY_CLEAN)) {
+				return true;
+			}
+		case Constants.Status.ROOM_STATUS_OCCUPY_DIRTY:
+			if (oldStatus.equals(Constants.Status.ROOM_STATUS_OCCUPY_CLEAN)) {
+				return true;
+			}
+		case Constants.Status.ROOM_STATUS_VACANT_CLEAN:
+			if (oldStatus.equals(Constants.Status.ROOM_STATUS_VACANT_DIRTY)) {
+				return true;
+			}
+		case Constants.Status.ROOM_STATUS_VACANT_DIRTY:
+			if (oldStatus.equals(Constants.Status.ROOM_STATUS_VACANT_CLEAN)
+					|| oldStatus.equals(Constants.Status.ROOM_STATUS_OUT_OF_SERVCIE)
+					|| oldStatus.equals(Constants.Status.ROOM_STATUS_OUT_OF_ORDER)) {
+				return true;
+			}
+		case Constants.Status.ROOM_STATUS_OUT_OF_ORDER:
+			if (oldStatus.equals(Constants.Status.ROOM_STATUS_VACANT_DIRTY)||oldStatus.equals(Constants.Status.ROOM_STATUS_VACANT_CLEAN)) {
+				return true;
+			}
+		case Constants.Status.ROOM_STATUS_OUT_OF_SERVCIE:
+			if (oldStatus.equals(Constants.Status.ROOM_STATUS_VACANT_DIRTY)||oldStatus.equals(Constants.Status.ROOM_STATUS_VACANT_CLEAN)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	@Override
-	public DtoResponse<String> changeRoomStatus(String id, String status) {
+	public DtoResponse<String> changeRoomStatus(String id, String status, int quantity) {
 		DtoResponse<String> rep = new DtoResponse<String>();
-		GuestRoomStatus roomStatus = findById(id);
+		GuestRoomStatus roomStatus =  guestRoomStatusDao.findByGuestRoomId(id);
 		String oldStatus = roomStatus.getStatus();
-		roomStatus.setStatus(status);
-		modify(roomStatus);
-		roomStatusQuantityService.transformRoomStatusQuantity(roomStatus.getHotelCode(), oldStatus, status, 1);
+		if(statusChangeSure(oldStatus,status)) {			
+			roomStatus.setStatus(status);
+			modify(roomStatus);
+			roomStatusQuantityService.transformRoomStatusQuantity(roomStatus.getHotelCode(), oldStatus, status, 1);
+		}else {
+			rep.setStatus(Constants.BusinessCode.CODE_ILLEGAL_OPERATION);
+			rep.setMessage(roomStatus.getRoomNum()+":当前状态为："+oldStatus+",无法修改");
+		}
 		return rep;
 	}
 

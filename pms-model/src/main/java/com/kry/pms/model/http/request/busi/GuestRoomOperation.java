@@ -10,9 +10,9 @@ public class GuestRoomOperation {
 	@NotBlank
 	private String op;
 	@NotBlank
-	private String roomIds;
+	private String[] roomIds;
 	private String roomNums;
-	private String toStatus;
+	private String endToStatus;
 	private String reasonId;
 	private String operationEmployeeId;
 	private LocalDateTime startTime;

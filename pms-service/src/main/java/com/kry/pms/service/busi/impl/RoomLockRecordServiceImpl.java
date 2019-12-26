@@ -1,5 +1,6 @@
 package com.kry.pms.service.busi.impl;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,14 +14,20 @@ import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
 import com.kry.pms.dao.busi.RoomLockRecordDao;
 import com.kry.pms.model.persistence.busi.RoomLockRecord;
+import com.kry.pms.model.persistence.dict.RoomLockReason;
+import com.kry.pms.model.persistence.room.GuestRoom;
+import com.kry.pms.model.persistence.room.GuestRoomStatus;
 import com.kry.pms.service.busi.RoomLockRecordService;
+import com.kry.pms.service.dict.RoomLockReasonService;
 
 @Service
-public class  RoomLockRecordServiceImpl implements  RoomLockRecordService{
+public class RoomLockRecordServiceImpl implements RoomLockRecordService {
 	@Autowired
-	 RoomLockRecordDao roomLockRecordDao;
-	 
-	 @Override
+	RoomLockRecordDao roomLockRecordDao;
+	@Autowired
+	RoomLockReasonService roomLockReasonService;
+
+	@Override
 	public RoomLockRecord add(RoomLockRecord roomLockRecord) {
 		return roomLockRecordDao.saveAndFlush(roomLockRecord);
 	}
@@ -46,8 +53,8 @@ public class  RoomLockRecordServiceImpl implements  RoomLockRecordService{
 
 	@Override
 	public List<RoomLockRecord> getAllByHotelCode(String code) {
-		return null;//默认不实现
-		//return roomLockRecordDao.findByHotelCode(code);
+		return null;// 默认不实现
+		// return roomLockRecordDao.findByHotelCode(code);
 	}
 
 	@Override
@@ -62,8 +69,17 @@ public class  RoomLockRecordServiceImpl implements  RoomLockRecordService{
 		}
 		return convent(roomLockRecordDao.findAll(ex, req));
 	}
-	 
-	 
-	 
-	 
+
+	@Override
+	public RoomLockRecord createRecord(GuestRoom gr, LocalDateTime startTime, LocalDateTime endTime,
+			RoomLockReason reason, String endToStatus) {
+		RoomLockRecord rlr = new RoomLockRecord();
+		rlr.setGuestRoom(gr);
+		rlr.setStartTime(startTime);
+		rlr.setEndTime(endTime);
+		rlr.setReason(reason);
+		rlr.setEndToStatus(endToStatus);
+		return rlr;
+	}
+
 }

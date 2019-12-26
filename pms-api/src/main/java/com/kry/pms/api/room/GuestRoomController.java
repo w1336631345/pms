@@ -36,12 +36,10 @@ public class GuestRoomController extends BaseController<GuestRoom> {
 		BeanUtils.copyProperties(guestRoomService.addWithDto(guestRoom), rep);
 		return rep;
 	}
-
 	@PutMapping
 	public HttpResponse<GuestRoom> modify(@RequestBody GuestRoom guestRoom) {
 		return getDefaultResponse().addData(guestRoomService.modify(guestRoom));
 	}
-
 	@DeleteMapping
 	public HttpResponse<String> delete(String id) {
 		HttpResponse<String> rep = new HttpResponse<>();
@@ -54,20 +52,12 @@ public class GuestRoomController extends BaseController<GuestRoom> {
 		BeanUtils.copyProperties(guestRoomService.batchAdd(guestRoom), rep);
 		return rep;
 	}
-	@PostMapping(path = "/lock")
-	public HttpResponse<String> lock(@Valid @RequestBody RoomLockBo rlb) {
-		HttpResponse<String> rep = new HttpResponse<String>();
-		BeanUtils.copyProperties(guestRoomService.locked(rlb), rep);
-		return rep;
-	}
 	@PostMapping(path = "/status/op")
 	public HttpResponse<String> statusOperation(@RequestBody GuestRoomOperation operation){
 		HttpResponse<String> rep = new HttpResponse<String>();
 		DtoResponse<String> response = guestRoomService.statusOperation(operation);
 		return rep;
 	}
-	
-	
 	@GetMapping
 	public HttpResponse<PageResponse<GuestRoom>> query(HttpServletRequest request) throws InstantiationException, IllegalAccessException{
 		HttpResponse<PageResponse<GuestRoom>> rep = new HttpResponse<PageResponse<GuestRoom>>();
