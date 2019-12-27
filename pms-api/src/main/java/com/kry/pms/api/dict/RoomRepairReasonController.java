@@ -1,5 +1,7 @@
 package com.kry.pms.api.dict;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +17,7 @@ import com.kry.pms.api.BaseController;
 import com.kry.pms.base.HttpResponse;
 import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
+import com.kry.pms.model.persistence.dict.RoomLockReason;
 import com.kry.pms.model.persistence.dict.RoomRepairReason;
 import com.kry.pms.service.dict.RoomRepairReasonService;
 
@@ -45,6 +48,11 @@ public class RoomRepairReasonController extends BaseController<RoomRepairReason>
 		HttpResponse<PageResponse<RoomRepairReason>> rep = new HttpResponse<PageResponse<RoomRepairReason>>();
 		PageRequest<RoomRepairReason> req = parse2PageRequest(request);
 		return rep.addData(roomRepairReasonService.listPage(req));
+	}
+	@GetMapping(path = "/all")
+	public HttpResponse<List<RoomRepairReason>> all(HttpServletRequest request) throws InstantiationException, IllegalAccessException{
+		HttpResponse<List<RoomRepairReason>> rep = new HttpResponse<List<RoomRepairReason>>();
+		return rep.addData(roomRepairReasonService.getAllByHotelCode(getCurrentHotleCode()));
 	}
 
 }

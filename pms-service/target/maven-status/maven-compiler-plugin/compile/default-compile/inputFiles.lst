@@ -22,6 +22,7 @@ E:\kry\src\pms-server\pms-service\src\main\java\com\kry\pms\service\goods\impl\P
 E:\kry\src\pms-server\pms-service\src\main\java\com\kry\pms\service\goods\ProductService.java
 E:\kry\src\pms-server\pms-service\src\main\java\com\kry\pms\service\marketing\impl\MarketingSourcesServiceImpl.java
 E:\kry\src\pms-server\pms-service\src\main\java\com\kry\pms\service\room\impl\FloorServiceImpl.java
+E:\kry\src\pms-server\pms-service\src\main\java\com\kry\pms\service\dict\impl\RoomRepairReasonServiceImpl.java
 E:\kry\src\pms-server\pms-service\src\main\java\com\kry\pms\service\busi\impl\BookingRecordServiceImpl.java
 E:\kry\src\pms-server\pms-service\src\main\java\com\kry\pms\service\org\impl\EmployeeServiceImpl.java
 E:\kry\src\pms-server\pms-service\src\main\java\com\kry\pms\service\room\impl\BuildingServiceImpl.java
@@ -41,6 +42,7 @@ E:\kry\src\pms-server\pms-service\src\main\java\com\kry\pms\service\report\impl\
 E:\kry\src\pms-server\pms-service\src\main\java\com\kry\pms\service\audit\impl\NightAuditServiceImpl.java
 E:\kry\src\pms-server\pms-service\src\main\java\com\kry\pms\service\guest\impl\CustomerLevelServiceImpl.java
 E:\kry\src\pms-server\pms-service\src\main\java\com\kry\pms\service\org\impl\DepartmentServiceImpl.java
+E:\kry\src\pms-server\pms-service\src\main\java\com\kry\pms\service\busi\RoomRepairRecordService.java
 E:\kry\src\pms-server\pms-service\src\main\java\com\kry\pms\service\sys\impl\ShiftServiceImpl.java
 E:\kry\src\pms-server\pms-service\src\main\java\com\kry\pms\service\audit\NightAuditService.java
 E:\kry\src\pms-server\pms-service\src\main\java\com\kry\pms\service\report\impl\FrontReceiveReportServiceImpl.java
@@ -51,6 +53,7 @@ E:\kry\src\pms-server\pms-service\src\main\java\com\kry\pms\service\report\Audit
 E:\kry\src\pms-server\pms-service\src\main\java\com\kry\pms\service\report\GenerateReportsLogService.java
 E:\kry\src\pms-server\pms-service\src\main\java\com\kry\pms\service\goods\impl\ProductServiceImpl.java
 E:\kry\src\pms-server\pms-service\src\main\java\com\kry\pms\service\room\BuildingService.java
+E:\kry\src\pms-server\pms-service\src\main\java\com\kry\pms\service\dict\RoomRepairReasonService.java
 E:\kry\src\pms-server\pms-service\src\main\java\com\kry\pms\service\marketing\RoomPriceSchemeService.java
 E:\kry\src\pms-server\pms-service\src\main\java\com\kry\pms\service\marketing\DiscountSchemeService.java
 E:\kry\src\pms-server\pms-service\src\main\java\com\kry\pms\service\busi\BookingItemService.java
@@ -124,6 +127,7 @@ E:\kry\src\pms-server\pms-service\src\main\java\com\kry\pms\service\busi\CreditG
 E:\kry\src\pms-server\pms-service\src\main\java\com\kry\pms\service\dict\CertificateTypeService.java
 E:\kry\src\pms-server\pms-service\src\main\java\com\kry\pms\service\busi\ChangeRoomRecordService.java
 E:\kry\src\pms-server\pms-service\src\main\java\com\kry\pms\service\sys\UserService.java
+E:\kry\src\pms-server\pms-service\src\main\java\com\kry\pms\service\busi\impl\RoomRepairRecordServiceImpl.java
 E:\kry\src\pms-server\pms-service\src\main\java\com\kry\pms\service\dict\impl\AreaServiceImpl.java
 E:\kry\src\pms-server\pms-service\src\main\java\com\kry\pms\service\org\HotelService.java
 E:\kry\src\pms-server\pms-service\src\main\java\com\kry\pms\service\busi\impl\SettleAccountRecordServiceImpl.java

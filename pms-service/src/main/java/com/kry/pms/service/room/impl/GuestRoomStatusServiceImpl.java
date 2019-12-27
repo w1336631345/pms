@@ -215,8 +215,8 @@ public class GuestRoomStatusServiceImpl implements GuestRoomStatusService {
 	public boolean statusChangeSure(String oldStatus, String newStatus) {
 		switch (newStatus) {
 		case Constants.Status.ROOM_STATUS_OCCUPY_CLEAN:
-			if (oldStatus.equals(Constants.Status.ROOM_STATUS_OCCUPY_CLEAN)
-					|| oldStatus.equals(Constants.Status.ROOM_STATUS_OCCUPY_CLEAN)) {
+			if (oldStatus.equals(Constants.Status.ROOM_STATUS_OCCUPY_DIRTY)
+					|| oldStatus.equals(Constants.Status.ROOM_STATUS_VACANT_CLEAN)) {
 				return true;
 			}
 		case Constants.Status.ROOM_STATUS_OCCUPY_DIRTY:
@@ -249,9 +249,9 @@ public class GuestRoomStatusServiceImpl implements GuestRoomStatusService {
 	public DtoResponse<String> changeRoomStatus(String id, String status, int quantity) {
 		DtoResponse<String> rep = new DtoResponse<String>();
 		GuestRoomStatus roomStatus =  guestRoomStatusDao.findByGuestRoomId(id);
-		String oldStatus = roomStatus.getStatus();
+		String oldStatus = roomStatus.getRoomStatus();
 		if(statusChangeSure(oldStatus,status)) {			
-			roomStatus.setStatus(status);
+			roomStatus.setRoomStatus(status);
 			modify(roomStatus);
 			roomStatusQuantityService.transformRoomStatusQuantity(roomStatus.getHotelCode(), oldStatus, status, 1);
 		}else {

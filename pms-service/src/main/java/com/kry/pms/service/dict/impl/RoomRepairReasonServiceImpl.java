@@ -46,8 +46,7 @@ public class  RoomRepairReasonServiceImpl implements  RoomRepairReasonService{
 
 	@Override
 	public List<RoomRepairReason> getAllByHotelCode(String code) {
-		return null;//默认不实现
-		//return roomRepairReasonDao.findByHotelCode(code);
+		return roomRepairReasonDao.findByHotelCodeAndDeleted(code,Constants.DELETED_FALSE);
 	}
 
 	@Override

@@ -56,6 +56,7 @@ public class GuestRoomController extends BaseController<GuestRoom> {
 	public HttpResponse<String> statusOperation(@RequestBody GuestRoomOperation operation){
 		HttpResponse<String> rep = new HttpResponse<String>();
 		DtoResponse<String> response = guestRoomService.statusOperation(operation);
+		BeanUtils.copyProperties(response, rep);
 		return rep;
 	}
 	@GetMapping

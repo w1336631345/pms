@@ -43,7 +43,7 @@ public class GuestRoomServiceImpl implements GuestRoomService {
 	@Autowired
 	RoomRepairReasonService roomRepairReasonService;
 	@Autowired
-	RoomRepairRecordService  roomRepairRecordService;
+	RoomRepairRecordService roomRepairRecordService;
 	@Autowired
 	RoomLockReasonService roomLockReasonService;
 
@@ -154,6 +154,7 @@ public class GuestRoomServiceImpl implements GuestRoomService {
 		return guestRoomDao.count(ex);
 	}
 
+	@Transactional
 	@Override
 	public DtoResponse<String> statusOperation(GuestRoomOperation op) {
 		DtoResponse<String> rep = new DtoResponse<>();
@@ -173,7 +174,7 @@ public class GuestRoomServiceImpl implements GuestRoomService {
 						rep.setMessage("必要参数不足：原因或者结束状态未选");
 					}
 					break;
-				case  Constants.Status.ROOM_STATUS_OUT_OF_SERVCIE:
+				case Constants.Status.ROOM_STATUS_OUT_OF_SERVCIE:
 					if (op.getReasonId() != null && op.getEndToStatus() != null) {
 						RoomLockReason rlr = roomLockReasonService.findById(op.getReasonId());
 						roomLockRecordService.add(roomLockRecordService.createRecord(gr, op.getStartTime(),
@@ -191,7 +192,7 @@ public class GuestRoomServiceImpl implements GuestRoomService {
 					rep.setStatus(r.getStatus());
 					rep.setMessage(rep.getMessage() + r.getMessage());
 				}
-			}else {
+			} else {
 				rep.setStatus(Constants.BusinessCode.CODE_PARAMETER_INVALID);
 				rep.setMessage("必要参数错误：房间找不到");
 			}
