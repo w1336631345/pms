@@ -47,4 +47,7 @@ public class RoomRecord extends PersistenceModel {
 	private DailyVerify dailyVerify;
 	@Column(columnDefinition = "varchar(32) default 'NO' COMMENT '是否入账（PAY：入账，NO：未入账）'")
 	private String isAccountEntry = "NO";//是否入账
+	@Column(columnDefinition = "double(8,2)  COMMENT '每日房价'")
+	private Double roomPrice;
+
 }
