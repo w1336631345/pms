@@ -5,4 +5,5 @@ import com.kry.pms.service.BaseService;
 
 public interface UserService extends BaseService<User>{
 
+    User getAuditUser(String username, String password, String hotelCode);
 }

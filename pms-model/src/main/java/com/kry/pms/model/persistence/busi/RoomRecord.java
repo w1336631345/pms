@@ -49,5 +49,7 @@ public class RoomRecord extends PersistenceModel {
 	private String isAccountEntry = "NO";//是否入账
 	@Column(columnDefinition = "double(8,2)  COMMENT '每日房价'")
 	private Double roomPrice;
+	@Column
+	private Double discount;
 
 }

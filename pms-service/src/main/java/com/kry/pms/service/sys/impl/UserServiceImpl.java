@@ -62,8 +62,12 @@ public class  UserServiceImpl implements  UserService{
 		}
 		return convent(userDao.findAll(ex, req));
 	}
-	 
-	 
+
+	@Override
+	 public User getAuditUser(String username, String password, String hotelCode){
+	 	User user = userDao.findByUsernameAndPasswordAndHotelCode(username, password, hotelCode);
+	 	return user;
+	 }
 	 
 	 
 }

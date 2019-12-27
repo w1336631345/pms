@@ -131,4 +131,22 @@ public class UserController extends BaseController<User> {
 		return rep.ok("密码修改成功");
 	}
 
+	/**
+	 * 功能描述: <br>权限账号查询
+	 * 〈〉
+	 * @Param: []
+	 * @Return: com.kry.pms.base.HttpResponse
+	 * @Author: huanghaibin
+	 * @Date: 2019/12/27 14:54
+	 */
+	@GetMapping(path = "/getAuditUser")
+	public HttpResponse getAuditUser(String username, String password){
+		HttpResponse hr = new HttpResponse();
+		User user = getUser();
+		String MD5password = MD5Utils.encrypt(username,user.getHotelCode(), password);
+		User u = userService.getAuditUser(username, MD5password, user.getHotelCode());
+		hr.setData(u);
+		return hr;
+	}
+
 }
