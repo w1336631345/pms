@@ -2,6 +2,8 @@ package com.kry.pms.service.goods.impl;
 
 import java.util.List;
 
+import com.kry.pms.dao.goods.ProductTypeDao;
+import com.kry.pms.model.persistence.goods.ProductType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Sort;
@@ -19,6 +21,8 @@ import com.kry.pms.service.goods.ProductCategoryService;
 public class  ProductCategoryServiceImpl implements  ProductCategoryService{
 	@Autowired
 	 ProductCategoryDao productCategoryDao;
+	@Autowired
+	ProductTypeDao productTypeDao;
 	 
 	 @Override
 	public ProductCategory add(ProductCategory productCategory) {
@@ -62,7 +66,17 @@ public class  ProductCategoryServiceImpl implements  ProductCategoryService{
 		}
 		return convent(productCategoryDao.findAll(ex, req));
 	}
-	 
+
+	@Override
+	public List<ProductCategory> treeAndType(String hotelCode){
+	 	List<ProductCategory> list = productCategoryDao.findByHotelCodeAndDeleted(hotelCode, Constants.DELETED_FALSE);
+	 	for(int i=0; i<list.size(); i++){
+	 		ProductCategory pc = list.get(i);
+	 		List<ProductType> productTypeList = productTypeDao.findByCategoryId(pc.getId());
+	 		pc.setProductTypeList(productTypeList);
+		}
+	 	return list;
+	}
 	 
 	 
 	 

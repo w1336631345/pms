@@ -17,7 +17,7 @@ public class BookkeepingSet {
     @Column(columnDefinition = "varchar(64)")
     protected String id;
     @Column(columnDefinition = "varchar(64) COMMENT '项目编码'")
-    private String productType;
+    private String productId;
     @Column(columnDefinition = "varchar(64) COMMENT '账号id'")
     private String accountId;
     @Column
