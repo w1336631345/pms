@@ -79,6 +79,8 @@ public class CheckInRecord extends PersistenceModel {
 	@Column
 	private String holdTime;
 	@Column
+	private Integer singleRoomCount;
+	@Column
 	private LocalDateTime leaveTime;
 	@Column(columnDefinition = "varchar(64) default '0000' COMMENT '入住编号'")
 	private String checkInSn;
@@ -128,6 +130,12 @@ public class CheckInRecord extends PersistenceModel {
 	public String getRoomLinkId() { return roomLinkId; }
 	public void setRoomLinkId(String roomLinkId) { this.roomLinkId = roomLinkId; }
 
+	public Integer getSingleRoomCount() {
+		return singleRoomCount;
+	}
+	public void setSingleRoomCount(Integer singleRoomCount) {
+		this.singleRoomCount = singleRoomCount;
+	}
 	public DiscountScheme getDiscountScheme() {
 		return discountScheme;
 	}

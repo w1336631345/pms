@@ -187,10 +187,12 @@ public class GuestRoomServiceImpl implements GuestRoomService {
 				default:
 					break;
 				}
-				DtoResponse<String> r = guestRoomStatusService.changeRoomStatus(id, op.getOp(), 1);
-				if (r.getStatus() != 0) {
-					rep.setStatus(r.getStatus());
-					rep.setMessage(rep.getMessage() + r.getMessage());
+				if (rep.getStatus() == 0) {
+					DtoResponse<String> r = guestRoomStatusService.changeRoomStatus(id, op.getOp(), 1);
+					if (r.getStatus() != 0) {
+						rep.setStatus(r.getStatus());
+						rep.setMessage(rep.getMessage() + r.getMessage());
+					}
 				}
 			} else {
 				rep.setStatus(Constants.BusinessCode.CODE_PARAMETER_INVALID);

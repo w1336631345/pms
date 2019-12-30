@@ -341,8 +341,9 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 		String orderNum = businessSeqService.fetchNextSeqNum(checkInRecord.getHotelCode(),
 				Constants.Key.BUSINESS_ORDER_NUM_SEQ_KEY);
 		checkInRecord.setOrderNum(orderNum);
-		if (checkInRecord.getGroupType() != null
-				&& checkInRecord.getGroupType().equals(Constants.Type.CHECK_IN_RECORD_GROUP_TYPE_YES)) {
+		if (checkInRecord.getSubRecords()!=null&&!checkInRecord.getSubRecords().isEmpty()) {
+//			if (checkInRecord.getGroupType() != null
+//					&& checkInRecord.getGroupType().equals(Constants.Type.CHECK_IN_RECORD_GROUP_TYPE_YES)) {
 			checkInRecord.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION);
 			checkInRecord.setType(Constants.Type.CHECK_IN_RECORD_GROUP);
 			initGroup(checkInRecord);
@@ -362,6 +363,9 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 				item.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION);
 				item.setType(Constants.Type.CHECK_IN_RECORD_RESERVE);
 				item.setGroupType(checkInRecord.getGroupType());
+				if(item.getRoomType()==null) {					
+					item.setRoomType(roomTypeService.findById(item.getRoomTypeId()));
+				}
 				item.setProtocolCorpation(checkInRecord.getProtocolCorpation());
 				boolean bookResult = roomStatisticsService.booking(item.getRoomType(), item.getArriveTime(),
 						item.getRoomCount(), item.getDays());
