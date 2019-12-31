@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.kry.pms.base.DtoResponse;
 import com.kry.pms.model.http.response.room.RoomStatusTableVo;
+import com.kry.pms.model.persistence.busi.CheckInRecord;
 import com.kry.pms.model.persistence.room.GuestRoom;
 import com.kry.pms.model.persistence.room.GuestRoomStatus;
 import com.kry.pms.service.BaseService;
@@ -28,4 +29,12 @@ public interface GuestRoomStatusService extends BaseService<GuestRoomStatus> {
 	public DtoResponse<String> changeRoomStatus(String id, String status,int quantity);
 
 	public void deleteByRoomId(String id);
+
+	void linkedRoom(String roomId, boolean status);
+
+	void addTogether(String roomId, CheckInRecord checkInRecord);
+
+	void checkIn(CheckInRecord cir);
+	
+	
 }

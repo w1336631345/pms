@@ -20,6 +20,7 @@ import com.kry.pms.model.http.response.room.BuildingVo;
 import com.kry.pms.model.http.response.room.FloorVo;
 import com.kry.pms.model.http.response.room.GuestRoomStatusVo;
 import com.kry.pms.model.http.response.room.RoomStatusTableVo;
+import com.kry.pms.model.persistence.busi.CheckInRecord;
 import com.kry.pms.model.persistence.room.Building;
 import com.kry.pms.model.persistence.room.Floor;
 import com.kry.pms.model.persistence.room.GuestRoom;
@@ -136,6 +137,29 @@ public class GuestRoomStatusServiceImpl implements GuestRoomStatusService {
 
 	}
 
+	@Override
+	public void checkIn(CheckInRecord cir) {
+		GuestRoomStatus grs = findGuestRoomStatusByGuestRoom(cir.getGuestRoom());
+		if (grs != null) {
+			grs.setRoomStatus(Constants.Status.ROOM_STATUS_OCCUPY_CLEAN);
+			String summary = grs.getSummary();
+			if(summary==null) {
+				summary = cir.getCustomer().getName();
+			}else {
+				summary+=cir.getCustomer().getName();
+			}
+			grs.setSummary(summary);
+			List<CheckInRecord> crs = grs.getCurrentCheckInRecords();
+			if (crs != null) {
+				grs.getCurrentCheckInRecords().add(cir);
+			} else {
+				crs = new ArrayList<>();
+				crs.add(cir);
+			}
+			modify(grs);
+		}
+	}
+
 	private GuestRoomStatus initGuestStatusRoom(GuestRoom guestRoom) {
 		GuestRoomStatus grs = new GuestRoomStatus();
 		grs.setGuestRoom(guestRoom);
@@ -165,8 +189,31 @@ public class GuestRoomStatusServiceImpl implements GuestRoomStatusService {
 
 	@Override
 	public void checkOut(String roomId) {
-		// TODO Auto-generated method stub
+		GuestRoomStatus grs = guestRoomStatusDao.findByGuestRoomId(roomId);
+		if (grs != null) {
+			grs.setRoomNum(Constants.Status.ROOM_STATUS_VACANT_DIRTY);
+			grs.setCurrentCheckInRecords(null);
+			modify(grs);
+		}
+	}
 
+	@Override
+	public void linkedRoom(String roomId, boolean status) {
+		GuestRoomStatus grs = guestRoomStatusDao.findByGuestRoomId(roomId);
+		if (grs != null) {
+			grs.setLinkedRoom(status);
+			modify(grs);
+		}
+	}
+
+	@Override
+	public void addTogether(String roomId, CheckInRecord checkInRecord) {
+		GuestRoomStatus grs = guestRoomStatusDao.findByGuestRoomId(roomId);
+		if (grs != null) {
+			grs.setSummary(grs.getSummary() + checkInRecord.getGuestRoom());
+			grs.getCurrentCheckInRecords().add(checkInRecord);
+			modify(grs);
+		}
 	}
 
 	@Override
@@ -234,11 +281,13 @@ public class GuestRoomStatusServiceImpl implements GuestRoomStatusService {
 				return true;
 			}
 		case Constants.Status.ROOM_STATUS_OUT_OF_ORDER:
-			if (oldStatus.equals(Constants.Status.ROOM_STATUS_VACANT_DIRTY)||oldStatus.equals(Constants.Status.ROOM_STATUS_VACANT_CLEAN)) {
+			if (oldStatus.equals(Constants.Status.ROOM_STATUS_VACANT_DIRTY)
+					|| oldStatus.equals(Constants.Status.ROOM_STATUS_VACANT_CLEAN)) {
 				return true;
 			}
 		case Constants.Status.ROOM_STATUS_OUT_OF_SERVCIE:
-			if (oldStatus.equals(Constants.Status.ROOM_STATUS_VACANT_DIRTY)||oldStatus.equals(Constants.Status.ROOM_STATUS_VACANT_CLEAN)) {
+			if (oldStatus.equals(Constants.Status.ROOM_STATUS_VACANT_DIRTY)
+					|| oldStatus.equals(Constants.Status.ROOM_STATUS_VACANT_CLEAN)) {
 				return true;
 			}
 		}
@@ -248,15 +297,15 @@ public class GuestRoomStatusServiceImpl implements GuestRoomStatusService {
 	@Override
 	public DtoResponse<String> changeRoomStatus(String id, String status, int quantity) {
 		DtoResponse<String> rep = new DtoResponse<String>();
-		GuestRoomStatus roomStatus =  guestRoomStatusDao.findByGuestRoomId(id);
+		GuestRoomStatus roomStatus = guestRoomStatusDao.findByGuestRoomId(id);
 		String oldStatus = roomStatus.getRoomStatus();
-		if(statusChangeSure(oldStatus,status)) {			
+		if (statusChangeSure(oldStatus, status)) {
 			roomStatus.setRoomStatus(status);
 			modify(roomStatus);
 			roomStatusQuantityService.transformRoomStatusQuantity(roomStatus.getHotelCode(), oldStatus, status, 1);
-		}else {
+		} else {
 			rep.setStatus(Constants.BusinessCode.CODE_ILLEGAL_OPERATION);
-			rep.setMessage(roomStatus.getRoomNum()+":当前状态为："+oldStatus+",无法修改");
+			rep.setMessage(roomStatus.getRoomNum() + ":当前状态为：" + oldStatus + ",无法修改");
 		}
 		return rep;
 	}

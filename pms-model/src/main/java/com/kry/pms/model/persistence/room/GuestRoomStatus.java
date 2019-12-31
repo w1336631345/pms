@@ -54,6 +54,8 @@ public class GuestRoomStatus extends PersistenceModel {
 	private Boolean repairRoom;// 维修
 	@Column(columnDefinition = "bit(1) default NULl COMMENT '欠费'")
 	private Boolean overdued;// 欠费
+	@Column(columnDefinition = "bit(1) default NULl COMMENT 'OTA'")
+	private Boolean ota;
 
 	@OneToMany(fetch = FetchType.LAZY)
 	private List<CheckInRecord> currentCheckInRecords;

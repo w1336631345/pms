@@ -125,7 +125,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 	@Override
 	public CheckInRecord updateAll(CheckUpdateItemTestBo checkUpdateItemTestBo) {
 		String[] ids = checkUpdateItemTestBo.getIds();
-		for(int i=0; i<ids.length; i++){
+		for (int i = 0; i < ids.length; i++) {
 			CheckInRecord cir = findById(ids[i]);
 			UpdateUtil.copyNullProperties(checkUpdateItemTestBo, cir);
 //			modify(cir);
@@ -133,10 +133,11 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 		}
 		return null;
 	}
+
 	@Override
 	public HttpResponse cancelIn(String[] ids) {
 		HttpResponse hr = new HttpResponse();
-		for(int i=0; i<ids.length; i++){
+		for (int i = 0; i < ids.length; i++) {
 			CheckInRecord cir = findById(ids[i]);
 			cir.setStatus("R");
 			checkInRecordDao.save(cir);
@@ -258,7 +259,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 				cir.setDays(br.getDays());
 				cir.setGuestRoom(gr);
 				cir.setHotelCode(gr.getHotelCode());
-				Account account = new Account(0,0);
+				Account account = new Account(0, 0);
 				account.setName(tempName);
 				account.setCustomer(customer);
 				account.setType(Constants.Type.ACCOUNT_CUSTOMER);
@@ -316,7 +317,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 				ncir.setSubRecords(null);
 				ncir.setStartDate(startDate);
 				ncir.setHotelCode(gr.getHotelCode());
-				Account account = new Account(0,0);
+				Account account = new Account(0, 0);
 				account.setRoomNum(gr.getRoomNum());
 				account.setCustomer(customer);
 				account.setCode(businessSeqService.fetchNextSeqNum(gr.getHotelCode(),
@@ -325,11 +326,12 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 				ncir.setRoomCount(1);
 				account.setType(Constants.Type.ACCOUNT_CUSTOMER);
 				ncir.setAccount(account);
-				ncir.setGroupType(cir.getGroupType());//设置分组类型（团队/散客）
-				ncir.setReserveId(cir.getId());//添加预留记录id
+				ncir.setGroupType(cir.getGroupType());// 设置分组类型（团队/散客）
+				ncir.setReserveId(cir.getId());// 添加预留记录id
 				ncir = add(ncir);
 				data.add(ncir);
 				roomRecordService.createRoomRecord(ncir);
+				guestRoomStatausService.checkIn(ncir);
 			}
 		}
 		return data;
@@ -341,7 +343,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 		String orderNum = businessSeqService.fetchNextSeqNum(checkInRecord.getHotelCode(),
 				Constants.Key.BUSINESS_ORDER_NUM_SEQ_KEY);
 		checkInRecord.setOrderNum(orderNum);
-		if (checkInRecord.getSubRecords()!=null&&!checkInRecord.getSubRecords().isEmpty()) {
+		if (checkInRecord.getSubRecords() != null && !checkInRecord.getSubRecords().isEmpty()) {
 //			if (checkInRecord.getGroupType() != null
 //					&& checkInRecord.getGroupType().equals(Constants.Type.CHECK_IN_RECORD_GROUP_TYPE_YES)) {
 			checkInRecord.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION);
@@ -363,7 +365,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 				item.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION);
 				item.setType(Constants.Type.CHECK_IN_RECORD_RESERVE);
 				item.setGroupType(checkInRecord.getGroupType());
-				if(item.getRoomType()==null) {					
+				if (item.getRoomType() == null) {
 					item.setRoomType(roomTypeService.findById(item.getRoomTypeId()));
 				}
 				item.setProtocolCorpation(checkInRecord.getProtocolCorpation());
@@ -374,21 +376,21 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 				}
 			}
 			checkInRecord = add(checkInRecord);
-		}else {
+		} else {
 			Customer customer = checkInRecord.getCustomer();
-			if(customer!=null&&customer.getId()==null) {
-				customer =customerService.add(customer);
+			if (customer != null && customer.getId() == null) {
+				customer = customerService.add(customer);
 			}
 			checkInRecord.setCustomer(customer);
 			checkInRecord.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION);
 			checkInRecord.setType(Constants.Type.CHECK_IN_RECORD_CUSTOMER);
-			roomStatisticsService.booking(checkInRecord.getRoomType(), checkInRecord.getArriveTime(),
-					1, checkInRecord.getDays());
+			roomStatisticsService.booking(checkInRecord.getRoomType(), checkInRecord.getArriveTime(), 1,
+					checkInRecord.getDays());
 			checkInRecord = add(checkInRecord);
 			Account account = accountService.createAccount(checkInRecord.getCustomer(), null);
 			checkInRecord.setAccount(account);
 			modify(checkInRecord);
-			
+
 		}
 		return checkInRecord;
 	}
@@ -398,8 +400,8 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 	}
 
 	private void initGroupAccount(CheckInRecord checkInRecord) {
-		Account account = new Account(0,0);
-		if(checkInRecord.getGroup()!=null) {
+		Account account = new Account(0, 0);
+		if (checkInRecord.getGroup() != null) {
 			account.setGroup(checkInRecord.getGroup());
 		}
 		account.setType(Constants.Type.ACCOUNT_GROUP);
@@ -624,7 +626,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 
 	@Override
 	public DtoResponse<String> hangUpByAccountId(String id) {
-		CheckInRecord cir  = checkInRecordDao.findByAccountId(id);
+		CheckInRecord cir = checkInRecordDao.findByAccountId(id);
 		DtoResponse<String> rep = new DtoResponse<String>();
 		cir.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_OUT_UNSETTLED);
 		modify(cir);
@@ -632,38 +634,39 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 	}
 
 	@Override
-	public List<CheckInRecord> findByOrderNumAndGuestRoomAndDeleted(String orderNum, GuestRoom guestRoom, int delete){
+	public List<CheckInRecord> findByOrderNumAndGuestRoomAndDeleted(String orderNum, GuestRoom guestRoom, int delete) {
 		List<CheckInRecord> list = checkInRecordDao.findByOrderNumAndGuestRoomAndDeleted(orderNum, guestRoom, delete);
 		return list;
 	}
 
-	//取消排房
+	// 取消排房
 	@Override
-	public HttpResponse callOffAssignRoom(String[] ids){
+	public HttpResponse callOffAssignRoom(String[] ids) {
 		HttpResponse hr = new HttpResponse();
 		List<String> reserveIds = new ArrayList<>();
 		String mainRecordId = null;
-		for(int i=0; i<ids.length; i++){
+		for (int i = 0; i < ids.length; i++) {
 			CheckInRecord cir = findById(ids[i]);
-			if(cir.getMainRecord() != null){
+			if (cir.getMainRecord() != null) {
 				mainRecordId = cir.getMainRecord().getId();
 			}
-			if(("G").equals(cir.getType())){
+			if (("G").equals(cir.getType())) {
 				return hr.error("主单不能修改");
 			}
 			cir.setDeleted(Constants.DELETED_TRUE);
-			//修改选中的数据状态，排房记录改为删除
+			// 修改选中的数据状态，排房记录改为删除
 			modify(cir);
-			//取消排房成功，修改房间状态
-			//修改排放记录状态为删除后，查询此房间是否还有其他人在住
-			List<CheckInRecord> list = checkInRecordDao.findByOrderNumAndGuestRoomAndDeleted(cir.getOrderNum(), cir.getGuestRoom(), Constants.DELETED_FALSE);
-			//如果该房间没有人在住了，则修改房间状态
-			if(list == null || list.isEmpty()){
-				//...修改房间状态代码
+			// 取消排房成功，修改房间状态
+			// 修改排放记录状态为删除后，查询此房间是否还有其他人在住
+			List<CheckInRecord> list = checkInRecordDao.findByOrderNumAndGuestRoomAndDeleted(cir.getOrderNum(),
+					cir.getGuestRoom(), Constants.DELETED_FALSE);
+			// 如果该房间没有人在住了，则修改房间状态
+			if (list == null || list.isEmpty()) {
+				// ...修改房间状态代码
 			}
-			//查出所有的预留记录id，放入集合
-			if(cir.getReserveId() != null){
-				if(!reserveIds.contains(cir.getReserveId())){
+			// 查出所有的预留记录id，放入集合
+			if (cir.getReserveId() != null) {
+				if (!reserveIds.contains(cir.getReserveId())) {
 					reserveIds.add(cir.getReserveId());
 				}
 			}
@@ -672,25 +675,26 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 		return hr;
 	}
 
-	//取消预订
+	// 取消预订
 	@Override
-	public HttpResponse callOffReserve(String[] ids){
+	public HttpResponse callOffReserve(String[] ids) {
 		HttpResponse hr = new HttpResponse();
 		List<String> reserveIds = new ArrayList<>();
 		String mainRecordId = null;
-		for(int i=0; i<ids.length; i++){
+		for (int i = 0; i < ids.length; i++) {
 			CheckInRecord cir = checkInRecordDao.getOne(ids[i]);
-			if(cir.getMainRecord() != null){
+			if (cir.getMainRecord() != null) {
 				mainRecordId = cir.getMainRecord().getId();
 			}
-			//如果是主单
-			if(("G").equals(cir.getType())){
+			// 如果是主单
+			if (("G").equals(cir.getType())) {
 				return hr.error("此处不能取消主单");
 			}
-			//如果是预留单，取消预留单下的所有排房/预定
-			if(("R").equals(cir.getType())){
-				List<CheckInRecord> list = checkInRecordDao.findByReserveIdAndDeleted(cir.getId(), Constants.DELETED_FALSE);
-				for(int j=0; j<list.size(); j++){
+			// 如果是预留单，取消预留单下的所有排房/预定
+			if (("R").equals(cir.getType())) {
+				List<CheckInRecord> list = checkInRecordDao.findByReserveIdAndDeleted(cir.getId(),
+						Constants.DELETED_FALSE);
+				for (int j = 0; j < list.size(); j++) {
 					CheckInRecord cird = list.get(j);
 					cird.setDeleted(Constants.DELETED_TRUE);
 					cird.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_CANCLE_BOOK);
@@ -700,9 +704,9 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 			cir.setDeleted(Constants.DELETED_TRUE);
 			cir.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_CANCLE_BOOK);
 			modify(cir);
-			//查出所有的预留记录id，放入集合
-			if(cir.getReserveId() != null){
-				if(!reserveIds.contains(cir.getReserveId())){
+			// 查出所有的预留记录id，放入集合
+			if (cir.getReserveId() != null) {
+				if (!reserveIds.contains(cir.getReserveId())) {
 					reserveIds.add(cir.getReserveId());
 				}
 			}
@@ -713,16 +717,16 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 	}
 
 	@Override
-	public HttpResponse updateCount(List<String> reserveIds, String mainRecordId){
+	public HttpResponse updateCount(List<String> reserveIds, String mainRecordId) {
 		HttpResponse hr = new HttpResponse();
-		//修改预留记录的已排房数量
-		for(int i=0; i<reserveIds.size(); i++){
+		// 修改预留记录的已排房数量
+		for (int i = 0; i < reserveIds.size(); i++) {
 			int count = checkInRecordDao.getReserveIdCount(reserveIds.get(i), Constants.DELETED_FALSE);
 			CheckInRecord cir = findById(reserveIds.get(i));
 			cir.setCheckInCount(count);
 			modify(cir);
 		}
-		//修改主单已排房数量
+		// 修改主单已排房数量
 		CheckInRecord cir = findById(mainRecordId);
 		int count = checkInRecordDao.getMainRecordIdCount(mainRecordId, Constants.DELETED_FALSE);
 		cir.setCheckInCount(count);
@@ -730,49 +734,51 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 		return hr.ok();
 	}
 
-	//查询可联房的数据
+	// 查询可联房的数据
 	@Override
-	public PageResponse<CheckInRecord> getNRoomLink(int pageIndex, int pageSize, String name, String roomNum, String hotelCode, String groupType){
+	public PageResponse<CheckInRecord> getNRoomLink(int pageIndex, int pageSize, String name, String roomNum,
+			String hotelCode, String groupType) {
 		Pageable page = org.springframework.data.domain.PageRequest.of(pageIndex - 1, pageSize);
 		Page<CheckInRecord> pageList = checkInRecordDao.findAll(new Specification<CheckInRecord>() {
 			@Override
 			public Predicate toPredicate(Root<CheckInRecord> root, CriteriaQuery<?> query,
-										 CriteriaBuilder criteriaBuilder) {
+					CriteriaBuilder criteriaBuilder) {
 				List<Predicate> list = new ArrayList<Predicate>();
-				if(hotelCode!=null) {
+				if (hotelCode != null) {
 					list.add(criteriaBuilder.equal(root.get("hotelCode"), hotelCode));
 				}
-				if(groupType!=null) {
+				if (groupType != null) {
 					list.add(criteriaBuilder.equal(root.get("groupType"), groupType));
 				}
-				if(roomNum!=null) {
+				if (roomNum != null) {
 					list.add(criteriaBuilder.equal(root.get("roomNum"), roomNum));
 				}
-				if(name!=null) {
-					//外键对象的属性，要用join再get
-					list.add(criteriaBuilder.like(root.join("customer").get("name"), "%"+name+"%"));
+				if (name != null) {
+					// 外键对象的属性，要用join再get
+					list.add(criteriaBuilder.like(root.join("customer").get("name"), "%" + name + "%"));
 				}
 				list.add(criteriaBuilder.isNull(root.get("roomLinkId")));
 				Predicate[] array = new Predicate[list.size()];
 				return criteriaBuilder.and(list.toArray(array));
 			}
-		},page);
+		}, page);
 		return convent(pageList);
 	}
 
-	//根据roomlinkId查询已经联房的数据
+	// 根据roomlinkId查询已经联房的数据
 	@Override
-	public List<CheckInRecord> getRoomLinkList(String roomLinkId){
+	public List<CheckInRecord> getRoomLinkList(String roomLinkId) {
 		List<CheckInRecord> list = new ArrayList<>();
-		if(roomLinkId != null){
+		if (roomLinkId != null) {
 			list = checkInRecordDao.findByRoomLinkId(roomLinkId);
 		}
 		return list;
 	}
-	//删除联房
+
+	// 删除联房
 	@Override
 	public void deleteRoomLink(String[] ids) {
-		for(int i=0; i<ids.length; i++){
+		for (int i = 0; i < ids.length; i++) {
 			CheckInRecord cir = checkInRecordDao.getOne(ids[i]);
 			cir.setRoomLinkId(null);
 			update(cir);
@@ -780,19 +786,19 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 	}
 
 	@Override
-	public List<CheckInRecord> getByRoomNum(String roomNum, String hotelCode, String groupType){
+	public List<CheckInRecord> getByRoomNum(String roomNum, String hotelCode, String groupType) {
 		List<CheckInRecord> list = checkInRecordDao.findAll(new Specification<CheckInRecord>() {
 			@Override
 			public Predicate toPredicate(Root<CheckInRecord> root, CriteriaQuery<?> query,
-										 CriteriaBuilder criteriaBuilder) {
+					CriteriaBuilder criteriaBuilder) {
 				List<Predicate> list = new ArrayList<Predicate>();
-				if(roomNum!=null) {
+				if (roomNum != null) {
 					list.add(criteriaBuilder.equal(root.join("guestRoom").get("roomNum"), roomNum));
 				}
-				if(hotelCode!=null) {
+				if (hotelCode != null) {
 					list.add(criteriaBuilder.equal(root.get("hotelCode"), hotelCode));
 				}
-				if(groupType!=null) {
+				if (groupType != null) {
 					list.add(criteriaBuilder.equal(root.get("groupType"), groupType));
 				}
 				list.add(criteriaBuilder.isNull(root.get("roomLinkId")));
@@ -804,16 +810,16 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 	}
 
 	@Override
-	public List<CheckInRecord> checkInTogether(String hotelCode, String orderNum){
+	public List<CheckInRecord> checkInTogether(String hotelCode, String orderNum) {
 		List<CheckInRecord> list = checkInRecordDao.findAll(new Specification<CheckInRecord>() {
 			@Override
 			public Predicate toPredicate(Root<CheckInRecord> root, CriteriaQuery<?> query,
-										 CriteriaBuilder criteriaBuilder) {
+					CriteriaBuilder criteriaBuilder) {
 				List<Predicate> list = new ArrayList<Predicate>();
-				if(hotelCode!=null) {
+				if (hotelCode != null) {
 					list.add(criteriaBuilder.equal(root.get("hotelCode"), hotelCode));
 				}
-				if(orderNum!=null) {
+				if (orderNum != null) {
 					list.add(criteriaBuilder.equal(root.get("orderNum"), orderNum));
 				}
 				list.add(criteriaBuilder.equal(root.get("deleted"), Constants.DELETED_FALSE));
@@ -825,18 +831,17 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 		return list;
 	}
 
-
 	@Override
-	public List<CheckInRecord> findByTogetherCode(String hotelCode, String togetherCod){
+	public List<CheckInRecord> findByTogetherCode(String hotelCode, String togetherCod) {
 		List<CheckInRecord> list = checkInRecordDao.findAll(new Specification<CheckInRecord>() {
 			@Override
 			public Predicate toPredicate(Root<CheckInRecord> root, CriteriaQuery<?> query,
-										 CriteriaBuilder criteriaBuilder) {
+					CriteriaBuilder criteriaBuilder) {
 				List<Predicate> list = new ArrayList<Predicate>();
-				if(hotelCode != null){
+				if (hotelCode != null) {
 					list.add(criteriaBuilder.equal(root.get("hotelCode"), hotelCode));
 				}
-				if(togetherCod!=null) {
+				if (togetherCod != null) {
 					list.add(criteriaBuilder.equal(root.get("togetherCode"), togetherCod));
 				}
 				list.add(criteriaBuilder.equal(root.get("deleted"), Constants.DELETED_FALSE));
@@ -848,44 +853,43 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 		return list;
 	}
 
-
 	@Override
-	@org.springframework.transaction.annotation.Transactional(rollbackFor=Exception.class)
-	public void addTogether(String hotelCode, String orderNum, String customerId, String status){
+	@org.springframework.transaction.annotation.Transactional(rollbackFor = Exception.class)
+	public void addTogether(String hotelCode, String orderNum, String customerId, String status) {
 		List<CheckInRecord> list = checkInTogether(hotelCode, orderNum);
 		CheckInRecord cir = list.get(0);
 		CheckInRecord checkInRecord = new CheckInRecord();
 		BeanUtils.copyProperties(cir, checkInRecord);
-		if(null != cir.getDemands() && !cir.getDemands().isEmpty()){
+		if (null != cir.getDemands() && !cir.getDemands().isEmpty()) {
 			List<RoomTag> demands = new ArrayList<>();
-			for(int i=0; i<demands.size(); i++){
+			for (int i = 0; i < demands.size(); i++) {
 				RoomTag rt = new RoomTag();
 				BeanUtils.copyProperties(demands.get(i), rt);
 				demands.add(rt);
 			}
 			checkInRecord.setDemands(demands);
-		}else{
+		} else {
 			checkInRecord.setDemands(null);
 		}
 		checkInRecord.setSubRecords(null);
 		Customer customer = customerService.findById(customerId);
 		checkInRecord.setId(null);
-		if(status != null && status != ""){
+		if (status != null && status != "") {
 			checkInRecord.setStatus(status);
 		}
-		//新增同住默认房价为零
+		// 新增同住默认房价为零
 		checkInRecord.setPurchasePrice(0.00);
 		checkInRecord.setPersonalPercentage(0.0);
 		checkInRecord.setCustomer(customer);
-		if(cir.getTogetherCode() == null){
+		if (cir.getTogetherCode() == null) {
 			String togetherNum = businessSeqService.fetchNextSeqNum(hotelCode, Constants.Key.TOGETHER_NUM_KEY);
-			for(int i=0; i<list.size(); i++){
+			for (int i = 0; i < list.size(); i++) {
 				CheckInRecord cirT = list.get(i);
 				cirT.setTogetherCode(togetherNum);
 				update(cirT);
 			}
 			checkInRecord.setTogetherCode(togetherNum);
-		}else {
+		} else {
 			checkInRecord.setTogetherCode(cir.getTogetherCode());
 		}
 		checkInRecordDao.save(checkInRecord);
@@ -896,38 +900,38 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 		return checkInRecordDao.findByAccountId(id);
 	}
 
-	//独单房价
+	// 独单房价
 	@Override
-	@org.springframework.transaction.annotation.Transactional(rollbackFor=Exception.class)
-	public void roomPriceAllocation(String hotelCode, String orderNum, String customerId){
+	@org.springframework.transaction.annotation.Transactional(rollbackFor = Exception.class)
+	public void roomPriceAllocation(String hotelCode, String orderNum, String customerId) {
 		List<CheckInRecord> list = checkInTogether(hotelCode, orderNum);
-		for(int i=0; i<list.size(); i++){
+		for (int i = 0; i < list.size(); i++) {
 			CheckInRecord cir = list.get(i);
 			String custId = cir.getCustomer().getId();
-			if(!customerId.equals(custId)){
+			if (!customerId.equals(custId)) {
 				cir.setPersonalPrice(0.0);
 				cir.setPersonalPercentage(1.0);
 				update(cir);
-			}else{
+			} else {
 				cir.setPersonalPrice(cir.getPurchasePrice());
-				cir.setPersonalPercentage(1.0);//因为是独单房价，占比1
+				cir.setPersonalPercentage(1.0);// 因为是独单房价，占比1
 			}
 		}
 	}
 
-	//平均房价
+	// 平均房价
 	@Override
-	@org.springframework.transaction.annotation.Transactional(rollbackFor=Exception.class)
-	public void roomPriceAvg(String hotelCode, String orderNum){
+	@org.springframework.transaction.annotation.Transactional(rollbackFor = Exception.class)
+	public void roomPriceAvg(String hotelCode, String orderNum) {
 		List<CheckInRecord> list = checkInTogether(hotelCode, orderNum);
-		if(list != null && !list.isEmpty()){
+		if (list != null && !list.isEmpty()) {
 			int peopleCount = list.size();
 			Double roomPrice = list.get(0).getPurchasePrice();
 			DecimalFormat df = new DecimalFormat("####0.00");
-			Double avg = roomPrice/peopleCount;
+			Double avg = roomPrice / peopleCount;
 			Double personalPrice = Double.parseDouble(df.format(avg));
-			Double personalPercentage = Double.parseDouble(df.format(1/peopleCount));
-			for(int i=0; i<list.size(); i++){
+			Double personalPercentage = Double.parseDouble(df.format(1 / peopleCount));
+			for (int i = 0; i < list.size(); i++) {
 				CheckInRecord cir = list.get(i);
 				cir.setPersonalPrice(personalPrice);
 				cir.setPersonalPercentage(personalPercentage);
