@@ -1,9 +1,13 @@
 package com.kry.pms.service.goods.impl;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.kry.pms.dao.goods.ProductTypeDao;
 import com.kry.pms.model.persistence.goods.ProductType;
+import org.apache.commons.collections4.MapUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Sort;
@@ -76,6 +80,21 @@ public class  ProductCategoryServiceImpl implements  ProductCategoryService{
 	 		pc.setProductTypeList(productTypeList);
 		}
 	 	return list;
+	}
+
+	@Override
+	public List<Map<String, Object>> getTreeAndType(String hotelCode){
+		List<Map<String, Object>> list = productCategoryDao.getTreeAndType(hotelCode, Constants.DELETED_FALSE);
+		List<Map<String, Object>> reList = new ArrayList<>();
+		for(int i=0; i<list.size(); i++){
+			Map<String, Object> map = list.get(i);
+			Map<String, Object> newOne = new HashMap<>();
+			List<Map<String, Object>> children = productTypeDao.getTypeList(MapUtils.getString(map, "productId"));
+			newOne.putAll(map);
+			newOne.put("children", children);
+			reList.add(newOne);
+		}
+		return reList;
 	}
 	 
 	 

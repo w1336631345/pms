@@ -20,6 +20,7 @@ import com.kry.pms.model.persistence.goods.ProductCategory;
 import com.kry.pms.service.goods.ProductCategoryService;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping(path = "/api/v1/goods/productCategory")
@@ -50,6 +51,14 @@ public class ProductCategoryController extends BaseController<ProductCategory> {
 		return rep.addData(productCategoryService.listPage(req));
 	}
 
+	/**
+	 * 功能描述: <br>团付设置、树
+	 * 〈〉
+	 * @Param: []
+	 * @Return: com.kry.pms.base.HttpResponse
+	 * @Author: huanghaibin
+	 * @Date: 2019/12/31 10:41
+	 */
 	@GetMapping(path="/treeAndType")
 	public HttpResponse treeAndType(){
 
@@ -59,5 +68,14 @@ public class ProductCategoryController extends BaseController<ProductCategory> {
 		hr.setData(list);
 		return hr;
 	}
+	@GetMapping(path="/getTreeAndType")
+	public HttpResponse getTreeAndType(){
+		HttpResponse hr = new HttpResponse();
+		User user = getUser();
+		List<Map<String, Object>> list = productCategoryService.getTreeAndType(user.getHotelCode());
+		hr.setData(list);
+		return hr;
+	}
+
 
 }

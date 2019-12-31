@@ -79,10 +79,22 @@ public class BookkeepingSetController extends BaseController<BookkeepingSet> {
 		HttpResponse hr = new HttpResponse();
 		User user = getUser();
 		BookkeepingSet bs = bookkeepingSetService.isExist(user.getHotelCode(), accountId, productId);
-		hr.setData(bs.getAccountId());
+		if(bs == null){
+			hr.setData(false);
+		}else{
+			hr.setData(true);
+		}
 		return hr;
 	}
 
+	/**
+	 * 功能描述: <br>查询已经设置的数据
+	 * 〈〉
+	 * @Param: [accountId]
+	 * @Return: com.kry.pms.base.HttpResponse
+	 * @Author: huanghaibin
+	 * @Date: 2019/12/31 11:13
+	 */
 	@GetMapping(path = "/findSet")
 	public HttpResponse findSet(String accountId){
 		HttpResponse hr = new HttpResponse();
