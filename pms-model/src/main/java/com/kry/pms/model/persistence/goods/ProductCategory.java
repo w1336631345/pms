@@ -3,11 +3,14 @@ package com.kry.pms.model.persistence.goods;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import com.kry.pms.model.persistence.PersistenceModel;
 
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.List;
 
 @Entity
 @Getter
@@ -24,4 +27,7 @@ public class ProductCategory extends PersistenceModel {
 	private String mainPicture;
 	@Column(columnDefinition = "varchar(400) default NUll COMMENT '缩略图'")
 	private String thumbnail;
+
+	@Transient
+	private List<ProductType> productTypeList;
 }

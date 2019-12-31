@@ -2,6 +2,7 @@ package com.kry.pms.service.sys.impl;
 
 import java.util.List;
 
+import com.kry.pms.base.HttpResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Sort;
@@ -35,6 +36,11 @@ public class  BookkeepingSetServiceImpl implements  BookkeepingSetService{
 	}
 
 	@Override
+	public void deleteIsTrue(String id) {
+		bookkeepingSetDao.deleteById(id);
+	}
+
+	@Override
 	public BookkeepingSet modify(BookkeepingSet bookkeepingSet) {
 		return bookkeepingSetDao.saveAndFlush(bookkeepingSet);
 	}
@@ -62,8 +68,27 @@ public class  BookkeepingSetServiceImpl implements  BookkeepingSetService{
 		}
 		return convent(bookkeepingSetDao.findAll(ex, req));
 	}
-	 
-	 
-	 
-	 
+	 @Override
+	 public BookkeepingSet isExist(String hotelCode, String accountId, String productId){
+	 	BookkeepingSet bs = bookkeepingSetDao.findByHotelCodeAndAccountIdAndProductId(hotelCode, accountId, productId);
+	 	return bs;
+	 }
+
+	@Override
+	public HttpResponse addList(List<BookkeepingSet> list, String hotelCode) {
+	 	HttpResponse hr = new HttpResponse();
+	 	for(int i=0; i<list.size(); i++){
+	 		BookkeepingSet bs = list.get(i);
+	 		bs.setHotelCode(hotelCode);
+	 		bs.setDeleted(Constants.DELETED_FALSE);
+			bookkeepingSetDao.saveAndFlush(bs);
+		}
+		return hr.ok();
+	}
+
+	@Override
+	public List<BookkeepingSet> findSet(String hotelCode, String accountId){
+	 	List<BookkeepingSet> list = bookkeepingSetDao.findByHotelCodeAndAccountId(hotelCode, accountId);
+	 	return list;
+	}
 }
