@@ -12,4 +12,6 @@ public interface RoomLockRecordService extends BaseService<RoomLockRecord>{
 	RoomLockRecord createRecord(GuestRoom gr, LocalDateTime startTime, LocalDateTime endTime, RoomLockReason reason,
 			String endToStatus);
 
+	RoomLockRecord openLock(String id, String operationEmployeeId);
+
 }

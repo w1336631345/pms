@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import com.kry.pms.base.DtoResponse;
+import com.kry.pms.model.http.response.room.GuestRoomStatusVo;
 import com.kry.pms.model.http.response.room.RoomStatusTableVo;
 import com.kry.pms.model.persistence.busi.CheckInRecord;
 import com.kry.pms.model.persistence.room.GuestRoom;
@@ -35,6 +36,10 @@ public interface GuestRoomStatusService extends BaseService<GuestRoomStatus> {
 	void addTogether(String roomId, CheckInRecord checkInRecord);
 
 	void checkIn(CheckInRecord cir);
+
+	public GuestRoomStatusVo detail(String id);
+
+	public GuestRoomStatusVo detailGuestRoom(String id);
 	
 	
 }

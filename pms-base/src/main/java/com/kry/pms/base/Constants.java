@@ -19,6 +19,7 @@ public class Constants {
 		public static final String DRAFT = "DRAFT";
 		public static final String NORMAL = "normal";
 		public static final String DISABLE = "DISABLE";
+		public static final String CLOSE = "CLOSE";
 		public static final String BOOKING_VERIFY = "booking_verify";
 		public static final String BOOKING_VERIFY_REFUSE = "booking_verify_refuse";
 		public static final String BOOKING_SUCCESS = "booking_success";

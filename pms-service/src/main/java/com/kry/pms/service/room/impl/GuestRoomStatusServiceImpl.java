@@ -143,10 +143,10 @@ public class GuestRoomStatusServiceImpl implements GuestRoomStatusService {
 		if (grs != null) {
 			grs.setRoomStatus(Constants.Status.ROOM_STATUS_OCCUPY_CLEAN);
 			String summary = grs.getSummary();
-			if(summary==null) {
+			if (summary == null) {
 				summary = cir.getCustomer().getName();
-			}else {
-				summary+=cir.getCustomer().getName();
+			} else {
+				summary += cir.getCustomer().getName();
 			}
 			grs.setSummary(summary);
 			List<CheckInRecord> crs = grs.getCurrentCheckInRecords();
@@ -262,8 +262,7 @@ public class GuestRoomStatusServiceImpl implements GuestRoomStatusService {
 	public boolean statusChangeSure(String oldStatus, String newStatus) {
 		switch (newStatus) {
 		case Constants.Status.ROOM_STATUS_OCCUPY_CLEAN:
-			if (oldStatus.equals(Constants.Status.ROOM_STATUS_OCCUPY_DIRTY)
-					|| oldStatus.equals(Constants.Status.ROOM_STATUS_VACANT_CLEAN)) {
+			if (oldStatus.equals(Constants.Status.ROOM_STATUS_OCCUPY_DIRTY)) {
 				return true;
 			}
 		case Constants.Status.ROOM_STATUS_OCCUPY_DIRTY:
@@ -275,9 +274,7 @@ public class GuestRoomStatusServiceImpl implements GuestRoomStatusService {
 				return true;
 			}
 		case Constants.Status.ROOM_STATUS_VACANT_DIRTY:
-			if (oldStatus.equals(Constants.Status.ROOM_STATUS_VACANT_CLEAN)
-					|| oldStatus.equals(Constants.Status.ROOM_STATUS_OUT_OF_SERVCIE)
-					|| oldStatus.equals(Constants.Status.ROOM_STATUS_OUT_OF_ORDER)) {
+			if (oldStatus.equals(Constants.Status.ROOM_STATUS_VACANT_CLEAN)) {
 				return true;
 			}
 		case Constants.Status.ROOM_STATUS_OUT_OF_ORDER:
@@ -317,6 +314,18 @@ public class GuestRoomStatusServiceImpl implements GuestRoomStatusService {
 			delete(status.getId());
 		}
 
+	}
+
+	@Override
+	public GuestRoomStatusVo detail(String id) {
+		GuestRoomStatus status = findById(id);
+		return GuestRoomStatusVo.covert(status);
+	}
+
+	@Override
+	public GuestRoomStatusVo detailGuestRoom(String id) {
+		GuestRoomStatus status = guestRoomStatusDao.findByGuestRoomId(id);
+		return GuestRoomStatusVo.covert(status);
 	}
 
 }

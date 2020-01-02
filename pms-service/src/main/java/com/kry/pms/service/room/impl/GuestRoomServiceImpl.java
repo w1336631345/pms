@@ -18,6 +18,8 @@ import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
 import com.kry.pms.dao.room.GuestRoomDao;
 import com.kry.pms.model.http.request.busi.GuestRoomOperation;
+import com.kry.pms.model.persistence.busi.RoomLockRecord;
+import com.kry.pms.model.persistence.busi.RoomRepairRecord;
 import com.kry.pms.model.persistence.dict.RoomLockReason;
 import com.kry.pms.model.persistence.dict.RoomRepairReason;
 import com.kry.pms.model.persistence.room.Floor;
@@ -46,6 +48,9 @@ public class GuestRoomServiceImpl implements GuestRoomService {
 	RoomRepairRecordService roomRepairRecordService;
 	@Autowired
 	RoomLockReasonService roomLockReasonService;
+
+	public static final String OP_OPEN_REPAIR = "_ROO";
+	public static final String OP_OPEN_LOCK = "_ROS";
 
 	@Override
 	public GuestRoom add(GuestRoom guestRoom) {
@@ -154,12 +159,61 @@ public class GuestRoomServiceImpl implements GuestRoomService {
 		return guestRoomDao.count(ex);
 	}
 
-	@Transactional
-	@Override
-	public DtoResponse<String> statusOperation(GuestRoomOperation op) {
+	private DtoResponse<String> openOperation(GuestRoomOperation op) {
 		DtoResponse<String> rep = new DtoResponse<>();
 		rep.setMessage("");
 		String[] ids = op.getRoomIds();
+		int errorCode = 0;
+		for (String id : ids) {
+			GuestRoom gr = findById(id);
+			if (gr != null) {
+				switch (op.getOp()) {
+				case OP_OPEN_LOCK:
+					RoomLockRecord rlr = roomLockRecordService.openLock(id,op.getOperationEmployeeId());
+					if (rlr == null || !rlr.getStatus().equals(Constants.Status.CLOSE)) {
+						DtoResponse<String> r = guestRoomStatusService.changeRoomStatus(id, rlr.getEndToStatus(), 1);
+						if (r.getStatus() != 0) {
+							errorCode = r.getStatus();
+							rep.setMessage(rep.getMessage() + r.getMessage());
+						}
+					}
+					break;
+				case OP_OPEN_REPAIR:
+					RoomRepairRecord rrr = roomRepairRecordService.openRepair(id,op.getOperationEmployeeId());
+					if (rrr == null || !rrr.getStatus().equals(Constants.Status.CLOSE)) {
+						DtoResponse<String> r = guestRoomStatusService.changeRoomStatus(id, rrr.getEndToStatus(), 1);
+						if (r.getStatus() != 0) {
+							errorCode = r.getStatus();
+							rep.setMessage(rep.getMessage() + r.getMessage());
+						}
+					}
+					break;
+				}
+
+			} else {
+				// 如果房间找不到，错误请求，不在判断其他房间
+				rep.setStatus(Constants.BusinessCode.CODE_PARAMETER_INVALID);
+				rep.setMessage("必要参数错误：房间找不到");
+				break;
+			}
+			if (rep.getStatus() == 0) {
+				rep.setStatus(errorCode);
+			}
+		}
+		return rep;
+	}
+
+	@Transactional
+	@Override
+	public DtoResponse<String> statusOperation(GuestRoomOperation op) {
+		if(op.getOp().startsWith("_R")) {
+			return openOperation(op);
+		}
+		DtoResponse<String> rep = new DtoResponse<>();
+		rep.setMessage("");
+		String[] ids = op.getRoomIds();
+		String toStatus = op.getOp();
+		int errorCode = 0;
 		for (String id : ids) {
 			GuestRoom gr = findById(id);
 			if (gr != null) {
@@ -188,16 +242,21 @@ public class GuestRoomServiceImpl implements GuestRoomService {
 					break;
 				}
 				if (rep.getStatus() == 0) {
-					DtoResponse<String> r = guestRoomStatusService.changeRoomStatus(id, op.getOp(), 1);
+					DtoResponse<String> r = guestRoomStatusService.changeRoomStatus(id, toStatus, 1);
 					if (r.getStatus() != 0) {
-						rep.setStatus(r.getStatus());
+						errorCode = r.getStatus();
 						rep.setMessage(rep.getMessage() + r.getMessage());
 					}
 				}
 			} else {
+				// 如果房间找不到，错误请求，不在判断其他房间
 				rep.setStatus(Constants.BusinessCode.CODE_PARAMETER_INVALID);
 				rep.setMessage("必要参数错误：房间找不到");
+				break;
 			}
+		}
+		if (rep.getStatus() == 0) {
+			rep.setStatus(errorCode);
 		}
 		return rep;
 	}

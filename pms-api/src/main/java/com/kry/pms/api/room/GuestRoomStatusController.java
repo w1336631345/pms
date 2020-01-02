@@ -17,6 +17,7 @@ import com.kry.pms.api.BaseController;
 import com.kry.pms.base.HttpResponse;
 import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
+import com.kry.pms.model.http.response.room.GuestRoomStatusVo;
 import com.kry.pms.model.http.response.room.RoomStatusTableVo;
 import com.kry.pms.model.persistence.room.GuestRoomStatus;
 import com.kry.pms.service.room.GuestRoomStatusService;
@@ -50,7 +51,19 @@ public class GuestRoomStatusController extends BaseController<GuestRoomStatus> {
 		rep.setData(guestRoomStatusService.table(getCurrentHotleCode()));
 		return rep;
 	}
-
+	
+	@GetMapping(path = "/detail/{id}")
+	public HttpResponse<GuestRoomStatusVo> detail(@PathVariable("id")String id) {
+		HttpResponse<GuestRoomStatusVo> rep = new HttpResponse<>();
+		rep.setData(guestRoomStatusService.detail(id));
+		return rep;
+	}
+	@GetMapping(path = "/detail/guestRoom/{id}")
+	public HttpResponse<GuestRoomStatusVo> detailGuestRoom(@PathVariable("id")String id) {
+		HttpResponse<GuestRoomStatusVo> rep = new HttpResponse<>();
+		rep.setData(guestRoomStatusService.detailGuestRoom(id));
+		return rep;
+	}
 	@PostMapping(path = "/roomStatus/{id}/{status}")
 	public HttpResponse<GuestRoomStatus> change(@PathVariable("id") String id, @PathVariable("status") String status) {
 		HttpResponse<GuestRoomStatus> response = new HttpResponse<GuestRoomStatus>();

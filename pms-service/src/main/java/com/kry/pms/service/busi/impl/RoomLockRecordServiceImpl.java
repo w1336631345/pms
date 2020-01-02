@@ -82,4 +82,14 @@ public class RoomLockRecordServiceImpl implements RoomLockRecordService {
 		return rlr;
 	}
 
+	@Override
+	public RoomLockRecord openLock(String id, String operationEmployeeId) {
+		RoomLockRecord rlr = roomLockRecordDao.findByGuestRoomIdAndStatus(id,Constants.Status.NORMAL);
+		if(rlr!=null) {
+			rlr.setStatus(Constants.Status.CLOSE);
+			modify(rlr);
+		}
+		return rlr;
+	}
+
 }

@@ -13,18 +13,17 @@ import com.kry.pms.base.Constants;
 import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
 import com.kry.pms.dao.busi.RoomRepairRecordDao;
-import com.kry.pms.model.persistence.busi.RoomLockRecord;
 import com.kry.pms.model.persistence.busi.RoomRepairRecord;
 import com.kry.pms.model.persistence.dict.RoomRepairReason;
 import com.kry.pms.model.persistence.room.GuestRoom;
 import com.kry.pms.service.busi.RoomRepairRecordService;
 
 @Service
-public class  RoomRepairRecordServiceImpl implements  RoomRepairRecordService{
+public class RoomRepairRecordServiceImpl implements RoomRepairRecordService {
 	@Autowired
-	 RoomRepairRecordDao roomRepairRecordDao;
-	 
-	 @Override
+	RoomRepairRecordDao roomRepairRecordDao;
+
+	@Override
 	public RoomRepairRecord add(RoomRepairRecord roomRepairRecord) {
 		return roomRepairRecordDao.saveAndFlush(roomRepairRecord);
 	}
@@ -50,8 +49,8 @@ public class  RoomRepairRecordServiceImpl implements  RoomRepairRecordService{
 
 	@Override
 	public List<RoomRepairRecord> getAllByHotelCode(String code) {
-		return null;//默认不实现
-		//return roomRepairRecordDao.findByHotelCode(code);
+		return null;// 默认不实现
+		// return roomRepairRecordDao.findByHotelCode(code);
 	}
 
 	@Override
@@ -78,8 +77,15 @@ public class  RoomRepairRecordServiceImpl implements  RoomRepairRecordService{
 		rlr.setEndToStatus(endToStatus);
 		return rlr;
 	}
-	 
-	 
-	 
-	 
+
+	@Override
+	public RoomRepairRecord openRepair(String id, String operationEmployeeId) {
+		RoomRepairRecord rlr = roomRepairRecordDao.findByGuestRoomIdAndStatus(id,Constants.Status.NORMAL);
+		if (rlr != null) {
+			rlr.setStatus(Constants.Status.CLOSE);
+			modify(rlr);
+		}
+		return rlr;
+	}
+
 }

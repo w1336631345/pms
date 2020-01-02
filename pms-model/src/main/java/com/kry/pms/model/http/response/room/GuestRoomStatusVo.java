@@ -1,8 +1,18 @@
 package com.kry.pms.model.http.response.room;
 
 import java.io.Serializable;
+import java.util.List;
+
+import org.springframework.beans.BeanUtils;
+
+import com.kry.pms.model.http.response.busi.CheckInRecordVo;
+import com.kry.pms.model.persistence.busi.CheckInRecord;
+import com.kry.pms.model.persistence.busi.RoomLockRecord;
+import com.kry.pms.model.persistence.busi.RoomRepairRecord;
+import com.kry.pms.model.persistence.room.GuestRoomStatus;
 
 import lombok.Data;
+
 @Data
 public class GuestRoomStatusVo implements Serializable {
 	private String roomTypeName;
@@ -22,4 +32,25 @@ public class GuestRoomStatusVo implements Serializable {
 	private Boolean repairRoom;// 维修
 	private Boolean overdued;// 欠费
 	private Boolean ota;
+	private List<CheckInRecordVo> currentCheckInRecords;
+	private List<CheckInRecordVo> willCheckInRecords;
+	private RoomLockRecord currentRoomLocakRecord;
+	private RoomRepairRecord currentRoomRepairRecord;
+	
+	public GuestRoomStatusVo() {
+		super();
+	}
+	
+	public static GuestRoomStatusVo covert(GuestRoomStatus grs) {
+		GuestRoomStatusVo grsv = new GuestRoomStatusVo();
+		BeanUtils.copyProperties(grs, grsv);
+		if(grs.getCurrentCheckInRecords()!=null) {
+			grsv.setCurrentCheckInRecords(CheckInRecordVo.convert(grs.getCurrentCheckInRecords()));
+		}
+		if(grs.getWillCheckInRecords()!=null) {
+			grsv.setWillCheckInRecords(CheckInRecordVo.convert(grs.getWillCheckInRecords()));
+		}
+		return grsv;
+		
+	}
 }

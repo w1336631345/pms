@@ -5,4 +5,6 @@ import com.kry.pms.model.persistence.busi.RoomRepairRecord;
 
 public interface RoomRepairRecordDao extends BaseDao<RoomRepairRecord>{
 
+	RoomRepairRecord findByGuestRoomIdAndStatus(String id, String normal);
+
 }
