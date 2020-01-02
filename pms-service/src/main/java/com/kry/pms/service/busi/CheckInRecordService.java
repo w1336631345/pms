@@ -20,11 +20,16 @@ import com.kry.pms.model.persistence.room.GuestRoom;
 import com.kry.pms.model.persistence.sys.User;
 import com.kry.pms.service.BaseService;
 
+import javax.transaction.Transactional;
+
 public interface CheckInRecordService extends BaseService<CheckInRecord> {
 	
 	public PageResponse<CheckInRecordListVo> querySummaryList(PageRequest<CheckInRecord> req);
 
-	CheckInRecord update(CheckInRecord checkInRecord);
+    @Transactional
+    HttpResponse modifyInfo(CheckInRecord checkInRecord);
+
+    CheckInRecord update(CheckInRecord checkInRecord);
 
 	CheckInRecord updateAll(CheckUpdateItemTestBo checkUpdateItemTestBo);
 

@@ -41,7 +41,7 @@ public class CheckInRecord extends PersistenceModel {
 	@ManyToOne
 	@JoinColumn(name="main_record_id")
 	private CheckInRecord mainRecord;
-	@OneToMany(cascade = CascadeType.ALL)
+	@OneToMany(cascade = CascadeType.DETACH)
 	@JoinColumn(name="main_record_id")
 	private List<CheckInRecord> subRecords;
 	@Column
@@ -123,7 +123,11 @@ public class CheckInRecord extends PersistenceModel {
 	//同住
 	@Column(columnDefinition = "varchar(64) COMMENT '同住编号'")
 	private String togetherCode;
+	@Transient
+	private boolean isUpdateTime = false;//用作判断主单是否修改了到店离店时间
 
+	public boolean getIsUpdateTime() { return isUpdateTime; }
+	public void setIsUpdateTime(boolean isUpdateTime) { this.isUpdateTime = isUpdateTime; }
 
 	public String getReserveId() { return reserveId; }
 	public void setReserveId(String reserveId) { this.reserveId = reserveId; }

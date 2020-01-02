@@ -42,6 +42,20 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
 	public HttpResponse<CheckInRecord> modify(@RequestBody CheckInRecord checkInRecord) {
 		return getDefaultResponse().addData(checkInRecordService.modify(checkInRecord));
 	}
+
+	/**
+	 * 功能描述: <br>修改主单时，判断是否修改到店离店时间，做相应处理
+	 * 〈〉
+	 * @Param: [checkInRecord]
+	 * @Return: com.kry.pms.base.HttpResponse<com.kry.pms.model.persistence.busi.CheckInRecord>
+	 * @Author: huanghaibin
+	 * @Date: 2020/1/2 14:48
+	 */
+	@PutMapping(path = "/modifyInfo")
+	public HttpResponse<CheckInRecord> modifyInfo(@RequestBody CheckInRecord checkInRecord) {
+		HttpResponse hr = checkInRecordService.modifyInfo(checkInRecord);
+		return hr;
+	}
 	
 	@PostMapping(path = "/book")
 	public HttpResponse<CheckInRecord> book(@RequestBody CheckInRecord checkInRecord) {
