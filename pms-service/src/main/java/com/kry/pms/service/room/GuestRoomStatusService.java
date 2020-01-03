@@ -27,8 +27,6 @@ public interface GuestRoomStatusService extends BaseService<GuestRoomStatus> {
 
 	public RoomStatusTableVo table(String currentHotleCode);
 
-	public DtoResponse<String> changeRoomStatus(String id, String status,int quantity);
-
 	public void deleteByRoomId(String id);
 
 	void linkedRoom(String roomId, boolean status);
@@ -40,6 +38,8 @@ public interface GuestRoomStatusService extends BaseService<GuestRoomStatus> {
 	public GuestRoomStatusVo detail(String id);
 
 	public GuestRoomStatusVo detailGuestRoom(String id);
+
+	DtoResponse<String> changeRoomStatus(String id, String status, int quantity, boolean force);
 	
 	
 }

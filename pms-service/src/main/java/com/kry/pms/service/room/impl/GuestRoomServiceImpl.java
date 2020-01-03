@@ -169,9 +169,9 @@ public class GuestRoomServiceImpl implements GuestRoomService {
 			if (gr != null) {
 				switch (op.getOp()) {
 				case OP_OPEN_LOCK:
-					RoomLockRecord rlr = roomLockRecordService.openLock(id,op.getOperationEmployeeId());
-					if (rlr == null || !rlr.getStatus().equals(Constants.Status.CLOSE)) {
-						DtoResponse<String> r = guestRoomStatusService.changeRoomStatus(id, rlr.getEndToStatus(), 1);
+					RoomLockRecord rlr = roomLockRecordService.openLock(id, op.getOperationEmployeeId());
+					if (rlr != null && rlr.getStatus().equals(Constants.Status.CLOSE)) {
+						DtoResponse<String> r = guestRoomStatusService.changeRoomStatus(id, rlr.getEndToStatus(), 1,true);
 						if (r.getStatus() != 0) {
 							errorCode = r.getStatus();
 							rep.setMessage(rep.getMessage() + r.getMessage());
@@ -179,9 +179,9 @@ public class GuestRoomServiceImpl implements GuestRoomService {
 					}
 					break;
 				case OP_OPEN_REPAIR:
-					RoomRepairRecord rrr = roomRepairRecordService.openRepair(id,op.getOperationEmployeeId());
-					if (rrr == null || !rrr.getStatus().equals(Constants.Status.CLOSE)) {
-						DtoResponse<String> r = guestRoomStatusService.changeRoomStatus(id, rrr.getEndToStatus(), 1);
+					RoomRepairRecord rrr = roomRepairRecordService.openRepair(id, op.getOperationEmployeeId());
+					if (rrr != null && rrr.getStatus().equals(Constants.Status.CLOSE)) {
+						DtoResponse<String> r = guestRoomStatusService.changeRoomStatus(id, rrr.getEndToStatus(), 1,true);
 						if (r.getStatus() != 0) {
 							errorCode = r.getStatus();
 							rep.setMessage(rep.getMessage() + r.getMessage());
@@ -206,7 +206,7 @@ public class GuestRoomServiceImpl implements GuestRoomService {
 	@Transactional
 	@Override
 	public DtoResponse<String> statusOperation(GuestRoomOperation op) {
-		if(op.getOp().startsWith("_R")) {
+		if (op.getOp().startsWith("_R")) {
 			return openOperation(op);
 		}
 		DtoResponse<String> rep = new DtoResponse<>();
@@ -242,7 +242,7 @@ public class GuestRoomServiceImpl implements GuestRoomService {
 					break;
 				}
 				if (rep.getStatus() == 0) {
-					DtoResponse<String> r = guestRoomStatusService.changeRoomStatus(id, toStatus, 1);
+					DtoResponse<String> r = guestRoomStatusService.changeRoomStatus(id, toStatus, 1,false);
 					if (r.getStatus() != 0) {
 						errorCode = r.getStatus();
 						rep.setMessage(rep.getMessage() + r.getMessage());

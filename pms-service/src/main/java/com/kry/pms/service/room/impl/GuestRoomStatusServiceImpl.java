@@ -292,11 +292,11 @@ public class GuestRoomStatusServiceImpl implements GuestRoomStatusService {
 	}
 
 	@Override
-	public DtoResponse<String> changeRoomStatus(String id, String status, int quantity) {
+	public DtoResponse<String> changeRoomStatus(String id, String status, int quantity,boolean force) {
 		DtoResponse<String> rep = new DtoResponse<String>();
 		GuestRoomStatus roomStatus = guestRoomStatusDao.findByGuestRoomId(id);
 		String oldStatus = roomStatus.getRoomStatus();
-		if (statusChangeSure(oldStatus, status)) {
+		if (force||statusChangeSure(oldStatus, status)) {
 			roomStatus.setRoomStatus(status);
 			modify(roomStatus);
 			roomStatusQuantityService.transformRoomStatusQuantity(roomStatus.getHotelCode(), oldStatus, status, 1);

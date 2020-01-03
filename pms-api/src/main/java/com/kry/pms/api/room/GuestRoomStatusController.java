@@ -64,12 +64,6 @@ public class GuestRoomStatusController extends BaseController<GuestRoomStatus> {
 		rep.setData(guestRoomStatusService.detailGuestRoom(id));
 		return rep;
 	}
-	@PostMapping(path = "/roomStatus/{id}/{status}")
-	public HttpResponse<GuestRoomStatus> change(@PathVariable("id") String id, @PathVariable("status") String status) {
-		HttpResponse<GuestRoomStatus> response = new HttpResponse<GuestRoomStatus>();
-		BeanUtils.copyProperties(guestRoomStatusService.changeRoomStatus(id, status,1), response);
-		return response;
-	}
 
 	@GetMapping
 	public HttpResponse<PageResponse<GuestRoomStatus>> query(HttpServletRequest request)

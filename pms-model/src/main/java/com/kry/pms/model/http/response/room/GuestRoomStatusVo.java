@@ -32,8 +32,8 @@ public class GuestRoomStatusVo implements Serializable {
 	private Boolean repairRoom;// 维修
 	private Boolean overdued;// 欠费
 	private Boolean ota;
-	private List<CheckInRecordVo> currentCheckInRecords;
-	private List<CheckInRecordVo> willCheckInRecords;
+	private List<CheckInRecordVo> currentCheckInRecord;
+	private List<CheckInRecordVo> willCheckInRecord;
 	private RoomLockRecord currentRoomLocakRecord;
 	private RoomRepairRecord currentRoomRepairRecord;
 	
@@ -45,10 +45,10 @@ public class GuestRoomStatusVo implements Serializable {
 		GuestRoomStatusVo grsv = new GuestRoomStatusVo();
 		BeanUtils.copyProperties(grs, grsv);
 		if(grs.getCurrentCheckInRecords()!=null) {
-			grsv.setCurrentCheckInRecords(CheckInRecordVo.convert(grs.getCurrentCheckInRecords()));
+			grsv.setCurrentCheckInRecord(CheckInRecordVo.convert(grs.getCurrentCheckInRecords()));
 		}
 		if(grs.getWillCheckInRecords()!=null) {
-			grsv.setWillCheckInRecords(CheckInRecordVo.convert(grs.getWillCheckInRecords()));
+			grsv.setWillCheckInRecord(CheckInRecordVo.convert(grs.getWillCheckInRecords()));
 		}
 		return grsv;
 		
