@@ -353,6 +353,8 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 					e.printStackTrace();
 				}
 				ncir.setDemands(tags);
+				ncir.setPersonalPrice(cir.getPurchasePrice());
+				ncir.setPersonalPercentage(1.0);
 				ncir.setId(null);
 				ncir.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION);
 				ncir.setCustomer(customer);

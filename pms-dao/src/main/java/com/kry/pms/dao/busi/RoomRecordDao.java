@@ -12,5 +12,6 @@ public interface RoomRecordDao extends BaseDao<RoomRecord>{
 	List<RoomRecord> findByHotelCodeAndRecordDate(String hotelCode, LocalDate recordDate);
 
 	List<RoomRecord> findByHotelCodeAndCheckInRecord(String hotelCode, CheckInRecord checkInRecord);
+	List<RoomRecord> findByCheckInRecord(CheckInRecord checkInRecord);
 
 }
