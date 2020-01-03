@@ -41,8 +41,9 @@ public class CheckInRecord extends PersistenceModel {
 	@ManyToOne
 	@JoinColumn(name="main_record_id")
 	private CheckInRecord mainRecord;
-	@OneToMany(cascade = CascadeType.DETACH)
-	@JoinColumn(name="main_record_id")
+//	@OneToMany(cascade = CascadeType.DETACH)
+//	@JoinColumn(name="main_record_id")
+	@Transient
 	private List<CheckInRecord> subRecords;
 	@Column
 	private String orderNum;

@@ -396,6 +396,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 			checkInRecord.setType(Constants.Type.CHECK_IN_RECORD_GROUP);
 			initGroup(checkInRecord);
 			initGroupAccount(checkInRecord);
+			checkInRecord = add(checkInRecord);
 			for (CheckInRecord item : checkInRecord.getSubRecords()) {
 				if (item.getRoomCount() != null && item.getRoomCount() > 0) {
 					item.setOrderNum(orderNum);
@@ -413,6 +414,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 					item.setType(Constants.Type.CHECK_IN_RECORD_RESERVE);
 					item.setGroupType(checkInRecord.getGroupType());
 					item.setHotelCode(checkInRecord.getHotelCode());
+					item.setMainRecord(checkInRecord);
 					if (item.getRoomType() == null) {
 						item.setRoomType(roomTypeService.findById(item.getRoomTypeId()));
 					}
@@ -422,9 +424,10 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 					if (!bookResult) {
 						// 房源不足
 					}
+					add(item);
 				}
 			}
-			checkInRecord = add(checkInRecord);
+
 		} else {
 			Customer customer = checkInRecord.getCustomer();
 			if (customer != null && customer.getId() == null) {
@@ -606,7 +609,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 			checkInRecord.setMainRecord(mainCheckInRecord);
 			checkInRecord = add(checkInRecord);
 			mainCheckInRecord.setRoomCount(mainCheckInRecord.getRoomCount() + checkInRecord.getRoomCount());
-			mainCheckInRecord.getSubRecords().add(checkInRecord);
+//			mainCheckInRecord.getSubRecords().add(checkInRecord);
 			modify(mainCheckInRecord);
 		}
 		return checkInRecord;
