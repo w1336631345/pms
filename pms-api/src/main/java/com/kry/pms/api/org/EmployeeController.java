@@ -8,6 +8,7 @@ import com.kry.pms.model.persistence.sys.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -55,7 +56,18 @@ public class EmployeeController extends BaseController<Employee> {
 		}
 		return rep;
 	}
-
+	@GetMapping(path="/dept/{code}")
+	public HttpResponse<List<Employee>> findEmplyeeByDeptCode(@PathVariable("code") String code){
+		HttpResponse<List<Employee>> rep = new HttpResponse<List<Employee>>();
+		List<Employee> emps = employeeService.findEmployeeByDeptCode(code,getCurrentHotleCode());
+		if(emps==null||emps.isEmpty()) {
+			rep.setStatus(Constants.BusinessCode.CODE_RESOURCE_NOT_ENOUGH);
+			rep.setMessage("请先添加销售部人员");
+		}else {
+			rep.setData(emps);
+		}
+		return rep;
+	}
 	@GetMapping
 	public HttpResponse<PageResponse<Employee>> query(HttpServletRequest request) throws InstantiationException, IllegalAccessException{
 		HttpResponse<PageResponse<Employee>> rep = new HttpResponse<PageResponse<Employee>>();

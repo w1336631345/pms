@@ -30,8 +30,6 @@ public class Customer extends PersistenceModel {
 	private User user;
 	@Column
 	private String mobile;
-	@Column
-	private String idCardNum;
 	@OneToOne
 	private GuestInfo guestInfo;
 	@Column
@@ -44,4 +42,6 @@ public class Customer extends PersistenceModel {
 	private Double costTotal;
 	@Column
 	private String certificateType;
+	@Column
+	private String idCardNum;
 }

@@ -337,7 +337,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 			startDate = startDate.plusDays(-1);
 		}
 		List<CheckInRecord> data = new ArrayList<CheckInRecord>();
-		String tempName = cir.getName() + gr.getRoomNum();
+		String tempName = gr.getRoomNum();
 		List<RoomTag> tags = null;
 		if (cir.getDemands() != null && !cir.getDemands().isEmpty()) {
 			tags = new ArrayList<RoomTag>();

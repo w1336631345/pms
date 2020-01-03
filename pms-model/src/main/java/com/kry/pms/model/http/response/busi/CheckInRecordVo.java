@@ -2,11 +2,11 @@ package com.kry.pms.model.http.response.busi;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.springframework.beans.BeanUtils;
 
+import com.kry.pms.model.http.response.marketing.CustomerVo;
 import com.kry.pms.model.persistence.busi.CheckInRecord;
 
 import lombok.Data;
@@ -18,6 +18,9 @@ public class CheckInRecordVo {
 	private LocalDateTime leaveTime;
 	private String protocolCorpationName;
 	private String protocolCorpationId;
+	private Double purchasePrice;
+	private Double personalPrice;
+	private CustomerVo customer;
 
 	public CheckInRecordVo() {
 
@@ -26,6 +29,13 @@ public class CheckInRecordVo {
 	public static CheckInRecordVo convert(CheckInRecord cir) {
 		CheckInRecordVo cirv = new CheckInRecordVo();
 		BeanUtils.copyProperties(cir, cirv);
+		if(cir.getCustomer()!=null) {
+			cirv.setCustomer(CustomerVo.convert(cir.getCustomer()));
+		}
+		if(cir.getProtocolCorpation()!=null) {
+			cirv.setProtocolCorpationId(cir.getProtocolCorpation().getId());
+			cirv.setProtocolCorpationName(cir.getProtocolCorpation().getName());
+		}
 		return cirv;
 
 	}
