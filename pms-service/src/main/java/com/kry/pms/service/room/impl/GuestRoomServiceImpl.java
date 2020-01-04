@@ -1,5 +1,6 @@
 package com.kry.pms.service.room.impl;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,6 +32,7 @@ import com.kry.pms.service.dict.RoomLockReasonService;
 import com.kry.pms.service.dict.RoomRepairReasonService;
 import com.kry.pms.service.room.GuestRoomService;
 import com.kry.pms.service.room.GuestRoomStatusService;
+import com.kry.pms.service.room.RoomUsageService;
 
 @Service
 public class GuestRoomServiceImpl implements GuestRoomService {
@@ -48,6 +50,8 @@ public class GuestRoomServiceImpl implements GuestRoomService {
 	RoomRepairRecordService roomRepairRecordService;
 	@Autowired
 	RoomLockReasonService roomLockReasonService;
+	@Autowired
+	RoomUsageService roomUsageService;
 
 	public static final String OP_OPEN_REPAIR = "_ROO";
 	public static final String OP_OPEN_LOCK = "_ROS";
@@ -175,6 +179,8 @@ public class GuestRoomServiceImpl implements GuestRoomService {
 						if (r.getStatus() != 0) {
 							errorCode = r.getStatus();
 							rep.setMessage(rep.getMessage() + r.getMessage());
+						}else {							
+							roomUsageService.unUse(gr, rlr.getId(), LocalDateTime.now());
 						}
 					}
 					break;
@@ -182,14 +188,16 @@ public class GuestRoomServiceImpl implements GuestRoomService {
 					RoomRepairRecord rrr = roomRepairRecordService.openRepair(id, op.getOperationEmployeeId());
 					if (rrr != null && rrr.getStatus().equals(Constants.Status.CLOSE)) {
 						DtoResponse<String> r = guestRoomStatusService.changeRoomStatus(id, rrr.getEndToStatus(), 1,true);
+						
 						if (r.getStatus() != 0) {
 							errorCode = r.getStatus();
 							rep.setMessage(rep.getMessage() + r.getMessage());
+						}else {
+							roomUsageService.unUse(gr, rrr.getId(), LocalDateTime.now());
 						}
 					}
 					break;
 				}
-
 			} else {
 				// 如果房间找不到，错误请求，不在判断其他房间
 				rep.setStatus(Constants.BusinessCode.CODE_PARAMETER_INVALID);
@@ -221,8 +229,10 @@ public class GuestRoomServiceImpl implements GuestRoomService {
 				case Constants.Status.ROOM_STATUS_OUT_OF_ORDER:
 					if (op.getReasonId() != null && op.getEndToStatus() != null) {
 						RoomRepairReason rpr = roomRepairReasonService.findById(op.getReasonId());
-						roomRepairRecordService.add(roomRepairRecordService.createRecord(gr, op.getStartTime(),
+						RoomRepairRecord record = roomRepairRecordService.add(roomRepairRecordService.createRecord(gr, op.getStartTime(),
 								op.getEndTime(), rpr, op.getEndToStatus()));
+						roomUsageService.use(gr, Constants.Status.ROOM_USAGE_LOCKED, op.getStartTime(), op.getEndTime(), record.getId(), null, rep);
+
 					} else {
 						rep.setStatus(Constants.BusinessCode.CODE_PARAMETER_INVALID);
 						rep.setMessage("必要参数不足：原因或者结束状态未选");
@@ -231,8 +241,9 @@ public class GuestRoomServiceImpl implements GuestRoomService {
 				case Constants.Status.ROOM_STATUS_OUT_OF_SERVCIE:
 					if (op.getReasonId() != null && op.getEndToStatus() != null) {
 						RoomLockReason rlr = roomLockReasonService.findById(op.getReasonId());
-						roomLockRecordService.add(roomLockRecordService.createRecord(gr, op.getStartTime(),
+						RoomLockRecord record = roomLockRecordService.add(roomLockRecordService.createRecord(gr, op.getStartTime(),
 								op.getEndTime(), rlr, op.getEndToStatus()));
+						roomUsageService.use(gr, Constants.Status.ROOM_USAGE_LOCKED, op.getStartTime(), op.getEndTime(), record.getId(), null, rep);
 					} else {
 						rep.setStatus(Constants.BusinessCode.CODE_PARAMETER_INVALID);
 						rep.setMessage("必要参数不足：原因或者结束状态未选");

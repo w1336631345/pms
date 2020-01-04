@@ -176,9 +176,87 @@ public class RoomUsageServiceImpl implements RoomUsageService {
 			}
 		} else {
 			response.setStatus(Constants.BusinessCode.CODE_RESOURCE_NOT_ENOUGH);
-			response.setMessage("房间号：" + gr.getRoomNum() + "在该时段无法办理入住");
+			response.setMessage("房间号：" + gr.getRoomNum() + "在该时段无法使用，请确认");
 		}
 		return data;
+	}
+
+	@Override
+	public boolean unUse(GuestRoom gr, String businessKey, LocalDateTime endTime) {
+		RoomUsage ru = roomUsageDao.findByGuestRoomIdAndBusinesskey(gr.getId(), businessKey);
+		if (ru != null) {
+			if (!ru.getStartDateTime().isBefore(endTime)) {
+				RoomUsage pru = ru.getPreRoomUsage();
+				RoomUsage npru = ru.getPostRoomUsage();
+				if (pru.getUsageStatus().equals(Constants.Status.ROOM_USAGE_FREE)) {
+					if (npru.getUsageStatus().equals(Constants.Status.ROOM_USAGE_FREE)) {
+						pru.setEndDateTime(npru.getEndDateTime());
+						updateDuration(pru);
+						RoomUsage nnpru = npru.getPostRoomUsage();
+						pru.setPostRoomUsage(nnpru);
+						modify(pru);
+						if(nnpru!=null) {							
+							nnpru.setPostRoomUsage(pru);
+							modify(nnpru);
+						}
+						delete(ru.getId());
+						delete(npru.getId());
+					} else {
+						pru.setEndDateTime(ru.getEndDateTime());
+						pru.setPostRoomUsage(npru);
+						modify(pru);
+						npru.setPreRoomUsage(pru);
+						modify(npru);
+					}
+				} else {
+					if (npru.getUsageStatus().equals(Constants.Status.ROOM_USAGE_FREE)) {
+						npru.setStartDateTime(ru.getStartDateTime());
+						updateDuration(npru);
+						npru.setPreRoomUsage(pru);
+						modify(npru);
+						pru.setPostRoomUsage(npru);
+						modify(pru);
+						delete(ru.getId());
+					} else {
+						ru.setUsageStatus(Constants.Status.ROOM_USAGE_FREE);
+					}
+				}
+			} else if (ru.getEndDateTime().isAfter(endTime)) {
+				RoomUsage npru = ru.getPostRoomUsage();
+				if (npru != null) {
+					if (npru.getUsageStatus().equals(Constants.Status.ROOM_USAGE_FREE)) {
+						npru.setStartDateTime(endTime);
+						updateDuration(npru);
+						ru.setEndDateTime(endTime);
+						updateDuration(ru);
+						modify(ru);
+						modify(npru);
+					} else {
+						RoomUsage nru = new RoomUsage();
+						nru.setUsageStatus(Constants.Status.ROOM_USAGE_FREE);
+						nru.setStartDateTime(endTime);
+						nru.setEndDateTime(ru.getEndDateTime());
+						ru.setEndDateTime(endTime);
+						updateDuration(ru);
+						updateDuration(nru);
+						add(nru);
+						ru.setPostRoomUsage(nru);
+						modify(ru);
+						nru.setPreRoomUsage(ru);
+						nru.setPostRoomUsage(npru);
+						modify(nru);
+						npru.setPreRoomUsage(nru);
+						modify(npru);
+					}
+				} else {
+					// 理论上不会出现
+				}
+			}
+		} else {
+			return false;
+		}
+		return true;
+
 	}
 
 	@Override
