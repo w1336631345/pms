@@ -265,38 +265,44 @@ public class GuestRoomStatusServiceImpl implements GuestRoomStatusService {
 			if (oldStatus.equals(Constants.Status.ROOM_STATUS_OCCUPY_DIRTY)) {
 				return true;
 			}
+			break;
 		case Constants.Status.ROOM_STATUS_OCCUPY_DIRTY:
 			if (oldStatus.equals(Constants.Status.ROOM_STATUS_OCCUPY_CLEAN)) {
 				return true;
 			}
+			break;
 		case Constants.Status.ROOM_STATUS_VACANT_CLEAN:
 			if (oldStatus.equals(Constants.Status.ROOM_STATUS_VACANT_DIRTY)) {
 				return true;
 			}
+			break;
 		case Constants.Status.ROOM_STATUS_VACANT_DIRTY:
 			if (oldStatus.equals(Constants.Status.ROOM_STATUS_VACANT_CLEAN)) {
 				return true;
 			}
+			break;
 		case Constants.Status.ROOM_STATUS_OUT_OF_ORDER:
 			if (oldStatus.equals(Constants.Status.ROOM_STATUS_VACANT_DIRTY)
 					|| oldStatus.equals(Constants.Status.ROOM_STATUS_VACANT_CLEAN)) {
 				return true;
 			}
+			break;
 		case Constants.Status.ROOM_STATUS_OUT_OF_SERVCIE:
 			if (oldStatus.equals(Constants.Status.ROOM_STATUS_VACANT_DIRTY)
 					|| oldStatus.equals(Constants.Status.ROOM_STATUS_VACANT_CLEAN)) {
 				return true;
 			}
+			break;
 		}
 		return false;
 	}
 
 	@Override
-	public DtoResponse<String> changeRoomStatus(String id, String status, int quantity,boolean force) {
+	public DtoResponse<String> changeRoomStatus(String id, String status, int quantity, boolean force) {
 		DtoResponse<String> rep = new DtoResponse<String>();
 		GuestRoomStatus roomStatus = guestRoomStatusDao.findByGuestRoomId(id);
 		String oldStatus = roomStatus.getRoomStatus();
-		if (force||statusChangeSure(oldStatus, status)) {
+		if (force || statusChangeSure(oldStatus, status)) {
 			roomStatus.setRoomStatus(status);
 			modify(roomStatus);
 			roomStatusQuantityService.transformRoomStatusQuantity(roomStatus.getHotelCode(), oldStatus, status, 1);
