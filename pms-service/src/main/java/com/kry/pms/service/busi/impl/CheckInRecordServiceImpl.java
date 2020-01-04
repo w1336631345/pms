@@ -4,11 +4,7 @@ import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import javax.persistence.OneToOne;
 import javax.persistence.criteria.CriteriaBuilder;
@@ -137,6 +133,16 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 						//释放资源
 						//...释放资源代码
 						//...
+						//..
+						//.
+						//查询主单下的成员记录
+						List<CheckInRecord> children = checkInRecordDao.findByMainRecordAndDeleted(dbCir, Constants.DELETED_FALSE);
+						for(int i=0; i<children.size(); i++){
+							CheckInRecord cir = children.get(i);
+							cir.setArriveTime(checkInRecord.getArriveTime());
+							cir.setLeaveTime(checkInRecord.getLeaveTime());
+							checkInRecordDao.saveAndFlush(cir);
+						}
 					}else{//改大
 						//查询主单下的成员记录
 						List<CheckInRecord> children = checkInRecordDao.findByMainRecordAndDeleted(dbCir, Constants.DELETED_FALSE);
@@ -175,6 +181,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 			UpdateUtil.copyNullProperties(checkUpdateItemTestBo, cir);
 //			modify(cir);
 			checkInRecordDao.save(cir);
+//			modifyInfo(cir);
 		}
 		return null;
 	}
