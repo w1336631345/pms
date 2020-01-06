@@ -7,4 +7,5 @@ import lombok.Data;
 public class CheckUpdateItemTestBo extends CheckInRecord {
 
     private String[] ids;
+
 }
