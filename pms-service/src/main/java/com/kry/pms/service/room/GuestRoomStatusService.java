@@ -40,6 +40,8 @@ public interface GuestRoomStatusService extends BaseService<GuestRoomStatus> {
 	public GuestRoomStatusVo detailGuestRoom(String id);
 
 	DtoResponse<String> changeRoomStatus(String id, String status, int quantity, boolean force);
+
+	public void updateSummary(GuestRoom gr,String oldVal, String newVal);
 	
 	
 }

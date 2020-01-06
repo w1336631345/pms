@@ -125,27 +125,26 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 		CheckInRecord dbCir = checkInRecordDao.getOne(checkInRecord.getId());
 		if (dbCir != null) {
 			checkInRecord.setMainRecord(dbCir.getMainRecord());
-			if (checkInRecord.getCustomer() != null) {
-				Customer customer = customerService.modify(checkInRecord.getCustomer());
-				checkInRecord.setCustomer(customer);
-			}
-			//如果是主单操作，判断是不是修改的时间
-			if(("G").equals(dbCir.getType())){
-				if(checkInRecord.getIsUpdateTime()){
-					//修改的离店时间小于之前时间（改小）
-					if(checkInRecord.getLeaveTime().isBefore(dbCir.getLeaveTime())){
-						//释放资源
-						//...释放资源代码
-						//...
-					}else{//改大
-						//查询主单下的成员记录
-						List<CheckInRecord> children = checkInRecordDao.findByMainRecordAndDeleted(dbCir, Constants.DELETED_FALSE);
-						for(int i=0; i<children.size(); i++){
+			updateCustomer(dbCir, checkInRecord);
+			// 如果是主单操作，判断是不是修改的时间
+			if (("G").equals(dbCir.getType())) {
+				if (checkInRecord.getIsUpdateTime()) {
+					// 修改的离店时间小于之前时间（改小）
+					if (checkInRecord.getLeaveTime().isBefore(dbCir.getLeaveTime())) {
+						// 释放资源
+						// ...释放资源代码
+						// ...
+					} else {// 改大
+							// 查询主单下的成员记录
+						List<CheckInRecord> children = checkInRecordDao.findByMainRecordAndDeleted(dbCir,
+								Constants.DELETED_FALSE);
+						for (int i = 0; i < children.size(); i++) {
 							CheckInRecord cir = children.get(i);
-							if(cir.getRoomType() != null){
-								//查询房类资源是否满足
-								boolean isExit = roomStatisticsService.booking(cir.getRoomType(), cir.getArriveTime(), cir.getRoomCount(), cir.getDays());
-								if(!isExit){
+							if (cir.getRoomType() != null) {
+								// 查询房类资源是否满足
+								boolean isExit = roomStatisticsService.booking(cir.getRoomType(), cir.getArriveTime(),
+										cir.getRoomCount(), cir.getDays());
+								if (!isExit) {
 									TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 									return hr.error("房类资源不够");
 								}
@@ -160,6 +159,14 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 			hr.addData(checkInRecordDao.saveAndFlush(checkInRecord));
 		}
 		return hr.ok();
+	}
+
+	private void updateCustomer(CheckInRecord dbCir, CheckInRecord cir) {
+		if(cir.getGuestRoom()!=null&&cir.getCustomer() != null) {
+			if(dbCir.getCustomer()!=null&&dbCir.getCustomer().getId().equals(cir.getCustomer().getId())) {
+				guestRoomStatausService.updateSummary(cir.getGuestRoom(),dbCir.getCustomer().getName(),cir.getCustomer().getName());
+			}
+		}
 	}
 
 	@Override

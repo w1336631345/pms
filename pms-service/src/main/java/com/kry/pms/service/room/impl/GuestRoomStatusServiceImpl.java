@@ -334,4 +334,11 @@ public class GuestRoomStatusServiceImpl implements GuestRoomStatusService {
 		return GuestRoomStatusVo.covert(status);
 	}
 
+	@Override
+	public void updateSummary(GuestRoom gr,String oldVal, String newVal) {
+		GuestRoomStatus status = guestRoomStatusDao.findByGuestRoomId(gr.getId());
+		status.setSummary(status.getSummary().replace(oldVal, newVal));
+		modify(status);
+	}
+
 }
