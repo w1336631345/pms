@@ -96,19 +96,19 @@ public interface CheckInRecordService extends BaseService<CheckInRecord> {
 
     List<CheckInRecord> getByRoomNum(String roomNum, String hotelCode, String groupType);
 
-    List<CheckInRecord> checkInTogether(String hotelCode, String orderNum);
+    List<CheckInRecord> checkInTogether(String hotelCode, String orderNum, String guestRoomId);
 
     List<CheckInRecord> findByTogetherCode(String hotelCode, String togetherCod);
 
-    void addTogether(String hotelCode, String orderNum, String customerId, String status);
+    void addTogether(String hotelCode, String orderNum, String customerId, String status, String guestRoomId);
 
 	//独单房价
 	@org.springframework.transaction.annotation.Transactional(rollbackFor=Exception.class)
-	void roomPriceAllocation(String hotelCode, String orderNum, String customerId);
+	void roomPriceAllocation(String hotelCode, String orderNum, String customerId, String guestRoomId);
 
     //平均房价
     @org.springframework.transaction.annotation.Transactional(rollbackFor=Exception.class)
-    void roomPriceAvg(String hotelCode, String orderNum);
+    void roomPriceAvg(String hotelCode, String orderNum, String guestRoomId);
 
 	public CheckInRecord queryByAccountId(String id);
 }
