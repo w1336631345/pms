@@ -9,7 +9,7 @@ public interface RoomRepairRecordDao extends BaseDao<RoomRepairRecord>{
 
 //	RoomRepairRecord findByGuestRoomIdAndStatus(String id, String normal);
 	
-	@Query(value = "select * from t_room_repair_record where guest_room_id = :1 and status =:2 order by start_tine desc limit 1 ",nativeQuery = true)
+	@Query(value = "select * from t_room_repair_record where guest_room_id = ?1 and status =?2 order by start_time desc limit 1 ",nativeQuery = true)
 	RoomRepairRecord queryTopRecord(String guestId,String status);
 
 }
