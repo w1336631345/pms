@@ -202,10 +202,10 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
 	 * @Date: 2019/12/23 14:38
 	 */
 	@GetMapping(value = "/checkInTogether")
-	public HttpResponse checkInTogether(String orderNum){
+	public HttpResponse checkInTogether(String orderNum, String guestRoomId){
 		HttpResponse hr = new HttpResponse();
 		User user = getUser();
-		List<CheckInRecord> list = checkInRecordService.checkInTogether(user.getHotelCode(),orderNum);
+		List<CheckInRecord> list = checkInRecordService.checkInTogether(user.getHotelCode(),orderNum, guestRoomId);
 		hr.setData(list);
 		return hr;
 	}
@@ -236,10 +236,10 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
 	 * @Date: 2019/12/23 17:38
 	 */
 	@GetMapping(value = "/addTogether")
-	public HttpResponse addTogether(String orderNum, String customerId, String status){
+	public HttpResponse addTogether(String orderNum, String customerId, String status, String guestRoomId){
 		HttpResponse hr = new HttpResponse();
 		User user = getUser();
-		checkInRecordService.addTogether(user.getHotelCode(), orderNum, customerId, status);
+		checkInRecordService.addTogether(user.getHotelCode(), orderNum, customerId, status, guestRoomId);
 		return hr.ok();
 	}
 
@@ -252,10 +252,10 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
 	 * @Date: 2019/12/24 17:40
 	 */
 	@GetMapping(value = "/roomPriceAllocation")
-	public HttpResponse roomPriceAllocation(String orderNum, String customerId){
+	public HttpResponse roomPriceAllocation(String orderNum, String customerId, String guestRoomId){
 		HttpResponse hr = new HttpResponse();
 		User user = getUser();
-		checkInRecordService.roomPriceAllocation(user.getHotelCode(), orderNum, customerId);
+		checkInRecordService.roomPriceAllocation(user.getHotelCode(), orderNum, customerId, guestRoomId);
 		return hr.ok();
 	}
 
@@ -268,10 +268,10 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
 	 * @Date: 2019/12/24 17:40
 	 */
 	@GetMapping(value = "/roomPriceAvg")
-	public HttpResponse roomPriceAvg(String orderNum){
+	public HttpResponse roomPriceAvg(String orderNum, String guestRoomId){
 		HttpResponse hr = new HttpResponse();
 		User user = getUser();
-		checkInRecordService.roomPriceAvg(user.getHotelCode(), orderNum);
+		checkInRecordService.roomPriceAvg(user.getHotelCode(), orderNum, guestRoomId);
 		return hr.ok();
 	}
 
