@@ -7,6 +7,8 @@ import com.kry.pms.base.DtoResponse;
 import com.kry.pms.model.http.response.room.GuestRoomStatusVo;
 import com.kry.pms.model.http.response.room.RoomStatusTableVo;
 import com.kry.pms.model.persistence.busi.CheckInRecord;
+import com.kry.pms.model.persistence.busi.RoomLockRecord;
+import com.kry.pms.model.persistence.busi.RoomRepairRecord;
 import com.kry.pms.model.persistence.room.GuestRoom;
 import com.kry.pms.model.persistence.room.GuestRoomStatus;
 import com.kry.pms.service.BaseService;
@@ -42,6 +44,14 @@ public interface GuestRoomStatusService extends BaseService<GuestRoomStatus> {
 	DtoResponse<String> changeRoomStatus(String id, String status, int quantity, boolean force);
 
 	public void updateSummary(GuestRoom gr,String oldVal, String newVal);
+
+	boolean unRepairGuestRoom(String id, RoomRepairRecord record);
+
+	boolean unLockGuestRoom(String id, RoomLockRecord record);
+
+	boolean repairGuestRoom(String id, RoomRepairRecord record);
+
+	boolean lockGuestRoom(String id, RoomLockRecord record);
 	
 	
 }

@@ -11,6 +11,7 @@ public class GuestRoomOperation {
 	private String op;
 	@NotBlank
 	private String[] roomIds;
+	private String currentId;
 	private String roomNums;
 	private String endToStatus;
 	private String reasonId;

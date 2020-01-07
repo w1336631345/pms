@@ -41,8 +41,6 @@ public interface CheckInRecordService extends BaseService<CheckInRecord> {
 
 	public CheckInRecord checkInByTempName(String string, String roomId, DtoResponse<String> response);
 
-	public List<CheckInRecord> checkInByTempName(int humanCount, BookingRecord br, BookingItem item, GuestRoom gr,
-			DtoResponse<String> response);
 
 	public List<CheckInRecord> checkInByTempName(int humanCount, CheckInRecord cir, GuestRoom gr,
 			DtoResponse<String> response);

@@ -80,8 +80,8 @@ public class RoomRepairRecordServiceImpl implements RoomRepairRecordService {
 
 	@Override
 	public RoomRepairRecord openRepair(String id, String operationEmployeeId) {
-		RoomRepairRecord rlr = roomRepairRecordDao.findByGuestRoomIdAndStatus(id,Constants.Status.NORMAL);
-		if (rlr != null) {
+		RoomRepairRecord rlr = roomRepairRecordDao.queryTopRecord(id, Constants.Status.NORMAL);
+		if (rlr != null && rlr.getGuestRoom().getId().equals(id) && rlr.getStatus().equals(Constants.Status.NORMAL)) {
 			rlr.setStatus(Constants.Status.CLOSE);
 			modify(rlr);
 		}

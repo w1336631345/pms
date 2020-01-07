@@ -3,6 +3,9 @@ package com.kry.pms.model.http.response.room;
 import java.io.Serializable;
 import java.util.List;
 
+import javax.persistence.FetchType;
+import javax.persistence.OneToMany;
+
 import org.springframework.beans.BeanUtils;
 
 import com.kry.pms.model.http.response.busi.CheckInRecordVo;
@@ -34,23 +37,28 @@ public class GuestRoomStatusVo implements Serializable {
 	private Boolean ota;
 	private List<CheckInRecordVo> currentCheckInRecord;
 	private List<CheckInRecordVo> willCheckInRecord;
-	private RoomLockRecord currentRoomLocakRecord;
-	private RoomRepairRecord currentRoomRepairRecord;
-	
+	private List<RoomLockRecordVo> lockRecord;
+	private List<RoomRepairRecordVo> repairRecord;
+
 	public GuestRoomStatusVo() {
 		super();
 	}
-	
+
 	public static GuestRoomStatusVo covert(GuestRoomStatus grs) {
 		GuestRoomStatusVo grsv = new GuestRoomStatusVo();
 		BeanUtils.copyProperties(grs, grsv);
-		if(grs.getCurrentCheckInRecords()!=null) {
+		if (grs.getCurrentCheckInRecords() != null) {
 			grsv.setCurrentCheckInRecord(CheckInRecordVo.convert(grs.getCurrentCheckInRecords()));
 		}
-		if(grs.getWillCheckInRecords()!=null) {
+		if (grs.getWillCheckInRecords() != null) {
 			grsv.setWillCheckInRecord(CheckInRecordVo.convert(grs.getWillCheckInRecords()));
 		}
+		if (grs.getLockRecords() != null) {
+			grsv.setLockRecord(RoomLockRecordVo.convert(grs.getLockRecords()));
+		}
+		if (grs.getRepairRecords() != null) {
+			grsv.setRepairRecord(RoomRepairRecordVo.convert(grs.getRepairRecords()));
+		}
 		return grsv;
-		
 	}
 }

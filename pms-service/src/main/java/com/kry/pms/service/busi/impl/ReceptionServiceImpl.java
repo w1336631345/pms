@@ -199,7 +199,7 @@ public class ReceptionServiceImpl implements ReceptionService {
 				if (roomAssignBo.getRoomId().length <= (cir.getRoomCount() - cir.getCheckInCount())) {
 					for (String roomId : roomAssignBo.getRoomId()) {
 						GuestRoom gr = guestRoomService.findById(roomId);
-						checkInRecordService.checkInByTempName(roomAssignBo.getHumanCountPreRoom(), cir, gr, response);
+						checkInRecordService.checkInByTempName(cir.getSingleRoomCount(), cir, gr, response);
 					}
 				} else {
 					response.setStatus(Constants.BusinessCode.CODE_RESOURCE_NOT_ENOUGH);

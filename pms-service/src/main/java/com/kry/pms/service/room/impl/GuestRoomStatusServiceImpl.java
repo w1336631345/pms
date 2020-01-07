@@ -2,6 +2,7 @@ package com.kry.pms.service.room.impl;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.springframework.beans.BeanUtils;
@@ -21,6 +22,8 @@ import com.kry.pms.model.http.response.room.FloorVo;
 import com.kry.pms.model.http.response.room.GuestRoomStatusVo;
 import com.kry.pms.model.http.response.room.RoomStatusTableVo;
 import com.kry.pms.model.persistence.busi.CheckInRecord;
+import com.kry.pms.model.persistence.busi.RoomLockRecord;
+import com.kry.pms.model.persistence.busi.RoomRepairRecord;
 import com.kry.pms.model.persistence.room.Building;
 import com.kry.pms.model.persistence.room.Floor;
 import com.kry.pms.model.persistence.room.GuestRoom;
@@ -305,12 +308,76 @@ public class GuestRoomStatusServiceImpl implements GuestRoomStatusService {
 		if (force || statusChangeSure(oldStatus, status)) {
 			roomStatus.setRoomStatus(status);
 			modify(roomStatus);
-			roomStatusQuantityService.transformRoomStatusQuantity(roomStatus.getHotelCode(), oldStatus, status, 1);
+//			roomStatusQuantityService.transformRoomStatusQuantity(roomStatus.getHotelCode(), oldStatus, status, 1);
 		} else {
 			rep.setStatus(Constants.BusinessCode.CODE_ILLEGAL_OPERATION);
 			rep.setMessage(roomStatus.getRoomNum() + ":当前状态为：" + oldStatus + ",无法修改");
 		}
 		return rep;
+	}
+
+	@Override
+	public boolean lockGuestRoom(String id, RoomLockRecord record) {
+		GuestRoomStatus roomStatus = guestRoomStatusDao.findByGuestRoomId(id);
+		roomStatus.setRoomStatus(Constants.Status.ROOM_STATUS_OUT_OF_SERVCIE);
+		if (roomStatus.getLockRecords() != null) {
+			roomStatus.getLockRecords().add(record);
+		} else {
+			ArrayList<RoomLockRecord> records = new ArrayList<>();
+			records.add(record);
+			roomStatus.setLockRecords(records);
+		}
+		modify(roomStatus);
+		return true;
+	}
+
+	@Override
+	public boolean repairGuestRoom(String id, RoomRepairRecord record) {
+		GuestRoomStatus roomStatus = guestRoomStatusDao.findByGuestRoomId(id);
+		roomStatus.setRoomStatus(Constants.Status.ROOM_STATUS_OUT_OF_ORDER);
+		if (roomStatus.getRepairRecords() != null) {
+			roomStatus.getRepairRecords().add(record);
+		} else {
+			ArrayList<RoomRepairRecord> records = new ArrayList<>();
+			records.add(record);
+			roomStatus.setRepairRecords(records);
+		}
+		modify(roomStatus);
+		return true;
+	}
+
+	@Override
+	public boolean unLockGuestRoom(String id, RoomLockRecord record) {
+		GuestRoomStatus roomStatus = guestRoomStatusDao.findByGuestRoomId(id);
+		roomStatus.setRoomStatus(record.getEndToStatus());
+		if (roomStatus.getLockRecords() != null) {
+			Iterator<RoomLockRecord> iterator = roomStatus.getLockRecords().iterator();
+			while (iterator.hasNext()) {
+				if (record.getId().equals(iterator.next().getId())) {
+					iterator.remove();
+					break;
+				}
+			}
+		}
+		modify(roomStatus);
+		return true;
+	}
+
+	@Override
+	public boolean unRepairGuestRoom(String id, RoomRepairRecord record) {
+		GuestRoomStatus roomStatus = guestRoomStatusDao.findByGuestRoomId(id);
+		roomStatus.setRoomStatus(record.getEndToStatus());
+		if (roomStatus.getRepairRecords() != null) {
+			Iterator<RoomRepairRecord> iterator = roomStatus.getRepairRecords().iterator();
+			while (iterator.hasNext()) {
+				if (record.getId().equals(iterator.next().getId())) {
+					iterator.remove();
+					break;
+				}
+			}
+		}
+		modify(roomStatus);
+		return true;
 	}
 
 	@Override
@@ -335,7 +402,7 @@ public class GuestRoomStatusServiceImpl implements GuestRoomStatusService {
 	}
 
 	@Override
-	public void updateSummary(GuestRoom gr,String oldVal, String newVal) {
+	public void updateSummary(GuestRoom gr, String oldVal, String newVal) {
 		GuestRoomStatus status = guestRoomStatusDao.findByGuestRoomId(gr.getId());
 		status.setSummary(status.getSummary().replace(oldVal, newVal));
 		modify(status);

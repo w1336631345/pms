@@ -4,9 +4,12 @@ import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-import javax.persistence.OneToOne;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Path;
@@ -14,9 +17,6 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.transaction.Transactional;
 
-import com.kry.pms.base.*;
-import com.kry.pms.model.http.request.busi.CheckUpdateItemTestBo;
-import com.kry.pms.service.util.UpdateUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
@@ -26,10 +26,18 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
+import com.kry.pms.base.Constants;
+import com.kry.pms.base.DtoResponse;
+import com.kry.pms.base.HttpResponse;
+import com.kry.pms.base.PageRequest;
+import com.kry.pms.base.PageResponse;
+import com.kry.pms.base.ParamSpecification;
 import com.kry.pms.dao.busi.CheckInRecordDao;
 import com.kry.pms.model.http.request.busi.CheckInBo;
 import com.kry.pms.model.http.request.busi.CheckInItemBo;
+import com.kry.pms.model.http.request.busi.CheckUpdateItemTestBo;
 import com.kry.pms.model.http.request.busi.TogetherBo;
 import com.kry.pms.model.http.response.busi.AccountSummaryVo;
 import com.kry.pms.model.http.response.busi.CheckInRecordListVo;
@@ -39,6 +47,7 @@ import com.kry.pms.model.persistence.busi.CheckInRecord;
 import com.kry.pms.model.persistence.guest.Customer;
 import com.kry.pms.model.persistence.room.GuestRoom;
 import com.kry.pms.model.persistence.room.RoomTag;
+import com.kry.pms.model.persistence.room.RoomUsage;
 import com.kry.pms.model.persistence.sys.Account;
 import com.kry.pms.model.persistence.sys.BusinessSeq;
 import com.kry.pms.model.persistence.sys.User;
@@ -55,7 +64,7 @@ import com.kry.pms.service.room.RoomUsageService;
 import com.kry.pms.service.sys.AccountService;
 import com.kry.pms.service.sys.BusinessSeqService;
 import com.kry.pms.service.sys.SystemConfigService;
-import org.springframework.transaction.interceptor.TransactionAspectSupport;
+import com.kry.pms.service.util.UpdateUtil;
 
 @Service
 public class CheckInRecordServiceImpl implements CheckInRecordService {
@@ -158,9 +167,10 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 	}
 
 	private void updateCustomer(CheckInRecord dbCir, CheckInRecord cir) {
-		if(cir.getGuestRoom()!=null&&cir.getCustomer() != null) {
-			if(dbCir.getCustomer()!=null&&dbCir.getCustomer().getId().equals(cir.getCustomer().getId())) {
-				guestRoomStatausService.updateSummary(cir.getGuestRoom(),dbCir.getCustomer().getName(),cir.getCustomer().getName());
+		if (cir.getGuestRoom() != null && cir.getCustomer() != null) {
+			if (dbCir.getCustomer() != null && dbCir.getCustomer().getId().equals(cir.getCustomer().getId())) {
+				guestRoomStatausService.updateSummary(cir.getGuestRoom(), dbCir.getCustomer().getName(),
+						cir.getCustomer().getName());
 			}
 		}
 	}
@@ -278,49 +288,6 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 	}
 
 	@Override
-	public List<CheckInRecord> checkInByTempName(int humanCount, BookingRecord br, BookingItem item, GuestRoom gr,
-			DtoResponse<String> response) {
-		List<CheckInRecord> data = new ArrayList<CheckInRecord>();
-		LocalTime criticalTime = systemConfigService.getCriticalTime(gr.getHotelCode());
-		LocalDate startDate = br.getArriveTime().toLocalDate();
-		if (br.getArriveTime().toLocalTime().isBefore(criticalTime)) {
-			startDate = startDate.plusDays(-1);
-		}
-		BusinessSeq bs = businessSeqService.fetchNextSeq(gr.getHotelCode(), Constants.Key.BUSINESS_SEQ_KEY);
-		String tempName = br.getName();
-		String checkInSn = "";
-		roomUsageService.use(gr, Constants.Status.ROOM_USAGE_BOOK, br.getArriveTime(), br.getLeaveTime(), checkInSn,
-				tempName, response);
-		if (response.getStatus() == 0) {
-			for (int i = 1; i <= humanCount; i++) {
-				tempName = br.getName() + gr.getRoomNum() + "#" + i;
-				Customer customer = customerService.createTempCustomer(gr.getHotelCode(), tempName);
-				CheckInRecord cir = new CheckInRecord();
-				cir.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION);
-				cir.setCustomer(customer);
-				cir.setCheckInSn(checkInSn);
-				cir.setType(Constants.Type.CHECK_IN_RECORD_CUSTOMER);
-				cir.setGroup(br.getGroup());
-				cir.setArriveTime(br.getArriveTime());
-				cir.setLeaveTime(br.getLeaveTime());
-				cir.setStartDate(startDate);
-				cir.setDays(br.getDays());
-				cir.setGuestRoom(gr);
-				cir.setHotelCode(gr.getHotelCode());
-				Account account = new Account(0, 0);
-				account.setName(tempName);
-				account.setCustomer(customer);
-				account.setType(Constants.Type.ACCOUNT_CUSTOMER);
-				cir.setAccount(account);
-				cir = add(cir);
-				data.add(cir);
-				roomRecordService.createRoomRecord(cir);
-			}
-		}
-		return data;
-	}
-
-	@Override
 	public List<CheckInRecord> findByBookId(String bookId) {
 		return checkInRecordDao.fingByBookId(bookId);
 	}
@@ -346,7 +313,9 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 			tags = new ArrayList<RoomTag>();
 			tags.addAll(cir.getDemands());
 		}
-		if (response.getStatus() == 0) {
+		DtoResponse<RoomUsage> r = roomUsageService.use(gr, Constants.Status.ROOM_USAGE_BOOK, cir.getArriveTime(),
+				cir.getLeaveTime(), cir.getId(), tempName);
+		if (r.getStatus() == 0) {
 			for (int i = 1; i <= humanCount; i++) {
 				Customer customer = customerService.createTempCustomer(gr.getHotelCode(), tempName + "#" + i);
 				CheckInRecord ncir = null;
@@ -974,6 +943,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 				cir.setPersonalPrice(cir.getPurchasePrice());
 				cir.setPersonalPercentage(1.0);// 因为是独单房价，占比1
 			}
+
 		}
 	}
 

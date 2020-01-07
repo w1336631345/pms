@@ -29,6 +29,7 @@ import com.kry.pms.model.persistence.room.RoomUsage;
 import com.kry.pms.service.busi.BookingItemService;
 import com.kry.pms.service.busi.BookingRecordService;
 import com.kry.pms.service.busi.CheckInRecordService;
+import com.kry.pms.service.room.RoomTypeQuantityService;
 import com.kry.pms.service.room.RoomUsageService;
 
 @Service
@@ -39,6 +40,8 @@ public class RoomUsageServiceImpl implements RoomUsageService {
 	BookingRecordService bookingRecordService;
 	@Autowired
 	CheckInRecordService checkInRecordService;
+	@Autowired
+	RoomTypeQuantityService roomTypeQuantityService;
 
 	@Override
 	public RoomUsage add(RoomUsage roomUsage) {
@@ -98,13 +101,15 @@ public class RoomUsageServiceImpl implements RoomUsageService {
 	}
 
 	@Override
-	public RoomUsage use(GuestRoom gr, String status, LocalDateTime startTime, LocalDateTime endTime,
-			String businesskey, String businessInfo, DtoResponse<String> response) {
+	public DtoResponse<RoomUsage> use(GuestRoom gr, String status, LocalDateTime startTime, LocalDateTime endTime,
+			String businesskey, String businessInfo) {
+		DtoResponse<RoomUsage> response  = new DtoResponse<RoomUsage>();
 		Duration d = Duration.between(startTime, endTime);
 		long duration = d.get(ChronoUnit.SECONDS) / 3600;
 		RoomUsage ru = roomUsageDao.queryGuestRoomUsable(gr.getId(), startTime, endTime);
 		RoomUsage data = null;
 		if (ru != null) {
+			
 			if (ru.getStartDateTime().isEqual(startTime)) {
 				if (ru.getEndDateTime().isEqual(endTime)) {
 					ru.setEndDateTime(endTime);
@@ -174,18 +179,20 @@ public class RoomUsageServiceImpl implements RoomUsageService {
 					data = modify(cru);
 				}
 			}
+			roomTypeQuantityService.useRoomType(gr.getRoomType(), startTime.toLocalDate(), endTime.toLocalDate(), status);
+			
 		} else {
 			response.setStatus(Constants.BusinessCode.CODE_RESOURCE_NOT_ENOUGH);
 			response.setMessage("房间号：" + gr.getRoomNum() + "在该时段无法使用，请确认");
 		}
-		return data;
+		return response.addData(data);
 	}
 
 	@Override
 	public boolean unUse(GuestRoom gr, String businessKey, LocalDateTime endTime) {
 		RoomUsage ru = roomUsageDao.findByGuestRoomIdAndBusinesskey(gr.getId(), businessKey);
 		if (ru != null) {
-			if (!ru.getStartDateTime().isBefore(endTime)) {
+			if (!ru.getStartDateTime().isBefore(endTime)) { //开始时间前释放资源 相当于直接取消
 				RoomUsage pru = ru.getPreRoomUsage();
 				RoomUsage npru = ru.getPostRoomUsage();
 				if (pru.getUsageStatus().equals(Constants.Status.ROOM_USAGE_FREE)) {
@@ -221,7 +228,7 @@ public class RoomUsageServiceImpl implements RoomUsageService {
 						ru.setUsageStatus(Constants.Status.ROOM_USAGE_FREE);
 					}
 				}
-			} else if (ru.getEndDateTime().isAfter(endTime)) {
+			} else if (ru.getEndDateTime().isAfter(endTime)) {//开始时间之后 结束时间之前 相当于提前释放资源
 				RoomUsage npru = ru.getPostRoomUsage();
 				if (npru != null) {
 					if (npru.getUsageStatus().equals(Constants.Status.ROOM_USAGE_FREE)) {
@@ -250,6 +257,7 @@ public class RoomUsageServiceImpl implements RoomUsageService {
 					}
 				} else {
 					// 理论上不会出现
+					return false;
 				}
 			}
 		} else {

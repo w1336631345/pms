@@ -1,6 +1,7 @@
 package com.kry.pms.service.room.impl;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,6 +11,7 @@ import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.kry.pms.base.Constants;
 import com.kry.pms.base.PageRequest;
@@ -125,6 +127,100 @@ public class RoomTypeQuantityServiceImpl implements RoomTypeQuantityService {
 		}
 	}
 
+	public void useRoomType(RoomType roomType, LocalDateTime startTime, LocalDateTime endTime, String useType) {
+		LocalDate startDate = startTime.toLocalDate();
+		LocalDate endDate = endTime.toLocalDate();
+		useRoomType(roomType, startDate, endDate, useType);
+	}
+	@Transactional
+	@Override
+	public void useRoomType(RoomType roomType, LocalDate startDate, LocalDate endDate, String useType) {
+		switch (useType) {
+		case Constants.Status.ROOM_USAGE_BOOK:
+			bookRoomType(roomType, startDate, endDate);
+			break;
+		case Constants.Status.ROOM_USAGE_ASSIGN:
+			assignRoomType(roomType,startDate,endDate);
+			break;
+		case Constants.Status.ROOM_USAGE_CHECK_IN:
+			checkInRoomType(roomType,startDate,endDate);
+			break;
+		case Constants.Status.ROOM_USAGE_LOCKED:
+			lockRoomType(roomType,startDate,endDate);
+			break;
+		case Constants.Status.ROOM_USAGE_REPARIE:
+			repairRoomType(roomType,startDate,endDate);
+			break;
+		default:
+			break;
+		}
+	}
+	private void bookRoomType(RoomType roomType, LocalDate startDate, LocalDate endDate) {
+		RoomTypeQuantity rtq = null;
+		LocalDate currentDate = startDate;
+		while(currentDate.isBefore(endDate)) {
+			rtq = findByRoomTypeAndQuantityDateForUpdate(roomType, currentDate);
+			rtq.setPredictableTotal(rtq.getPredictableTotal()-1);
+			rtq.setReserveTotal(rtq.getReserveTotal()+1);
+			currentDate = currentDate.plusDays(1);
+			modify(rtq);
+		}
+	}
+	private void assignRoomType(RoomType roomType, LocalDate startDate, LocalDate endDate) {
+		RoomTypeQuantity rtq = null;
+		LocalDate currentDate = startDate;
+		while(currentDate.isBefore(endDate)) {
+			rtq = findByRoomTypeAndQuantityDateForUpdate(roomType, currentDate);
+			rtq.setReserveTotal(rtq.getReserveTotal()-1);
+			rtq.setBookingTotal(rtq.getBookingTotal()+1);
+			currentDate = currentDate.plusDays(1);
+			modify(rtq);
+		}
+	}
+	private void lockRoomType(RoomType roomType, LocalDate startDate, LocalDate endDate) {
+		RoomTypeQuantity rtq = null;
+		LocalDate currentDate = startDate;
+		while(currentDate.isBefore(endDate)) {
+			rtq = findByRoomTypeAndQuantityDateForUpdate(roomType, currentDate);
+			rtq.setAvailableTotal(rtq.getAvailableTotal()-1);
+			rtq.setLockedTotal(rtq.getLockedTotal()+1);
+			currentDate = currentDate.plusDays(1);
+			modify(rtq);
+		}
+	}
+	private void repairRoomType(RoomType roomType, LocalDate startDate, LocalDate endDate) {
+		RoomTypeQuantity rtq = null;
+		LocalDate currentDate = startDate;
+		while(currentDate.isBefore(endDate)) {
+			rtq = findByRoomTypeAndQuantityDateForUpdate(roomType, currentDate);
+			rtq.setAvailableTotal(rtq.getAvailableTotal()-1);
+			rtq.setRepairTotal(rtq.getRepairTotal()+1);
+			currentDate = currentDate.plusDays(1);
+			modify(rtq);
+		}
+	}
+	private void checkInRoomType(RoomType roomType, LocalDate startDate, LocalDate endDate) {
+		RoomTypeQuantity rtq = null;
+		LocalDate currentDate = startDate;
+		while(currentDate.isBefore(endDate)) {
+			rtq = findByRoomTypeAndQuantityDateForUpdate(roomType, currentDate);
+			rtq.setBookingTotal(rtq.getBookingTotal()-1);
+			rtq.setUsedTotal(rtq.getUsedTotal()+1);
+			currentDate = currentDate.plusDays(1);
+			modify(rtq);
+		}
+	}
+
+	public void unUseRoomType(RoomType roomType, LocalDateTime startTime, LocalDateTime endTime) {
+		LocalDate startDate = startTime.toLocalDate();
+		LocalDate endDate = endTime.toLocalDate();
+		unUseRoomType(roomType, startDate, endDate);
+	}
+
+	public void unUseRoomType(RoomType roomType, LocalDate startDate, LocalDate endDate) {
+		
+	}
+
 	@Override
 	public void checkIn(GuestRoom gr, LocalDate startDate, Integer days) {
 		RoomTypeQuantity rtq = null;
@@ -185,7 +281,7 @@ public class RoomTypeQuantityServiceImpl implements RoomTypeQuantityService {
 	public List<RoomTypeQuantityVo> queryByDay(String currentHotleCode, LocalDate startDate, LocalDate endDate) {
 		List<RoomTypeQuantityVo> data = new ArrayList<RoomTypeQuantityVo>();
 		RoomTypeQuantityVo rv = null;
-		for(RoomTypeQuantity r :roomTypeQuantityDao.queryByDay(currentHotleCode, startDate, endDate)) {
+		for (RoomTypeQuantity r : roomTypeQuantityDao.queryByDay(currentHotleCode, startDate, endDate)) {
 			rv = new RoomTypeQuantityVo();
 			BeanUtils.copyProperties(r, rv);
 			rv.setRoomTypeId(r.getRoomType().getId());

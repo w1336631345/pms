@@ -14,6 +14,7 @@ import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
 import com.kry.pms.dao.busi.RoomLockRecordDao;
 import com.kry.pms.model.persistence.busi.RoomLockRecord;
+import com.kry.pms.model.persistence.busi.RoomRepairRecord;
 import com.kry.pms.model.persistence.dict.RoomLockReason;
 import com.kry.pms.model.persistence.room.GuestRoom;
 import com.kry.pms.model.persistence.room.GuestRoomStatus;
@@ -84,8 +85,8 @@ public class RoomLockRecordServiceImpl implements RoomLockRecordService {
 
 	@Override
 	public RoomLockRecord openLock(String id, String operationEmployeeId) {
-		RoomLockRecord rlr = roomLockRecordDao.findByGuestRoomIdAndStatus(id,Constants.Status.NORMAL);
-		if(rlr!=null) {
+		RoomLockRecord rlr = roomLockRecordDao.queryTopRecord(id, Constants.Status.NORMAL);
+		if (rlr != null && rlr.getGuestRoom().getId().equals(id) && rlr.getStatus().equals(Constants.Status.NORMAL)) {
 			rlr.setStatus(Constants.Status.CLOSE);
 			modify(rlr);
 		}

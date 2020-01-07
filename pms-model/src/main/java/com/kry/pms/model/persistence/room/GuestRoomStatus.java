@@ -61,9 +61,9 @@ public class GuestRoomStatus extends PersistenceModel {
 	private List<CheckInRecord> currentCheckInRecords;
 	@OneToMany(fetch = FetchType.LAZY)
 	private List<CheckInRecord> willCheckInRecords;
-	@OneToOne(fetch = FetchType.LAZY)
-	private RoomLockRecord currentRoomLocakRecord;
-	@OneToOne(fetch = FetchType.LAZY)
-	private RoomRepairRecord currentRoomRepairRecord;
+	@OneToMany(fetch = FetchType.LAZY)
+	private List<RoomLockRecord> lockRecords;
+	@OneToMany(fetch = FetchType.LAZY)
+	private List<RoomRepairRecord> repairRecords;
 
 }

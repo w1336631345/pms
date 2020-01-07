@@ -1,5 +1,6 @@
 package com.kry.pms.service.room.impl;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +26,7 @@ import com.kry.pms.model.persistence.dict.RoomLockReason;
 import com.kry.pms.model.persistence.dict.RoomRepairReason;
 import com.kry.pms.model.persistence.room.Floor;
 import com.kry.pms.model.persistence.room.GuestRoom;
+import com.kry.pms.model.persistence.room.RoomUsage;
 import com.kry.pms.service.busi.RoomLockRecordService;
 import com.kry.pms.service.busi.RoomRecordService;
 import com.kry.pms.service.busi.RoomRepairRecordService;
@@ -167,6 +169,7 @@ public class GuestRoomServiceImpl implements GuestRoomService {
 		DtoResponse<String> rep = new DtoResponse<>();
 		rep.setMessage("");
 		String[] ids = op.getRoomIds();
+		LocalDateTime currentDate = LocalDateTime.now();
 		int errorCode = 0;
 		for (String id : ids) {
 			GuestRoom gr = findById(id);
@@ -175,25 +178,24 @@ public class GuestRoomServiceImpl implements GuestRoomService {
 				case OP_OPEN_LOCK:
 					RoomLockRecord rlr = roomLockRecordService.openLock(id, op.getOperationEmployeeId());
 					if (rlr != null && rlr.getStatus().equals(Constants.Status.CLOSE)) {
-						DtoResponse<String> r = guestRoomStatusService.changeRoomStatus(id, rlr.getEndToStatus(), 1,true);
-						if (r.getStatus() != 0) {
-							errorCode = r.getStatus();
-							rep.setMessage(rep.getMessage() + r.getMessage());
-						}else {							
-							roomUsageService.unUse(gr, rlr.getId(), LocalDateTime.now());
+						roomUsageService.unUse(gr, rlr.getId(), currentDate);
+						if (rlr.getStartTime().isBefore(currentDate)) {
+							if (guestRoomStatusService.unLockGuestRoom(id, rlr)) {
+							} else {
+								errorCode = Constants.BusinessCode.CODE_ILLEGAL_OPERATION;
+							}
 						}
 					}
 					break;
 				case OP_OPEN_REPAIR:
 					RoomRepairRecord rrr = roomRepairRecordService.openRepair(id, op.getOperationEmployeeId());
 					if (rrr != null && rrr.getStatus().equals(Constants.Status.CLOSE)) {
-						DtoResponse<String> r = guestRoomStatusService.changeRoomStatus(id, rrr.getEndToStatus(), 1,true);
-						
-						if (r.getStatus() != 0) {
-							errorCode = r.getStatus();
-							rep.setMessage(rep.getMessage() + r.getMessage());
-						}else {
-							roomUsageService.unUse(gr, rrr.getId(), LocalDateTime.now());
+						roomUsageService.unUse(gr, rrr.getId(), currentDate);
+						if (rrr.getStartTime().isBefore(currentDate)) {
+							if (guestRoomStatusService.unRepairGuestRoom(id, rrr)) {
+							} else {
+								errorCode = Constants.BusinessCode.CODE_ILLEGAL_OPERATION;
+							}
 						}
 					}
 					break;
@@ -222,6 +224,7 @@ public class GuestRoomServiceImpl implements GuestRoomService {
 		String[] ids = op.getRoomIds();
 		String toStatus = op.getOp();
 		int errorCode = 0;
+		StringBuilder message = new StringBuilder();
 		for (String id : ids) {
 			GuestRoom gr = findById(id);
 			if (gr != null) {
@@ -229,10 +232,21 @@ public class GuestRoomServiceImpl implements GuestRoomService {
 				case Constants.Status.ROOM_STATUS_OUT_OF_ORDER:
 					if (op.getReasonId() != null && op.getEndToStatus() != null) {
 						RoomRepairReason rpr = roomRepairReasonService.findById(op.getReasonId());
-						RoomRepairRecord record = roomRepairRecordService.add(roomRepairRecordService.createRecord(gr, op.getStartTime(),
-								op.getEndTime(), rpr, op.getEndToStatus()));
-						roomUsageService.use(gr, Constants.Status.ROOM_USAGE_LOCKED, op.getStartTime(), op.getEndTime(), record.getId(), null, rep);
-
+						DtoResponse<RoomUsage> r = roomUsageService.use(gr, Constants.Status.ROOM_USAGE_REPARIE,
+								op.getStartTime(), op.getEndTime(), null, null);
+						if (r.getStatus() == 0) {
+							RoomRepairRecord record = roomRepairRecordService.add(roomRepairRecordService
+									.createRecord(gr, op.getStartTime(), op.getEndTime(), rpr, op.getEndToStatus()));
+							r.getData().setBusinesskey(record.getId());
+							roomUsageService.modify(r.getData());
+							if (op.getStartTime().toLocalDate().isEqual(LocalDate.now())) {
+								guestRoomStatusService.repairGuestRoom(gr.getId(), record);
+							}
+						} else {
+							message.append(gr.getRoomNum());
+							message.append(" 房间资源不足，请确认");
+							message.append("\n");
+						}
 					} else {
 						rep.setStatus(Constants.BusinessCode.CODE_PARAMETER_INVALID);
 						rep.setMessage("必要参数不足：原因或者结束状态未选");
@@ -241,26 +255,38 @@ public class GuestRoomServiceImpl implements GuestRoomService {
 				case Constants.Status.ROOM_STATUS_OUT_OF_SERVCIE:
 					if (op.getReasonId() != null && op.getEndToStatus() != null) {
 						RoomLockReason rlr = roomLockReasonService.findById(op.getReasonId());
-						RoomLockRecord record = roomLockRecordService.add(roomLockRecordService.createRecord(gr, op.getStartTime(),
-								op.getEndTime(), rlr, op.getEndToStatus()));
-						roomUsageService.use(gr, Constants.Status.ROOM_USAGE_LOCKED, op.getStartTime(), op.getEndTime(), record.getId(), null, rep);
+						DtoResponse<RoomUsage> r = roomUsageService.use(gr, Constants.Status.ROOM_USAGE_LOCKED,
+								op.getStartTime(), op.getEndTime(), null, null);
+						if (r.getStatus() == 0) {
+							RoomLockRecord record = roomLockRecordService.add(roomLockRecordService.createRecord(gr,
+									op.getStartTime(), op.getEndTime(), rlr, op.getEndToStatus()));
+							r.getData().setBusinesskey(record.getId());
+							roomUsageService.modify(r.getData());
+							if (op.getStartTime().toLocalDate().isEqual(LocalDate.now())) {
+								guestRoomStatusService.lockGuestRoom(gr.getId(), record);
+							}
+						} else {
+							message.append(gr.getRoomNum());
+							message.append(" 房间资源不足，请确认");
+							message.append("\n");
+						}
 					} else {
 						rep.setStatus(Constants.BusinessCode.CODE_PARAMETER_INVALID);
 						rep.setMessage("必要参数不足：原因或者结束状态未选");
 					}
 					break;
 				default:
+					if (rep.getStatus() == 0) {
+						DtoResponse<String> r = guestRoomStatusService.changeRoomStatus(id, toStatus, 1, false);
+						if (r.getStatus() != 0) {
+							errorCode = r.getStatus();
+							rep.setMessage(rep.getMessage() + r.getMessage());
+						}
+					}
 					break;
 				}
-				if (rep.getStatus() == 0) {
-					DtoResponse<String> r = guestRoomStatusService.changeRoomStatus(id, toStatus, 1,false);
-					if (r.getStatus() != 0) {
-						errorCode = r.getStatus();
-						rep.setMessage(rep.getMessage() + r.getMessage());
-					}
-				}
 			} else {
-				// 如果房间找不到，错误请求，不在判断其他房间
+				// 如果房间找不到 错误请求 不在判断其他房间
 				rep.setStatus(Constants.BusinessCode.CODE_PARAMETER_INVALID);
 				rep.setMessage("必要参数错误：房间找不到");
 				break;
@@ -268,6 +294,7 @@ public class GuestRoomServiceImpl implements GuestRoomService {
 		}
 		if (rep.getStatus() == 0) {
 			rep.setStatus(errorCode);
+			rep.setMessage(message.toString());
 		}
 		return rep;
 	}
