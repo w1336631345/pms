@@ -51,7 +51,10 @@ public interface CheckInRecordService extends BaseService<CheckInRecord> {
 
 	public CheckInRecord book(CheckInRecord checkInRecord);
 
-    PageResponse<CheckInRecord> notYet(int pageCount, int pageSize,String status, User user);
+	@Transactional
+	CheckInRecord bookByRoomTypeTest(CheckInRecord checkInRecord);
+
+	PageResponse<CheckInRecord> notYet(int pageCount, int pageSize, String status, User user);
 
     PageResponse<CheckInRecord> accountEntryList(int pageIndex, int pageSize, User user);
 

@@ -74,4 +74,15 @@ public interface CheckInRecordDao extends BaseDao<CheckInRecord>{
 	List<CheckInRecord> findByRoomLinkId(String roomLinkId);
 
 	List<CheckInRecord> findByMainRecordAndDeleted(CheckInRecord mainRecord, int deleted);
+
+	@Query(nativeQuery = true, value = " select  " +
+			" tcr.id, ta.`code`, tcr.arrive_time, tcr.leave_time, " +
+			" tcr.name_, tcr.room_count, tcr.human_count, tcr.`status` " +
+			" from t_checkin_record tcr left join t_account ta " +
+			" on tcr.account_id = ta.id " +
+			" where tcr.deleted =0 and tcr.delet tcr.group_type='Y' and tcr.type_='G' " +
+			" and if(:arriveTime is not null && :arriveTime != '', DATE_FORMAT(tcr.arrive_time, '%Y-%m-%d')>=:arriveTime, 1=1 ) " +
+			" and if(:arriveTime is not null && :arriveTime != '', DATE_FORMAT(tcr.arrive_time, '%Y-%m-%d')<=:arriveTime, 1=1 ) " +
+			"")
+	List<CheckInRecord> getGroup(@Param("arriveTime") String arriveTime);
 }
