@@ -147,12 +147,12 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 							CheckInRecord cir = children.get(i);
 							if (cir.getRoomType() != null) {
 								// 查询房类资源是否满足
-								boolean isExit = roomStatisticsService.booking(cir.getRoomType(), cir.getArriveTime(),
-										cir.getRoomCount(), cir.getDays());
-								if (!isExit) {
-									TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-									return hr.error("房类资源不够");
-								}
+//								boolean isExit = roomStatisticsService.booking(cir.getRoomType(), cir.getArriveTime(),
+//										cir.getRoomCount(), cir.getDays());
+//								if (!isExit) {
+//									TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+//									return hr.error("房类资源不够");
+//								}
 							}
 							cir.setArriveTime(checkInRecord.getArriveTime());
 							cir.setLeaveTime(checkInRecord.getLeaveTime());
@@ -234,7 +234,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 			LocalDateTime time = LocalDateTime.now();
 			ArrayList<CheckInRecord> list = createCheckInRecord(ciib, gr, time);
 			// TODO check is group
-			roomStatisticsService.checkIn(gr, time, ciib.getDays(), false);
+//			roomStatisticsService.checkIn(gr, time, ciib.getDays(), false);
 
 		}
 	}
@@ -393,11 +393,11 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 						item.setRoomType(roomTypeService.findById(item.getRoomTypeId()));
 					}
 					item.setProtocolCorpation(checkInRecord.getProtocolCorpation());
-					boolean bookResult = roomStatisticsService.booking(item.getRoomType(), item.getArriveTime(),
-							item.getRoomCount(), item.getDays());
-					if (!bookResult) {
-						// 房源不足
-					}
+//					boolean bookResult = roomStatisticsService.booking(item.getRoomType(), item.getArriveTime(),
+//							item.getRoomCount(), item.getDays());
+//					if (!bookResult) {
+//						// 房源不足
+//					}
 					add(item);
 				}
 			}
@@ -410,8 +410,8 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 			checkInRecord.setCustomer(customer);
 			checkInRecord.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION);
 			checkInRecord.setType(Constants.Type.CHECK_IN_RECORD_CUSTOMER);
-			roomStatisticsService.booking(checkInRecord.getRoomType(), checkInRecord.getArriveTime(), 1,
-					checkInRecord.getDays());
+//			roomStatisticsService.booking(checkInRecord.getRoomType(), checkInRecord.getArriveTime(), 1,
+//					checkInRecord.getDays());
 			checkInRecord = add(checkInRecord);
 			Account account = accountService.createAccount(checkInRecord.getCustomer(), null);
 			checkInRecord.setAccount(account);
