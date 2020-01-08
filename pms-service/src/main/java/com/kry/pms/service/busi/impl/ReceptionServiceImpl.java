@@ -6,7 +6,6 @@ import java.util.List;
 
 import javax.transaction.Transactional;
 
-import com.kry.pms.base.HttpResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
@@ -15,7 +14,6 @@ import com.kry.pms.base.Constants;
 import com.kry.pms.base.DtoResponse;
 import com.kry.pms.model.http.request.busi.BillItemBo;
 import com.kry.pms.model.http.request.busi.BillSettleBo;
-import com.kry.pms.model.http.request.busi.BookingItemBo;
 import com.kry.pms.model.http.request.busi.CheckInBo;
 import com.kry.pms.model.http.request.busi.CheckInItemBo;
 import com.kry.pms.model.http.request.busi.RoomAssignBo;
@@ -74,32 +72,8 @@ public class ReceptionServiceImpl implements ReceptionService {
 	@Autowired
 	RoomStatisticsService roomStatisticsService;
 
-	@Override
-	public DtoResponse<BookingRecord> groupBook(BookingRecord br) {
-		DtoResponse<BookingRecord> rep = new DtoResponse<>();
-		br.setCheckInRecords(createGroupMainCheckInRecord(br));
-		rep = bookingRecordService.book(br);
-		return rep;
-	}
 
-	private List<CheckInRecord> createBookingCheckInRecords(BookingRecord br, List<BookingItemBo> bibs) {
-		ArrayList<CheckInRecord> items = new ArrayList<CheckInRecord>();
-		CheckInRecord cir;
-		for (BookingItemBo bib : bibs) {
-			cir = new CheckInRecord();
-			cir.setPurchasePrice(bib.getPurchasePrice());
-			cir.setRoomCount(bib.getRoomCount());
-			cir.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION);
-			cir.setArriveTime(br.getArriveTime());
-			cir.setLeaveTime(br.getLeaveTime());
-			cir.setDays(br.getDays());
-			cir.setHoldTime(br.getHoldTime());
-			cir.setRoomType(roomTypeService.findById(bib.getRoomTypeId()));
-			cir.setPriceSchemeItem(roomPriceSchemeItemService.findById(bib.getPriceSchemeItemId()));
-			items.add(cir);
-		}
-		return items;
-	}
+
 
 	private List<CheckInRecord> createGroupMainCheckInRecord(BookingRecord br) {
 		String tempName = br.getName();
@@ -340,6 +314,12 @@ public class ReceptionServiceImpl implements ReceptionService {
 			}
 		}
 		return rep;
+	}
+
+	@Override
+	public DtoResponse<BookingRecord> groupBook(BookingRecord br) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

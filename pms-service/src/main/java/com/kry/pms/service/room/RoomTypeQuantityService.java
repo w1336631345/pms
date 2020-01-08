@@ -22,4 +22,5 @@ public interface RoomTypeQuantityService extends BaseService<RoomTypeQuantity>{
 	public RoomTypeQuantityPredictableVo queryPredic(String currentHotleCode,String roomTypeId, LocalDate startDate, LocalDate endDate);
 	public List<RoomTypeQuantityVo> queryByDay( String currentHotleCode,LocalDate parse, LocalDate parse2);
 	void useRoomType(RoomType roomType, LocalDate startDate, LocalDate endDate, String useType);
+	public void unUseRoomType(RoomType roomType, LocalDate startDate, LocalDate startDate2, String roomUsageBook);
 }

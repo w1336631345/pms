@@ -41,6 +41,14 @@ public interface GuestRoomStatusService extends BaseService<GuestRoomStatus> {
 
 	public GuestRoomStatusVo detailGuestRoom(String id);
 
+	/**
+	 * 
+	 * @param id  房间id
+	 * @param status 状态
+	 * @param quantity 数量
+	 * @param force 强制更改，前端直接该房态为false
+	 * @return
+	 */
 	DtoResponse<String> changeRoomStatus(String id, String status, int quantity, boolean force);
 
 	public void updateSummary(GuestRoom gr,String oldVal, String newVal);

@@ -103,13 +103,12 @@ public class RoomUsageServiceImpl implements RoomUsageService {
 	@Override
 	public DtoResponse<RoomUsage> use(GuestRoom gr, String status, LocalDateTime startTime, LocalDateTime endTime,
 			String businesskey, String businessInfo) {
-		DtoResponse<RoomUsage> response  = new DtoResponse<RoomUsage>();
+		DtoResponse<RoomUsage> response = new DtoResponse<RoomUsage>();
 		Duration d = Duration.between(startTime, endTime);
 		long duration = d.get(ChronoUnit.SECONDS) / 3600;
 		RoomUsage ru = roomUsageDao.queryGuestRoomUsable(gr.getId(), startTime, endTime);
 		RoomUsage data = null;
 		if (ru != null) {
-			
 			if (ru.getStartDateTime().isEqual(startTime)) {
 				if (ru.getEndDateTime().isEqual(endTime)) {
 					ru.setEndDateTime(endTime);
@@ -146,7 +145,7 @@ public class RoomUsageServiceImpl implements RoomUsageService {
 					npur.setBusinesskey(businesskey);
 					ru = modify(ru);
 					npur.setPreRoomUsage(ru);
-					add(npur);
+					data = add(npur);
 					ru.setPostRoomUsage(npur);
 					modify(ru);
 				} else {
@@ -179,20 +178,31 @@ public class RoomUsageServiceImpl implements RoomUsageService {
 					data = modify(cru);
 				}
 			}
-			roomTypeQuantityService.useRoomType(gr.getRoomType(), startTime.toLocalDate(), endTime.toLocalDate(), status);
-			
+			roomTypeQuantityService.useRoomType(gr.getRoomType(), startTime.toLocalDate(), endTime.toLocalDate(),
+					status);
 		} else {
 			response.setStatus(Constants.BusinessCode.CODE_RESOURCE_NOT_ENOUGH);
 			response.setMessage("房间号：" + gr.getRoomNum() + "在该时段无法使用，请确认");
 		}
 		return response.addData(data);
 	}
+	@Override
+	public boolean changeUseStatus(GuestRoom gr, String businessKey, String status) {
+		RoomUsage ru = roomUsageDao.findByGuestRoomIdAndBusinesskey(gr.getId(), businessKey);
+		if (ru != null) {
+			ru.setUsageStatus(status);
+			modify(ru);
+			roomTypeQuantityService.useRoomType(gr.getRoomType(), ru.getStartDateTime().toLocalDate(),
+					ru.getEndDateTime().toLocalDate(), status);
+		}
+		return true;
+	}
 
 	@Override
 	public boolean unUse(GuestRoom gr, String businessKey, LocalDateTime endTime) {
 		RoomUsage ru = roomUsageDao.findByGuestRoomIdAndBusinesskey(gr.getId(), businessKey);
 		if (ru != null) {
-			if (!ru.getStartDateTime().isBefore(endTime)) { //开始时间前释放资源 相当于直接取消
+			if (!ru.getStartDateTime().isBefore(endTime)) { // 开始时间前释放资源 相当于直接取消
 				RoomUsage pru = ru.getPreRoomUsage();
 				RoomUsage npru = ru.getPostRoomUsage();
 				if (pru.getUsageStatus().equals(Constants.Status.ROOM_USAGE_FREE)) {
@@ -202,7 +212,7 @@ public class RoomUsageServiceImpl implements RoomUsageService {
 						RoomUsage nnpru = npru.getPostRoomUsage();
 						pru.setPostRoomUsage(nnpru);
 						modify(pru);
-						if(nnpru!=null) {							
+						if (nnpru != null) {
 							nnpru.setPostRoomUsage(pru);
 							modify(nnpru);
 						}
@@ -228,7 +238,7 @@ public class RoomUsageServiceImpl implements RoomUsageService {
 						ru.setUsageStatus(Constants.Status.ROOM_USAGE_FREE);
 					}
 				}
-			} else if (ru.getEndDateTime().isAfter(endTime)) {//开始时间之后 结束时间之前 相当于提前释放资源
+			} else if (ru.getEndDateTime().isAfter(endTime)) {// 开始时间之后 结束时间之前 相当于提前释放资源
 				RoomUsage npru = ru.getPostRoomUsage();
 				if (npru != null) {
 					if (npru.getUsageStatus().equals(Constants.Status.ROOM_USAGE_FREE)) {

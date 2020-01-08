@@ -25,14 +25,36 @@ public interface RoomUsageService extends BaseService<RoomUsage> {
 
 	/**
 	 * 释放资源
+	 * 
 	 * @param gr
 	 * @param businessKey 业务id，checkInRecordId，roomLockRecordId，roomRepairRecordId
-	 * @param endTime 提前结束的时间
+	 * @param endTime     提前结束的时间
 	 * @return
 	 */
 	boolean unUse(GuestRoom gr, String businessKey, LocalDateTime endTime);
 
+	/**
+	 * 使用资源
+	 * 
+	 * @param gr
+	 * @param status
+	 * @param startTime
+	 * @param endTime
+	 * @param businesskey  业务id，checkInRecordId，roomLockRecordId，roomRepairRecordId
+	 * @param businessInfo
+	 * @return
+	 */
 	public DtoResponse<RoomUsage> use(GuestRoom gr, String status, LocalDateTime startTime, LocalDateTime endTime,
 			String businesskey, String businessInfo);
+
+	/**
+	 * 改变房间使用状态，
+	 * 
+	 * @param gr 房间号
+	 * @param businessKey 业务id
+	 * @param status 目标状态
+	 * @return
+	 */
+	boolean changeUseStatus(GuestRoom gr, String businessKey, String status);
 
 }

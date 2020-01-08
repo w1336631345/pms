@@ -308,6 +308,7 @@ public class GuestRoomStatusServiceImpl implements GuestRoomStatusService {
 		if (force || statusChangeSure(oldStatus, status)) {
 			roomStatus.setRoomStatus(status);
 			modify(roomStatus);
+			//该数量改为前端统计
 //			roomStatusQuantityService.transformRoomStatusQuantity(roomStatus.getHotelCode(), oldStatus, status, 1);
 		} else {
 			rep.setStatus(Constants.BusinessCode.CODE_ILLEGAL_OPERATION);

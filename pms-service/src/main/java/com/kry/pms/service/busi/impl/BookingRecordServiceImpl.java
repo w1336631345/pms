@@ -77,33 +77,6 @@ public class BookingRecordServiceImpl implements BookingRecordService {
 	}
 
 	@Override
-	public DtoResponse<BookingRecord> book(BookingRecord record) {
-		DtoResponse<BookingRecord> rep = new DtoResponse<BookingRecord>();
-		boolean result = true;
-		for (CheckInRecord cir : record.getCheckInRecords()) {
-			if(cir.getType().equals(Constants.Type.CHECK_IN_RECORD_GROUP)) {
-				for(CheckInRecord scir:cir.getSubRecords()) {
-					if (roomStatisticsService.booking(cir.getRoomType(), record.getArriveTime(), cir.getRoomCount(),
-							record.getDays())) {
-						result = false;
-					}
-				}
-			}else {
-				if (roomStatisticsService.booking(cir.getRoomType(), record.getArriveTime(), cir.getRoomCount(),
-						record.getDays())) {
-					result = false;
-				}
-			}	
-		}
-		if (!result) {
-			rep.setStatus(Constants.BusinessCode.CODE_RESOURCE_NOT_ENOUGH);
-		} else {
-			rep.addData(add(record));
-		}
-		return rep;
-	}
-
-	@Override
 	public DtoResponse<BookingRecord> operation(BookOperationBo bookOperationBo) {
 		String bookId = bookOperationBo.getBookId();
 		BookingRecord br = findById(bookId);

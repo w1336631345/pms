@@ -137,7 +137,29 @@ public class RoomTypeQuantityServiceImpl implements RoomTypeQuantityService {
 	public void useRoomType(RoomType roomType, LocalDate startDate, LocalDate endDate, String useType) {
 		switch (useType) {
 		case Constants.Status.ROOM_USAGE_BOOK:
-			bookRoomType(roomType, startDate, endDate);
+//			bookRoomType(roomType, startDate, endDate);
+			break;
+		case Constants.Status.ROOM_USAGE_ASSIGN:
+			assignRoomType(roomType,startDate,endDate);
+			break;
+		case Constants.Status.ROOM_USAGE_CHECK_IN:
+			checkInRoomType(roomType,startDate,endDate);
+			break;
+		case Constants.Status.ROOM_USAGE_LOCKED:
+			lockRoomType(roomType,startDate,endDate);
+			break;
+		case Constants.Status.ROOM_USAGE_REPARIE:
+			repairRoomType(roomType,startDate,endDate);
+			break;
+		default:
+			break;
+		}
+	}
+	@Override
+	public void unUseRoomType(RoomType roomType, LocalDate startDate, LocalDate endDate, String useType) {
+		switch (useType) {
+		case Constants.Status.ROOM_USAGE_BOOK:
+//			bookRoomType(roomType, startDate, endDate);
 			break;
 		case Constants.Status.ROOM_USAGE_ASSIGN:
 			assignRoomType(roomType,startDate,endDate);

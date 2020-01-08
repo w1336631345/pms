@@ -2,21 +2,51 @@ package com.kry.pms.service.room;
 
 import java.time.LocalDateTime;
 
-import com.kry.pms.model.persistence.busi.RoomRecord;
-import com.kry.pms.model.persistence.room.GuestRoom;
-import com.kry.pms.model.persistence.room.RoomType;
-
 public interface RoomStatisticsService {
+
 	/**
-	 * 预定 调整客房类型统计表
 	 * 
-	 * @param roomType    房类型
-	 * @param checkInDate 预定入住时间
-	 * @param quantity    数量
-	 * @param days        入住天数
+	 * @param cir
 	 * @return
 	 */
-	public boolean booking(RoomType roomType, LocalDateTime checkInDate, int quantity, int days);
+	public boolean reserve(UseInfoAble info);
+
+	/**
+	 * 
+	 * @param cir
+	 * @return
+	 */
+	public boolean cancleReserve(UseInfoAble info);
+	/**
+	 * 
+	 * @param info
+	 * @return
+	 */
+
+	public boolean assignRoom(UseInfoAble info);
+
+	/**
+	 * 
+	 * @param info
+	 * @return
+	 */
+	public boolean cancleAssign(UseInfoAble info);
+
+	/**
+	 * 
+	 * @param cir
+	 * @return
+	 */
+
+	public boolean booking(UseInfoAble info);
+
+	/**
+	 * 
+	 * @param cir
+	 * @return
+	 */
+
+	public boolean cancelBooking(UseInfoAble info);
 
 	/**
 	 * 入住 调整客房类型统计表，房间状态表，房间状态统计表
@@ -27,7 +57,14 @@ public interface RoomStatisticsService {
 	 * @return
 	 */
 
-	public boolean checkIn(GuestRoom guestRoom, LocalDateTime checkInDate, int days,boolean isGroup);
+	public boolean checkIn(UseInfoAble info);
+
+	/**
+	 * 
+	 * @param cir
+	 * @return
+	 */
+	public boolean cancleCheckIn(UseInfoAble info);
 
 	/**
 	 * 退房 调整客房类型统计表，房间状态表，房间状态统计表
@@ -36,17 +73,14 @@ public interface RoomStatisticsService {
 	 * @param checkOutDate 退房时间
 	 * @return
 	 */
-	public boolean checkOut(GuestRoom guestRoom, LocalDateTime checkOutDate);
+	public boolean checkOut(UseInfoAble info);
 
 	/**
-	 * 换房 调整客房类型统计表，房间状态表，房间状态统计表
 	 * 
-	 * @param roomRecord   入住记录
-	 * @param newGuestRoom 新房间
+	 * @param cir
 	 * @return
 	 */
-
-	public boolean changeRoom(RoomRecord roomRecord, GuestRoom newGuestRoom);
+	public boolean cancelCheckOut(UseInfoAble info);
 
 	/**
 	 * 维修 调整客房类型统计表，房间状态表，房间状态统计表
@@ -55,41 +89,30 @@ public interface RoomStatisticsService {
 	 * @return
 	 */
 
-	public boolean repairRoom(GuestRoom guestRoom);
+	public boolean repair(UseInfoAble info);
 
 	/**
-	 * 维修完成  调整客房类型统计表，房间状态表，房间状态统计表
+	 * 维修完成 调整客房类型统计表，房间状态表，房间状态统计表
 	 * 
 	 * @param guestRoom
 	 * @return
 	 */
-	public boolean repairRoomComplete(GuestRoom guestRoom);
+	public boolean cancelRepair(UseInfoAble info, LocalDateTime cancleDateTime);
 
 	/**
-	 * 锁定房间   调整客房类型统计表，房间状态表，房间状态统计表
+	 * 锁定房间 调整客房类型统计表，房间状态表，房间状态统计表
+	 * 
 	 * @param guestRoom
 	 * @return
 	 */
-	public boolean lockedRoom(GuestRoom guestRoom,LocalDateTime checkInDate, int days);
+	public boolean lock(UseInfoAble info);
 
 	/**
 	 * 解除锁定状态，调整客房类型统计表，房间状态表，房间状态统计表
+	 * 
 	 * @param guestRoom
 	 * @return
 	 */
-	public boolean unlockRoom(GuestRoom guestRoom);
+	public boolean cancleLock(UseInfoAble info, LocalDateTime cancleDateTime);
 
-	/**
-	 * 特指手工将客房置为空脏房，其他操作不算，调整房间状态表，房间状态统计表
-	 * @param guestRoom
-	 * @return
-	 */
-	public boolean dirtyRoom(GuestRoom guestRoom);
-
-	/**
-	 * 特指手工将客房置为空净房，其他操作不算，调整房间状态表，房间状态统计表
-	 * @param guestRoom
-	 * @return
-	 */
-	public boolean cleanedRoom(GuestRoom guestRoom);
 }
