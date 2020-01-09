@@ -34,7 +34,7 @@ import com.kry.pms.model.persistence.sys.Account;
 
 @Entity
 @Table(name = "t_checkin_record")
-public class CheckInRecord extends PersistenceModel implements UseInfoAble {
+public class CheckInRecord extends PersistenceModel {
 	@OneToOne(cascade = CascadeType.DETACH)
 	private Customer customer;// 客户
 	@ManyToOne(fetch = FetchType.LAZY)
@@ -521,71 +521,24 @@ public class CheckInRecord extends PersistenceModel implements UseInfoAble {
 		this.personalPercentage = personalPercentage;
 	}
 
-	@Override
-	public String getSummaryInfo() {
-		return null;
+	public Boolean getLinked() {
+		return linked;
 	}
 
-	@Override
-	public String getBusinessKey() {
-		return this.orderNum;
+	public void setLinked(Boolean linked) {
+		this.linked = linked;
 	}
 
-	@Override
-	public boolean isGroup() {
-		return type.equals(Constants.Type.CHECK_IN_RECORD_GROUP);
+	public String getLinkNum() {
+		return linkNum;
 	}
 
-	@Override
-	public boolean isOTA() {
-		if (getMarketingSources() != null) {
-			return getMarketingSources().getName().equals("OTA");
-		}
-		return false;
+	public void setLinkNum(String linkNum) {
+		this.linkNum = linkNum;
 	}
 
-	@Override
-	public boolean isFree() {
-		return false;
-	}
-
-	@Override
-	public boolean isHourRoom() {
-		return false;
-	}
-
-	@Override
-	public boolean isArrears() {
-		if (getAccount() != null) {
-			return getAccount().getTotal() < 0;
-		}
-		return false;
-	}
-
-	@Override
-	public LocalDateTime getStartTime() {
-		return this.arriveTime;
-	}
-
-	@Override
-	public LocalDateTime getEndTime() {
-		return this.leaveTime;
-	}
-
-	@Override
-	public boolean isTodayLeave() {
-		if(getLeaveTime()!=null) {
-			return getLeaveTime().toLocalDate().isEqual(LocalDate.now());
-		}
-		return false;
-	}
-
-	@Override
-	public boolean isTodayArrive() {
-		if(getArriveTime()!=null) {
-			return getArriveTime().toLocalDate().isEqual(LocalDate.now());
-		}
-		return false;
+	public void setUpdateTime(boolean isUpdateTime) {
+		this.isUpdateTime = isUpdateTime;
 	}
 
 }

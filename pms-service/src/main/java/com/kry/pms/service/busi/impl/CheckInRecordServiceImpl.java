@@ -41,6 +41,7 @@ import com.kry.pms.model.http.request.busi.CheckUpdateItemTestBo;
 import com.kry.pms.model.http.request.busi.TogetherBo;
 import com.kry.pms.model.http.response.busi.AccountSummaryVo;
 import com.kry.pms.model.http.response.busi.CheckInRecordListVo;
+import com.kry.pms.model.other.wrapper.CheckInRecordWrapper;
 import com.kry.pms.model.persistence.busi.BookingItem;
 import com.kry.pms.model.persistence.busi.BookingRecord;
 import com.kry.pms.model.persistence.busi.CheckInRecord;
@@ -399,7 +400,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 //						// 房源不足
 //					}
 					item = add(item);
-					roomStatisticsService.reserve(item);
+					roomStatisticsService.reserve(new CheckInRecordWrapper(item));
 				}
 			}
 

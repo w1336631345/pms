@@ -6,6 +6,9 @@ import com.kry.pms.model.persistence.room.GuestRoom;
 import com.kry.pms.model.persistence.room.RoomType;
 
 public interface UseInfoAble {
+	
+	
+	public Integer getRoomCount();
 
 	public boolean isTodayLeave();
 
@@ -16,14 +19,14 @@ public interface UseInfoAble {
 	 * 
 	 * @return
 	 */
-	public RoomType getRoomType();
+	public RoomType roomType();
 
 	/**
 	 * 获取房间
 	 * 
 	 * @return
 	 */
-	public GuestRoom getGuestRoom();
+	public GuestRoom guestRoom();
 
 	/**
 	 * 获取摘要信息

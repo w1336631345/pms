@@ -37,7 +37,7 @@ public class RoomRepairRecord extends PersistenceModel implements UseInfoAble {
 	private Boolean autoReOpen;
 
 	@Override
-	public RoomType getRoomType() {
+	public RoomType roomType() {
 		return getGuestRoom().getRoomType();
 	}
 
@@ -89,5 +89,17 @@ public class RoomRepairRecord extends PersistenceModel implements UseInfoAble {
 	@Override
 	public boolean isTodayArrive() {
 		return false;
+	}
+
+	@Override
+	public GuestRoom guestRoom() {
+		// TODO Auto-generated method stub
+		return getGuestRoom();
+	}
+
+	@Override
+	public Integer getRoomCount() {
+		// TODO Auto-generated method stub
+		return 1;
 	}
 }

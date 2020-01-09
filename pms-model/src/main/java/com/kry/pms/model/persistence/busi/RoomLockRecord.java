@@ -36,7 +36,7 @@ public class RoomLockRecord extends PersistenceModel implements UseInfoAble{
 	@Column
 	private Boolean autoReOpen;
 	@Override
-	public RoomType getRoomType() {
+	public RoomType roomType() {
 		return guestRoom.getRoomType();
 	}
 	@Override
@@ -76,6 +76,15 @@ public class RoomLockRecord extends PersistenceModel implements UseInfoAble{
 	public boolean isTodayArrive() {
 		// TODO Auto-generated method stub
 		return false;
+	}
+	@Override
+	public GuestRoom guestRoom() {
+		// TODO Auto-generated method stub
+		return getGuestRoom();
+	}
+	@Override
+	public Integer getRoomCount() {
+		return 1;
 	}
 	
 }

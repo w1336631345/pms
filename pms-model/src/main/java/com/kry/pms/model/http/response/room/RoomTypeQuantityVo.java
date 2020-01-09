@@ -19,13 +19,14 @@ public class RoomTypeQuantityVo implements Serializable {
 	private Integer repairTotal = 0;
 	private Integer lockedTotal = 0;
 	private Integer usedTotal = 0;
+	private Integer reserveTotal = 0;
 
 	public RoomTypeQuantityVo() {
 	}
 
 	public RoomTypeQuantityVo(String roomTypeId, String roomTypeName, String roomTypeCode, LocalDate quantityDate,
 			Integer roomCount, Integer availableTotal, Integer predictableTotal, Integer bookingTotal,
-			Integer willLeaveTotal, Integer repairTotal, Integer lockedTotal, Integer usedTotal) {
+			Integer willLeaveTotal, Integer repairTotal, Integer lockedTotal, Integer usedTotal,Integer reserveTotal) {
 		super();
 		this.roomTypeId = roomTypeId;
 		this.roomTypeName = roomTypeName;
@@ -39,6 +40,7 @@ public class RoomTypeQuantityVo implements Serializable {
 		this.repairTotal = repairTotal;
 		this.lockedTotal = lockedTotal;
 		this.usedTotal = usedTotal;
+		this.reserveTotal = reserveTotal;
 	}
 
 }

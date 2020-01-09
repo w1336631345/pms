@@ -412,7 +412,7 @@ public class GuestRoomStatusServiceImpl implements GuestRoomStatusService {
 	}
 	@Override
 	public void changeStatus(UseInfoAble info) {
-		GuestRoomStatus status = guestRoomStatusDao.findByGuestRoomId(info.getGuestRoom().getId());
+		GuestRoomStatus status = guestRoomStatusDao.findByGuestRoomId(info.guestRoom().getId());
 		if (status != null) {
 			if (info.getStartTime().isBefore(LocalDateTime.now())) {
 				status.setFree(info.isFree());

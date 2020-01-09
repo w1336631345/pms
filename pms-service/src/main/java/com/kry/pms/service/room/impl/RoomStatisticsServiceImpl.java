@@ -26,22 +26,21 @@ public class RoomStatisticsServiceImpl implements RoomStatisticsService {
 
 	@Override
 	public boolean reserve(UseInfoAble info) {
-		roomTypeQuantityService.useRoomType(info.getRoomType(), info.getStartTime().toLocalDate(),
-				info.getEndTime().toLocalDate(), Constants.Status.ROOM_USAGE_BOOK);
+		roomTypeQuantityService.useRoomType(info,Constants.Status.ROOM_USAGE_BOOK);
 		
 		return true;
 	}
 
 	@Override
 	public boolean cancleReserve(UseInfoAble info) {
-		roomTypeQuantityService.unUseRoomType(info.getRoomType(), info.getStartTime().toLocalDate(),
+		roomTypeQuantityService.unUseRoomType(info.roomType(), info.getStartTime().toLocalDate(),
 				info.getEndTime().toLocalDate(), Constants.Status.ROOM_USAGE_BOOK);
 		return true;
 	}
 
 	@Override
 	public boolean assignRoom(UseInfoAble info) {
-		roomUsageService.use(info.getGuestRoom(), Constants.Status.ROOM_USAGE_BOOK, info.getStartTime(),
+		roomUsageService.use(info.guestRoom(), Constants.Status.ROOM_USAGE_BOOK, info.getStartTime(),
 				info.getEndTime(), info.getBusinessKey(), info.getSummaryInfo());
 		guestRoomStatusService.changeStatus(info);
 		return true;
@@ -49,7 +48,7 @@ public class RoomStatisticsServiceImpl implements RoomStatisticsService {
 
 	@Override
 	public boolean cancleAssign(UseInfoAble info) {
-		roomUsageService.unUse(info.getGuestRoom(), info.getBusinessKey(), null);
+		roomUsageService.unUse(info.guestRoom(), info.getBusinessKey(), null);
 		guestRoomStatusService.changeStatus(info);
 		return true;
 	}
@@ -67,7 +66,7 @@ public class RoomStatisticsServiceImpl implements RoomStatisticsService {
 
 	@Override
 	public boolean checkIn(UseInfoAble info) {
-		roomUsageService.changeUseStatus(info.getGuestRoom(), info.getBusinessKey(),
+		roomUsageService.changeUseStatus(info.guestRoom(), info.getBusinessKey(),
 				Constants.Status.ROOM_USAGE_CHECK_IN);
 		guestRoomStatusService.changeStatus(info);
 		return true;
@@ -75,21 +74,21 @@ public class RoomStatisticsServiceImpl implements RoomStatisticsService {
 
 	@Override
 	public boolean cancleCheckIn(UseInfoAble info) {
-		roomUsageService.unUse(info.getGuestRoom(), info.getBusinessKey(), null);
+		roomUsageService.unUse(info.guestRoom(), info.getBusinessKey(), null);
 		guestRoomStatusService.changeStatus(info);
 		return true;
 	}
 
 	@Override
 	public boolean checkOut(UseInfoAble info) {
-		roomUsageService.changeUseStatus(info.getGuestRoom(), info.getBusinessKey(),
+		roomUsageService.changeUseStatus(info.guestRoom(), info.getBusinessKey(),
 				Constants.Status.ROOM_USAGE_CHECK_OUT);
 		return true;
 	}
 
 	@Override
 	public boolean cancelCheckOut(UseInfoAble info) {
-		roomUsageService.changeUseStatus(info.getGuestRoom(), info.getBusinessKey(),
+		roomUsageService.changeUseStatus(info.guestRoom(), info.getBusinessKey(),
 				Constants.Status.ROOM_USAGE_CHECK_IN);
 		return false;
 	}
