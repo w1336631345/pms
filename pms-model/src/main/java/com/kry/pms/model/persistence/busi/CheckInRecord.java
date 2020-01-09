@@ -38,13 +38,8 @@ public class CheckInRecord extends PersistenceModel implements UseInfoAble {
 	@OneToOne(cascade = CascadeType.DETACH)
 	private Customer customer;//客户
 	@ManyToOne(fetch = FetchType.LAZY)
-<<<<<<< HEAD
-	@JoinColumn(name = "booking_record_id")
-	private BookingRecord BookingRecord;
-=======
 	@JoinColumn(name="booking_record_id")
 	private BookingRecord BookingRecord;//预订记录id
->>>>>>> a269d24ea2c5cda5a52447db56a418b18dbaedbf
 	@OneToOne
 	private RoomPriceSchemeItem priceSchemeItem;//房价方案
 	@OneToOne
@@ -58,13 +53,8 @@ public class CheckInRecord extends PersistenceModel implements UseInfoAble {
 	@Column
 	private String orderType;
 	@ManyToOne
-<<<<<<< HEAD
-	@JoinColumn(name = "main_record_id")
-	private CheckInRecord mainRecord;
-=======
 	@JoinColumn(name="main_record_id")
 	private CheckInRecord mainRecord;//主单id
->>>>>>> a269d24ea2c5cda5a52447db56a418b18dbaedbf
 //	@OneToMany(cascade = CascadeType.DETACH)
 //	@JoinColumn(name="main_record_id")
 	@Transient
@@ -138,13 +128,9 @@ public class CheckInRecord extends PersistenceModel implements UseInfoAble {
 	@Transient
 	private String mainRecordId;//主单id
 	@OneToOne
-<<<<<<< HEAD
-	private DiscountScheme discountScheme;
 	// 预留记录id
-=======
 	private DiscountScheme discountScheme;//优惠方案
-	//预留记录id
->>>>>>> a269d24ea2c5cda5a52447db56a418b18dbaedbf
+
 	@Column
 	private String reserveId;
 	// 联房id
