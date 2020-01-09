@@ -1,6 +1,7 @@
 package com.kry.pms.service.room.impl;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -17,6 +18,7 @@ import com.kry.pms.base.DtoResponse;
 import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
 import com.kry.pms.dao.room.GuestRoomStatusDao;
+import com.kry.pms.model.func.UseInfoAble;
 import com.kry.pms.model.http.response.room.BuildingVo;
 import com.kry.pms.model.http.response.room.FloorVo;
 import com.kry.pms.model.http.response.room.GuestRoomStatusVo;
@@ -308,7 +310,7 @@ public class GuestRoomStatusServiceImpl implements GuestRoomStatusService {
 		if (force || statusChangeSure(oldStatus, status)) {
 			roomStatus.setRoomStatus(status);
 			modify(roomStatus);
-			//该数量改为前端统计
+			// 该数量改为前端统计
 //			roomStatusQuantityService.transformRoomStatusQuantity(roomStatus.getHotelCode(), oldStatus, status, 1);
 		} else {
 			rep.setStatus(Constants.BusinessCode.CODE_ILLEGAL_OPERATION);
@@ -407,6 +409,39 @@ public class GuestRoomStatusServiceImpl implements GuestRoomStatusService {
 		GuestRoomStatus status = guestRoomStatusDao.findByGuestRoomId(gr.getId());
 		status.setSummary(status.getSummary().replace(oldVal, newVal));
 		modify(status);
+	}
+	@Override
+	public void changeStatus(UseInfoAble info) {
+		GuestRoomStatus status = guestRoomStatusDao.findByGuestRoomId(info.getGuestRoom().getId());
+		if (status != null) {
+			if (info.getStartTime().isBefore(LocalDateTime.now())) {
+				status.setFree(info.isFree());
+				status.setGroup(info.isGroup());
+				status.setOta(info.isOTA());
+				status.setHourRoom(info.isHourRoom());
+				status.setOverdued(info.isArrears());
+			}
+			if(info.isTodayArrive()) {
+				status.setWillArrive(true);
+			}
+			if(info.isTodayLeave()) {
+				status.setWillArrive(true);
+			}
+			modify(status);
+		}
+	}
+
+	private String convertToRoomStatus(String useStatus) {
+		switch (useStatus) {
+		case Constants.Status.ROOM_USAGE_CHECK_IN:
+			return Constants.Status.ROOM_STATUS_OCCUPY_CLEAN;
+		case Constants.Status.ROOM_USAGE_LOCKED:
+			return Constants.Status.ROOM_STATUS_OUT_OF_SERVCIE;
+		case Constants.Status.ROOM_USAGE_REPARIE:
+			return Constants.Status.ROOM_STATUS_OUT_OF_SERVCIE;
+		default:
+			return null;
+		}
 	}
 
 }

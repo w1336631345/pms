@@ -67,5 +67,15 @@ public class RoomLockRecord extends PersistenceModel implements UseInfoAble{
 	public boolean isArrears() {
 		return false;
 	}
+	@Override
+	public boolean isTodayLeave() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+	@Override
+	public boolean isTodayArrive() {
+		// TODO Auto-generated method stub
+		return false;
+	}
 	
 }

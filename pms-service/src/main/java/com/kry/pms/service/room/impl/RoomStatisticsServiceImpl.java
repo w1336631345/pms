@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.kry.pms.base.Constants;
 import com.kry.pms.model.func.UseInfoAble;
+import com.kry.pms.service.room.GuestRoomStatusService;
 import com.kry.pms.service.room.RoomStatisticsService;
 import com.kry.pms.service.room.RoomTypeQuantityService;
 import com.kry.pms.service.room.RoomUsageService;
@@ -20,11 +21,14 @@ public class RoomStatisticsServiceImpl implements RoomStatisticsService {
 	RoomTypeQuantityService roomTypeQuantityService;
 	@Autowired
 	RoomUsageService roomUsageService;
+	@Autowired
+	GuestRoomStatusService guestRoomStatusService;
 
 	@Override
 	public boolean reserve(UseInfoAble info) {
 		roomTypeQuantityService.useRoomType(info.getRoomType(), info.getStartTime().toLocalDate(),
 				info.getEndTime().toLocalDate(), Constants.Status.ROOM_USAGE_BOOK);
+		
 		return true;
 	}
 
@@ -39,12 +43,14 @@ public class RoomStatisticsServiceImpl implements RoomStatisticsService {
 	public boolean assignRoom(UseInfoAble info) {
 		roomUsageService.use(info.getGuestRoom(), Constants.Status.ROOM_USAGE_BOOK, info.getStartTime(),
 				info.getEndTime(), info.getBusinessKey(), info.getSummaryInfo());
+		guestRoomStatusService.changeStatus(info);
 		return true;
 	}
 
 	@Override
 	public boolean cancleAssign(UseInfoAble info) {
 		roomUsageService.unUse(info.getGuestRoom(), info.getBusinessKey(), null);
+		guestRoomStatusService.changeStatus(info);
 		return true;
 	}
 
@@ -61,25 +67,30 @@ public class RoomStatisticsServiceImpl implements RoomStatisticsService {
 
 	@Override
 	public boolean checkIn(UseInfoAble info) {
-		roomUsageService.changeUseStatus(info.getGuestRoom(), info.getBusinessKey(), Constants.Status.ROOM_USAGE_CHECK_IN);
+		roomUsageService.changeUseStatus(info.getGuestRoom(), info.getBusinessKey(),
+				Constants.Status.ROOM_USAGE_CHECK_IN);
+		guestRoomStatusService.changeStatus(info);
 		return true;
 	}
 
 	@Override
 	public boolean cancleCheckIn(UseInfoAble info) {
 		roomUsageService.unUse(info.getGuestRoom(), info.getBusinessKey(), null);
+		guestRoomStatusService.changeStatus(info);
 		return true;
 	}
 
 	@Override
 	public boolean checkOut(UseInfoAble info) {
-		roomUsageService.changeUseStatus(info.getGuestRoom(), info.getBusinessKey(), Constants.Status.ROOM_USAGE_CHECK_OUT);
+		roomUsageService.changeUseStatus(info.getGuestRoom(), info.getBusinessKey(),
+				Constants.Status.ROOM_USAGE_CHECK_OUT);
 		return true;
 	}
 
 	@Override
 	public boolean cancelCheckOut(UseInfoAble info) {
-		roomUsageService.changeUseStatus(info.getGuestRoom(), info.getBusinessKey(), Constants.Status.ROOM_USAGE_CHECK_IN);
+		roomUsageService.changeUseStatus(info.getGuestRoom(), info.getBusinessKey(),
+				Constants.Status.ROOM_USAGE_CHECK_IN);
 		return false;
 	}
 

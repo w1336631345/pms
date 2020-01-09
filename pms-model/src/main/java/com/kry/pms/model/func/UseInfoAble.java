@@ -5,7 +5,11 @@ import java.time.LocalDateTime;
 import com.kry.pms.model.persistence.room.GuestRoom;
 import com.kry.pms.model.persistence.room.RoomType;
 
-public interface  UseInfoAble{
+public interface UseInfoAble {
+
+	public boolean isTodayLeave();
+
+	public boolean isTodayArrive();
 
 	/**
 	 * 获取房间类型

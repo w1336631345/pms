@@ -398,7 +398,8 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 //					if (!bookResult) {
 //						// 房源不足
 //					}
-					add(item);
+					item = add(item);
+					roomStatisticsService.reserve(item);
 				}
 			}
 

@@ -29,6 +29,7 @@ import com.kry.pms.model.persistence.room.RoomUsage;
 import com.kry.pms.service.busi.BookingItemService;
 import com.kry.pms.service.busi.BookingRecordService;
 import com.kry.pms.service.busi.CheckInRecordService;
+import com.kry.pms.service.room.GuestRoomStatusService;
 import com.kry.pms.service.room.RoomTypeQuantityService;
 import com.kry.pms.service.room.RoomUsageService;
 
@@ -42,6 +43,8 @@ public class RoomUsageServiceImpl implements RoomUsageService {
 	CheckInRecordService checkInRecordService;
 	@Autowired
 	RoomTypeQuantityService roomTypeQuantityService;
+	@Autowired
+	GuestRoomStatusService guestRoomStatusService;
 
 	@Override
 	public RoomUsage add(RoomUsage roomUsage) {
@@ -186,14 +189,18 @@ public class RoomUsageServiceImpl implements RoomUsageService {
 		}
 		return response.addData(data);
 	}
+
 	@Override
 	public boolean changeUseStatus(GuestRoom gr, String businessKey, String status) {
 		RoomUsage ru = roomUsageDao.findByGuestRoomIdAndBusinesskey(gr.getId(), businessKey);
-		if (ru != null) {
+		if (ru != null && !ru.getUsageStatus().equals(status)) {
 			ru.setUsageStatus(status);
 			modify(ru);
 			roomTypeQuantityService.useRoomType(gr.getRoomType(), ru.getStartDateTime().toLocalDate(),
 					ru.getEndDateTime().toLocalDate(), status);
+			if (ru.getStartDateTime().toLocalDate().isEqual(LocalDate.now())) {
+				guestRoomStatusService.changeRoomStatus(gr.getId(), status, 1, true);
+			}
 		}
 		return true;
 	}
@@ -201,7 +208,7 @@ public class RoomUsageServiceImpl implements RoomUsageService {
 	@Override
 	public boolean unUse(GuestRoom gr, String businessKey, LocalDateTime endTime) {
 		RoomUsage ru = roomUsageDao.findByGuestRoomIdAndBusinesskey(gr.getId(), businessKey);
-		if(endTime==null) {
+		if (endTime == null) {
 			endTime = ru.getStartDateTime();
 		}
 		if (ru != null) {

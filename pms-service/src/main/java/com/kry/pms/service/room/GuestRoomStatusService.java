@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import com.kry.pms.base.DtoResponse;
+import com.kry.pms.model.func.UseInfoAble;
 import com.kry.pms.model.http.response.room.GuestRoomStatusVo;
 import com.kry.pms.model.http.response.room.RoomStatusTableVo;
 import com.kry.pms.model.persistence.busi.CheckInRecord;
@@ -60,6 +61,8 @@ public interface GuestRoomStatusService extends BaseService<GuestRoomStatus> {
 	boolean repairGuestRoom(String id, RoomRepairRecord record);
 
 	boolean lockGuestRoom(String id, RoomLockRecord record);
+
+	void changeStatus(UseInfoAble info);
 	
 	
 }

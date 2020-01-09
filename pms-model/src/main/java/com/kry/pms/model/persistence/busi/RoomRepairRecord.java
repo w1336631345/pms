@@ -80,4 +80,14 @@ public class RoomRepairRecord extends PersistenceModel implements UseInfoAble {
 		// TODO Auto-generated method stub
 		return false;
 	}
+
+	@Override
+	public boolean isTodayLeave() {
+		return false;
+	}
+
+	@Override
+	public boolean isTodayArrive() {
+		return false;
+	}
 }
