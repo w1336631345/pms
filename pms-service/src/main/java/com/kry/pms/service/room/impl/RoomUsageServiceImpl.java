@@ -201,6 +201,9 @@ public class RoomUsageServiceImpl implements RoomUsageService {
 	@Override
 	public boolean unUse(GuestRoom gr, String businessKey, LocalDateTime endTime) {
 		RoomUsage ru = roomUsageDao.findByGuestRoomIdAndBusinesskey(gr.getId(), businessKey);
+		if(endTime==null) {
+			endTime = ru.getStartDateTime();
+		}
 		if (ru != null) {
 			if (!ru.getStartDateTime().isBefore(endTime)) { // 开始时间前释放资源 相当于直接取消
 				RoomUsage pru = ru.getPreRoomUsage();

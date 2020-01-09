@@ -6,10 +6,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.kry.pms.base.Constants;
+import com.kry.pms.model.func.UseInfoAble;
 import com.kry.pms.service.room.RoomStatisticsService;
 import com.kry.pms.service.room.RoomTypeQuantityService;
 import com.kry.pms.service.room.RoomUsageService;
-import com.kry.pms.service.room.UseInfoAble;
 import com.kry.pms.service.sys.SystemConfigService;
 
 @Service
@@ -44,13 +44,12 @@ public class RoomStatisticsServiceImpl implements RoomStatisticsService {
 
 	@Override
 	public boolean cancleAssign(UseInfoAble info) {
-		// TODO Auto-generated method stub
-		return false;
+		roomUsageService.unUse(info.getGuestRoom(), info.getBusinessKey(), null);
+		return true;
 	}
 
 	@Override
 	public boolean booking(UseInfoAble info) {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
@@ -62,25 +61,25 @@ public class RoomStatisticsServiceImpl implements RoomStatisticsService {
 
 	@Override
 	public boolean checkIn(UseInfoAble info) {
-		// TODO Auto-generated method stub
-		return false;
+		roomUsageService.changeUseStatus(info.getGuestRoom(), info.getBusinessKey(), Constants.Status.ROOM_USAGE_CHECK_IN);
+		return true;
 	}
 
 	@Override
 	public boolean cancleCheckIn(UseInfoAble info) {
-		// TODO Auto-generated method stub
-		return false;
+		roomUsageService.unUse(info.getGuestRoom(), info.getBusinessKey(), null);
+		return true;
 	}
 
 	@Override
 	public boolean checkOut(UseInfoAble info) {
-		// TODO Auto-generated method stub
-		return false;
+		roomUsageService.changeUseStatus(info.getGuestRoom(), info.getBusinessKey(), Constants.Status.ROOM_USAGE_CHECK_OUT);
+		return true;
 	}
 
 	@Override
 	public boolean cancelCheckOut(UseInfoAble info) {
-		// TODO Auto-generated method stub
+		roomUsageService.changeUseStatus(info.getGuestRoom(), info.getBusinessKey(), Constants.Status.ROOM_USAGE_CHECK_IN);
 		return false;
 	}
 

@@ -1,11 +1,11 @@
-package com.kry.pms.service.room;
+package com.kry.pms.model.func;
 
 import java.time.LocalDateTime;
 
 import com.kry.pms.model.persistence.room.GuestRoom;
 import com.kry.pms.model.persistence.room.RoomType;
 
-public interface UseInfoAble {
+public interface  UseInfoAble{
 
 	/**
 	 * 获取房间类型

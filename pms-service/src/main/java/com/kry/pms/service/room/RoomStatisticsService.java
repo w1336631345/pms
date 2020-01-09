@@ -2,6 +2,8 @@ package com.kry.pms.service.room;
 
 import java.time.LocalDateTime;
 
+import com.kry.pms.model.func.UseInfoAble;
+
 public interface RoomStatisticsService {
 
 	/**
