@@ -62,6 +62,20 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
 		checkInRecord.setHotelCode(getCurrentHotleCode());
 		return getDefaultResponse().addData(checkInRecordService.book(checkInRecord));
 	}
+
+	/**
+	 * 功能描述: <br>直接预订或入住
+	 * 〈〉
+	 * @Param: [checkInRecord]
+	 * @Return: com.kry.pms.base.HttpResponse<com.kry.pms.model.persistence.busi.CheckInRecord>
+	 * @Author: huanghaibin
+	 * @Date: 2020/1/8 10:45
+	 */
+	@PostMapping(path = "/bookByRoom")
+	public HttpResponse<CheckInRecord> bookByRoom(@RequestBody CheckInRecord checkInRecord) {
+		checkInRecord.setHotelCode(getCurrentHotleCode());
+		return getDefaultResponse().addData(checkInRecordService.bookByRoomTypeTest(checkInRecord));
+	}
 	
 	@PostMapping(path = "/reserve")
 	public HttpResponse<List<CheckInRecord>> addReserve(@RequestBody List<CheckInRecord> checkInRecords){

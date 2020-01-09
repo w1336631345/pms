@@ -421,6 +421,122 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 		return checkInRecord;
 	}
 
+	@Override
+	@Transactional
+	public CheckInRecord bookByRoomTypeTest(CheckInRecord checkInRecord){
+		checkInRecord.setCheckInCount(1);
+		checkInRecord.setRoomCount(1);
+		checkInRecord.setType(Constants.Type.CHECK_IN_RECORD_CUSTOMER);
+		checkInRecord.setGroupType(Constants.Type.CHECK_IN_RECORD_GROUP_TYPE_NO );
+		checkInRecord.setSingleRoomCount(1);
+		checkInRecord.setStartDate(LocalDate.from(checkInRecord.getArriveTime()));
+		GuestRoom gr = guestRoomService.findById(checkInRecord.getGuestRoom().getId());
+		String tempName = gr.getRoomNum();
+//		if(checkInRecord.getCustomer() == null){
+			Customer customer = customerService.createTempCustomer(gr.getHotelCode(), tempName + "#" + 1);
+			checkInRecord.setCustomer(customer);
+			Account account = accountService.createAccount(customer, null);
+			checkInRecord.setAccount(account);
+//		}
+		CheckInRecord cir = add(checkInRecord);
+
+		if((Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN).equals(checkInRecord.getStatus())){
+			DtoResponse<RoomUsage> r = roomUsageService.use(gr, Constants.Status.ROOM_USAGE_CHECK_IN, cir.getArriveTime(),
+					cir.getLeaveTime(), cir.getId(), tempName);
+			guestRoomStatausService.changeRoomStatus(gr.getId(), Constants.Status.ROOM_STATUS_OCCUPY_CLEAN, 1, true);
+		}else{
+			DtoResponse<RoomUsage> r = roomUsageService.use(gr, Constants.Status.ROOM_USAGE_BOOK, cir.getArriveTime(),
+					cir.getLeaveTime(), cir.getId(), tempName);
+		}
+		roomRecordService.createRoomRecord(cir);
+		return cir;
+	}
+
+	@Transactional
+	public CheckInRecord bookByRoomType(CheckInRecord checkInRecord) {
+		String orderNum = businessSeqService.fetchNextSeqNum(checkInRecord.getHotelCode(),
+				Constants.Key.BUSINESS_ORDER_NUM_SEQ_KEY);
+		checkInRecord.setOrderNum(orderNum);
+		if(checkInRecord.getCustomer() != null){
+			if(checkInRecord.getCustomer().getId() != null && checkInRecord.getCustomer().getId() != ""){
+
+			}else {
+				checkInRecord.setCustomer(null);
+			}
+		}
+		int humanCount = checkInRecord.getHumanCount();
+		DtoResponse<String> response = new DtoResponse<String>();
+		for(int i=0; i<humanCount; i++){
+			CheckInRecord cir = new CheckInRecord();
+			BeanUtils.copyProperties(cir, checkInRecord);
+			cir.setMainRecord(checkInRecord);
+			cir.setStatus(Constants.Type.CHECK_IN_RECORD_RESERVE);//R
+			cir.setCheckInCount(1);
+			cir.setRoomCount(1);
+			add(checkInRecord);
+			GuestRoom gr = guestRoomService.findById(checkInRecord.getGuestRoom().getId());
+			checkInByTempName(cir.getSingleRoomCount(), cir, gr, response);
+		}
+
+
+
+		if (checkInRecord.getSubRecords() != null && !checkInRecord.getSubRecords().isEmpty()) {
+			checkInRecord.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION);
+			checkInRecord.setType(Constants.Type.CHECK_IN_RECORD_GROUP);
+			initGroup(checkInRecord);
+			initGroupAccount(checkInRecord);
+			checkInRecord = add(checkInRecord);
+			for (CheckInRecord item : checkInRecord.getSubRecords()) {
+				if (item.getRoomCount() != null && item.getRoomCount() > 0) {
+					item.setOrderNum(orderNum);
+					item.setGroupType(checkInRecord.getGroupType());
+					item.setHoldTime(checkInRecord.getHoldTime());
+					item.setArriveTime(checkInRecord.getArriveTime());
+					item.setLeaveTime(checkInRecord.getLeaveTime());
+					item.setDays(checkInRecord.getDays());
+					item.setContactName(checkInRecord.getContactName());
+					item.setMarketEmployee(checkInRecord.getMarketEmployee());
+					item.setDistributionChannel(checkInRecord.getDistributionChannel());
+					item.setContactMobile(checkInRecord.getContactMobile());
+					item.setRoomType(roomTypeService.findById(item.getRoomTypeId()));
+					item.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION);
+					item.setType(Constants.Type.CHECK_IN_RECORD_RESERVE);
+					item.setGroupType(checkInRecord.getGroupType());
+					item.setHotelCode(checkInRecord.getHotelCode());
+					item.setMainRecord(checkInRecord);
+					if (item.getRoomType() == null) {
+						item.setRoomType(roomTypeService.findById(item.getRoomTypeId()));
+					}
+					item.setProtocolCorpation(checkInRecord.getProtocolCorpation());
+//					boolean bookResult = roomStatisticsService.booking(item.getRoomType(), item.getArriveTime(),
+//							item.getRoomCount(), item.getDays());
+//					if (!bookResult) {
+//						// 房源不足
+//						TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+//					}
+					add(item);
+				}
+			}
+
+		} else {
+			Customer customer = checkInRecord.getCustomer();
+			if (customer != null && customer.getId() == null) {
+				customer = customerService.add(customer);
+			}
+			checkInRecord.setCustomer(customer);
+			checkInRecord.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION);
+			checkInRecord.setType(Constants.Type.CHECK_IN_RECORD_CUSTOMER);
+//			roomStatisticsService.booking(checkInRecord.getRoomType(), checkInRecord.getArriveTime(), 1,
+//					checkInRecord.getDays());
+			checkInRecord = add(checkInRecord);
+			Account account = accountService.createAccount(checkInRecord.getCustomer(), null);
+			checkInRecord.setAccount(account);
+			modify(checkInRecord);
+
+		}
+		return checkInRecord;
+	}
+
 	private void initGroup(CheckInRecord checkInRecord) {
 
 	}

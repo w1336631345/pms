@@ -36,31 +36,41 @@ import com.kry.pms.model.persistence.sys.Account;
 @Table(name = "t_checkin_record")
 public class CheckInRecord extends PersistenceModel implements UseInfoAble {
 	@OneToOne(cascade = CascadeType.DETACH)
-	private Customer customer;
+	private Customer customer;//客户
 	@ManyToOne(fetch = FetchType.LAZY)
+<<<<<<< HEAD
 	@JoinColumn(name = "booking_record_id")
 	private BookingRecord BookingRecord;
+=======
+	@JoinColumn(name="booking_record_id")
+	private BookingRecord BookingRecord;//预订记录id
+>>>>>>> a269d24ea2c5cda5a52447db56a418b18dbaedbf
 	@OneToOne
-	private RoomPriceSchemeItem priceSchemeItem;
+	private RoomPriceSchemeItem priceSchemeItem;//房价方案
 	@OneToOne
-	private GuestRoom guestRoom;
+	private GuestRoom guestRoom;//房间
 	@Column(name = "name_")
-	private String name;
+	private String name;//姓名
 	@OneToOne
-	private RoomPriceScheme roomPriceScheme;
+	private RoomPriceScheme roomPriceScheme;//房价方案
 	@OneToOne
-	private RoomType roomType;
+	private RoomType roomType;//房间类型
 	@Column
 	private String orderType;
 	@ManyToOne
+<<<<<<< HEAD
 	@JoinColumn(name = "main_record_id")
 	private CheckInRecord mainRecord;
+=======
+	@JoinColumn(name="main_record_id")
+	private CheckInRecord mainRecord;//主单id
+>>>>>>> a269d24ea2c5cda5a52447db56a418b18dbaedbf
 //	@OneToMany(cascade = CascadeType.DETACH)
 //	@JoinColumn(name="main_record_id")
 	@Transient
-	private List<CheckInRecord> subRecords;
+	private List<CheckInRecord> subRecords;//子单
 	@Column
-	private String orderNum;
+	private String orderNum;//订单编号
 	@Column
 	private Boolean linked;
 	@Column
@@ -68,19 +78,19 @@ public class CheckInRecord extends PersistenceModel implements UseInfoAble {
 	@Column
 	private Double regularPrice;
 	@Column
-	private Double discount;
+	private Double discount;//打折
 	@Column
-	private Integer humanCount;
+	private Integer humanCount;//总人数
 	@Column
-	private Integer roomCount;
+	private Integer roomCount;//房间数
 	@ManyToMany(cascade = CascadeType.PERSIST)
-	private List<RoomTag> demands;
+	private List<RoomTag> demands;//房间标签
 	@Column
-	private Integer chrildrenCount;
+	private Integer chrildrenCount;//子单数
 	@Column
-	private LocalDateTime arriveTime;
+	private LocalDateTime arriveTime;//到达时间
 	@Column
-	private LocalDate startDate;
+	private LocalDate startDate;//开始时间
 	@Column
 	private Double purchasePrice;// 成交价格
 	@Column
@@ -88,48 +98,53 @@ public class CheckInRecord extends PersistenceModel implements UseInfoAble {
 	@Column
 	private Double personalPercentage;// 个人承担价格占比
 	@Column
-	private Integer checkInCount;
+	private Integer checkInCount;//已排房数
 	@Column
-	private Integer days;
+	private Integer days;//入住天数
 	@Column
 	private String holdTime;
 	@Column
-	private Integer singleRoomCount;
+	private Integer singleRoomCount;//单房人数
 	@Column
-	private LocalDateTime leaveTime;
+	private LocalDateTime leaveTime;//离店时间
 	@Column(columnDefinition = "varchar(64) default '0000' COMMENT '入住编号'")
 	private String checkInSn;
 	@Column(name = "type_")
 	private String type;
 	@Column
-	private String groupType;
+	private String groupType;//团队还是散客
 	@ManyToOne
-	private Group group;
+	private Group group;//团队信息
 	@OneToOne(cascade = CascadeType.PERSIST)
-	private Account account;
+	private Account account;//账号
 	@Transient
-	private String roomTypeId;
+	private String roomTypeId;//房间类型id
 	@Column
-	private String contactName;
+	private String contactName;//预订人
 	@Column
-	private String contactMobile;
+	private String contactMobile;//预订人电话
 	@OneToOne
-	private MarketingSources marketingSources;
+	private MarketingSources marketingSources;//市场来源
 	@OneToOne
-	private ProtocolCorpation protocolCorpation;
+	private ProtocolCorpation protocolCorpation;//协议单位
 	@OneToOne
-	private Employee operationEmployee;
+	private Employee operationEmployee;//操作人
 	@OneToOne
-	private DistributionChannel distributionChannel;
+	private DistributionChannel distributionChannel;//市场渠道
 	@OneToOne
-	private Employee marketEmployee;
+	private Employee marketEmployee;//销售员
 	@Column
 	private String remark;
 	@Transient
-	private String mainRecordId;
+	private String mainRecordId;//主单id
 	@OneToOne
+<<<<<<< HEAD
 	private DiscountScheme discountScheme;
 	// 预留记录id
+=======
+	private DiscountScheme discountScheme;//优惠方案
+	//预留记录id
+>>>>>>> a269d24ea2c5cda5a52447db56a418b18dbaedbf
 	@Column
 	private String reserveId;
 	// 联房id
