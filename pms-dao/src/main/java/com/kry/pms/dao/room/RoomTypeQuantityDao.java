@@ -31,4 +31,6 @@ public interface RoomTypeQuantityDao extends BaseDao<RoomTypeQuantity> {
 	@Query(value = "select 	t.* from t_room_type_quantity t where t.hotel_code =?1 and t.quantity_date between ?2 and ?3 ", nativeQuery = true)
 	List<RoomTypeQuantity> queryByDay(String currentHotleCode, LocalDate startDate, LocalDate endDate);
 
+	List<RoomTypeQuantity> findByHotelCodeAndQuantityDate(String hotleCode, LocalDate date);
+
 }

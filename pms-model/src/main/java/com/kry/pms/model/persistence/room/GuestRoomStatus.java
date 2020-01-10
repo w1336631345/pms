@@ -57,13 +57,4 @@ public class GuestRoomStatus extends PersistenceModel {
 	@Column(columnDefinition = "bit(1) default NULl COMMENT 'OTA'")
 	private Boolean ota;
 
-	@OneToMany(fetch = FetchType.LAZY)
-	private List<CheckInRecord> currentCheckInRecords;
-	@OneToMany(fetch = FetchType.LAZY)
-	private List<CheckInRecord> willCheckInRecords;
-	@OneToMany(fetch = FetchType.LAZY)
-	private List<RoomLockRecord> lockRecords;
-	@OneToMany(fetch = FetchType.LAZY)
-	private List<RoomRepairRecord> repairRecords;
-
 }

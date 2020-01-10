@@ -329,7 +329,21 @@ public class RoomTypeQuantityServiceImpl implements RoomTypeQuantityService {
 	}
 
 	@Override
-	public void useRoomType(UseInfoAble info,String userType) {
-		useRoomType(info.roomType(), info.getStartTime().toLocalDate(), info.getEndTime().toLocalDate(),userType, info.getRoomCount());
+	public void useRoomType(UseInfoAble info, String userType) {
+		useRoomType(info.roomType(), info.getStartTime().toLocalDate(), info.getEndTime().toLocalDate(), userType,
+				info.getRoomCount());
+	}
+
+	@Override
+	public List<RoomTypeQuantityVo> queryOneDay(String currentHotleCode, LocalDate date) {
+		List<RoomTypeQuantityVo> data = new ArrayList<RoomTypeQuantityVo>();
+		RoomTypeQuantityVo rv = null;
+		for (RoomTypeQuantity r : roomTypeQuantityDao.findByHotelCodeAndQuantityDate(currentHotleCode, date)) {
+			rv = new RoomTypeQuantityVo();
+			BeanUtils.copyProperties(r, rv);
+			rv.setRoomTypeId(r.getRoomType().getId());
+			data.add(rv);
+		}
+		return data;
 	}
 }

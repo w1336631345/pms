@@ -41,6 +41,12 @@ public class RoomTypeQuantityController extends BaseController<RoomTypeQuantity>
 		List<RoomTypeQuantityVo> data = roomTypeQuantityService.queryByDay(getCurrentHotleCode(),LocalDate.parse(startDate),LocalDate.parse(endDate));
 		return rep.addData(data);
 	}
+	@GetMapping(path="/today")
+	public HttpResponse<List<RoomTypeQuantityVo>> today(){
+		HttpResponse<List<RoomTypeQuantityVo>> rep = new HttpResponse<>();
+		List<RoomTypeQuantityVo> data = roomTypeQuantityService.queryOneDay(getCurrentHotleCode(),LocalDate.now());
+		return rep.addData(data);
+	}
 	@PutMapping
 	public HttpResponse<RoomTypeQuantity> modify(@RequestBody RoomTypeQuantity roomTypeQuantity) {
 		return getDefaultResponse().addData(roomTypeQuantityService.modify(roomTypeQuantity));

@@ -243,9 +243,10 @@ public class GuestRoomServiceImpl implements GuestRoomService {
 								guestRoomStatusService.repairGuestRoom(gr.getId(), record);
 							}
 						} else {
+							errorCode = Constants.BusinessCode.CODE_ILLEGAL_OPERATION;
 							message.append(gr.getRoomNum());
 							message.append(" 房间资源不足，请确认");
-							message.append("\n");
+							message.append("/n");
 						}
 					} else {
 						rep.setStatus(Constants.BusinessCode.CODE_PARAMETER_INVALID);
@@ -266,9 +267,10 @@ public class GuestRoomServiceImpl implements GuestRoomService {
 								guestRoomStatusService.lockGuestRoom(gr.getId(), record);
 							}
 						} else {
+							errorCode = Constants.BusinessCode.CODE_ILLEGAL_OPERATION;
 							message.append(gr.getRoomNum());
 							message.append(" 房间资源不足，请确认");
-							message.append("\n");
+							message.append("/n");
 						}
 					} else {
 						rep.setStatus(Constants.BusinessCode.CODE_PARAMETER_INVALID);

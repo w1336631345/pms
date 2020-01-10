@@ -154,13 +154,13 @@ public class GuestRoomStatusServiceImpl implements GuestRoomStatusService {
 				summary += cir.getCustomer().getName();
 			}
 			grs.setSummary(summary);
-			List<CheckInRecord> crs = grs.getCurrentCheckInRecords();
-			if (crs != null) {
-				grs.getCurrentCheckInRecords().add(cir);
-			} else {
-				crs = new ArrayList<>();
-				crs.add(cir);
-			}
+//			List<CheckInRecord> crs = grs.getCurrentCheckInRecords();
+//			if (crs != null) {
+//				grs.getCurrentCheckInRecords().add(cir);
+//			} else {
+//				crs = new ArrayList<>();
+//				crs.add(cir);
+//			}
 			modify(grs);
 		}
 	}
@@ -197,7 +197,7 @@ public class GuestRoomStatusServiceImpl implements GuestRoomStatusService {
 		GuestRoomStatus grs = guestRoomStatusDao.findByGuestRoomId(roomId);
 		if (grs != null) {
 			grs.setRoomNum(Constants.Status.ROOM_STATUS_VACANT_DIRTY);
-			grs.setCurrentCheckInRecords(null);
+//			grs.setCurrentCheckInRecords(null);
 			modify(grs);
 		}
 	}
@@ -216,7 +216,7 @@ public class GuestRoomStatusServiceImpl implements GuestRoomStatusService {
 		GuestRoomStatus grs = guestRoomStatusDao.findByGuestRoomId(roomId);
 		if (grs != null) {
 			grs.setSummary(grs.getSummary() + checkInRecord.getGuestRoom());
-			grs.getCurrentCheckInRecords().add(checkInRecord);
+//			grs.getCurrentCheckInRecords().add(checkInRecord);
 			modify(grs);
 		}
 	}
@@ -323,13 +323,13 @@ public class GuestRoomStatusServiceImpl implements GuestRoomStatusService {
 	public boolean lockGuestRoom(String id, RoomLockRecord record) {
 		GuestRoomStatus roomStatus = guestRoomStatusDao.findByGuestRoomId(id);
 		roomStatus.setRoomStatus(Constants.Status.ROOM_STATUS_OUT_OF_SERVCIE);
-		if (roomStatus.getLockRecords() != null) {
-			roomStatus.getLockRecords().add(record);
-		} else {
-			ArrayList<RoomLockRecord> records = new ArrayList<>();
-			records.add(record);
-			roomStatus.setLockRecords(records);
-		}
+//		if (roomStatus.getLockRecords() != null) {
+//			roomStatus.getLockRecords().add(record);
+//		} else {
+//			ArrayList<RoomLockRecord> records = new ArrayList<>();
+//			records.add(record);
+//			roomStatus.setLockRecords(records);
+//		}
 		modify(roomStatus);
 		return true;
 	}
@@ -338,13 +338,13 @@ public class GuestRoomStatusServiceImpl implements GuestRoomStatusService {
 	public boolean repairGuestRoom(String id, RoomRepairRecord record) {
 		GuestRoomStatus roomStatus = guestRoomStatusDao.findByGuestRoomId(id);
 		roomStatus.setRoomStatus(Constants.Status.ROOM_STATUS_OUT_OF_ORDER);
-		if (roomStatus.getRepairRecords() != null) {
-			roomStatus.getRepairRecords().add(record);
-		} else {
-			ArrayList<RoomRepairRecord> records = new ArrayList<>();
-			records.add(record);
-			roomStatus.setRepairRecords(records);
-		}
+//		if (roomStatus.getRepairRecords() != null) {
+//			roomStatus.getRepairRecords().add(record);
+//		} else {
+//			ArrayList<RoomRepairRecord> records = new ArrayList<>();
+//			records.add(record);
+//			roomStatus.setRepairRecords(records);
+//		}
 		modify(roomStatus);
 		return true;
 	}
@@ -353,15 +353,15 @@ public class GuestRoomStatusServiceImpl implements GuestRoomStatusService {
 	public boolean unLockGuestRoom(String id, RoomLockRecord record) {
 		GuestRoomStatus roomStatus = guestRoomStatusDao.findByGuestRoomId(id);
 		roomStatus.setRoomStatus(record.getEndToStatus());
-		if (roomStatus.getLockRecords() != null) {
-			Iterator<RoomLockRecord> iterator = roomStatus.getLockRecords().iterator();
-			while (iterator.hasNext()) {
-				if (record.getId().equals(iterator.next().getId())) {
-					iterator.remove();
-					break;
-				}
-			}
-		}
+//		if (roomStatus.getLockRecords() != null) {
+//			Iterator<RoomLockRecord> iterator = roomStatus.getLockRecords().iterator();
+//			while (iterator.hasNext()) {
+//				if (record.getId().equals(iterator.next().getId())) {
+//					iterator.remove();
+//					break;
+//				}
+//			}
+//		}
 		modify(roomStatus);
 		return true;
 	}
@@ -370,15 +370,15 @@ public class GuestRoomStatusServiceImpl implements GuestRoomStatusService {
 	public boolean unRepairGuestRoom(String id, RoomRepairRecord record) {
 		GuestRoomStatus roomStatus = guestRoomStatusDao.findByGuestRoomId(id);
 		roomStatus.setRoomStatus(record.getEndToStatus());
-		if (roomStatus.getRepairRecords() != null) {
-			Iterator<RoomRepairRecord> iterator = roomStatus.getRepairRecords().iterator();
-			while (iterator.hasNext()) {
-				if (record.getId().equals(iterator.next().getId())) {
-					iterator.remove();
-					break;
-				}
-			}
-		}
+//		if (roomStatus.getRepairRecords() != null) {
+//			Iterator<RoomRepairRecord> iterator = roomStatus.getRepairRecords().iterator();
+//			while (iterator.hasNext()) {
+//				if (record.getId().equals(iterator.next().getId())) {
+//					iterator.remove();
+//					break;
+//				}
+//			}
+//		}
 		modify(roomStatus);
 		return true;
 	}

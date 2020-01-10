@@ -25,5 +25,6 @@ public interface RoomTypeQuantityService extends BaseService<RoomTypeQuantity>{
 	void useRoomType(RoomType roomType, LocalDate startDate, LocalDate endDate, String useType);
 	public void unUseRoomType(RoomType roomType, LocalDate startDate, LocalDate startDate2, String roomUsageBook);
 	void useRoomType(UseInfoAble info, String userType);
+	public List<RoomTypeQuantityVo> queryOneDay(String currentHotleCode, LocalDate now);
 
 }
