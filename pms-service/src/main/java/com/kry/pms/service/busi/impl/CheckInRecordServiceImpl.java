@@ -314,47 +314,48 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 			tags = new ArrayList<RoomTag>();
 			tags.addAll(cir.getDemands());
 		}
-		DtoResponse<RoomUsage> r = roomUsageService.use(gr, Constants.Status.ROOM_USAGE_BOOK, cir.getArriveTime(),
-				cir.getLeaveTime(), cir.getId(), tempName);
-		if (r.getStatus() == 0) {
-			for (int i = 1; i <= humanCount; i++) {
-				Customer customer = customerService.createTempCustomer(gr.getHotelCode(), tempName + "#" + i);
-				CheckInRecord ncir = null;
-				try {
-					ncir = (CheckInRecord) cir.clone();
-				} catch (CloneNotSupportedException e) {
-					e.printStackTrace();
-				}
-				ncir.setDemands(tags);
-				ncir.setPersonalPrice(cir.getPurchasePrice());
-				ncir.setPersonalPercentage(1.0);
-				ncir.setId(null);
-				ncir.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION);
-				ncir.setCustomer(customer);
-				ncir.setName(customer.getName());
-				ncir.setType(Constants.Type.CHECK_IN_RECORD_CUSTOMER);
-				ncir.setGuestRoom(gr);
-				ncir.setSubRecords(null);
-				ncir.setStartDate(startDate);
-				ncir.setHotelCode(gr.getHotelCode());
-				Account account = new Account(0, 0);
-				account.setRoomNum(gr.getRoomNum());
-				account.setCustomer(customer);
-				account.setCode(businessSeqService.fetchNextSeqNum(gr.getHotelCode(),
-						Constants.Key.BUSINESS_BUSINESS_CUSTOMER_ACCOUNT_SEQ_KEY));
-				ncir.setCheckInCount(1);
-				ncir.setRoomCount(1);
-				account.setType(Constants.Type.ACCOUNT_CUSTOMER);
-				ncir.setAccount(account);
-				ncir.setGroupType(cir.getGroupType());// 设置分组类型（团队/散客）
-				ncir.setReserveId(cir.getId());// 添加预留记录id
-				ncir.setMainRecord(cir.getMainRecord());
-				ncir = add(ncir);
-				data.add(ncir);
-				roomRecordService.createRoomRecord(ncir);
-				guestRoomStatausService.checkIn(ncir);
+//		DtoResponse<RoomUsage> r = roomUsageService.use(gr, Constants.Status.ROOM_USAGE_BOOK, cir.getArriveTime(),
+//				cir.getLeaveTime(), cir.getId(), tempName);
+//		roomStatisticsService.assignRoom(new CheckInRecordWrapper(cir));
+		for (int i = 1; i <= humanCount; i++) {
+			Customer customer = customerService.createTempCustomer(gr.getHotelCode(), tempName + "#" + i);
+			CheckInRecord ncir = null;
+			try {
+				ncir = (CheckInRecord) cir.clone();
+			} catch (CloneNotSupportedException e) {
+				e.printStackTrace();
 			}
+			ncir.setDemands(tags);
+			ncir.setPersonalPrice(cir.getPurchasePrice());
+			ncir.setPersonalPercentage(1.0);
+			ncir.setId(null);
+			ncir.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION);
+			ncir.setCustomer(customer);
+			ncir.setName(customer.getName());
+			ncir.setType(Constants.Type.CHECK_IN_RECORD_CUSTOMER);
+			ncir.setGuestRoom(gr);
+			ncir.setSubRecords(null);
+			ncir.setStartDate(startDate);
+			ncir.setHotelCode(gr.getHotelCode());
+			Account account = new Account(0, 0);
+			account.setRoomNum(gr.getRoomNum());
+			account.setCustomer(customer);
+			account.setCode(businessSeqService.fetchNextSeqNum(gr.getHotelCode(),
+					Constants.Key.BUSINESS_BUSINESS_CUSTOMER_ACCOUNT_SEQ_KEY));
+			ncir.setCheckInCount(1);
+			ncir.setRoomCount(1);
+			account.setType(Constants.Type.ACCOUNT_CUSTOMER);
+			ncir.setAccount(account);
+			ncir.setGroupType(cir.getGroupType());// 设置分组类型（团队/散客）
+			ncir.setReserveId(cir.getId());// 添加预留记录id
+			ncir.setMainRecord(cir.getMainRecord());
+			ncir = add(ncir);
+			data.add(ncir);
+			roomRecordService.createRoomRecord(ncir);
+			roomStatisticsService.assignRoom(new CheckInRecordWrapper(ncir));
+//			guestRoomStatausService.checkIn(ncir);
 		}
+
 		return data;
 	}
 
@@ -425,28 +426,28 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 
 	@Override
 	@Transactional
-	public CheckInRecord bookByRoomTypeTest(CheckInRecord checkInRecord){
+	public CheckInRecord bookByRoomTypeTest(CheckInRecord checkInRecord) {
 		checkInRecord.setCheckInCount(1);
 		checkInRecord.setRoomCount(1);
 		checkInRecord.setType(Constants.Type.CHECK_IN_RECORD_CUSTOMER);
-		checkInRecord.setGroupType(Constants.Type.CHECK_IN_RECORD_GROUP_TYPE_NO );
+		checkInRecord.setGroupType(Constants.Type.CHECK_IN_RECORD_GROUP_TYPE_NO);
 		checkInRecord.setSingleRoomCount(1);
 		checkInRecord.setStartDate(LocalDate.from(checkInRecord.getArriveTime()));
 		GuestRoom gr = guestRoomService.findById(checkInRecord.getGuestRoom().getId());
 		String tempName = gr.getRoomNum();
 //		if(checkInRecord.getCustomer() == null){
-			Customer customer = customerService.createTempCustomer(gr.getHotelCode(), tempName + "#" + 1);
-			checkInRecord.setCustomer(customer);
-			Account account = accountService.createAccount(customer, null);
-			checkInRecord.setAccount(account);
+		Customer customer = customerService.createTempCustomer(gr.getHotelCode(), tempName + "#" + 1);
+		checkInRecord.setCustomer(customer);
+		Account account = accountService.createAccount(customer, null);
+		checkInRecord.setAccount(account);
 //		}
 		CheckInRecord cir = add(checkInRecord);
 
-		if((Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN).equals(checkInRecord.getStatus())){
-			DtoResponse<RoomUsage> r = roomUsageService.use(gr, Constants.Status.ROOM_USAGE_CHECK_IN, cir.getArriveTime(),
-					cir.getLeaveTime(), cir.getId(), tempName);
+		if ((Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN).equals(checkInRecord.getStatus())) {
+			DtoResponse<RoomUsage> r = roomUsageService.use(gr, Constants.Status.ROOM_USAGE_CHECK_IN,
+					cir.getArriveTime(), cir.getLeaveTime(), cir.getId(), tempName);
 			guestRoomStatausService.changeRoomStatus(gr.getId(), Constants.Status.ROOM_STATUS_OCCUPY_CLEAN, 1, true);
-		}else{
+		} else {
 			DtoResponse<RoomUsage> r = roomUsageService.use(gr, Constants.Status.ROOM_USAGE_BOOK, cir.getArriveTime(),
 					cir.getLeaveTime(), cir.getId(), tempName);
 		}
@@ -459,28 +460,26 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 		String orderNum = businessSeqService.fetchNextSeqNum(checkInRecord.getHotelCode(),
 				Constants.Key.BUSINESS_ORDER_NUM_SEQ_KEY);
 		checkInRecord.setOrderNum(orderNum);
-		if(checkInRecord.getCustomer() != null){
-			if(checkInRecord.getCustomer().getId() != null && checkInRecord.getCustomer().getId() != ""){
+		if (checkInRecord.getCustomer() != null) {
+			if (checkInRecord.getCustomer().getId() != null && checkInRecord.getCustomer().getId() != "") {
 
-			}else {
+			} else {
 				checkInRecord.setCustomer(null);
 			}
 		}
 		int humanCount = checkInRecord.getHumanCount();
 		DtoResponse<String> response = new DtoResponse<String>();
-		for(int i=0; i<humanCount; i++){
+		for (int i = 0; i < humanCount; i++) {
 			CheckInRecord cir = new CheckInRecord();
 			BeanUtils.copyProperties(cir, checkInRecord);
 			cir.setMainRecord(checkInRecord);
-			cir.setStatus(Constants.Type.CHECK_IN_RECORD_RESERVE);//R
+			cir.setStatus(Constants.Type.CHECK_IN_RECORD_RESERVE);// R
 			cir.setCheckInCount(1);
 			cir.setRoomCount(1);
 			add(checkInRecord);
 			GuestRoom gr = guestRoomService.findById(checkInRecord.getGuestRoom().getId());
 			checkInByTempName(cir.getSingleRoomCount(), cir, gr, response);
 		}
-
-
 
 		if (checkInRecord.getSubRecords() != null && !checkInRecord.getSubRecords().isEmpty()) {
 			checkInRecord.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION);

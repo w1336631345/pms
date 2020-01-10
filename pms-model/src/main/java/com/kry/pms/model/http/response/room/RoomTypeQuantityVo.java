@@ -20,27 +20,29 @@ public class RoomTypeQuantityVo implements Serializable {
 	private Integer lockedTotal = 0;
 	private Integer usedTotal = 0;
 	private Integer reserveTotal = 0;
+	private Integer hseTotal = 0;
+	private Integer freeTotal = 0;
 
 	public RoomTypeQuantityVo() {
 	}
 
-	public RoomTypeQuantityVo(String roomTypeId, String roomTypeName, String roomTypeCode, LocalDate quantityDate,
-			Integer roomCount, Integer availableTotal, Integer predictableTotal, Integer bookingTotal,
-			Integer willLeaveTotal, Integer repairTotal, Integer lockedTotal, Integer usedTotal,Integer reserveTotal) {
-		super();
-		this.roomTypeId = roomTypeId;
-		this.roomTypeName = roomTypeName;
-		this.roomTypeCode = roomTypeCode;
-		this.quantityDate = quantityDate;
-		this.roomCount = roomCount;
-		this.availableTotal = availableTotal;
-		this.predictableTotal = predictableTotal;
-		this.bookingTotal = bookingTotal;
-		this.willLeaveTotal = willLeaveTotal;
-		this.repairTotal = repairTotal;
-		this.lockedTotal = lockedTotal;
-		this.usedTotal = usedTotal;
-		this.reserveTotal = reserveTotal;
-	}
+//	public RoomTypeQuantityVo(String roomTypeId, String roomTypeName, String roomTypeCode, LocalDate quantityDate,
+//			Integer roomCount, Integer availableTotal, Integer predictableTotal, Integer bookingTotal,
+//			Integer willLeaveTotal, Integer repairTotal, Integer lockedTotal, Integer usedTotal, Integer reserveTotal) {
+//		super();
+//		this.roomTypeId = roomTypeId;
+//		this.roomTypeName = roomTypeName;
+//		this.roomTypeCode = roomTypeCode;
+//		this.quantityDate = quantityDate;
+//		this.roomCount = roomCount;
+//		this.availableTotal = availableTotal;
+//		this.predictableTotal = predictableTotal;
+//		this.bookingTotal = bookingTotal;
+//		this.willLeaveTotal = willLeaveTotal;
+//		this.repairTotal = repairTotal;
+//		this.lockedTotal = lockedTotal;
+//		this.usedTotal = usedTotal;
+//		this.reserveTotal = reserveTotal;
+//	}
 
 }

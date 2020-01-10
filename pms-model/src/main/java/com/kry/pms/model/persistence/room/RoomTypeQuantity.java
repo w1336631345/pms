@@ -35,16 +35,20 @@ public class RoomTypeQuantity extends PersistenceModel {
 	@Column(columnDefinition="int(8) COMMENT '预定数(预留)'")
 	private Integer reserveTotal;// 已预留
 	@Column(columnDefinition="int(8) COMMENT '预定数(已分房)'")
-	private Integer bookingTotal ;//已纷繁
+	private Integer bookingTotal ;// 已分房
 	@Column(columnDefinition="int(8) COMMENT '将离'")
 	private Integer willLeaveTotal;//将要离开
 	@Column(columnDefinition="int(8) COMMENT '将到'")
 	private Integer willArriveTotal;//将要到
 	@Column(columnDefinition="int(8) COMMENT '维修房'")
-	private Integer repairTotal ;//维修
+	private Integer repairTotal ;// 已维修
 	@Column(columnDefinition="int(8) COMMENT '锁定房'")
 	private Integer lockedTotal ;//锁定
 	@Column(columnDefinition="int(8) COMMENT '在住房'")
 	private Integer usedTotal ;//在住
+	@Column(columnDefinition="int(8) COMMENT '自用房'")
+	private Integer hseTotal;
+	@Column(columnDefinition="int(8) COMMENT '免费房'")
+	private Integer freeTotal;
 
 }

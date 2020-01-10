@@ -27,7 +27,6 @@ public class RoomStatisticsServiceImpl implements RoomStatisticsService {
 	@Override
 	public boolean reserve(UseInfoAble info) {
 		roomTypeQuantityService.useRoomType(info,Constants.Status.ROOM_USAGE_BOOK);
-		
 		return true;
 	}
 
@@ -40,7 +39,7 @@ public class RoomStatisticsServiceImpl implements RoomStatisticsService {
 
 	@Override
 	public boolean assignRoom(UseInfoAble info) {
-		roomUsageService.use(info.guestRoom(), Constants.Status.ROOM_USAGE_BOOK, info.getStartTime(),
+		roomUsageService.use(info.guestRoom(), Constants.Status.ROOM_USAGE_ASSIGN, info.getStartTime(),
 				info.getEndTime(), info.getBusinessKey(), info.getSummaryInfo());
 		guestRoomStatusService.changeStatus(info);
 		return true;

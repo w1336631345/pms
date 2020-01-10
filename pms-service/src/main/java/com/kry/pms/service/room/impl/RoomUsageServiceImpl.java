@@ -109,6 +109,13 @@ public class RoomUsageServiceImpl implements RoomUsageService {
 		DtoResponse<RoomUsage> response = new DtoResponse<RoomUsage>();
 		Duration d = Duration.between(startTime, endTime);
 		long duration = d.get(ChronoUnit.SECONDS) / 3600;
+		if(status.equals(Constants.Status.ROOM_USAGE_ASSIGN)) {
+			RoomUsage eru  = roomUsageDao.findByGuestRoomIdAndBusinesskeyAndUsageStatus(gr.getId(),businesskey,status);
+			if(eru!=null) {
+				//同房间多人多次分房
+				return response.addData(eru);
+			}
+		}
 		RoomUsage ru = roomUsageDao.queryGuestRoomUsable(gr.getId(), startTime, endTime);
 		RoomUsage data = null;
 		if (ru != null) {

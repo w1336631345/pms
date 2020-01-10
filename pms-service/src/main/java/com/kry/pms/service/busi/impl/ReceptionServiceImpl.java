@@ -18,6 +18,7 @@ import com.kry.pms.model.http.request.busi.CheckInBo;
 import com.kry.pms.model.http.request.busi.CheckInItemBo;
 import com.kry.pms.model.http.request.busi.RoomAssignBo;
 import com.kry.pms.model.http.response.busi.AccountSummaryVo;
+import com.kry.pms.model.other.wrapper.CheckInRecordWrapper;
 import com.kry.pms.model.persistence.busi.BillItem;
 import com.kry.pms.model.persistence.busi.BookingRecord;
 import com.kry.pms.model.persistence.busi.CheckInRecord;
@@ -239,6 +240,7 @@ public class ReceptionServiceImpl implements ReceptionService {
 		if (togetherRecord != null && !togetherRecord.isEmpty()) {
 			rep.setCode(1);
 		}
+		roomStatisticsService.checkIn(new CheckInRecordWrapper(cir));
 		return rep;
 	}
 
