@@ -1,9 +1,11 @@
 package com.kry.pms.api.busi;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.kry.pms.model.http.request.busi.CheckInRecordListBo;
 import org.springframework.beans.BeanUtils;
 import com.kry.pms.model.http.request.busi.CheckUpdateItemBo;
 import com.kry.pms.model.http.request.busi.CheckUpdateItemTestBo;
@@ -183,6 +185,22 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
 		return rep;
 	}
 
+	/**
+	 * 功能描述: <br>房态图批量操作的，快速入住
+	 * 〈〉
+	 * @Param: [checkInRecordListBo]
+	 * @Return: com.kry.pms.base.HttpResponse
+	 * @Author: huanghaibin
+	 * @Date: 2020/1/9 10:22
+	 */
+	@PostMapping(path="/bookByRoomList")
+	public HttpResponse bookByRoomList(@RequestBody CheckInRecordListBo checkInRecordListBo){
+		HttpResponse hr = new HttpResponse();
+		List<CheckInRecord> list = checkInRecordService.bookByRoomList(checkInRecordListBo);
+		hr.addData(list);
+		return hr.ok();
+	}
+
 	public HttpResponse<PageResponse<CheckInRecordListVo>> queryHistory(){
 		HttpResponse<PageResponse<CheckInRecordListVo>> rep = new HttpResponse<PageResponse<CheckInRecordListVo>>();
 		return rep;
@@ -286,6 +304,68 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
 		HttpResponse hr = new HttpResponse();
 		User user = getUser();
 		checkInRecordService.roomPriceAvg(user.getHotelCode(), orderNum, guestRoomId);
+		return hr.ok();
+	}
+
+	/**
+	 * 功能描述: <br>查询团队
+	 * 〈〉
+	 * @Param: [arriveTime, leaveTime, name_, code_]
+	 * @Return: com.kry.pms.base.HttpResponse
+	 * @Author: huanghaibin
+	 * @Date: 2020/1/9 14:27
+	 */
+	@GetMapping(value = "/getGroup")
+	public HttpResponse getGroup(String arriveTime, String leaveTime, String name_, String code_){
+		HttpResponse hr = new HttpResponse();
+		User user = getUser();
+		List<Map<String, Object>> list = checkInRecordService.getGroup(user.getHotelCode(), arriveTime, leaveTime, name_, code_);
+		hr.addData(list);
+		return hr.ok();
+	}
+
+	/**
+	 * 功能描述: <br>入团
+	 * 〈〉
+	 * @Param:
+	 * @Return: com.kry.pms.base.HttpResponse
+	 * @Author: huanghaibin
+	 * @Date: 2020/1/9 17:19
+	 */
+	@GetMapping(value = "/inGroup")
+	public HttpResponse inGroup(String[] cir, String cirG, Boolean isFollowGroup){
+		HttpResponse hr = new HttpResponse();
+		checkInRecordService.inGroup(cir,cirG, isFollowGroup);
+		return hr.ok();
+	}
+
+	/**
+	 * 功能描述: <br>出团
+	 * 〈〉
+	 * @Param: [cir, cirG]
+	 * @Return: com.kry.pms.base.HttpResponse
+	 * @Author: huanghaibin
+	 * @Date: 2020/1/9 17:50
+	 */
+	@GetMapping(value = "/outGroup")
+	public HttpResponse outGroup(String[] cir, String cirG, Boolean isFollowGroup){
+		HttpResponse hr = new HttpResponse();
+		checkInRecordService.outGroup(cir,cirG,isFollowGroup);
+		return hr.ok();
+	}
+
+	/**
+	 * 功能描述: <br>转团
+	 * 〈〉
+	 * @Param: [cir, cirG, isFollowGroup]
+	 * @Return: com.kry.pms.base.HttpResponse
+	 * @Author: huanghaibin
+	 * @Date: 2020/1/10 17:09
+	 */
+	@GetMapping(value = "/updateGroup")
+	public HttpResponse updateGroup(String[] cir, String cirG, String cirU, Boolean isFollowGroup){
+		HttpResponse hr = new HttpResponse();
+		checkInRecordService.updateGroup(cir,cirG,cirU, isFollowGroup);
 		return hr.ok();
 	}
 
