@@ -447,6 +447,10 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 	@Override
 	@Transactional
 	public CheckInRecord bookByRoomTypeTest(CheckInRecord checkInRecord) {
+        String orderNum = businessSeqService.fetchNextSeqNum(checkInRecord.getHotelCode(),
+                Constants.Key.BUSINESS_ORDER_NUM_SEQ_KEY);
+        checkInRecord.setOrderNum(orderNum);
+        checkInRecord.setHumanCount(1);
 		checkInRecord.setCheckInCount(1);
 		checkInRecord.setRoomCount(1);
 		checkInRecord.setType(Constants.Type.CHECK_IN_RECORD_CUSTOMER);

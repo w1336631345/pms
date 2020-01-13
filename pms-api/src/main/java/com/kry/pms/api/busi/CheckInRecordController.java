@@ -58,7 +58,14 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
 		HttpResponse hr = checkInRecordService.modifyInfo(checkInRecord);
 		return hr;
 	}
-	
+	/**
+	 * 功能描述: <br>保存-预订
+	 * 〈〉
+	 * @Param: [checkInRecord]
+	 * @Return: com.kry.pms.base.HttpResponse<com.kry.pms.model.persistence.busi.CheckInRecord>
+	 * @Author: huanghaibin
+	 * @Date: 2020/1/13 15:21
+	 */
 	@PostMapping(path = "/book")
 	public HttpResponse<CheckInRecord> book(@RequestBody CheckInRecord checkInRecord) {
 		checkInRecord.setHotelCode(getCurrentHotleCode());
@@ -75,7 +82,8 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
 	 */
 	@PostMapping(path = "/bookByRoom")
 	public HttpResponse<CheckInRecord> bookByRoom(@RequestBody CheckInRecord checkInRecord) {
-		checkInRecord.setHotelCode(getCurrentHotleCode());
+	    User user = getUser();
+		checkInRecord.setHotelCode(user.getHotelCode());
 		return getDefaultResponse().addData(checkInRecordService.bookByRoomTypeTest(checkInRecord));
 	}
 	
