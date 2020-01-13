@@ -47,18 +47,18 @@ public class GuestRoomStatusVo implements Serializable {
 	public static GuestRoomStatusVo covert(GuestRoomStatus grs) {
 		GuestRoomStatusVo grsv = new GuestRoomStatusVo();
 		BeanUtils.copyProperties(grs, grsv);
-//		if (grs.getCurrentCheckInRecords() != null) {
-//			grsv.setCurrentCheckInRecord(CheckInRecordVo.convert(grs.getCurrentCheckInRecords()));
-//		}
-//		if (grs.getWillCheckInRecords() != null) {
-//			grsv.setWillCheckInRecord(CheckInRecordVo.convert(grs.getWillCheckInRecords()));
-//		}
-//		if (grs.getLockRecords() != null) {
-//			grsv.setLockRecord(RoomLockRecordVo.convert(grs.getLockRecords()));
-//		}
-//		if (grs.getRepairRecords() != null) {
-//			grsv.setRepairRecord(RoomRepairRecordVo.convert(grs.getRepairRecords()));
-//		}
+		if (grs.getCurrentCheckInRecords() != null) {
+			grsv.setCurrentCheckInRecord(CheckInRecordVo.convert(grs.getCurrentCheckInRecords()));
+		}
+		if (grs.getWillCheckInRecords() != null) {
+			grsv.setWillCheckInRecord(CheckInRecordVo.convert(grs.getWillCheckInRecords()));
+		}
+		if (grs.getLockRecords() != null) {
+			grsv.setLockRecord(RoomLockRecordVo.convert(grs.getLockRecords()));
+		}
+		if (grs.getRepairRecords() != null) {
+			grsv.setRepairRecord(RoomRepairRecordVo.convert(grs.getRepairRecords()));
+		}
 		return grsv;
 	}
 }

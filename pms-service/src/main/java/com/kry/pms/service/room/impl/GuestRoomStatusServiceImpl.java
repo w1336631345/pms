@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.aspectj.internal.lang.annotation.ajcDeclareAnnotation;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
@@ -30,6 +31,7 @@ import com.kry.pms.model.persistence.room.Building;
 import com.kry.pms.model.persistence.room.Floor;
 import com.kry.pms.model.persistence.room.GuestRoom;
 import com.kry.pms.model.persistence.room.GuestRoomStatus;
+import com.kry.pms.service.busi.CheckInRecordService;
 import com.kry.pms.service.room.BuildingService;
 import com.kry.pms.service.room.FloorService;
 import com.kry.pms.service.room.GuestRoomService;
@@ -51,6 +53,8 @@ public class GuestRoomStatusServiceImpl implements GuestRoomStatusService {
 	GuestRoomService guestRoomService;
 	@Autowired
 	FloorService floorService;
+	@Autowired
+	CheckInRecordService checkInRecordService;
 
 	@Override
 	public GuestRoomStatus add(GuestRoomStatus guestRoomStatus) {
@@ -323,13 +327,6 @@ public class GuestRoomStatusServiceImpl implements GuestRoomStatusService {
 	public boolean lockGuestRoom(String id, RoomLockRecord record) {
 		GuestRoomStatus roomStatus = guestRoomStatusDao.findByGuestRoomId(id);
 		roomStatus.setRoomStatus(Constants.Status.ROOM_STATUS_OUT_OF_SERVCIE);
-//		if (roomStatus.getLockRecords() != null) {
-//			roomStatus.getLockRecords().add(record);
-//		} else {
-//			ArrayList<RoomLockRecord> records = new ArrayList<>();
-//			records.add(record);
-//			roomStatus.setLockRecords(records);
-//		}
 		modify(roomStatus);
 		return true;
 	}
@@ -338,13 +335,6 @@ public class GuestRoomStatusServiceImpl implements GuestRoomStatusService {
 	public boolean repairGuestRoom(String id, RoomRepairRecord record) {
 		GuestRoomStatus roomStatus = guestRoomStatusDao.findByGuestRoomId(id);
 		roomStatus.setRoomStatus(Constants.Status.ROOM_STATUS_OUT_OF_ORDER);
-//		if (roomStatus.getRepairRecords() != null) {
-//			roomStatus.getRepairRecords().add(record);
-//		} else {
-//			ArrayList<RoomRepairRecord> records = new ArrayList<>();
-//			records.add(record);
-//			roomStatus.setRepairRecords(records);
-//		}
 		modify(roomStatus);
 		return true;
 	}
@@ -353,15 +343,6 @@ public class GuestRoomStatusServiceImpl implements GuestRoomStatusService {
 	public boolean unLockGuestRoom(String id, RoomLockRecord record) {
 		GuestRoomStatus roomStatus = guestRoomStatusDao.findByGuestRoomId(id);
 		roomStatus.setRoomStatus(record.getEndToStatus());
-//		if (roomStatus.getLockRecords() != null) {
-//			Iterator<RoomLockRecord> iterator = roomStatus.getLockRecords().iterator();
-//			while (iterator.hasNext()) {
-//				if (record.getId().equals(iterator.next().getId())) {
-//					iterator.remove();
-//					break;
-//				}
-//			}
-//		}
 		modify(roomStatus);
 		return true;
 	}
@@ -370,15 +351,6 @@ public class GuestRoomStatusServiceImpl implements GuestRoomStatusService {
 	public boolean unRepairGuestRoom(String id, RoomRepairRecord record) {
 		GuestRoomStatus roomStatus = guestRoomStatusDao.findByGuestRoomId(id);
 		roomStatus.setRoomStatus(record.getEndToStatus());
-//		if (roomStatus.getRepairRecords() != null) {
-//			Iterator<RoomRepairRecord> iterator = roomStatus.getRepairRecords().iterator();
-//			while (iterator.hasNext()) {
-//				if (record.getId().equals(iterator.next().getId())) {
-//					iterator.remove();
-//					break;
-//				}
-//			}
-//		}
 		modify(roomStatus);
 		return true;
 	}
@@ -389,18 +361,18 @@ public class GuestRoomStatusServiceImpl implements GuestRoomStatusService {
 		if (status != null) {
 			delete(status.getId());
 		}
-
 	}
-
 	@Override
 	public GuestRoomStatusVo detail(String id) {
 		GuestRoomStatus status = findById(id);
+		inflatRecordInfo(status);
 		return GuestRoomStatusVo.covert(status);
 	}
 
 	@Override
 	public GuestRoomStatusVo detailGuestRoom(String id) {
 		GuestRoomStatus status = guestRoomStatusDao.findByGuestRoomId(id);
+		inflatRecordInfo(status);
 		return GuestRoomStatusVo.covert(status);
 	}
 
@@ -410,6 +382,16 @@ public class GuestRoomStatusServiceImpl implements GuestRoomStatusService {
 		status.setSummary(status.getSummary().replace(oldVal, newVal));
 		modify(status);
 	}
+
+	private void inflatRecordInfo(GuestRoomStatus status) {
+		List<CheckInRecord> currentCheckInRecords = checkInRecordService.findByGuestRoomAndStatusAndDeleted(
+				status.getGuestRoom(), Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN, Constants.DELETED_FALSE);
+		status.setCurrentCheckInRecords(currentCheckInRecords);
+		List<CheckInRecord> willCheckInRecords = checkInRecordService.findTodayCheckInRecord(status.getGuestRoom(),
+				Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION);
+		status.setWillCheckInRecords(willCheckInRecords);
+	}
+
 	@Override
 	public void changeStatus(UseInfoAble info) {
 		GuestRoomStatus status = guestRoomStatusDao.findByGuestRoomId(info.guestRoom().getId());
@@ -421,10 +403,10 @@ public class GuestRoomStatusServiceImpl implements GuestRoomStatusService {
 				status.setHourRoom(info.isHourRoom());
 				status.setOverdued(info.isArrears());
 			}
-			if(info.isTodayArrive()) {
+			if (info.isTodayArrive()) {
 				status.setWillArrive(true);
 			}
-			if(info.isTodayLeave()) {
+			if (info.isTodayLeave()) {
 				status.setWillArrive(true);
 			}
 			modify(status);

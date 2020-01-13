@@ -20,6 +20,7 @@ import com.kry.pms.base.DtoResponse;
 import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
 import com.kry.pms.dao.room.RoomUsageDao;
+import com.kry.pms.model.func.UseInfoAble;
 import com.kry.pms.model.http.response.room.RoomUsageVo;
 import com.kry.pms.model.persistence.busi.BookingItem;
 import com.kry.pms.model.persistence.busi.BookingRecord;
@@ -43,8 +44,8 @@ public class RoomUsageServiceImpl implements RoomUsageService {
 	CheckInRecordService checkInRecordService;
 	@Autowired
 	RoomTypeQuantityService roomTypeQuantityService;
-	@Autowired
-	GuestRoomStatusService guestRoomStatusService;
+//	@Autowired
+//	GuestRoomStatusService guestRoomStatusService;
 
 	@Override
 	public RoomUsage add(RoomUsage roomUsage) {
@@ -106,95 +107,7 @@ public class RoomUsageServiceImpl implements RoomUsageService {
 	@Override
 	public DtoResponse<RoomUsage> use(GuestRoom gr, String status, LocalDateTime startTime, LocalDateTime endTime,
 			String businesskey, String businessInfo) {
-		DtoResponse<RoomUsage> response = new DtoResponse<RoomUsage>();
-		Duration d = Duration.between(startTime, endTime);
-		long duration = d.get(ChronoUnit.SECONDS) / 3600;
-		if(status.equals(Constants.Status.ROOM_USAGE_ASSIGN)) {
-			RoomUsage eru  = roomUsageDao.findByGuestRoomIdAndBusinesskeyAndUsageStatus(gr.getId(),businesskey,status);
-			if(eru!=null) {
-				//同房间多人多次分房
-				return response.addData(eru);
-			}
-		}
-		RoomUsage ru = roomUsageDao.queryGuestRoomUsable(gr.getId(), startTime, endTime);
-		RoomUsage data = null;
-		if (ru != null) {
-			if (ru.getStartDateTime().isEqual(startTime)) {
-				if (ru.getEndDateTime().isEqual(endTime)) {
-					ru.setEndDateTime(endTime);
-					ru.setBusinessInfo(businessInfo);
-					ru.setBusinesskey(businesskey);
-					ru.setUsageStatus(status);
-					data = modify(ru);
-				} else {
-					RoomUsage npur = new RoomUsage();
-					BeanUtils.copyProperties(ru, npur);
-					npur.setPostRoomUsage(ru.getPostRoomUsage());
-					ru.setEndDateTime(endTime);
-					ru.setBusinessInfo(businessInfo);
-					ru.setBusinesskey(businesskey);
-					ru.setUsageStatus(status);
-					ru = modify(ru);
-					npur.setPreRoomUsage(ru);
-					npur.setId(null);
-					updateDuration(npur);
-					add(npur);
-					ru.setPostRoomUsage(npur);
-					data = modify(ru);
-				}
-			} else {
-				if (ru.getEndDateTime().isEqual(endTime)) {
-					RoomUsage npur = new RoomUsage();
-					BeanUtils.copyProperties(ru, npur);
-					ru.setEndDateTime(startTime);
-					updateDuration(ru);
-					npur.setStartDateTime(endTime);
-					npur.setUsageStatus(status);
-					npur.setBusinessInfo(businessInfo);
-					npur.setId(null);
-					npur.setBusinesskey(businesskey);
-					ru = modify(ru);
-					npur.setPreRoomUsage(ru);
-					data = add(npur);
-					ru.setPostRoomUsage(npur);
-					modify(ru);
-				} else {
-					RoomUsage cru = new RoomUsage();
-					RoomUsage pru = new RoomUsage();
-					BeanUtils.copyProperties(ru, cru);
-					BeanUtils.copyProperties(ru, pru);
-					cru.setId(null);
-					cru.setStartDateTime(startTime);
-					cru.setEndDateTime(endTime);
-					cru.setBusinessInfo(businessInfo);
-					cru.setBusinesskey(businesskey);
-					cru.setDuration(duration);
-					cru.setUsageStatus(status);
-					ru = modify(ru);
-					cru.setPreRoomUsage(ru);
-					cru = add(cru);
-
-					ru.setEndDateTime(startTime);
-					updateDuration(ru);
-					ru.setPostRoomUsage(cru);
-					modify(ru);
-
-					pru.setId(null);
-					pru.setStartDateTime(endTime);
-					pru.setPreRoomUsage(cru);
-					updateDuration(pru);
-					add(pru);
-					cru.setPostRoomUsage(pru);
-					data = modify(cru);
-				}
-			}
-			roomTypeQuantityService.useRoomType(gr.getRoomType(), startTime.toLocalDate(), endTime.toLocalDate(),
-					status);
-		} else {
-			response.setStatus(Constants.BusinessCode.CODE_RESOURCE_NOT_ENOUGH);
-			response.setMessage("房间号：" + gr.getRoomNum() + "在该时段无法使用，请确认");
-		}
-		return response.addData(data);
+		return use(gr, status, startTime, endTime, businesskey, businessInfo, true);
 	}
 
 	@Override
@@ -205,9 +118,7 @@ public class RoomUsageServiceImpl implements RoomUsageService {
 			modify(ru);
 			roomTypeQuantityService.useRoomType(gr.getRoomType(), ru.getStartDateTime().toLocalDate(),
 					ru.getEndDateTime().toLocalDate(), status);
-			if (ru.getStartDateTime().toLocalDate().isEqual(LocalDate.now())) {
-				guestRoomStatusService.changeRoomStatus(gr.getId(), status, 1, true);
-			}
+
 		}
 		return true;
 	}
@@ -351,6 +262,123 @@ public class RoomUsageServiceImpl implements RoomUsageService {
 
 		}
 		return null;
+	}
+
+	@Override
+	public boolean checkIn(UseInfoAble info) {
+		RoomUsage ru = roomUsageDao.findByGuestRoomIdAndBusinesskey(info.guestRoom().getId(), info.getBusinessKey());
+		if (ru == null) { //该状态为没有预留直接入住
+			//使用房间资源
+			use(info.guestRoom(), Constants.Status.ROOM_USAGE_CHECK_IN, info.getStartTime(), info.getEndTime(),
+					info.getBusinessKey(), info.getSummaryInfo(), false);
+			//使用房类资源
+			roomTypeQuantityService.checkInRoomTypeWithoutBook(info.roomType(), info.getStartTime().toLocalDate(),
+					info.getEndTime().toLocalDate(), 1);
+		} else {//有预留
+			//修改房间状态
+			ru.setUsageStatus(Constants.Status.ROOM_USAGE_CHECK_IN);
+			modify(ru);
+			//修改房类资源
+			roomTypeQuantityService.useRoomType(info.guestRoom().getRoomType(), ru.getStartDateTime().toLocalDate(),
+					ru.getEndDateTime().toLocalDate(), Constants.Status.ROOM_USAGE_CHECK_IN);
+		}
+		return true;
+	}
+
+	@Override
+	public DtoResponse<RoomUsage> use(GuestRoom gr, String status, LocalDateTime startTime, LocalDateTime endTime,
+			String businesskey, String businessInfo, boolean roomTypeOperation) {
+		DtoResponse<RoomUsage> response = new DtoResponse<RoomUsage>();
+		Duration d = Duration.between(startTime, endTime);
+		long duration = d.get(ChronoUnit.SECONDS) / 3600;
+		if (status.equals(Constants.Status.ROOM_USAGE_ASSIGN)) {
+			RoomUsage eru = roomUsageDao.findByGuestRoomIdAndBusinesskeyAndUsageStatus(gr.getId(), businesskey, status);
+			if (eru != null) {
+				// 同房间多人多次分房
+				return response.addData(eru);
+			}
+		}
+		RoomUsage ru = roomUsageDao.queryGuestRoomUsable(gr.getId(), startTime, endTime);
+		RoomUsage data = null;
+		if (ru != null) {
+			if (ru.getStartDateTime().isEqual(startTime)) {
+				if (ru.getEndDateTime().isEqual(endTime)) {
+					ru.setEndDateTime(endTime);
+					ru.setBusinessInfo(businessInfo);
+					ru.setBusinesskey(businesskey);
+					ru.setUsageStatus(status);
+					data = modify(ru);
+				} else {
+					RoomUsage npur = new RoomUsage();
+					BeanUtils.copyProperties(ru, npur);
+					npur.setPostRoomUsage(ru.getPostRoomUsage());
+					ru.setEndDateTime(endTime);
+					ru.setBusinessInfo(businessInfo);
+					ru.setBusinesskey(businesskey);
+					ru.setUsageStatus(status);
+					ru = modify(ru);
+					npur.setPreRoomUsage(ru);
+					npur.setId(null);
+					updateDuration(npur);
+					add(npur);
+					ru.setPostRoomUsage(npur);
+					data = modify(ru);
+				}
+			} else {
+				if (ru.getEndDateTime().isEqual(endTime)) {
+					RoomUsage npur = new RoomUsage();
+					BeanUtils.copyProperties(ru, npur);
+					ru.setEndDateTime(startTime);
+					updateDuration(ru);
+					npur.setStartDateTime(endTime);
+					npur.setUsageStatus(status);
+					npur.setBusinessInfo(businessInfo);
+					npur.setId(null);
+					npur.setBusinesskey(businesskey);
+					ru = modify(ru);
+					npur.setPreRoomUsage(ru);
+					data = add(npur);
+					ru.setPostRoomUsage(npur);
+					modify(ru);
+				} else {
+					RoomUsage cru = new RoomUsage();
+					RoomUsage pru = new RoomUsage();
+					BeanUtils.copyProperties(ru, cru);
+					BeanUtils.copyProperties(ru, pru);
+					cru.setId(null);
+					cru.setStartDateTime(startTime);
+					cru.setEndDateTime(endTime);
+					cru.setBusinessInfo(businessInfo);
+					cru.setBusinesskey(businesskey);
+					cru.setDuration(duration);
+					cru.setUsageStatus(status);
+					ru = modify(ru);
+					cru.setPreRoomUsage(ru);
+					cru = add(cru);
+
+					ru.setEndDateTime(startTime);
+					updateDuration(ru);
+					ru.setPostRoomUsage(cru);
+					modify(ru);
+
+					pru.setId(null);
+					pru.setStartDateTime(endTime);
+					pru.setPreRoomUsage(cru);
+					updateDuration(pru);
+					add(pru);
+					cru.setPostRoomUsage(pru);
+					data = modify(cru);
+				}
+			}
+			if (roomTypeOperation) {
+				roomTypeQuantityService.useRoomType(gr.getRoomType(), startTime.toLocalDate(), endTime.toLocalDate(),
+						status);
+			}
+		} else {
+			response.setStatus(Constants.BusinessCode.CODE_RESOURCE_NOT_ENOUGH);
+			response.setMessage("房间号：" + gr.getRoomNum() + "在该时段无法使用，请确认");
+		}
+		return response.addData(data);
 	}
 
 }

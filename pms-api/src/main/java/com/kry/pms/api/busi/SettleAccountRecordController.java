@@ -18,6 +18,7 @@ import com.kry.pms.api.BaseController;
 import com.kry.pms.base.HttpResponse;
 import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
+import com.kry.pms.model.http.response.busi.SettleInfoVo;
 import com.kry.pms.model.persistence.busi.SettleAccountRecord;
 import com.kry.pms.service.busi.SettleAccountRecordService;
 
@@ -26,6 +27,7 @@ import com.kry.pms.service.busi.SettleAccountRecordService;
 public class SettleAccountRecordController extends BaseController<SettleAccountRecord> {
 	@Autowired
 	SettleAccountRecordService settleAccountRecordService;
+
 	@PostMapping
 	public HttpResponse<SettleAccountRecord> add(@RequestBody SettleAccountRecord settleAccountRecord) {
 		return getDefaultResponse().addData(settleAccountRecordService.add(settleAccountRecord));
@@ -44,16 +46,18 @@ public class SettleAccountRecordController extends BaseController<SettleAccountR
 	}
 
 	@GetMapping
-	public HttpResponse<PageResponse<SettleAccountRecord>> query(HttpServletRequest request) throws InstantiationException, IllegalAccessException{
+	public HttpResponse<PageResponse<SettleAccountRecord>> query(HttpServletRequest request)
+			throws InstantiationException, IllegalAccessException {
 		HttpResponse<PageResponse<SettleAccountRecord>> rep = new HttpResponse<PageResponse<SettleAccountRecord>>();
 		PageRequest<SettleAccountRecord> req = parse2PageRequest(request);
 		return rep.addData(settleAccountRecordService.listPage(req));
 	}
-	@GetMapping(path="/cancle/{id}")
-	public HttpResponse<String> cancle(@PathVariable("id")String id){
-		 HttpResponse<String> rep = new HttpResponse<String>();
-		 BeanUtils.copyProperties(settleAccountRecordService.cancle(id), rep);
-		 return rep;
+
+	@GetMapping(path = "/cancle/{id}")
+	public HttpResponse<String> cancle(@PathVariable("id") String id) {
+		HttpResponse<String> rep = new HttpResponse<String>();
+		BeanUtils.copyProperties(settleAccountRecordService.cancle(id), rep);
+		return rep;
 	}
 
 }

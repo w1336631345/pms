@@ -13,7 +13,10 @@ import lombok.Data;
 
 @Data
 public class CheckInRecordVo {
+	private String id;
 	private String name;
+	private String orderNum;
+	private String groupType;
 	private LocalDateTime arriveTime;
 	private LocalDateTime leaveTime;
 	private String protocolCorpationName;
@@ -29,10 +32,10 @@ public class CheckInRecordVo {
 	public static CheckInRecordVo convert(CheckInRecord cir) {
 		CheckInRecordVo cirv = new CheckInRecordVo();
 		BeanUtils.copyProperties(cir, cirv);
-		if(cir.getCustomer()!=null) {
+		if (cir.getCustomer() != null) {
 			cirv.setCustomer(CustomerVo.convert(cir.getCustomer()));
 		}
-		if(cir.getProtocolCorpation()!=null) {
+		if (cir.getProtocolCorpation() != null) {
 			cirv.setProtocolCorpationId(cir.getProtocolCorpation().getId());
 			cirv.setProtocolCorpationName(cir.getProtocolCorpation().getName());
 		}

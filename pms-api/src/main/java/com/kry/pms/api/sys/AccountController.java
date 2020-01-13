@@ -1,11 +1,14 @@
 package com.kry.pms.api.sys;
 
+import java.nio.channels.SeekableByteChannel;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -17,6 +20,7 @@ import com.kry.pms.base.DtoResponse;
 import com.kry.pms.base.HttpResponse;
 import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
+import com.kry.pms.model.http.response.busi.SettleInfoVo;
 import com.kry.pms.model.persistence.sys.Account;
 import com.kry.pms.service.org.EmployeeService;
 import com.kry.pms.service.sys.AccountService;
@@ -39,18 +43,26 @@ public class AccountController extends BaseController<Account> {
 		return getDefaultResponse().addData(accountService.modify(account));
 	}
 
-	@DeleteMapping	
+	@DeleteMapping
 	public HttpResponse<String> delete(String id) {
 		HttpResponse<String> rep = new HttpResponse<>();
 		accountService.delete(id);
 		return rep;
 	}
+
 	@GetMapping(path = "/personPrice")
-	public HttpResponse<Double> queryRoomPrice(String id){
+	public HttpResponse<Double> queryRoomPrice(String id) {
 		HttpResponse<Double> rep = new HttpResponse<>();
 		DtoResponse<Double> response = accountService.queryRoomPrice(id);
 		BeanUtils.copyProperties(response, rep);
 		return rep;
+	}
+
+	@GetMapping("/settleInfo/{type}/{id}")
+	public HttpResponse<SettleInfoVo> getSettleInfo(@PathVariable String type,@PathVariable String id) {
+		 HttpResponse<SettleInfoVo> response = new HttpResponse<SettleInfoVo>();
+		 SettleInfoVo settleInfoVo = accountService.getSettleInfo(type,id);
+		 return response.addData(settleInfoVo);
 	}
 
 	@GetMapping

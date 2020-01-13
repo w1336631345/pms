@@ -250,6 +250,19 @@ public class RoomTypeQuantityServiceImpl implements RoomTypeQuantityService {
 		}
 	}
 
+	@Override
+	public void checkInRoomTypeWithoutBook(RoomType roomType, LocalDate startDate, LocalDate endDate, int quantity) {
+		RoomTypeQuantity rtq = null;
+		LocalDate currentDate = startDate;
+		while (currentDate.isBefore(endDate)) {
+			rtq = findByRoomTypeAndQuantityDateForUpdate(roomType, currentDate);
+			rtq.setPredictableTotal(rtq.getPredictableTotal() - quantity);
+			rtq.setUsedTotal(rtq.getUsedTotal() + quantity);
+			currentDate = currentDate.plusDays(1);
+			modify(rtq);
+		}
+	}
+
 	public void unUseRoomType(RoomType roomType, LocalDateTime startTime, LocalDateTime endTime) {
 		LocalDate startDate = startTime.toLocalDate();
 		LocalDate endDate = endTime.toLocalDate();

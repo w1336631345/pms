@@ -8,6 +8,7 @@ import java.util.Map;
 
 import javax.transaction.Transactional;
 
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Sort;
@@ -22,6 +23,7 @@ import com.kry.pms.base.PageResponse;
 import com.kry.pms.dao.sys.AccountDao;
 import com.kry.pms.model.http.request.busi.BillCheckBo;
 import com.kry.pms.model.http.response.busi.AccountSummaryVo;
+import com.kry.pms.model.http.response.busi.SettleInfoVo;
 import com.kry.pms.model.persistence.busi.Bill;
 import com.kry.pms.model.persistence.busi.CheckInRecord;
 import com.kry.pms.model.persistence.busi.CreditGrantingRecord;
@@ -209,12 +211,78 @@ public class AccountServiceImpl implements AccountService {
 		DtoResponse<Double> rep = new DtoResponse<Double>();
 		CheckInRecord cir = checkInRecordService.queryByAccountId(id);
 		if (cir != null) {
-			return rep.addData(cir.getPurchasePrice()==null?0.0:cir.getPurchasePrice());
-		}else {
+			return rep.addData(cir.getPurchasePrice() == null ? 0.0 : cir.getPurchasePrice());
+		} else {
 			rep.setStatus(Constants.BusinessCode.CODE_ILLEGAL_OPERATION);
 			rep.setMessage("找不到对应的订单");
 		}
 		return rep;
 	}
 
+	@Override
+	public SettleInfoVo getSettleInfo(String type, String id) {
+		SettleInfoVo siv = null;
+		switch (type) {
+		case Constants.Type.SETTLE_TYPE_ALL:
+			siv = getSingleAccountSettleInfo(id);
+			break;
+		case Constants.Type.SETTLE_TYPE_PART:
+
+			break;
+		case Constants.Type.SETTLE_TYPE_GROUP:
+			siv = getSingleAccountSettleInfo(id);
+			break;
+		case Constants.Type.SETTLE_TYPE_IGROUP:
+
+			break;
+		case Constants.Type.SETTLE_TYPE_ROOM:
+			siv = getRoomSettleInfo(id);
+			break;
+		case Constants.Type.SETTLE_TYPE_LINK:
+			siv = getLinkSettleInfo(id);
+			break;
+
+		default:
+			break;
+		}
+		return siv;
+	}
+
+	private SettleInfoVo getRoomSettleInfo(String id) {
+		List<CheckInRecord> cirs = checkInRecordService.findByGuestRoomAndStatusAndDeleted(id,
+				Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN, Constants.DELETED_FALSE);
+		SettleInfoVo info = new SettleInfoVo();
+		for (CheckInRecord cir : cirs) {
+			if (cir.getAccount() != null) {
+				countSettleInfo(info, cir.getAccount());
+			}
+		}
+		return info;
+	}
+
+	private SettleInfoVo getSingleAccountSettleInfo(String id) {
+		SettleInfoVo info = new SettleInfoVo();
+		Account account = findById(id);
+		BeanUtils.copyProperties(account, info);
+		return info;
+	}
+
+	private void countSettleInfo(SettleInfoVo info, Account account) {
+		info.setCost(BigDecimalUtil.add(info.getCost(), account.getCost()));
+		info.setPay(BigDecimalUtil.add(info.getPay(), account.getPay()));
+		info.setCreditLimit(BigDecimalUtil.add(info.getCreditLimit(), account.getCreditLimit()));
+		info.setAvailableCreditLimit(
+				BigDecimalUtil.add(info.getAvailableCreditLimit(), account.getAvailableCreditLimit()));
+	}
+
+	private SettleInfoVo getLinkSettleInfo(String id) {
+		List<CheckInRecord> cirs = checkInRecordService.findByLinkId(id);
+		SettleInfoVo info = new SettleInfoVo();
+		for (CheckInRecord cir : cirs) {
+			if (cir.getAccount() != null) {
+				countSettleInfo(info, cir.getAccount());
+			}
+		}
+		return info;
+	}
 }

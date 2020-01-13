@@ -8,7 +8,11 @@ import javax.persistence.FetchType;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
+import com.kry.pms.model.http.response.busi.CheckInRecordVo;
+import com.kry.pms.model.http.response.room.RoomLockRecordVo;
+import com.kry.pms.model.http.response.room.RoomRepairRecordVo;
 import com.kry.pms.model.persistence.PersistenceModel;
 import com.kry.pms.model.persistence.busi.CheckInRecord;
 import com.kry.pms.model.persistence.busi.RoomLockRecord;
@@ -56,5 +60,14 @@ public class GuestRoomStatus extends PersistenceModel {
 	private Boolean overdued;// 欠费
 	@Column(columnDefinition = "bit(1) default NULl COMMENT 'OTA'")
 	private Boolean ota;
+	
+	@Transient
+	private List<CheckInRecord> currentCheckInRecords;
+	@Transient
+	private List<CheckInRecord> willCheckInRecords;
+	@Transient
+	private List<RoomLockRecord> lockRecords;
+	@Transient
+	private List<RoomRepairRecord> repairRecords;
 
 }

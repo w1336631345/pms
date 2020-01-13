@@ -1,5 +1,6 @@
 package com.kry.pms.service.room.impl;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,12 +63,15 @@ public class RoomStatisticsServiceImpl implements RoomStatisticsService {
 		// TODO Auto-generated method stub
 		return false;
 	}
-
 	@Override
 	public boolean checkIn(UseInfoAble info) {
-		roomUsageService.changeUseStatus(info.guestRoom(), info.getBusinessKey(),
-				Constants.Status.ROOM_USAGE_CHECK_IN);
-		guestRoomStatusService.changeStatus(info);
+//		roomUsageService.changeUseStatus(info.guestRoom(), info.getBusinessKey(),
+//				Constants.Status.ROOM_USAGE_CHECK_IN);
+//		
+		roomUsageService.checkIn(info);
+		if (info.getStartTime().toLocalDate().isEqual(LocalDate.now())) {
+			guestRoomStatusService.changeRoomStatus(info.guestRoom().getId(), Constants.Status.ROOM_STATUS_OCCUPY_CLEAN, 1, true);
+		}
 		return true;
 	}
 

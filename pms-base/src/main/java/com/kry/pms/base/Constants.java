@@ -8,12 +8,13 @@ public class Constants {
 	public static final String KEY_METHOD_SET_PRE = "set";
 	public static final String KEY_METHOD_GET_PRE = "get";
 	public static final String KEY_DEFAULT_SEPARATOR = ",";
-	public interface Operation{
+
+	public interface Operation {
 		public static final String BOOK_CANCEL = "cancel";
 		public static final String BOOK_VERIFY_PASS = "verify_pass";
 		public static final String BOOK_VERIFY_REFUSE = "verify_refuse";
 	}
-	
+
 	public interface Status {
 		public static final String DELETE = "DELETE";
 		public static final String DRAFT = "DRAFT";
@@ -36,76 +37,74 @@ public class Constants {
 		public static final String ROOM_STATUS_OUT_OF_ORDER = "OO";
 		public static final String ROOM_STATUS_OUT_OF_SERVCIE = "OS";
 		public static final String ROOM_STATUS_EXPECTE_DEPARTURE = "ED";
-		public static final String ROOM_STATUS_FREE = "COM";		
+		public static final String ROOM_STATUS_FREE = "COM";
 		public static final String ROOM_RECORD_STATUS_CHECK_IN = "check_in";
 		public static final String ROOM_RECORD_STATUS_DAILY_VERIFY_PASS = "daily_verif_pass";
 		public static final String ROOM_RECORD_STATUS_CHECK_OUT = "check_out";
-		public static final String CHECKIN_RECORD_STATUS_RESERVATION = "R";//预订
-		public static final String CHECKIN_RECORD_STATUS_CHECK_IN = "I";//入住
-		public static final String CHECKIN_RECORD_STATUS_CHECK_OUT = "O";//退房
-		public static final String CHECKIN_RECORD_STATUS_DEPARTURE_YESTERDAY = "D";//历史订单
-		public static final String CHECKIN_RECORD_STATUS_NO_SHOW = "N";//未到
-		public static final String CHECKIN_RECORD_STATUS_OUT_UNSETTLED = "S";//退房未结账
-		public static final String CHECKIN_RECORD_STATUS_CANCLE_BOOK = "X";//取消
+		public static final String CHECKIN_RECORD_STATUS_RESERVATION = "R";// 预订
+		public static final String CHECKIN_RECORD_STATUS_CHECK_IN = "I";// 入住
+		public static final String CHECKIN_RECORD_STATUS_CHECK_OUT = "O";// 退房
+		public static final String CHECKIN_RECORD_STATUS_DEPARTURE_YESTERDAY = "D";// 历史订单
+		public static final String CHECKIN_RECORD_STATUS_NO_SHOW = "N";// 未到
+		public static final String CHECKIN_RECORD_STATUS_OUT_UNSETTLED = "S";// 退房未结账
+		public static final String CHECKIN_RECORD_STATUS_CANCLE_BOOK = "X";// 取消
 		public static final String BILL_SETTLED = "SETTLED";
 		public static final String BILL_NEED_SETTLED = "NEED_SETTLED";
 		public static final String BILL_CANCLE_SETTLED = "CANCLE_SETTLED";
 		public static final String BILL_INVALID = "INVALID";
 		public static final String BILL_TRANSFER = "TRANSFER";
-		
-		public static final String ROOM_USAGE_FREE="F";
-		public static final String ROOM_USAGE_CHECK_IN="I";
-		public static final String ROOM_USAGE_CHECK_OUT="O";
+
+		public static final String ROOM_USAGE_FREE = "F";
+		public static final String ROOM_USAGE_CHECK_IN = "I";
+		public static final String ROOM_USAGE_CHECK_OUT = "O";
 		public static final String ROOM_USAGE_ASSIGN = "A";
-		public static final String ROOM_USAGE_LOCKED="L";
-		public static final String ROOM_USAGE_BOOK="R";
-		public static final String ROOM_USAGE_REPARIE="p";
-		
-		public static final String ACCOUNT_IN="I";
-		public static final String ACCOUNT_SETTLE="S";
-		public static final String ACCOUNT_HOLD="H";
+		public static final String ROOM_USAGE_LOCKED = "L";
+		public static final String ROOM_USAGE_BOOK = "R";
+		public static final String ROOM_USAGE_REPARIE = "p";
+
+		public static final String ACCOUNT_IN = "I";
+		public static final String ACCOUNT_SETTLE = "S";
+		public static final String ACCOUNT_HOLD = "H";
 
 		public static final String SETTLE_ACCOUNT_CANCLE = "C";
 
-		public static final String SETTLEMENT_OK = "0";//换房记录差价结清状态，结清
-		public static final String SETTLEMENT_NO = "1";//换房记录差价结清状态，未结清
+		public static final String SETTLEMENT_OK = "0";// 换房记录差价结清状态，结清
+		public static final String SETTLEMENT_NO = "1";// 换房记录差价结清状态，未结清
 	}
-	
-	public interface Key{
-		public static final String BUSINESS_SEQ_KEY="CHECKIN_SN";
-		public static final String SESSION_ATTR_SHIFT_CODE="SHIFT";
-		public static final String BUSINESS_ORDER_NUM_SEQ_KEY="ORDER_NUM";
-		public static final String BUSINESS_BUSINESS_DATE_SEQ_KEY="BUINESS_DATE";
-		public static final String BUSINESS_BUSINESS_SETTLE_SEQ_KEY="SETTLE_NUM";
-		public static final String BUSINESS_BUSINESS_CUSTOMER_ACCOUNT_SEQ_KEY="CUSTOMER_ACCOUNT_NUM";
-		public static final String BUSINESS_BUSINESS_GROUP_ACCOUNT_SEQ_KEY="GROUP_ACCOUNT_NUM";
-		public static final String TOGETHER_NUM_KEY="TOGETHER_NUM";
+
+	public interface Key {
+		public static final String BUSINESS_SEQ_KEY = "CHECKIN_SN";
+		public static final String SESSION_ATTR_SHIFT_CODE = "SHIFT";
+		public static final String BUSINESS_ORDER_NUM_SEQ_KEY = "ORDER_NUM";
+		public static final String BUSINESS_BUSINESS_DATE_SEQ_KEY = "BUINESS_DATE";
+		public static final String BUSINESS_BUSINESS_SETTLE_SEQ_KEY = "SETTLE_NUM";
+		public static final String BUSINESS_BUSINESS_CUSTOMER_ACCOUNT_SEQ_KEY = "CUSTOMER_ACCOUNT_NUM";
+		public static final String BUSINESS_BUSINESS_GROUP_ACCOUNT_SEQ_KEY = "GROUP_ACCOUNT_NUM";
+		public static final String TOGETHER_NUM_KEY = "TOGETHER_NUM";
 	}
 
 	public interface Type {
-		
+
 		public static final String BILL_CHECK_TYPE_ALL = "ALL";
 		public static final String BILL_CHECK_TYPE_PART = "PART";
-		
+
 		public static final String BUSINESS_SEQ_PDS = "PDS";
-		public static final String BUSINESS_SEQ_PS="PS";
-		public static final String BUSINESS_SEQ_DS="DS";
-		
-		public static final String PRODUCT_TYPE_COST="cost";
-		public static final String PRODUCT_TYPE_PAY="pay";
-		
-		
+		public static final String BUSINESS_SEQ_PS = "PS";
+		public static final String BUSINESS_SEQ_DS = "DS";
+
+		public static final String PRODUCT_TYPE_COST = "cost";
+		public static final String PRODUCT_TYPE_PAY = "pay";
+
 		public static final String BOOK_GROUP = "GROUP";
-		
-		
-		public static final String CHECK_IN_RECORD_GROUP_TYPE_NO="N";
+
+		public static final String CHECK_IN_RECORD_GROUP_TYPE_NO = "N";
 		public static final String CHECK_IN_RECORD_GROUP_TYPE_YES = "Y";
-		
+
 		public static final String CHECK_IN_RECORD_CUSTOMER = "C";
 		public static final String CHECK_IN_RECORD_RESERVE = "R";
 		public static final String CHECK_IN_RECORD_GROUP = "G";
 		public static final String CHECK_IN_RECORD_LINK = "L";
-		
+
 		public static final String AUTO_DAILY_VERIFY = "auto_daily_verify";
 		public static final String BILL_ITEM_ROOM_RECORD = "room";
 		// AR 账户
@@ -127,8 +126,15 @@ public class Constants {
 		// 服务（虚拟商品）
 		public static final String PRODUCT_SERVICE = "SERVICE";
 
-		public static final String CHANGE_ROOM_PAY_B = "B";//换房记录差价处理方式，补差价
-		public static final String CHANGE_ROOM_PAY_F = "F";//换房记录差价处理方式，免费升级
+		public static final String CHANGE_ROOM_PAY_B = "B";// 换房记录差价处理方式，补差价
+		public static final String CHANGE_ROOM_PAY_F = "F";// 换房记录差价处理方式，免费升级
+
+		public static final String SETTLE_TYPE_GROUP = "GROUP";
+		public static final String SETTLE_TYPE_ALL = "ALL";
+		public static final String SETTLE_TYPE_PART = "PART";
+		public static final String SETTLE_TYPE_LINK = "LINK";
+		public static final String SETTLE_TYPE_IGROUP = "IG";
+		public static final String SETTLE_TYPE_ROOM = "ROOM";
 
 	}
 
@@ -147,9 +153,8 @@ public class Constants {
 		public static final int CODE_RESOURCE_NOT_ENOUGH = 900;
 		public static final int CODE_PARAMETER_INVALID = 901;
 		public static final int CODE_ILLEGAL_OPERATION = 801;
-		
-		
-		public static final String DEPT_MARKETING_DEFAULT_CODE="MARKETING";
+
+		public static final String DEPT_MARKETING_DEFAULT_CODE = "MARKETING";
 	}
 
 	public interface SystemConfig {
@@ -164,45 +169,48 @@ public class Constants {
 	}
 
 	public interface ReportSort {
-		public static final String REPORT_ROOM_RATE = "0";//营业日报表排序-房费账务统计
-		public static final String REPORT_ROOM_CHECKIN_A = "1";//营业日报表排序-a、客房总数统计
-		public static final String REPORT_ROOM_CHECKIN_B = "2";//营业日报表排序-房间入住（b、出租总数）统计
-		public static final String REPORT_ROOM_CHECKIN_C = "3";//营业日报表排序-房间入住（c、出售率）统计
-		public static final String REPORT_ROOM_CHECKIN_D = "4";//营业日报表排序-房间入住（d、房租收入）统计
-		public static final String REPORT_ROOM_CHECKIN_E = "5";//营业日报表排序-房间入住（e、平均房价）统计
-		public static final String REPORT_ROOM_CHECKIN_F = "6";//营业日报表排序-房间入住（f、人数统计）统计
-		public static final String REPORT_ROOM_CHECKIN_G = "7";//营业日报表排序-房间入住（g、客房其他收入）统计
+		public static final String REPORT_ROOM_RATE = "0";// 营业日报表排序-房费账务统计
+		public static final String REPORT_ROOM_CHECKIN_A = "1";// 营业日报表排序-a、客房总数统计
+		public static final String REPORT_ROOM_CHECKIN_B = "2";// 营业日报表排序-房间入住（b、出租总数）统计
+		public static final String REPORT_ROOM_CHECKIN_C = "3";// 营业日报表排序-房间入住（c、出售率）统计
+		public static final String REPORT_ROOM_CHECKIN_D = "4";// 营业日报表排序-房间入住（d、房租收入）统计
+		public static final String REPORT_ROOM_CHECKIN_E = "5";// 营业日报表排序-房间入住（e、平均房价）统计
+		public static final String REPORT_ROOM_CHECKIN_F = "6";// 营业日报表排序-房间入住（f、人数统计）统计
+		public static final String REPORT_ROOM_CHECKIN_G = "7";// 营业日报表排序-房间入住（g、客房其他收入）统计
 	}
+
 	public interface ReportType {
-		public static final String REPORT_ROOM_RATE = "RATE";//营业日报表项目类型-房费账务统计
-		public static final String REPORT_ROOM_NUM = "NUM";//营业日报表项目类型-房间数量统计
-		public static final String REPORT_ROOM_CHECKIN = "CHECKIN";//营业日报表项目类型-房间数量统计
+		public static final String REPORT_ROOM_RATE = "RATE";// 营业日报表项目类型-房费账务统计
+		public static final String REPORT_ROOM_NUM = "NUM";// 营业日报表项目类型-房间数量统计
+		public static final String REPORT_ROOM_CHECKIN = "CHECKIN";// 营业日报表项目类型-房间数量统计
 	}
+
 	public interface ReportProject {
-		public static final String REPORT_ROOM_RATE = "客房房费";//营业日报表项目-房费相关统计
-		public static final String REPORT_ROOM_OTHER = "其他";//营业日报表项目-房费其它统计
-		public static final String REPORT_ROOM_TOTAL = "营业状况统计"; //营业日报表项目-房费总和统计
-		public static final String REPORT_ROOM_CHECKIN_A = "a、客房总数"; //营业日报表项目-统计-a、客房总数
-		public static final String REPORT_ROOM_CHECKIN_B = "b、出租总数"; //营业日报表项目-统计-b、出租总数
-		public static final String REPORT_ROOM_CHECKIN_C = "c、售卖率"; //营业日报表项目-统计-c、售卖率
-		public static final String REPORT_ROOM_CHECKIN_D = "d、房租收入"; //营业日报表项目-统计-d、房租收入
-		public static final String REPORT_ROOM_CHECKIN_E = "e、平均房价"; //营业日报表项目-统计-e、平均房价
-		public static final String REPORT_ROOM_CHECKIN_F = "f、人数统计"; //营业日报表项目-统计-f、人数统计
-		public static final String REPORT_ROOM_CHECKIN_G = "g、客房其他收入"; //营业日报表项目-统计-g、客房其他收入
+		public static final String REPORT_ROOM_RATE = "客房房费";// 营业日报表项目-房费相关统计
+		public static final String REPORT_ROOM_OTHER = "其他";// 营业日报表项目-房费其它统计
+		public static final String REPORT_ROOM_TOTAL = "营业状况统计"; // 营业日报表项目-房费总和统计
+		public static final String REPORT_ROOM_CHECKIN_A = "a、客房总数"; // 营业日报表项目-统计-a、客房总数
+		public static final String REPORT_ROOM_CHECKIN_B = "b、出租总数"; // 营业日报表项目-统计-b、出租总数
+		public static final String REPORT_ROOM_CHECKIN_C = "c、售卖率"; // 营业日报表项目-统计-c、售卖率
+		public static final String REPORT_ROOM_CHECKIN_D = "d、房租收入"; // 营业日报表项目-统计-d、房租收入
+		public static final String REPORT_ROOM_CHECKIN_E = "e、平均房价"; // 营业日报表项目-统计-e、平均房价
+		public static final String REPORT_ROOM_CHECKIN_F = "f、人数统计"; // 营业日报表项目-统计-f、人数统计
+		public static final String REPORT_ROOM_CHECKIN_G = "g、客房其他收入"; // 营业日报表项目-统计-g、客房其他收入
 	}
+
 	public interface ReportProjectType {
-		public static final String REPORT_ROOM_RATE = "roomrate";//营业日报表项目类型-房费统计
-		public static final String REPORT_ROOM_NUM_A = "room_a";//营业日报表项目-房间统计 a、客房总数
-		public static final String REPORT_ROOM_NUM_B = "room_b"; //营业日报表项目-房间统计 b、出租总数
-		public static final String REPORT_ROOM_NUM_C = "room_c"; //营业日报表项目-房间统计 c、出售率
-		public static final String REPORT_ROOM_NUM_D = "room_d"; //营业日报表项目-房间统计 d、房租收入
-		public static final String REPORT_ROOM_NUM_E = "room_e"; //营业日报表项目-房间统计 e、平均房价
-		public static final String REPORT_ROOM_NUM_F = "room_f"; //营业日报表项目-房间统计 f、人数统计
-		public static final String REPORT_ROOM_NUM_G = "room_g"; //营业日报表项目-房间统计 g、客房其他收入
+		public static final String REPORT_ROOM_RATE = "roomrate";// 营业日报表项目类型-房费统计
+		public static final String REPORT_ROOM_NUM_A = "room_a";// 营业日报表项目-房间统计 a、客房总数
+		public static final String REPORT_ROOM_NUM_B = "room_b"; // 营业日报表项目-房间统计 b、出租总数
+		public static final String REPORT_ROOM_NUM_C = "room_c"; // 营业日报表项目-房间统计 c、出售率
+		public static final String REPORT_ROOM_NUM_D = "room_d"; // 营业日报表项目-房间统计 d、房租收入
+		public static final String REPORT_ROOM_NUM_E = "room_e"; // 营业日报表项目-房间统计 e、平均房价
+		public static final String REPORT_ROOM_NUM_F = "room_f"; // 营业日报表项目-房间统计 f、人数统计
+		public static final String REPORT_ROOM_NUM_G = "room_g"; // 营业日报表项目-房间统计 g、客房其他收入
 	}
 
 	public interface auditNightMode {
-		public static final String NIGHT_AUDIT_AUTO = "AUTO";//夜审入账方式-自动入账
-		public static final String NIGHT_AUDIT_MANUAL = "MANUAL";//夜审入账方式-手动入账
+		public static final String NIGHT_AUDIT_AUTO = "AUTO";// 夜审入账方式-自动入账
+		public static final String NIGHT_AUDIT_MANUAL = "MANUAL";// 夜审入账方式-手动入账
 	}
 }

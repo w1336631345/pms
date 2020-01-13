@@ -1088,4 +1088,25 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 			}
 		}
 	}
+
+	@Override
+	public List<CheckInRecord> findByGuestRoomAndStatusAndDeleted(GuestRoom guestRoom, String status, int deleted) {
+		return checkInRecordDao.findByGuestRoomAndStatusAndDeleted(guestRoom, status, deleted);
+	}
+
+	@Override
+	public List<CheckInRecord> findTodayCheckInRecord(GuestRoom guestRoom, String status) {
+		return checkInRecordDao.findByGuestRoomIdAndStatusAndDeletedAndStartDate(guestRoom.getId(), status,
+				Constants.DELETED_FALSE,LocalDate.now());
+	}
+
+	@Override
+	public List<CheckInRecord> findByLinkId(String id) {
+		return checkInRecordDao.findByRoomLinkId(id);
+	}
+
+	@Override
+	public List<CheckInRecord> findByGuestRoomAndStatusAndDeleted(String guestRoomId, String status, int deleted) {
+		return checkInRecordDao.findByGuestRoomIdAndStatusAndDeleted(guestRoomId, status, deleted);
+	}
 }

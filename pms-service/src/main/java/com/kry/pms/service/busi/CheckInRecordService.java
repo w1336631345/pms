@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import com.kry.pms.base.Constants;
 import com.kry.pms.base.DtoResponse;
 import com.kry.pms.base.HttpResponse;
 import com.kry.pms.base.PageRequest;
@@ -23,13 +24,13 @@ import com.kry.pms.service.BaseService;
 import javax.transaction.Transactional;
 
 public interface CheckInRecordService extends BaseService<CheckInRecord> {
-	
+
 	public PageResponse<CheckInRecordListVo> querySummaryList(PageRequest<CheckInRecord> req);
 
-    @Transactional
-    HttpResponse modifyInfo(CheckInRecord checkInRecord);
+	@Transactional
+	HttpResponse modifyInfo(CheckInRecord checkInRecord);
 
-    CheckInRecord update(CheckInRecord checkInRecord);
+	CheckInRecord update(CheckInRecord checkInRecord);
 
 	CheckInRecord updateAll(CheckUpdateItemTestBo checkUpdateItemTestBo);
 
@@ -40,7 +41,6 @@ public interface CheckInRecordService extends BaseService<CheckInRecord> {
 	public List<CheckInRecord> checkOut(String roomId);
 
 	public CheckInRecord checkInByTempName(String string, String roomId, DtoResponse<String> response);
-
 
 	public List<CheckInRecord> checkInByTempName(int humanCount, CheckInRecord cir, GuestRoom gr,
 			DtoResponse<String> response);
@@ -56,11 +56,11 @@ public interface CheckInRecordService extends BaseService<CheckInRecord> {
 
 	PageResponse<CheckInRecord> notYet(int pageCount, int pageSize, String status, User user);
 
-    PageResponse<CheckInRecord> accountEntryList(int pageIndex, int pageSize, User user);
+	PageResponse<CheckInRecord> accountEntryList(int pageIndex, int pageSize, User user);
 
-    List<CheckInRecord> accountEntryListAll(String hotelCode);
+	List<CheckInRecord> accountEntryListAll(String hotelCode);
 
-    PageResponse<Map<String, Object>> unreturnedGuests(int pageIndex, int pageSize, String status, User user);
+	PageResponse<Map<String, Object>> unreturnedGuests(int pageIndex, int pageSize, String status, User user);
 
 	List<Map<String, Object>> getStatistics(User user);
 
@@ -74,7 +74,7 @@ public interface CheckInRecordService extends BaseService<CheckInRecord> {
 
 	public CheckInRecord addTogether(TogetherBo togetherBo);
 
-	public List<CheckInRecord> findRoomTogetherRecord(CheckInRecord cir,String status);
+	public List<CheckInRecord> findRoomTogetherRecord(CheckInRecord cir, String status);
 
 	public DtoResponse<String> hangUp(String id);
 
@@ -84,32 +84,43 @@ public interface CheckInRecordService extends BaseService<CheckInRecord> {
 
 	HttpResponse callOffAssignRoom(String[] ids);
 
-	//取消预订
+	// 取消预订
 	HttpResponse callOffReserve(String[] ids);
 
 	HttpResponse updateCount(List<String> reserveIds, String mainRecordId);
 
-    PageResponse<CheckInRecord> getNRoomLink(int pageIndex, int pageSize, String name, String roomNum, String hotelCode, String groupType);
+	PageResponse<CheckInRecord> getNRoomLink(int pageIndex, int pageSize, String name, String roomNum, String hotelCode,
+			String groupType);
 
-    List<CheckInRecord> getRoomLinkList(String roomLinkId);
+	List<CheckInRecord> getRoomLinkList(String roomLinkId);
 
-    void deleteRoomLink(String[] ids);
+	void deleteRoomLink(String[] ids);
 
-    List<CheckInRecord> getByRoomNum(String roomNum, String hotelCode, String groupType);
+	List<CheckInRecord> getByRoomNum(String roomNum, String hotelCode, String groupType);
 
-    List<CheckInRecord> checkInTogether(String hotelCode, String orderNum, String guestRoomId);
+	List<CheckInRecord> checkInTogether(String hotelCode, String orderNum, String guestRoomId);
 
-    List<CheckInRecord> findByTogetherCode(String hotelCode, String togetherCod);
+	List<CheckInRecord> findByTogetherCode(String hotelCode, String togetherCod);
 
-    void addTogether(String hotelCode, String orderNum, String customerId, String status, String guestRoomId);
+	void addTogether(String hotelCode, String orderNum, String customerId, String status, String guestRoomId);
 
-	//独单房价
-	@org.springframework.transaction.annotation.Transactional(rollbackFor=Exception.class)
+	// 独单房价
+	@org.springframework.transaction.annotation.Transactional(rollbackFor = Exception.class)
 	void roomPriceAllocation(String hotelCode, String orderNum, String customerId, String guestRoomId);
 
-    //平均房价
-    @org.springframework.transaction.annotation.Transactional(rollbackFor=Exception.class)
-    void roomPriceAvg(String hotelCode, String orderNum, String guestRoomId);
+	// 平均房价
+	@org.springframework.transaction.annotation.Transactional(rollbackFor = Exception.class)
+	void roomPriceAvg(String hotelCode, String orderNum, String guestRoomId);
 
 	public CheckInRecord queryByAccountId(String id);
+
+	public List<CheckInRecord> findByGuestRoomAndStatusAndDeleted(GuestRoom guestRoom,
+			String checkinRecordStatusCheckIn, int deletedFalse);
+	
+	public List<CheckInRecord> findByGuestRoomAndStatusAndDeleted(String guestRoomId,
+			String checkinRecordStatusCheckIn, int deletedFalse);
+
+	public List<CheckInRecord> findTodayCheckInRecord(GuestRoom guestRoom, String status);
+
+	public List<CheckInRecord> findByLinkId(String id);
 }
