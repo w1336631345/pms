@@ -26,7 +26,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import com.kry.pms.base.Constants;
 import com.kry.pms.base.DtoResponse;
@@ -35,22 +34,22 @@ import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
 import com.kry.pms.base.ParamSpecification;
 import com.kry.pms.dao.busi.CheckInRecordDao;
+import com.kry.pms.dao.busi.RoomLinkDao;
 import com.kry.pms.model.http.request.busi.CheckInBo;
 import com.kry.pms.model.http.request.busi.CheckInItemBo;
+import com.kry.pms.model.http.request.busi.CheckInRecordListBo;
 import com.kry.pms.model.http.request.busi.CheckUpdateItemTestBo;
 import com.kry.pms.model.http.request.busi.TogetherBo;
 import com.kry.pms.model.http.response.busi.AccountSummaryVo;
 import com.kry.pms.model.http.response.busi.CheckInRecordListVo;
 import com.kry.pms.model.other.wrapper.CheckInRecordWrapper;
-import com.kry.pms.model.persistence.busi.BookingItem;
-import com.kry.pms.model.persistence.busi.BookingRecord;
 import com.kry.pms.model.persistence.busi.CheckInRecord;
+import com.kry.pms.model.persistence.busi.RoomLink;
 import com.kry.pms.model.persistence.guest.Customer;
 import com.kry.pms.model.persistence.room.GuestRoom;
 import com.kry.pms.model.persistence.room.RoomTag;
 import com.kry.pms.model.persistence.room.RoomUsage;
 import com.kry.pms.model.persistence.sys.Account;
-import com.kry.pms.model.persistence.sys.BusinessSeq;
 import com.kry.pms.model.persistence.sys.User;
 import com.kry.pms.service.busi.CheckInRecordService;
 import com.kry.pms.service.busi.RoomRecordService;
@@ -95,6 +94,8 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 	RoomTypeService roomTypeService;
 	@Autowired
 	AccountService accountService;
+	@Autowired
+	RoomLinkDao roomLinkDao;
 
 	@Override
 	public CheckInRecord add(CheckInRecord checkInRecord) {
@@ -425,8 +426,29 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 	}
 
 	@Override
+	public List<CheckInRecord> bookByRoomList(CheckInRecordListBo cirlb){
+		List<CheckInRecord> list = cirlb.getCirs();
+		String roomLinkId = null;
+		if(cirlb.getIsRoomLink()){
+			RoomLink rl = new RoomLink();
+			rl.setDeleted(Constants.DELETED_FALSE);
+			roomLinkDao.save(rl);
+			roomLinkId = rl.getId();
+		}
+		for(int i=0; i<list.size(); i++){
+			list.get(i).setRoomLinkId(roomLinkId);
+			bookByRoomTypeTest(list.get(i));
+		}
+		return list;
+	}
+
+	@Override
 	@Transactional
 	public CheckInRecord bookByRoomTypeTest(CheckInRecord checkInRecord) {
+        String orderNum = businessSeqService.fetchNextSeqNum(checkInRecord.getHotelCode(),
+                Constants.Key.BUSINESS_ORDER_NUM_SEQ_KEY);
+        checkInRecord.setOrderNum(orderNum);
+        checkInRecord.setHumanCount(1);
 		checkInRecord.setCheckInCount(1);
 		checkInRecord.setRoomCount(1);
 		checkInRecord.setType(Constants.Type.CHECK_IN_RECORD_CUSTOMER);
@@ -434,12 +456,14 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 		checkInRecord.setSingleRoomCount(1);
 		checkInRecord.setStartDate(LocalDate.from(checkInRecord.getArriveTime()));
 		GuestRoom gr = guestRoomService.findById(checkInRecord.getGuestRoom().getId());
+		checkInRecord.setHotelCode(gr.getHotelCode());
 		String tempName = gr.getRoomNum();
 //		if(checkInRecord.getCustomer() == null){
-		Customer customer = customerService.createTempCustomer(gr.getHotelCode(), tempName + "#" + 1);
-		checkInRecord.setCustomer(customer);
-		Account account = accountService.createAccount(customer, null);
-		checkInRecord.setAccount(account);
+			Customer customer = customerService.createTempCustomer(gr.getHotelCode(), tempName + "#" + 1);
+			checkInRecord.setCustomer(customer);
+			checkInRecord.setName(customer.getName());
+			Account account = accountService.createAccount(customer, null);
+			checkInRecord.setAccount(account);
 //		}
 		CheckInRecord cir = add(checkInRecord);
 
@@ -1108,5 +1132,111 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 	@Override
 	public List<CheckInRecord> findByGuestRoomAndStatusAndDeleted(String guestRoomId, String status, int deleted) {
 		return checkInRecordDao.findByGuestRoomIdAndStatusAndDeleted(guestRoomId, status, deleted);
+	}
+
+	@Override
+	public List<Map<String, Object>> getGroup(String hotelCode, String arriveTime, String leaveTime, String name_, String code_){
+		List<Map<String, Object>> list = checkInRecordDao.getGroup(hotelCode, arriveTime, leaveTime, name_, code_);
+		return list;
+	}
+
+	@Override
+	public void inGroup(String[] cId, String gId, Boolean isFollowGroup){
+		CheckInRecord cirG = checkInRecordDao.getOne(gId);
+		List<String> roomNums = new ArrayList<>();
+		int checkInCount = 0;
+		for(int i=0; i<cId.length; i++){
+			String id = cId[i];
+			CheckInRecord cir = checkInRecordDao.getOne(id);
+			if(!roomNums.contains(cir.getGuestRoom().getRoomNum())){
+				roomNums.add(cir.getGuestRoom().getRoomNum());
+			}
+			cir.setMainRecord(cirG);
+			cir.setOrderNum(cirG.getOrderNum());
+			cir.setGroupType(Constants.Type.CHECK_IN_RECORD_GROUP_TYPE_YES);
+			if(isFollowGroup){
+				cir.setMarketingSources(cirG.getMarketingSources());
+				cir.setRoomPriceScheme(cirG.getRoomPriceScheme());
+			}
+			//如果是入住，主单入住数加1
+			if(("I").equals(cir.getStatus())){
+				checkInCount += 1;
+			}
+			checkInRecordDao.save(cir);
+		}
+		cirG.setRoomCount(cirG.getRoomCount()+roomNums.size());
+//		cirG.setHumanCount(cirG.getHumanCount()+cId.length);
+		cirG.setCheckInCount(cirG.getCheckInCount() + checkInCount);
+		checkInRecordDao.save(cirG);
+	}
+
+	@Override
+	public void outGroup(String[] cId, String gId, Boolean isFollowGroup){
+		CheckInRecord cirG = checkInRecordDao.getOne(gId);
+		List<String> roomNums = new ArrayList<>();
+		int checkInCount = 0;
+		for(int i=0; i<cId.length; i++){
+			String id = cId[i];
+			CheckInRecord cir = checkInRecordDao.getOne(id);
+			String orderNum = businessSeqService.fetchNextSeqNum(cir.getHotelCode(),
+					Constants.Key.BUSINESS_ORDER_NUM_SEQ_KEY);
+			if(cir.getGuestRoom() != null){
+				if(!roomNums.contains(cir.getGuestRoom().getRoomNum())){
+					roomNums.add(cir.getGuestRoom().getRoomNum());
+				}
+			}
+			cir.setMainRecord(null);
+			cir.setOrderNum(orderNum);
+			cir.setGroupType(Constants.Type.CHECK_IN_RECORD_GROUP_TYPE_NO);
+			//如果是入住，主单入住数减1
+			if(("I").equals(cir.getStatus())){
+				checkInCount += 1;
+			}
+			if(isFollowGroup){
+				//
+			}
+			checkInRecordDao.save(cir);
+		}
+
+		cirG.setRoomCount(cirG.getRoomCount()-roomNums.size());
+//		cirG.setHumanCount(cirG.getHumanCount()-cId.length);
+		cirG.setCheckInCount(cirG.getCheckInCount() - checkInCount);
+		checkInRecordDao.save(cirG);
+	}
+
+	@Override
+	public void updateGroup(String[] cId, String gId, String uId, Boolean isFollowGroup){
+		CheckInRecord cirG = checkInRecordDao.getOne(gId);
+		CheckInRecord cirU = checkInRecordDao.getOne(uId);
+		List<String> roomNums = new ArrayList<>();
+		int checkInCount = 0;
+		for(int i=0; i<cId.length; i++){
+			String id = cId[i];
+			CheckInRecord cir = checkInRecordDao.getOne(id);
+			if(!roomNums.contains(cir.getGuestRoom().getRoomNum())){
+				roomNums.add(cir.getGuestRoom().getRoomNum());
+			}
+			cir.setMainRecord(cirU);
+			cir.setOrderNum(cirU.getOrderNum());
+			cir.setGroupType(Constants.Type.CHECK_IN_RECORD_GROUP_TYPE_YES);
+			if(isFollowGroup){
+				cir.setMarketingSources(cirU.getMarketingSources());
+				cir.setRoomPriceScheme(cirU.getRoomPriceScheme());
+			}
+			//如果是入住，主单入住数加1
+			if(("I").equals(cir.getStatus())){
+				checkInCount += 1;
+			}
+			checkInRecordDao.save(cir);
+		}
+		cirG.setRoomCount(cirG.getRoomCount()-roomNums.size());
+		cirG.setHumanCount(cirG.getHumanCount()-cId.length);
+		cirG.setCheckInCount(cirG.getCheckInCount() - checkInCount);
+		checkInRecordDao.save(cirG);
+
+		cirU.setRoomCount(cirU.getRoomCount()+roomNums.size());
+//		cirU.setHumanCount(cirU.getHumanCount()+cId.length);
+		cirU.setCheckInCount(cirU.getCheckInCount() + checkInCount);
+		checkInRecordDao.save(cirU);
 	}
 }

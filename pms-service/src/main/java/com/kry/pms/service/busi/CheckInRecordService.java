@@ -10,6 +10,7 @@ import com.kry.pms.base.HttpResponse;
 import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
 import com.kry.pms.model.http.request.busi.CheckInBo;
+import com.kry.pms.model.http.request.busi.CheckInRecordListBo;
 import com.kry.pms.model.http.request.busi.CheckUpdateItemTestBo;
 import com.kry.pms.model.http.request.busi.TogetherBo;
 import com.kry.pms.model.http.response.busi.AccountSummaryVo;
@@ -24,11 +25,11 @@ import com.kry.pms.service.BaseService;
 import javax.transaction.Transactional;
 
 public interface CheckInRecordService extends BaseService<CheckInRecord> {
-
+	
 	public PageResponse<CheckInRecordListVo> querySummaryList(PageRequest<CheckInRecord> req);
 
-	@Transactional
-	HttpResponse modifyInfo(CheckInRecord checkInRecord);
+    @Transactional
+    HttpResponse modifyInfo(CheckInRecord checkInRecord);
 
 	CheckInRecord update(CheckInRecord checkInRecord);
 
@@ -51,7 +52,9 @@ public interface CheckInRecordService extends BaseService<CheckInRecord> {
 
 	public CheckInRecord book(CheckInRecord checkInRecord);
 
-	@Transactional
+    List<CheckInRecord> bookByRoomList(CheckInRecordListBo cirlb);
+
+    @Transactional
 	CheckInRecord bookByRoomTypeTest(CheckInRecord checkInRecord);
 
 	PageResponse<CheckInRecord> notYet(int pageCount, int pageSize, String status, User user);
@@ -123,4 +126,12 @@ public interface CheckInRecordService extends BaseService<CheckInRecord> {
 	public List<CheckInRecord> findTodayCheckInRecord(GuestRoom guestRoom, String status);
 
 	public List<CheckInRecord> findByLinkId(String id);
+
+    List<Map<String, Object>> getGroup(String hotelCode, String arriveTime, String leaveTime, String name_, String code_);
+
+    void inGroup(String[] cId, String gId, Boolean isFollowGroup);
+
+    void outGroup(String[] cId, String gId, Boolean isFollowGroup);
+
+	void updateGroup(String[] cId, String gId, String uId, Boolean isFollowGroup);
 }
