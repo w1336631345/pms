@@ -384,6 +384,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 					item.setGroupType(checkInRecord.getGroupType());
 					item.setHotelCode(checkInRecord.getHotelCode());
 					item.setMainRecord(checkInRecord);
+					item.setCheckInCount(0);
 					if (item.getRoomType() == null) {
 						item.setRoomType(roomTypeService.findById(item.getRoomTypeId()));
 					}
@@ -672,9 +673,9 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 		}
 		return asvm.values();
 	}
-	
-	
-	
+
+
+
 	@Override
 	public PageResponse<CheckInRecordListVo> querySummaryList(PageRequest<CheckInRecord> prq) {
 		PageResponse<CheckInRecord> cirp = listPage(prq);
@@ -914,6 +915,8 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 					list.add(criteriaBuilder.like(root.join("customer").get("name"), "%" + name + "%"));
 				}
 				list.add(criteriaBuilder.isNull(root.get("roomLinkId")));
+				list.add(criteriaBuilder.equal(root.get("type"), Constants.Type.CHECK_IN_RECORD_CUSTOMER));
+				list.add(criteriaBuilder.equal(root.get("deleted"), Constants.DELETED_FALSE));
 				Predicate[] array = new Predicate[list.size()];
 				return criteriaBuilder.and(list.toArray(array));
 			}
@@ -927,6 +930,19 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 		List<CheckInRecord> list = new ArrayList<>();
 		if (roomLinkId != null) {
 			list = checkInRecordDao.findByRoomLinkId(roomLinkId);
+		}
+		return list;
+	}
+	// 根据roomlinkId查询已经联房的数据,否则根据订单号和房间查询
+	@Override
+	public List<CheckInRecord> getRoomLinkListTo(String id, String orderNum) {
+		CheckInRecord cir = checkInRecordDao.getOne(id);
+		String roomLinkId = cir.getRoomLinkId();
+		List<CheckInRecord> list = new ArrayList<>();
+		if (roomLinkId != null) {
+			list = checkInRecordDao.findByRoomLinkId(roomLinkId);
+		}else {
+			list = checkInRecordDao.findByOrderNumAndGuestRoomAndDeleted(orderNum, cir.getGuestRoom(), Constants.DELETED_FALSE);
 		}
 		return list;
 	}
@@ -1230,5 +1246,19 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 	public Collection<AccountSummaryVo> getAccountSummaryByLinkNum(String orderNum, String accountCustomer) {
 		List<CheckInRecord> data = findByLinkId(orderNum);
 		return checkInRecordToAccountSummaryVo(data);
+	}
+	//修改预留
+	@Override
+	@Transactional
+	public CheckInRecord updateReserve(CheckInRecord cir){
+		CheckInRecord oldCir = checkInRecordDao.getOne(cir.getId());
+		CheckInRecordWrapper cirw = new CheckInRecordWrapper(oldCir);
+		roomStatisticsService.cancleReserve(cirw);//先取消以前预留
+		CheckInRecord checkInRecord = new CheckInRecord();
+		cir.setId(null);
+		BeanUtils.copyProperties(cir, checkInRecord);
+		checkInRecord = checkInRecordDao.saveAndFlush(checkInRecord);
+		roomStatisticsService.reserve(new CheckInRecordWrapper(checkInRecord));//重新预留
+		return checkInRecord;
 	}
 }

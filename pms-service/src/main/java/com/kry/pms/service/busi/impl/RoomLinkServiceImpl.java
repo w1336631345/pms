@@ -4,15 +4,19 @@ import com.kry.pms.base.Constants;
 import com.kry.pms.base.HttpResponse;
 import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
+import com.kry.pms.dao.busi.CheckInRecordDao;
 import com.kry.pms.dao.busi.RoomLinkDao;
 import com.kry.pms.model.http.request.busi.RoomLinkBo;
 import com.kry.pms.model.persistence.busi.CheckInRecord;
 import com.kry.pms.model.persistence.busi.RoomLink;
+import com.kry.pms.model.persistence.room.GuestRoom;
 import com.kry.pms.service.busi.CheckInRecordService;
 import com.kry.pms.service.busi.RoomLinkService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
+import java.awt.peer.CanvasPeer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,6 +27,8 @@ public class RoomLinkServiceImpl implements RoomLinkService {
     RoomLinkDao roomLinkDao;
     @Autowired
     CheckInRecordService checkInRecordService;
+    @Autowired
+    CheckInRecordDao checkInRecordDao;
 
     @Override
     public RoomLink add(RoomLink entity) {
@@ -58,6 +64,7 @@ public class RoomLinkServiceImpl implements RoomLinkService {
 
     //添加联房
     @Override
+    @Transactional
     public HttpResponse addRoomLink(RoomLinkBo roomLinkBo){
         HttpResponse hr = new HttpResponse();
         String roomLinkId = null;
@@ -66,16 +73,26 @@ public class RoomLinkServiceImpl implements RoomLinkService {
             String ids[] = roomLinkBo.getIds();
             for(int i=0; i<ids.length; i++){
                 CheckInRecord cir = checkInRecordService.findById(ids[i]);
-                if(cir.getGuestRoom() != null){
-                    String roomNum = cir.getGuestRoom().getRoomNum();
-                    String hotelCode = cir.getHotelCode();
-                    List<CheckInRecord> list = checkInRecordService.getByRoomNum(roomNum, hotelCode, Constants.Type.CHECK_IN_RECORD_GROUP_TYPE_NO);
-                    for(int m=0; m<list.size(); m++){
-                        CheckInRecord cirRoomNum = list.get(m);
-                        cirRoomNum.setRoomLinkId(roomLinkBo.getRoomLinkId());
-                        checkInRecordService.update(cirRoomNum);
+//                if(cir.getGuestRoom() != null){
+//                    String roomNum = cir.getGuestRoom().getRoomNum();
+//                    String hotelCode = cir.getHotelCode();
+//                    List<CheckInRecord> list = checkInRecordService.getByRoomNum(roomNum, hotelCode, Constants.Type.CHECK_IN_RECORD_GROUP_TYPE_NO);
+//                    for(int m=0; m<list.size(); m++){
+//                        CheckInRecord cirRoomNum = list.get(m);
+//                        cirRoomNum.setRoomLinkId(roomLinkBo.getRoomLinkId());
+//                        checkInRecordService.update(cirRoomNum);
+//                    }
+//                }
+                    if(cir.getGuestRoom() != null){
+                        GuestRoom gr = cir.getGuestRoom();
+                        String orderNum = cir.getOrderNum();
+                        List<CheckInRecord> list = checkInRecordDao.findByOrderNumAndGuestRoomAndDeleted(orderNum, gr, Constants.DELETED_FALSE);
+                        for(int m=0; m<list.size(); m++){
+                            CheckInRecord cirRoomNum = list.get(m);
+                            cirRoomNum.setRoomLinkId(roomLinkBo.getRoomLinkId());
+                            checkInRecordService.update(cirRoomNum);
+                        }
                     }
-                }
                 cir.setRoomLinkId(roomLinkBo.getRoomLinkId());
                 checkInRecordService.update(cir);
             }
@@ -88,9 +105,7 @@ public class RoomLinkServiceImpl implements RoomLinkService {
             for(int i=0; i<ids.length; i++){
                 CheckInRecord cir = checkInRecordService.findById(ids[i]);
                 if(cir.getGuestRoom() != null){
-                    String roomNum = cir.getGuestRoom().getRoomNum();
-                    String hotelCode = cir.getHotelCode();
-                    List<CheckInRecord> list = checkInRecordService.getByRoomNum(roomNum, hotelCode, Constants.Type.CHECK_IN_RECORD_GROUP_TYPE_NO);
+                    List<CheckInRecord> list = checkInRecordService.findByOrderNumAndGuestRoomAndDeleted(cir.getOrderNum(), cir.getGuestRoom(), Constants.DELETED_FALSE);
                     for(int m=0; m<list.size(); m++){
                         CheckInRecord cirRoomNum = list.get(m);
                         cirRoomNum.setRoomLinkId(rl.getId());
@@ -120,9 +135,10 @@ public class RoomLinkServiceImpl implements RoomLinkService {
             if(roomLinkId == null){
                 roomLinkId = cir.getRoomLinkId();
             }
-            String roomNum = cir.getGuestRoom().getRoomNum();
-            String hotelCode = cir.getHotelCode();
-            List<CheckInRecord> list = checkInRecordService.getByRoomNum(roomNum, hotelCode, Constants.Type.CHECK_IN_RECORD_GROUP_TYPE_NO);
+//            String roomNum = cir.getGuestRoom().getRoomNum();
+//            String hotelCode = cir.getHotelCode();
+//            List<CheckInRecord> list = checkInRecordService.getByRoomNum(roomNum, hotelCode, Constants.Type.CHECK_IN_RECORD_GROUP_TYPE_NO);
+            List<CheckInRecord> list = checkInRecordService.findByOrderNumAndGuestRoomAndDeleted(cir.getOrderNum(), cir.getGuestRoom(), Constants.DELETED_FALSE);
             for(int m=0; m<list.size(); m++){
                 CheckInRecord cirRoomNum = list.get(m);
                 cirRoomNum.setRoomLinkId(null);

@@ -136,4 +136,9 @@ public interface CheckInRecordService extends BaseService<CheckInRecord> {
     void outGroup(String[] cId, String gId, Boolean isFollowGroup);
 
 	void updateGroup(String[] cId, String gId, String uId, Boolean isFollowGroup);
+
+	//修改预留
+	CheckInRecord updateReserve(CheckInRecord cir);
+
+    List<CheckInRecord> getRoomLinkListTo(String id, String orderNum);
 }

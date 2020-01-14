@@ -74,10 +74,10 @@ public class RoomLinkController extends BaseController<RoomLink> {
      * @Author: huanghaibin
      * @Date: 2019/12/19 15:28
      */
-    @GetMapping(value = "/roomLinkList")
-    public HttpResponse getRoomLinkList(String roomLinkId){
+    @GetMapping(value = "/roomLinkListTo")
+    public HttpResponse roomLinkListTo(String id, String orderNum){
         HttpResponse hr = new HttpResponse();
-        List<CheckInRecord> list = checkInRecordService.getRoomLinkList(roomLinkId);
+        List<CheckInRecord> list = checkInRecordService.getRoomLinkListTo(id, orderNum);
         hr.setData(list);
         return hr;
     }
