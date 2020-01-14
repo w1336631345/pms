@@ -1,6 +1,7 @@
 package com.kry.pms.dao.busi;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -67,19 +68,18 @@ public interface CheckInRecordDao extends BaseDao<CheckInRecord> {
 
 	List<CheckInRecord> findByMainRecordAndDeleted(CheckInRecord mainRecord, int deleted);
 
-	@Query(nativeQuery = true, value = " select  " +
-			" tcr.id, ta.`code`, DATE_FORMAT(tcr.arrive_time,'%Y-%m-%d %T') arrive_time, DATE_FORMAT(tcr.leave_time, '%Y-%m-%d %T') leave_time, " +
-			" tcr.name_, tcr.room_count, tcr.human_count, tcr.`status` " +
-			" from t_checkin_record tcr left join t_account ta " +
-			" on tcr.account_id = ta.id " +
-			" where tcr.deleted =0 and tcr.group_type='Y' and tcr.type_='G' " +
-			" and if(:hotelCode is not null && :hotelCode != '', tcr.hotel_code=:hotelCode, 1=1 ) " +
-			" and if(:arriveTime is not null && :arriveTime != '', DATE_FORMAT(tcr.arrive_time, '%Y-%m-%d')<=:arriveTime, 1=1 ) " +
-			" and if(:leaveTime is not null && :leaveTime != '', DATE_FORMAT(tcr.leave_time, '%Y-%m-%d')>=:leaveTime, 1=1 ) " +
-			" and if(:name_ is not null && :name_ != '', tcr.name_=:name_, 1=1 ) " +
-			" and if(:code_ is not null && :code_ != '', ta.`code`=:code_, 1=1 ) ")
-	List<Map<String, Object>> getGroup(@Param("hotelCode")String hotelCode, @Param("arriveTime") String arriveTime,
-									   @Param("leaveTime")String leaveTime, @Param("name_")String name_, @Param("code_")String code_);
+	@Query(nativeQuery = true, value = " select  "
+			+ " tcr.id, ta.`code`, DATE_FORMAT(tcr.arrive_time,'%Y-%m-%d %T') arrive_time, DATE_FORMAT(tcr.leave_time, '%Y-%m-%d %T') leave_time, "
+			+ " tcr.name_, tcr.room_count, tcr.human_count, tcr.`status` "
+			+ " from t_checkin_record tcr left join t_account ta " + " on tcr.account_id = ta.id "
+			+ " where tcr.deleted =0 and tcr.group_type='Y' and tcr.type_='G' "
+			+ " and if(:hotelCode is not null && :hotelCode != '', tcr.hotel_code=:hotelCode, 1=1 ) "
+			+ " and if(:arriveTime is not null && :arriveTime != '', DATE_FORMAT(tcr.arrive_time, '%Y-%m-%d')<=:arriveTime, 1=1 ) "
+			+ " and if(:leaveTime is not null && :leaveTime != '', DATE_FORMAT(tcr.leave_time, '%Y-%m-%d')>=:leaveTime, 1=1 ) "
+			+ " and if(:name_ is not null && :name_ != '', tcr.name_=:name_, 1=1 ) "
+			+ " and if(:code_ is not null && :code_ != '', ta.`code`=:code_, 1=1 ) ")
+	List<Map<String, Object>> getGroup(@Param("hotelCode") String hotelCode, @Param("arriveTime") String arriveTime,
+			@Param("leaveTime") String leaveTime, @Param("name_") String name_, @Param("code_") String code_);
 
 	List<CheckInRecord> findByGuestRoomAndStatusAndDeleted(GuestRoom guestRoom, String status, int deleted);
 

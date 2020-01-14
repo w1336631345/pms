@@ -92,5 +92,9 @@ public class RoomLockRecordServiceImpl implements RoomLockRecordService {
 		}
 		return rlr;
 	}
+	@Override
+	public List<RoomLockRecord> findByGuestRoomAndStatus(GuestRoom guestRoom, String status) {
+		return roomLockRecordDao.findByGuestRoomAndStatus(guestRoom,status);
+	}
 
 }

@@ -79,13 +79,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 	@Autowired
 	RoomStatisticsService roomStatisticsService;
 	@Autowired
-	GuestRoomStatusService guestRoomStatausService;
-	@Autowired
 	SystemConfigService systemConfigService;
-	@Autowired
-	RoomTypeQuantityService roomTypeQuantityService;
-	@Autowired
-	RoomStatusQuantityService roomStatusQuantityService;
 	@Autowired
 	RoomUsageService roomUsageService;
 	@Autowired
@@ -171,8 +165,8 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 	private void updateCustomer(CheckInRecord dbCir, CheckInRecord cir) {
 		if (cir.getGuestRoom() != null && cir.getCustomer() != null) {
 			if (dbCir.getCustomer() != null && dbCir.getCustomer().getId().equals(cir.getCustomer().getId())) {
-				guestRoomStatausService.updateSummary(cir.getGuestRoom(), dbCir.getCustomer().getName(),
-						cir.getCustomer().getName());
+//				guestRoomStatausService.updateSummary(cir.getGuestRoom(), dbCir.getCustomer().getName(),
+//						cir.getCustomer().getName());
 			}
 		}
 	}
@@ -265,8 +259,6 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 			sb.append(customer.getGuestInfo().getName());
 			sb.append(" ");
 		}
-		guestRoomStatausService.checkIn(gr, startDate, sb.toString(), false, false, false, false, false);
-		roomTypeQuantityService.checkIn(gr, startDate, ciib.getDays());
 		return list;
 	}
 
@@ -426,16 +418,16 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 	}
 
 	@Override
-	public List<CheckInRecord> bookByRoomList(CheckInRecordListBo cirlb){
+	public List<CheckInRecord> bookByRoomList(CheckInRecordListBo cirlb) {
 		List<CheckInRecord> list = cirlb.getCirs();
 		String roomLinkId = null;
-		if(cirlb.getIsRoomLink()){
+		if (cirlb.getIsRoomLink()) {
 			RoomLink rl = new RoomLink();
 			rl.setDeleted(Constants.DELETED_FALSE);
 			roomLinkDao.save(rl);
 			roomLinkId = rl.getId();
 		}
-		for(int i=0; i<list.size(); i++){
+		for (int i = 0; i < list.size(); i++) {
 			list.get(i).setRoomLinkId(roomLinkId);
 			bookByRoomTypeTest(list.get(i));
 		}
@@ -445,10 +437,10 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 	@Override
 	@Transactional
 	public CheckInRecord bookByRoomTypeTest(CheckInRecord checkInRecord) {
-        String orderNum = businessSeqService.fetchNextSeqNum(checkInRecord.getHotelCode(),
-                Constants.Key.BUSINESS_ORDER_NUM_SEQ_KEY);
-        checkInRecord.setOrderNum(orderNum);
-        checkInRecord.setHumanCount(1);
+		String orderNum = businessSeqService.fetchNextSeqNum(checkInRecord.getHotelCode(),
+				Constants.Key.BUSINESS_ORDER_NUM_SEQ_KEY);
+		checkInRecord.setOrderNum(orderNum);
+		checkInRecord.setHumanCount(1);
 		checkInRecord.setCheckInCount(1);
 		checkInRecord.setRoomCount(1);
 		checkInRecord.setType(Constants.Type.CHECK_IN_RECORD_CUSTOMER);
@@ -458,23 +450,12 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 		GuestRoom gr = guestRoomService.findById(checkInRecord.getGuestRoom().getId());
 		checkInRecord.setHotelCode(gr.getHotelCode());
 		String tempName = gr.getRoomNum();
-//		if(checkInRecord.getCustomer() == null){
-			Customer customer = customerService.createTempCustomer(gr.getHotelCode(), tempName + "#" + 1);
-			checkInRecord.setCustomer(customer);
-			checkInRecord.setName(customer.getName());
-			Account account = accountService.createAccount(customer, null);
-			checkInRecord.setAccount(account);
-//		}
+		Customer customer = customerService.createTempCustomer(gr.getHotelCode(), tempName + "#" + 1);
+		checkInRecord.setCustomer(customer);
+		checkInRecord.setName(customer.getName());
+		Account account = accountService.createAccount(customer, null);
+		checkInRecord.setAccount(account);
 		CheckInRecord cir = add(checkInRecord);
-
-		if ((Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN).equals(checkInRecord.getStatus())) {
-			DtoResponse<RoomUsage> r = roomUsageService.use(gr, Constants.Status.ROOM_USAGE_CHECK_IN,
-					cir.getArriveTime(), cir.getLeaveTime(), cir.getId(), tempName);
-			guestRoomStatausService.changeRoomStatus(gr.getId(), Constants.Status.ROOM_STATUS_OCCUPY_CLEAN, 1, true);
-		} else {
-			DtoResponse<RoomUsage> r = roomUsageService.use(gr, Constants.Status.ROOM_USAGE_BOOK, cir.getArriveTime(),
-					cir.getLeaveTime(), cir.getId(), tempName);
-		}
 		roomRecordService.createRoomRecord(cir);
 		return cir;
 	}
@@ -663,18 +644,23 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 	public Collection<AccountSummaryVo> getAccountSummaryByOrderNum(String orderNum, String type) {
 		List<CheckInRecord> cirs = checkInRecordDao.findByOrderNumAndTypeAndDeleted(orderNum, type,
 				Constants.DELETED_FALSE);
+		return checkInRecordToAccountSummaryVo(cirs);
+	}
+
+	private Collection<AccountSummaryVo> checkInRecordToAccountSummaryVo(List<CheckInRecord> data){
 		Map<String, AccountSummaryVo> asvm = new HashMap<>();
-		for (CheckInRecord cir : cirs) {
-			AccountSummaryVo asv = null;
-			if (cir.getAccount() != null) {
+		AccountSummaryVo asv = null;
+		for (CheckInRecord cir : data) {
+			if (cir.getAccount() != null&&cir.getGuestRoom()!=null) {
 				Account acc = cir.getAccount();
 				acc.setRoomNum(cir.getGuestRoom().getRoomNum());
 				acc.setName(cir.getCustomer().getName());
 				if (!asvm.containsKey(cir.getGuestRoom().getRoomNum())) {
 					asv = new AccountSummaryVo();
-					asv.setType("temp");
+					asv.setType("room");
+					asv.setSettleType(Constants.Type.SETTLE_TYPE_ROOM);
 					asv.setRoomNum(acc.getRoomNum());
-					asv.setId(acc.getRoomNum());
+					asv.setId(cir.getGuestRoom().getId());
 					asv.setName(acc.getRoomNum());
 					asv.setChildren(new ArrayList<AccountSummaryVo>());
 					asvm.put(acc.getRoomNum(), asv);
@@ -686,7 +672,9 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 		}
 		return asvm.values();
 	}
-
+	
+	
+	
 	@Override
 	public PageResponse<CheckInRecordListVo> querySummaryList(PageRequest<CheckInRecord> prq) {
 		PageResponse<CheckInRecord> cirp = listPage(prq);
@@ -1135,108 +1123,112 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 	}
 
 	@Override
-	public List<Map<String, Object>> getGroup(String hotelCode, String arriveTime, String leaveTime, String name_, String code_){
+	public List<Map<String, Object>> getGroup(String hotelCode, String arriveTime, String leaveTime, String name_,
+			String code_) {
 		List<Map<String, Object>> list = checkInRecordDao.getGroup(hotelCode, arriveTime, leaveTime, name_, code_);
 		return list;
 	}
 
 	@Override
-	public void inGroup(String[] cId, String gId, Boolean isFollowGroup){
+	public void inGroup(String[] cId, String gId, Boolean isFollowGroup) {
 		CheckInRecord cirG = checkInRecordDao.getOne(gId);
 		List<String> roomNums = new ArrayList<>();
 		int checkInCount = 0;
-		for(int i=0; i<cId.length; i++){
+		for (int i = 0; i < cId.length; i++) {
 			String id = cId[i];
 			CheckInRecord cir = checkInRecordDao.getOne(id);
-			if(!roomNums.contains(cir.getGuestRoom().getRoomNum())){
+			if (!roomNums.contains(cir.getGuestRoom().getRoomNum())) {
 				roomNums.add(cir.getGuestRoom().getRoomNum());
 			}
 			cir.setMainRecord(cirG);
 			cir.setOrderNum(cirG.getOrderNum());
 			cir.setGroupType(Constants.Type.CHECK_IN_RECORD_GROUP_TYPE_YES);
-			if(isFollowGroup){
+			if (isFollowGroup) {
 				cir.setMarketingSources(cirG.getMarketingSources());
 				cir.setRoomPriceScheme(cirG.getRoomPriceScheme());
 			}
-			//如果是入住，主单入住数加1
-			if(("I").equals(cir.getStatus())){
+			// 如果是入住，主单入住数加1
+			if (("I").equals(cir.getStatus())) {
 				checkInCount += 1;
 			}
 			checkInRecordDao.save(cir);
 		}
-		cirG.setRoomCount(cirG.getRoomCount()+roomNums.size());
+		cirG.setRoomCount(cirG.getRoomCount() + roomNums.size());
 //		cirG.setHumanCount(cirG.getHumanCount()+cId.length);
 		cirG.setCheckInCount(cirG.getCheckInCount() + checkInCount);
 		checkInRecordDao.save(cirG);
 	}
 
 	@Override
-	public void outGroup(String[] cId, String gId, Boolean isFollowGroup){
+	public void outGroup(String[] cId, String gId, Boolean isFollowGroup) {
 		CheckInRecord cirG = checkInRecordDao.getOne(gId);
 		List<String> roomNums = new ArrayList<>();
 		int checkInCount = 0;
-		for(int i=0; i<cId.length; i++){
+		for (int i = 0; i < cId.length; i++) {
 			String id = cId[i];
 			CheckInRecord cir = checkInRecordDao.getOne(id);
 			String orderNum = businessSeqService.fetchNextSeqNum(cir.getHotelCode(),
 					Constants.Key.BUSINESS_ORDER_NUM_SEQ_KEY);
-			if(cir.getGuestRoom() != null){
-				if(!roomNums.contains(cir.getGuestRoom().getRoomNum())){
+			if (cir.getGuestRoom() != null) {
+				if (!roomNums.contains(cir.getGuestRoom().getRoomNum())) {
 					roomNums.add(cir.getGuestRoom().getRoomNum());
 				}
 			}
 			cir.setMainRecord(null);
 			cir.setOrderNum(orderNum);
 			cir.setGroupType(Constants.Type.CHECK_IN_RECORD_GROUP_TYPE_NO);
-			//如果是入住，主单入住数减1
-			if(("I").equals(cir.getStatus())){
+			// 如果是入住，主单入住数减1
+			if (("I").equals(cir.getStatus())) {
 				checkInCount += 1;
 			}
-			if(isFollowGroup){
+			if (isFollowGroup) {
 				//
 			}
 			checkInRecordDao.save(cir);
 		}
 
-		cirG.setRoomCount(cirG.getRoomCount()-roomNums.size());
-//		cirG.setHumanCount(cirG.getHumanCount()-cId.length);
+		cirG.setRoomCount(cirG.getRoomCount() - roomNums.size());
 		cirG.setCheckInCount(cirG.getCheckInCount() - checkInCount);
 		checkInRecordDao.save(cirG);
 	}
 
 	@Override
-	public void updateGroup(String[] cId, String gId, String uId, Boolean isFollowGroup){
+	public void updateGroup(String[] cId, String gId, String uId, Boolean isFollowGroup) {
 		CheckInRecord cirG = checkInRecordDao.getOne(gId);
 		CheckInRecord cirU = checkInRecordDao.getOne(uId);
 		List<String> roomNums = new ArrayList<>();
 		int checkInCount = 0;
-		for(int i=0; i<cId.length; i++){
+		for (int i = 0; i < cId.length; i++) {
 			String id = cId[i];
 			CheckInRecord cir = checkInRecordDao.getOne(id);
-			if(!roomNums.contains(cir.getGuestRoom().getRoomNum())){
+			if (!roomNums.contains(cir.getGuestRoom().getRoomNum())) {
 				roomNums.add(cir.getGuestRoom().getRoomNum());
 			}
 			cir.setMainRecord(cirU);
 			cir.setOrderNum(cirU.getOrderNum());
 			cir.setGroupType(Constants.Type.CHECK_IN_RECORD_GROUP_TYPE_YES);
-			if(isFollowGroup){
+			if (isFollowGroup) {
 				cir.setMarketingSources(cirU.getMarketingSources());
 				cir.setRoomPriceScheme(cirU.getRoomPriceScheme());
 			}
-			//如果是入住，主单入住数加1
-			if(("I").equals(cir.getStatus())){
+			// 如果是入住，主单入住数加1
+			if (("I").equals(cir.getStatus())) {
 				checkInCount += 1;
 			}
 			checkInRecordDao.save(cir);
 		}
-		cirG.setRoomCount(cirG.getRoomCount()-roomNums.size());
-		cirG.setHumanCount(cirG.getHumanCount()-cId.length);
+		cirG.setRoomCount(cirG.getRoomCount() - roomNums.size());
+		cirG.setHumanCount(cirG.getHumanCount() - cId.length);
 		cirG.setCheckInCount(cirG.getCheckInCount() - checkInCount);
 		checkInRecordDao.save(cirG);
-
-		cirU.setRoomCount(cirU.getRoomCount()+roomNums.size());
-//		cirU.setHumanCount(cirU.getHumanCount()+cId.length);
+		cirU.setRoomCount(cirU.getRoomCount() + roomNums.size());
 		cirU.setCheckInCount(cirU.getCheckInCount() + checkInCount);
 		checkInRecordDao.save(cirU);
+	}
+
+	@Override
+	public Collection<AccountSummaryVo> getAccountSummaryByLinkNum(String orderNum, String accountCustomer) {
+		List<CheckInRecord> data = findByLinkId(orderNum);
+		return checkInRecordToAccountSummaryVo(data);
 	}
 }

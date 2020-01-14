@@ -88,4 +88,9 @@ public class RoomRepairRecordServiceImpl implements RoomRepairRecordService {
 		return rlr;
 	}
 
+	@Override
+	public List<RoomRepairRecord> findByGuestRoomAndStatus(GuestRoom guestRoom, String status) {
+		return roomRepairRecordDao.findByGuestRoomAndStatus(guestRoom,status);
+	}
+
 }

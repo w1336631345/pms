@@ -7,8 +7,8 @@ import com.kry.pms.service.BaseService;
 public interface RoomStatusQuantityService extends BaseService<RoomStatusQuantity>{
 
 
-	void checkIn(GuestRoom gr, String oldStatus);
+	public void checkIn(GuestRoom gr, String oldStatus);
 
-	void transformRoomStatusQuantity(String hotelCode, String oldStatus, String newStatus, int quantity);
+	public void transformRoomStatusQuantity(String hotelCode, String oldStatus, String newStatus, int quantity);
 
 }

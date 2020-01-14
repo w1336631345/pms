@@ -1,6 +1,7 @@
 package com.kry.pms.service.busi;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import com.kry.pms.model.persistence.busi.RoomRepairRecord;
 import com.kry.pms.model.persistence.dict.RoomRepairReason;
@@ -13,5 +14,7 @@ public interface RoomRepairRecordService extends BaseService<RoomRepairRecord> {
 			String endToStatus);
 
 	RoomRepairRecord openRepair(String id, String operationEmployeeId);
+
+	List<RoomRepairRecord> findByGuestRoomAndStatus(GuestRoom guestRoom, String normal);
 
 }

@@ -35,7 +35,7 @@ public class RoomRepairRecordVo {
 		BeanUtils.copyProperties(rlr, rlrv);
 		rlrv.setRoomId(rlr.getGuestRoom().getId());
 		rlrv.setRoomNum(rlr.getGuestRoom().getRoomNum());
-		return null;
+		return rlrv;
 	}
 
 }

@@ -1,6 +1,7 @@
 package com.kry.pms.service.busi;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import com.kry.pms.model.persistence.busi.RoomLockRecord;
 import com.kry.pms.model.persistence.dict.RoomLockReason;
@@ -13,5 +14,7 @@ public interface RoomLockRecordService extends BaseService<RoomLockRecord>{
 			String endToStatus);
 
 	RoomLockRecord openLock(String id, String operationEmployeeId);
+
+	List<RoomLockRecord> findByGuestRoomAndStatus(GuestRoom guestRoom, String status);
 
 }

@@ -33,7 +33,7 @@ public class CheckInRecordWrapper implements UseInfoAble {
 	@JsonIgnore
 	@Override
 	public boolean isGroup() {
-		return this.checkInRecord.getType().equals(Constants.Type.CHECK_IN_RECORD_GROUP);
+		return this.checkInRecord.getGroupType().equals(Constants.Type.CHECK_IN_RECORD_GROUP_TYPE_YES);
 	}
 
 	@JsonIgnore

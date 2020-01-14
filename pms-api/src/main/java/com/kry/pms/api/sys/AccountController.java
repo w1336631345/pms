@@ -1,7 +1,5 @@
 package com.kry.pms.api.sys;
 
-import java.nio.channels.SeekableByteChannel;
-
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.BeanUtils;

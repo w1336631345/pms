@@ -73,9 +73,6 @@ public class ReceptionServiceImpl implements ReceptionService {
 	@Autowired
 	RoomStatisticsService roomStatisticsService;
 
-
-
-
 	private List<CheckInRecord> createGroupMainCheckInRecord(BookingRecord br) {
 		String tempName = br.getName();
 		String checkInSn = businessSeqService.fetchNextSeqNum(br.getHotelCode(), Constants.Key.BUSINESS_SEQ_KEY);
@@ -254,21 +251,32 @@ public class ReceptionServiceImpl implements ReceptionService {
 				asv = new AccountSummaryVo();
 				asv.setName("团队所有账务");
 				asv.setType("temp");
+				asv.setSettleType(Constants.Type.SETTLE_TYPE_NONE);
 				asv.setChildren(new ArrayList<>());
 				Account account = cir.getAccount();
 				AccountSummaryVo group = new AccountSummaryVo(account);
+				group.setSettleType(Constants.Type.SETTLE_TYPE_GROUP);
 				asv.getChildren().add(group);
 				asv.getChildren().addAll((checkInRecordService.getAccountSummaryByOrderNum(cir.getOrderNum(),
 						Constants.Type.CHECK_IN_RECORD_CUSTOMER)));
 				break;
 			case Constants.Type.CHECK_IN_RECORD_GROUP_TYPE_NO:
-				Collection<AccountSummaryVo> data = checkInRecordService.getAccountSummaryByOrderNum(cir.getOrderNum(),
-						Constants.Type.CHECK_IN_RECORD_CUSTOMER);
-				if (data != null && !data.isEmpty()) {
-					asv = (AccountSummaryVo) data.toArray()[0];
+				if(cir.getRoomLinkId()==null) {//散客
+					Collection<AccountSummaryVo> data = checkInRecordService.getAccountSummaryByOrderNum(cir.getOrderNum(),
+							Constants.Type.CHECK_IN_RECORD_CUSTOMER);
+					if (data != null && !data.isEmpty()) {
+						asv = (AccountSummaryVo) data.toArray()[0];
+					}
+				}else {//联房
+					Collection<AccountSummaryVo> data = checkInRecordService.getAccountSummaryByLinkNum(cir.getRoomLinkId(),
+							Constants.Type.CHECK_IN_RECORD_CUSTOMER);
+					asv = new AccountSummaryVo();
+					asv.setName("联房账务");
+					asv.setType("link");
+					asv.setSettleType(Constants.Type.SETTLE_TYPE_LINK);
+					asv.setChildren(data);
 				}
 				break;
-
 			default:
 				break;
 			}

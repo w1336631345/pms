@@ -3,10 +3,8 @@ package com.kry.pms.service.room.impl;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
-import org.aspectj.internal.lang.annotation.ajcDeclareAnnotation;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
@@ -32,6 +30,8 @@ import com.kry.pms.model.persistence.room.Floor;
 import com.kry.pms.model.persistence.room.GuestRoom;
 import com.kry.pms.model.persistence.room.GuestRoomStatus;
 import com.kry.pms.service.busi.CheckInRecordService;
+import com.kry.pms.service.busi.RoomLockRecordService;
+import com.kry.pms.service.busi.RoomRepairRecordService;
 import com.kry.pms.service.room.BuildingService;
 import com.kry.pms.service.room.FloorService;
 import com.kry.pms.service.room.GuestRoomService;
@@ -55,6 +55,10 @@ public class GuestRoomStatusServiceImpl implements GuestRoomStatusService {
 	FloorService floorService;
 	@Autowired
 	CheckInRecordService checkInRecordService;
+	@Autowired
+	RoomRepairRecordService roomRepairRecordService;
+	@Autowired
+	RoomLockRecordService roomLockRecordService;
 
 	@Override
 	public GuestRoomStatus add(GuestRoomStatus guestRoomStatus) {
@@ -362,6 +366,7 @@ public class GuestRoomStatusServiceImpl implements GuestRoomStatusService {
 			delete(status.getId());
 		}
 	}
+
 	@Override
 	public GuestRoomStatusVo detail(String id) {
 		GuestRoomStatus status = findById(id);
@@ -390,6 +395,13 @@ public class GuestRoomStatusServiceImpl implements GuestRoomStatusService {
 		List<CheckInRecord> willCheckInRecords = checkInRecordService.findTodayCheckInRecord(status.getGuestRoom(),
 				Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION);
 		status.setWillCheckInRecords(willCheckInRecords);
+		List<RoomRepairRecord> rrrs = roomRepairRecordService.findByGuestRoomAndStatus(status.getGuestRoom(),
+				Constants.Status.NORMAL);
+		status.setRepairRecords(rrrs);
+		List<RoomLockRecord> rlrs = roomLockRecordService.findByGuestRoomAndStatus(status.getGuestRoom(),
+				Constants.Status.NORMAL);
+		status.setLockRecords(rlrs);
+
 	}
 
 	@Override

@@ -69,6 +69,8 @@ public interface CheckInRecordService extends BaseService<CheckInRecord> {
 
 	public Collection<AccountSummaryVo> getAccountSummaryByOrderNum(String orderNum, String accountCustomer);
 
+	public Collection<AccountSummaryVo> getAccountSummaryByLinkNum(String orderNum, String accountCustomer);
+
 	public List<CheckInRecord> findByOrderNum(String orderNum);
 
 	public CheckInRecord addReserve(CheckInRecord checkInRecord);

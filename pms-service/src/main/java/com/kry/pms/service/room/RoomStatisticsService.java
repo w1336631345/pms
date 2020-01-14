@@ -3,25 +3,26 @@ package com.kry.pms.service.room;
 import java.time.LocalDateTime;
 
 import com.kry.pms.model.func.UseInfoAble;
+import com.kry.pms.model.other.wrapper.CheckInRecordWrapper;
 
 public interface RoomStatisticsService {
 
 	/**
 	 * 
-	 * @param cir
+	 * @param cir checkInRecord的包装类实现了该接口，请使用CheckInRecordWrapper
 	 * @return
 	 */
 	public boolean reserve(UseInfoAble info);
 
 	/**
 	 * 
-	 * @param cir
+	 * @param cir checkInRecord的包装类实现了该接口，请使用CheckInRecordWrapper
 	 * @return
 	 */
 	public boolean cancleReserve(UseInfoAble info);
 	/**
 	 * 
-	 * @param info
+	 * @param info checkInRecord的包装类实现了该接口，请使用CheckInRecordWrapper
 	 * @return
 	 */
 
@@ -29,14 +30,14 @@ public interface RoomStatisticsService {
 
 	/**
 	 * 
-	 * @param info
+	 * @param info checkInRecord的包装类实现了该接口，请使用CheckInRecordWrapper
 	 * @return
 	 */
 	public boolean cancleAssign(UseInfoAble info);
 
 	/**
 	 * 
-	 * @param cir
+	 * @param cir checkInRecord的包装类实现了该接口，请使用CheckInRecordWrapper 
 	 * @return
 	 */
 

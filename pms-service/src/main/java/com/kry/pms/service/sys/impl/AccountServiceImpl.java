@@ -223,7 +223,7 @@ public class AccountServiceImpl implements AccountService {
 	public SettleInfoVo getSettleInfo(String type, String id) {
 		SettleInfoVo siv = null;
 		switch (type) {
-		case Constants.Type.SETTLE_TYPE_ALL:
+		case Constants.Type.SETTLE_TYPE_ACCOUNT:
 			siv = getSingleAccountSettleInfo(id);
 			break;
 		case Constants.Type.SETTLE_TYPE_PART:
@@ -268,11 +268,25 @@ public class AccountServiceImpl implements AccountService {
 	}
 
 	private void countSettleInfo(SettleInfoVo info, Account account) {
-		info.setCost(BigDecimalUtil.add(info.getCost(), account.getCost()));
-		info.setPay(BigDecimalUtil.add(info.getPay(), account.getPay()));
-		info.setCreditLimit(BigDecimalUtil.add(info.getCreditLimit(), account.getCreditLimit()));
-		info.setAvailableCreditLimit(
-				BigDecimalUtil.add(info.getAvailableCreditLimit(), account.getAvailableCreditLimit()));
+		if (account.getCost() != null) {
+			info.setCost(BigDecimalUtil.add(info.getCost(), account.getCost()));
+		}
+		if (account.getPay() != null) {
+			info.setPay(BigDecimalUtil.add(info.getPay(), account.getPay()));
+		}
+		if (account.getCreditLimit() != null) {
+			info.setCreditLimit(BigDecimalUtil.add(info.getCreditLimit(), account.getCreditLimit()));
+		}
+		if (account.getAvailableCreditLimit() != null) {
+			info.setAvailableCreditLimit(
+					BigDecimalUtil.add(info.getAvailableCreditLimit(), account.getAvailableCreditLimit()));
+		}
+		if (account.getTotal() != null) {
+			info.setTotal(BigDecimalUtil.add(info.getTotal(), account.getTotal()));
+		}
+		if (account.getCurrentBillSeq() != null) {
+			info.setTotalSeq(info.getTotalSeq() + account.getCurrentBillSeq());
+		}
 	}
 
 	private SettleInfoVo getLinkSettleInfo(String id) {

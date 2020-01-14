@@ -130,11 +130,12 @@ public class Constants {
 		public static final String CHANGE_ROOM_PAY_F = "F";// 换房记录差价处理方式，免费升级
 
 		public static final String SETTLE_TYPE_GROUP = "GROUP";
-		public static final String SETTLE_TYPE_ALL = "ALL";
+		public static final String SETTLE_TYPE_ACCOUNT = "ACCOUNT";
 		public static final String SETTLE_TYPE_PART = "PART";
 		public static final String SETTLE_TYPE_LINK = "LINK";
 		public static final String SETTLE_TYPE_IGROUP = "IG";
 		public static final String SETTLE_TYPE_ROOM = "ROOM";
+		public static final String SETTLE_TYPE_NONE = "NONE";
 
 	}
 
