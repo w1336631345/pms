@@ -10,5 +10,5 @@ public interface RoomStatusQuantityService extends BaseService<RoomStatusQuantit
 	public void checkIn(GuestRoom gr, String oldStatus);
 
 	public void transformRoomStatusQuantity(String hotelCode, String oldStatus, String newStatus, int quantity);
-
+	
 }

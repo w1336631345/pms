@@ -668,7 +668,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 				} else {
 					asv = asvm.get(acc.getRoomNum());
 				}
-				asv.getChildren().add(new AccountSummaryVo(acc));
+				asv.getChildren().add(new AccountSummaryVo(cir));
 			}
 		}
 		return asvm.values();

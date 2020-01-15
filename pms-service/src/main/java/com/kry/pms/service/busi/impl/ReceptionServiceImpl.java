@@ -255,6 +255,7 @@ public class ReceptionServiceImpl implements ReceptionService {
 				asv.setChildren(new ArrayList<>());
 				Account account = cir.getAccount();
 				AccountSummaryVo group = new AccountSummaryVo(account);
+				group.setRoomStatus(cir.getStatus());
 				group.setSettleType(Constants.Type.SETTLE_TYPE_GROUP);
 				asv.getChildren().add(group);
 				asv.getChildren().addAll((checkInRecordService.getAccountSummaryByOrderNum(cir.getOrderNum(),
