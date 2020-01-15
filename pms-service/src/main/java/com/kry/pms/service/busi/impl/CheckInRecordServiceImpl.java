@@ -195,6 +195,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 			CheckInRecord cir = findById(ids[i]);
 			cir.setStatus("R");
 			checkInRecordDao.save(cir);
+			roomStatisticsService.cancleCheckIn(new CheckInRecordWrapper(cir));
 		}
 		return hr;
 	}
@@ -813,6 +814,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 			cir.setDeleted(Constants.DELETED_TRUE);
 			// 修改选中的数据状态，排房记录改为删除
 			modify(cir);
+			roomStatisticsService.cancleAssign(new CheckInRecordWrapper(cir));
 			// 取消排房成功，修改房间状态
 			// 修改排放记录状态为删除后，查询此房间是否还有其他人在住
 			List<CheckInRecord> list = checkInRecordDao.findByOrderNumAndGuestRoomAndDeleted(cir.getOrderNum(),
