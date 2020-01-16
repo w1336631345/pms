@@ -862,23 +862,27 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 				for (int j = 0; j < list.size(); j++) {
 					CheckInRecord cird = list.get(j);
 					cird.setDeleted(Constants.DELETED_TRUE);
-					cird.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_CANCLE_BOOK);
-					modify(cird);
+//					String statusR = cird.getStatus();
 					if((Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN).equals(cird.getStatus())){
 						roomStatisticsService.checkIn(new CheckInRecordWrapper(cird));
-					}else if((Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION).equals(cird.getStatus())){
+					}
+					if((Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION).equals(cird.getStatus())){
 						roomStatisticsService.booking(new CheckInRecordWrapper(cird));
 					}
+					cird.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_CANCLE_BOOK);
+					modify(cird);
 				}
 			}
 			cir.setDeleted(Constants.DELETED_TRUE);
-			cir.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_CANCLE_BOOK);
-			modify(cir);
-			if((Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN).equals(cir.getStatus())){
+			String status = cir.getStatus();
+			if((Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN).equals(status)){
 				roomStatisticsService.checkIn(new CheckInRecordWrapper(cir));
-			}else if((Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION).equals(cir.getStatus())){
+			}
+			if((Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION).equals(status)){
 				roomStatisticsService.booking(new CheckInRecordWrapper(cir));
 			}
+			cir.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_CANCLE_BOOK);
+			modify(cir);
 			// 查出所有的预留记录id，放入集合
 			if (cir.getReserveId() != null) {
 				if (!reserveIds.contains(cir.getReserveId())) {
