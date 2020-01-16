@@ -235,7 +235,7 @@ public class GuestRoomStatusServiceImpl implements GuestRoomStatusService {
 		ArrayList<BuildingVo> data = new ArrayList<>();
 		List<Building> list = buildingService.getAllByHotelCode(currentHotleCode);
 		ArrayList<FloorVo> fvs = null;
-		ArrayList<GuestRoomStatusVo> grsvs = null;
+		List<GuestRoomStatusVo> grsvs = null;
 		GuestRoomStatusVo grsv = null;
 		FloorVo fv = null;
 		BuildingVo bv = null;
@@ -244,22 +244,29 @@ public class GuestRoomStatusServiceImpl implements GuestRoomStatusService {
 			if (fs != null && !fs.isEmpty()) {
 				fvs = new ArrayList<FloorVo>();
 				for (Floor f : fs) {
-					List<GuestRoomStatus> rs = guestRoomStatusDao.queryByFloorId(f.getId());
-					if (rs != null && !rs.isEmpty()) {
-						grsvs = new ArrayList<>();
-						for (GuestRoomStatus grs : rs) {
-							grsv = new GuestRoomStatusVo();
-							BeanUtils.copyProperties(grs, grsv);
-							grsv.setRoomStatusId(grs.getId());
-							grsv.setRoomNum(grs.getGuestRoom().getRoomNum());
-							grsv.setGuestRoomId(grs.getGuestRoom().getId());
-							grsvs.add(grsv);
-						}
+//					List<GuestRoomStatus> rs = guestRoomStatusDao.queryViewByFloorId(f.getId());
+//					if (rs != null && !rs.isEmpty()) {
+//						grsvs = new ArrayList<>();
+//						for (GuestRoomStatus grs : rs) {
+//							grsv = new GuestRoomStatusVo();
+//							BeanUtils.copyProperties(grs, grsv);
+//							grsv.setRoomNum(grs.getGuestRoom().getRoomNum());
+//							grsv.setGuestRoomId(grs.getGuestRoom().getId());
+//							grsvs.add(grsv);
+//						}
+//						fv = new FloorVo();
+//						BeanUtils.copyProperties(f, fv);
+//						fv.setRooms(grsvs);
+//						fvs.add(fv);
+//					}
+					grsvs = guestRoomStatusDao.queryViewByFloorId(f.getId());
+					if (grsvs != null && !grsvs.isEmpty()) {
 						fv = new FloorVo();
 						BeanUtils.copyProperties(f, fv);
 						fv.setRooms(grsvs);
 						fvs.add(fv);
 					}
+					
 
 				}
 				bv = new BuildingVo();
