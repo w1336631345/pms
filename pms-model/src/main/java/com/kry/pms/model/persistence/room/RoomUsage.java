@@ -20,7 +20,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Table(name = "t_room_usage")
-public class RoomUsage implements Serializable{
+public class RoomUsage implements Serializable {
 	@Id
 	@GeneratedValue(generator = "uuid")
 	@GenericGenerator(name = "uuid", strategy = "uuid")
@@ -30,6 +30,8 @@ public class RoomUsage implements Serializable{
 	private RoomUsage preRoomUsage;
 	@OneToOne(fetch = FetchType.LAZY)
 	private RoomUsage postRoomUsage;
+	@Column
+	private Integer humanCount;
 	@OneToOne
 	private GuestRoom guestRoom;
 	@Column

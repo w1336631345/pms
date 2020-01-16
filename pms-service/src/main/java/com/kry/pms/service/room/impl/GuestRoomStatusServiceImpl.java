@@ -266,7 +266,6 @@ public class GuestRoomStatusServiceImpl implements GuestRoomStatusService {
 						fv.setRooms(grsvs);
 						fvs.add(fv);
 					}
-					
 
 				}
 				bv = new BuildingVo();
@@ -416,19 +415,41 @@ public class GuestRoomStatusServiceImpl implements GuestRoomStatusService {
 		GuestRoomStatus status = guestRoomStatusDao.findByGuestRoomId(info.guestRoom().getId());
 		if (status != null) {
 			if (info.getStartTime().isBefore(LocalDateTime.now())) {
-				status.setFree(info.isFree());
-				status.setGroup(info.isGroup());
-				status.setOta(info.isOTA());
-				status.setHourRoom(info.isHourRoom());
-				status.setOverdued(info.isArrears());
-			}
-			if (info.isTodayArrive()) {
-				status.setWillArrive(true);
-			}
-			if (info.isTodayLeave()) {
-				status.setWillArrive(true);
+				if (info.getRoomStatus() != null) {
+					if (Constants.Status.ROOM_STATUS_OCCUPY_CLEAN.equals(info.getRoomStatus())) {
+						status.setFree(info.isFree());
+						status.setGroup(info.isGroup());
+						status.setOta(info.isOTA());
+						status.setHourRoom(info.isHourRoom());
+						status.setOverdued(info.isArrears());
+						status.setWillArrive(false);
+					} else {
+						status.setFree(false);
+						status.setGroup(false);
+						status.setOta(false);
+						status.setHourRoom(false);
+						status.setOverdued(false);
+					}
+					status.setRoomStatus(info.getRoomStatus());
+				} else {
+					if (info.isTodayArrive()) {
+						status.setWillArrive(true);
+					}
+					if (info.isTodayLeave()) {
+						status.setWillLeave(true);
+					}
+				}
 			}
 			modify(status);
+		}
+	}
+
+	private String nextRoomStatus(String currentStatus) {
+		switch (currentStatus) {
+		case Constants.Status.ROOM_STATUS_OCCUPY_CLEAN:
+			return Constants.Status.ROOM_STATUS_VACANT_CLEAN;
+		default:
+			return Constants.Status.ROOM_STATUS_VACANT_DIRTY;
 		}
 	}
 

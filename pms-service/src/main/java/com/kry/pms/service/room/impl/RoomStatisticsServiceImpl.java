@@ -68,15 +68,16 @@ public class RoomStatisticsServiceImpl implements RoomStatisticsService {
 //		roomUsageService.changeUseStatus(info.guestRoom(), info.getBusinessKey(),
 //				Constants.Status.ROOM_USAGE_CHECK_IN);
 //		
-		roomUsageService.checkIn(info);
-		if (info.getStartTime().toLocalDate().isEqual(LocalDate.now())) {
-			guestRoomStatusService.changeRoomStatus(info.guestRoom().getId(), Constants.Status.ROOM_STATUS_OCCUPY_CLEAN, 1, true);
+		if(info.guestRoom()!=null) {
+			roomUsageService.checkIn(info);
+			guestRoomStatusService.changeStatus(info);
 		}
 		return true;
 	}
 
 	@Override
 	public boolean cancleCheckIn(UseInfoAble info) {
+		//未判断是否为同时离开
 		roomUsageService.unUse(info.guestRoom(), info.getBusinessKey(), null);
 		guestRoomStatusService.changeStatus(info);
 		return true;

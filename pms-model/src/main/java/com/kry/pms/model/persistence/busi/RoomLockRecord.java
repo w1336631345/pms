@@ -7,6 +7,7 @@ import javax.persistence.Entity;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+import com.kry.pms.base.Constants;
 import com.kry.pms.model.func.UseInfoAble;
 import com.kry.pms.model.persistence.PersistenceModel;
 import com.kry.pms.model.persistence.dict.RoomLockReason;
@@ -69,22 +70,23 @@ public class RoomLockRecord extends PersistenceModel implements UseInfoAble{
 	}
 	@Override
 	public boolean isTodayLeave() {
-		// TODO Auto-generated method stub
 		return false;
 	}
 	@Override
 	public boolean isTodayArrive() {
-		// TODO Auto-generated method stub
 		return false;
 	}
 	@Override
 	public GuestRoom guestRoom() {
-		// TODO Auto-generated method stub
 		return getGuestRoom();
 	}
 	@Override
 	public Integer getRoomCount() {
 		return 1;
+	}
+	@Override
+	public String getRoomStatus() {
+		return Constants.Status.ROOM_STATUS_OUT_OF_SERVCIE;
 	}
 	
 }

@@ -108,7 +108,24 @@ public class CheckInRecordWrapper implements UseInfoAble {
 
 	@Override
 	public Integer getRoomCount() {
-		
+
 		return checkInRecord.getRoomCount();
+	}
+
+	@Override
+	public String getRoomStatus() {
+		if (checkInRecord.getStatus() != null) {
+			switch (checkInRecord.getStatus()) {
+			case Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN:
+				return Constants.Status.ROOM_STATUS_OCCUPY_CLEAN;
+			case Constants.Status.CHECKIN_RECORD_STATUS_OUT_UNSETTLED:
+				return Constants.Status.ROOM_STATUS_VACANT_DIRTY;
+			case Constants.Status.CHECKIN_RECORD_STATUS_CHECK_OUT:
+				return Constants.Status.ROOM_STATUS_VACANT_DIRTY;
+			case Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION:
+				return Constants.Status.ROOM_STATUS_VACANT_CLEAN;
+			}
+		}
+		return null;
 	}
 }

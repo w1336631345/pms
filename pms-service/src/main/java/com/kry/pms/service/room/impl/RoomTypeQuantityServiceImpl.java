@@ -177,7 +177,7 @@ public class RoomTypeQuantityServiceImpl implements RoomTypeQuantityService {
 			assignRoomType(roomType, startDate, endDate, quantity);
 			break;
 		case Constants.Status.ROOM_USAGE_CHECK_IN:
-			checkInRoomType(roomType, startDate, endDate, quantity);
+			unCheckInRoomType(roomType, startDate, endDate, quantity);
 			break;
 		case Constants.Status.ROOM_USAGE_LOCKED:
 			lockRoomType(roomType, startDate, endDate, quantity);
@@ -189,7 +189,18 @@ public class RoomTypeQuantityServiceImpl implements RoomTypeQuantityService {
 			break;
 		}
 	}
-
+	private void unCheckInRoomType(RoomType roomType, LocalDate startDate, LocalDate endDate, int quantity) {
+		RoomTypeQuantity rtq = null;
+		LocalDate currentDate = startDate;
+		while (currentDate.isBefore(endDate)) {
+			rtq = findByRoomTypeAndQuantityDateForUpdate(roomType, currentDate);
+			rtq.setBookingTotal(rtq.getBookingTotal() + quantity);
+			rtq.setUsedTotal(rtq.getUsedTotal() - quantity);
+			currentDate = currentDate.plusDays(1);
+			modify(rtq);
+		}
+	}
+	
 	private void bookRoomType(RoomType roomType, LocalDate startDate, LocalDate endDate, int quantity) {
 		RoomTypeQuantity rtq = null;
 		LocalDate currentDate = startDate;

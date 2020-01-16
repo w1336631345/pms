@@ -13,6 +13,8 @@ public interface UseInfoAble {
 	public boolean isTodayLeave();
 
 	public boolean isTodayArrive();
+	
+	public String getRoomStatus();
 
 	/**
 	 * 获取房间类型

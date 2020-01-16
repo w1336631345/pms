@@ -187,7 +187,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 		}
 		return null;
 	}
-
+	@Transactional
 	@Override
 	public HttpResponse cancelIn(String[] ids) {
 		HttpResponse hr = new HttpResponse();

@@ -42,6 +42,7 @@ import com.kry.pms.service.sys.AccountService;
 import com.kry.pms.service.sys.BusinessSeqService;
 import com.kry.pms.service.sys.SystemConfigService;
 
+@Transactional
 @Service
 public class ReceptionServiceImpl implements ReceptionService {
 	@Autowired
@@ -262,15 +263,15 @@ public class ReceptionServiceImpl implements ReceptionService {
 						Constants.Type.CHECK_IN_RECORD_CUSTOMER)));
 				break;
 			case Constants.Type.CHECK_IN_RECORD_GROUP_TYPE_NO:
-				if(cir.getRoomLinkId()==null) {//散客
-					Collection<AccountSummaryVo> data = checkInRecordService.getAccountSummaryByOrderNum(cir.getOrderNum(),
-							Constants.Type.CHECK_IN_RECORD_CUSTOMER);
+				if (cir.getRoomLinkId() == null) {// 散客
+					Collection<AccountSummaryVo> data = checkInRecordService
+							.getAccountSummaryByOrderNum(cir.getOrderNum(), Constants.Type.CHECK_IN_RECORD_CUSTOMER);
 					if (data != null && !data.isEmpty()) {
 						asv = (AccountSummaryVo) data.toArray()[0];
 					}
-				}else {//联房
-					Collection<AccountSummaryVo> data = checkInRecordService.getAccountSummaryByLinkNum(cir.getRoomLinkId(),
-							Constants.Type.CHECK_IN_RECORD_CUSTOMER);
+				} else {// 联房
+					Collection<AccountSummaryVo> data = checkInRecordService
+							.getAccountSummaryByLinkNum(cir.getRoomLinkId(), Constants.Type.CHECK_IN_RECORD_CUSTOMER);
 					asv = new AccountSummaryVo();
 					asv.setName("联房账务");
 					asv.setType("link");

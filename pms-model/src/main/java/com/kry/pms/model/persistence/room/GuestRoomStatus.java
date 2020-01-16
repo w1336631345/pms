@@ -33,6 +33,8 @@ public class GuestRoomStatus extends PersistenceModel {
 	@Column
 	private String roomTypeName;
 	@Column
+	private Integer humanCount;
+	@Column
 	private String summary;
 	@Column(columnDefinition = "varchar(64) default 'VC' COMMENT '客房状态'")
 	private String roomStatus;
