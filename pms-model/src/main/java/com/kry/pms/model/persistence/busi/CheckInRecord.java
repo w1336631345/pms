@@ -55,6 +55,10 @@ public class CheckInRecord extends PersistenceModel {
 	@Column
 	private Integer humanCount;// 总人数
 	@Column
+	private Integer adultCount;//成人数量
+	@Column
+	private Integer childCount;//小孩数量
+	@Column
 	private Integer roomCount;// 房间数
 	@ManyToMany(cascade = CascadeType.PERSIST)
 	private List<RoomTag> demands;// 房间标签
@@ -123,13 +127,28 @@ public class CheckInRecord extends PersistenceModel {
 	@Column(columnDefinition = "varchar(64) COMMENT '同住编号'")
 	private String togetherCode;
 	@Transient
-	private boolean isUpdateTime = false;// 用作判断主单是否修改了到店离店时间
+	private Boolean isUpdateTime = false;// 用作判断主单是否修改了到店离店时间
+	@ManyToMany
+	private List<Arrangement> arrangements;//房间布置
+	@Column
+	private Boolean isSecrecy;//房价是否保密
+	public Boolean isSecrecy() { return isSecrecy; }
+	public void setSecrecy(Boolean secrecy) { isSecrecy = secrecy; }
 
-	public boolean getIsUpdateTime() {
+
+	public List<Arrangement> getArrangements() { return arrangements; }
+	public void setArrangements(List<Arrangement> arrangements) { this.arrangements = arrangements; }
+
+	public Integer getAdultCount() { return adultCount; }
+	public void setAdultCount(Integer adultCount) { this.adultCount = adultCount; }
+	public Integer getChildCount() { return childCount; }
+	public void setChildCount(Integer childCount) { this.childCount = childCount; }
+
+	public Boolean getIsUpdateTime() {
 		return isUpdateTime;
 	}
 
-	public void setIsUpdateTime(boolean isUpdateTime) {
+	public void setIsUpdateTime(Boolean isUpdateTime) {
 		this.isUpdateTime = isUpdateTime;
 	}
 

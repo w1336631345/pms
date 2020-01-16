@@ -17,6 +17,7 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.transaction.Transactional;
 
+import com.kry.pms.model.persistence.busi.Arrangement;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
@@ -311,6 +312,10 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 //		DtoResponse<RoomUsage> r = roomUsageService.use(gr, Constants.Status.ROOM_USAGE_BOOK, cir.getArriveTime(),
 //				cir.getLeaveTime(), cir.getId(), tempName);
 //		roomStatisticsService.assignRoom(new CheckInRecordWrapper(cir));
+		List<Arrangement> arrangements = new ArrayList<>();
+		for(int i=0; i<cir.getArrangements().size(); i++){
+			arrangements.add(cir.getArrangements().get(i));
+		}
 		for (int i = 1; i <= humanCount; i++) {
 			Customer customer = customerService.createTempCustomer(gr.getHotelCode(), tempName + "#" + i);
 			CheckInRecord ncir = null;
@@ -343,6 +348,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 			ncir.setGroupType(cir.getGroupType());// 设置分组类型（团队/散客）
 			ncir.setReserveId(cir.getId());// 添加预留记录id
 			ncir.setMainRecord(cir.getMainRecord());
+			ncir.setArrangements(arrangements);
 			ncir = add(ncir);
 			data.add(ncir);
 			roomRecordService.createRoomRecord(ncir);
@@ -804,6 +810,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 
 	// 取消排房
 	@Override
+	@Transactional
 	public HttpResponse callOffAssignRoom(String[] ids) {
 		HttpResponse hr = new HttpResponse();
 		List<String> reserveIds = new ArrayList<>();
@@ -1057,6 +1064,14 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 		CheckInRecord cir = list.get(0);
 		CheckInRecord checkInRecord = new CheckInRecord();
 		BeanUtils.copyProperties(cir, checkInRecord);
+		//上面是浅拷贝，集合不允许被多次引用（会报集合共享引用不允许错误）,作出以下处理
+		List<Arrangement> arrangements = cir.getArrangements();
+		List<Arrangement> arrangements1 = new ArrayList<>();
+		for(int i=0; i<arrangements.size(); i++){
+			arrangements1.add(arrangements.get(i));
+		}
+		checkInRecord.setArrangements(arrangements1);
+		//浅拷贝处理完毕
 		if (null != cir.getDemands() && !cir.getDemands().isEmpty()) {
 			List<RoomTag> demands = new ArrayList<>();
 			for (int i = 0; i < demands.size(); i++) {

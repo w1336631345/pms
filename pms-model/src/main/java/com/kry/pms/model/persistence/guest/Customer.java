@@ -44,4 +44,16 @@ public class Customer extends PersistenceModel {
 	private String certificateType;
 	@Column
 	private String idCardNum;
+	@Column
+	private String credit;//信用
+	@Column
+	private String nationality;//国籍
+	@Column
+	private String nation;//民族
+	@Column
+	private String gender;//性别
+	@Column
+	private Integer age;//年龄
+	@Column
+	private String address;//地址
 }
