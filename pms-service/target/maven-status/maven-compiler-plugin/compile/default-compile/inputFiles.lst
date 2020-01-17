@@ -13,6 +13,7 @@ E:\kry\src\pms-server\pms-service\src\main\java\com\kry\pms\service\dict\impl\Ro
 E:\kry\src\pms-server\pms-service\src\main\java\com\kry\pms\service\sys\SystemConfigService.java
 E:\kry\src\pms-server\pms-service\src\main\java\com\kry\pms\service\report\RoomReportService.java
 E:\kry\src\pms-server\pms-service\src\main\java\com\kry\pms\service\sys\AccountService.java
+E:\kry\src\pms-server\pms-service\src\main\java\com\kry\pms\service\busi\ArrangementService.java
 E:\kry\src\pms-server\pms-service\src\main\java\com\kry\pms\service\sys\impl\SystemConfigServiceImpl.java
 E:\kry\src\pms-server\pms-service\src\main\java\com\kry\pms\service\goods\ProductCategoryService.java
 E:\kry\src\pms-server\pms-service\src\main\java\com\kry\pms\service\quratz\impl\QuartzSetService.java
@@ -108,6 +109,7 @@ E:\kry\src\pms-server\pms-service\src\main\java\com\kry\pms\service\dict\impl\Co
 E:\kry\src\pms-server\pms-service\src\main\java\com\kry\pms\service\room\RoomTagService.java
 E:\kry\src\pms-server\pms-service\src\main\java\com\kry\pms\service\report\FrontReceiveReportService.java
 E:\kry\src\pms-server\pms-service\src\main\java\com\kry\pms\service\room\impl\RoomTypeQuantityServiceImpl.java
+E:\kry\src\pms-server\pms-service\src\main\java\com\kry\pms\service\busi\impl\ArrangementServiceImpl.java
 E:\kry\src\pms-server\pms-service\src\main\java\com\kry\pms\service\busi\impl\RoomRecordServiceImpl.java
 E:\kry\src\pms-server\pms-service\src\main\java\com\kry\pms\service\marketing\impl\DiscountSchemeServiceImpl.java
 E:\kry\src\pms-server\pms-service\src\main\java\com\kry\pms\service\busi\impl\CheckInRecordServiceImpl.java

@@ -39,13 +39,6 @@ public class GuestRoomStatusVo implements Serializable {
 	private List<CheckInRecordVo> willCheckInRecord;
 	private List<RoomLockRecordVo> lockRecord;
 	private List<RoomRepairRecordVo> repairRecord;
-
-	
-	
-	
-	
-	
-	
 	
 	public GuestRoomStatusVo() {
 		super();
@@ -54,6 +47,7 @@ public class GuestRoomStatusVo implements Serializable {
 	public static GuestRoomStatusVo covert(GuestRoomStatus grs) {
 		GuestRoomStatusVo grsv = new GuestRoomStatusVo();
 		BeanUtils.copyProperties(grs, grsv);
+		grsv.setGuestRoomId(grs.getGuestRoom().getId());
 		if (grs.getCurrentCheckInRecords() != null) {
 			grsv.setCurrentCheckInRecord(CheckInRecordVo.convert(grs.getCurrentCheckInRecords()));
 		}
@@ -72,6 +66,7 @@ public class GuestRoomStatusVo implements Serializable {
 	public static GuestRoomStatusVo covert(GuestRoomStatus grs, boolean withDetail) {
 		GuestRoomStatusVo grsv = new GuestRoomStatusVo();
 		BeanUtils.copyProperties(grs, grsv);
+		grsv.setGuestRoomId(grs.getGuestRoom().getId());
 		if (withDetail) {
 			if (grs.getCurrentCheckInRecords() != null) {
 				grsv.setCurrentCheckInRecord(CheckInRecordVo.convert(grs.getCurrentCheckInRecords()));

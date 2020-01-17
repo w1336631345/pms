@@ -1,7 +1,10 @@
 package com.kry.pms.service.room;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+
+import org.springframework.cglib.core.Local;
 
 import com.kry.pms.base.DtoResponse;
 import com.kry.pms.model.func.UseInfoAble;
@@ -47,7 +50,7 @@ public interface RoomUsageService extends BaseService<RoomUsage> {
 	 */
 	public DtoResponse<RoomUsage> use(GuestRoom gr, String status, LocalDateTime startTime, LocalDateTime endTime,
 			String businesskey, String businessInfo);
-	
+
 	/**
 	 * 使用房间资源，是否改变房类资源
 	 * 
@@ -55,24 +58,26 @@ public interface RoomUsageService extends BaseService<RoomUsage> {
 	 * @param status
 	 * @param startTime
 	 * @param endTime
-	 * @param businesskey  业务id，checkInRecordId，roomLockRecordId，roomRepairRecordId
+	 * @param businesskey       业务id，checkInRecordId，roomLockRecordId，roomRepairRecordId
 	 * @param businessInfo
 	 * @param roomTypeOperation
 	 * @return
 	 */
 	public DtoResponse<RoomUsage> use(GuestRoom gr, String status, LocalDateTime startTime, LocalDateTime endTime,
-			String businesskey, String businessInfo,boolean roomTypeOperation);
+			String businesskey, String businessInfo, boolean roomTypeOperation);
 
 	/**
 	 * 改变房间使用状态，
 	 * 
-	 * @param gr 房间号
+	 * @param gr          房间号
 	 * @param businessKey 业务id
-	 * @param status 目标状态
+	 * @param status      目标状态
 	 * @return
 	 */
 	boolean changeUseStatus(GuestRoom gr, String businessKey, String status);
 
 	public boolean checkIn(UseInfoAble info);
+
+	public boolean freeCheck(GuestRoom gr, LocalDateTime startTime, LocalDateTime endDateTime);
 
 }

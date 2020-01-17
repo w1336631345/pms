@@ -64,6 +64,9 @@ public class RoomUsageController extends BaseController<RoomUsage> {
 		rep.addData(roomUsageService.queryUsableGuestRoomsByCheckInRecordId(checkInRecordId,roomTypeId,roomNum));
 		return rep;
 	}
+	
+	
+	
 
 	@GetMapping
 	public HttpResponse<PageResponse<RoomUsage>> query(HttpServletRequest request)

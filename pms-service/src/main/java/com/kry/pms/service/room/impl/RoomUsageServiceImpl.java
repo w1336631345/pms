@@ -21,15 +21,21 @@ import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
 import com.kry.pms.dao.room.RoomUsageDao;
 import com.kry.pms.model.func.UseInfoAble;
+import com.kry.pms.model.http.response.busi.CheckInRecordVo;
+import com.kry.pms.model.http.response.room.RoomLockRecordVo;
+import com.kry.pms.model.http.response.room.RoomRepairRecordVo;
 import com.kry.pms.model.http.response.room.RoomUsageVo;
 import com.kry.pms.model.persistence.busi.BookingItem;
 import com.kry.pms.model.persistence.busi.BookingRecord;
 import com.kry.pms.model.persistence.busi.CheckInRecord;
+import com.kry.pms.model.persistence.busi.RoomRepairRecord;
 import com.kry.pms.model.persistence.room.GuestRoom;
 import com.kry.pms.model.persistence.room.RoomUsage;
 import com.kry.pms.service.busi.BookingItemService;
 import com.kry.pms.service.busi.BookingRecordService;
 import com.kry.pms.service.busi.CheckInRecordService;
+import com.kry.pms.service.busi.RoomLockRecordService;
+import com.kry.pms.service.busi.RoomRepairRecordService;
 import com.kry.pms.service.room.GuestRoomStatusService;
 import com.kry.pms.service.room.RoomTypeQuantityService;
 import com.kry.pms.service.room.RoomUsageService;
@@ -42,8 +48,15 @@ public class RoomUsageServiceImpl implements RoomUsageService {
 	BookingRecordService bookingRecordService;
 	@Autowired
 	CheckInRecordService checkInRecordService;
+
 	@Autowired
 	RoomTypeQuantityService roomTypeQuantityService;
+
+	@Autowired
+	RoomLockRecordService roomLockRecordService;
+
+	@Autowired
+	RoomRepairRecordService roomRepairRecordService;
 //	@Autowired
 //	GuestRoomStatusService guestRoomStatusService;
 
@@ -80,7 +93,6 @@ public class RoomUsageServiceImpl implements RoomUsageService {
 	public List<RoomUsageVo> queryUsableGuestRooms(String roomTypeId, LocalDateTime startTime,
 			LocalDateTime endDateTime) {
 		List<RoomUsage> list = roomUsageDao.queryUsableGuestRooms(roomTypeId, startTime, endDateTime);
-//		System.out.println("牛逼的房价"+list.get(0).getGuestRoom().getRoomType().getPrice());
 		List<RoomUsageVo> data = new ArrayList<RoomUsageVo>();
 		if (list != null && !list.isEmpty()) {
 			for (RoomUsage ru : list) {
@@ -89,6 +101,23 @@ public class RoomUsageServiceImpl implements RoomUsageService {
 			return data;
 		}
 		return null;
+	}
+
+	private void inflateRoomUsageVo(RoomUsageVo roomUsageVo, RoomUsage ru) {
+		if (roomUsageVo.getBusinesskey() != null) {
+			if (Constants.Status.ROOM_USAGE_LOCKED.equals(roomUsageVo.getUsageStatus())) {
+				roomUsageVo.setRoomLockRecordVo(
+						RoomLockRecordVo.convert(roomLockRecordService.findById(roomUsageVo.getBusinesskey())));
+			} else if (Constants.Status.ROOM_USAGE_REPARIE.equals(roomUsageVo.getUsageStatus())) {
+				roomUsageVo.setRoomRepairRecordVo(
+						RoomRepairRecordVo.convert(roomRepairRecordService.findById(roomUsageVo.getBusinesskey())));
+			} else {
+				roomUsageVo.setCheckInRecordVo(
+						CheckInRecordVo.convert(checkInRecordService.findByOrderNumAndGuestRoomAndDeleted(
+								roomUsageVo.getBusinesskey(), ru.getGuestRoom(), Constants.DELETED_FALSE)));
+
+			}
+		}
 	}
 
 	@Override
@@ -110,16 +139,28 @@ public class RoomUsageServiceImpl implements RoomUsageService {
 		return use(gr, status, startTime, endTime, businesskey, businessInfo, true);
 	}
 
+	public RoomUsage initRoomUsage(GuestRoom gr) {
+		RoomUsage ru = new RoomUsage();
+		ru.setStartDateTime(LocalDateTime.now());
+		return add(ru);
+	}
+
 	@Override
 	public boolean changeUseStatus(GuestRoom gr, String businessKey, String status) {
 		RoomUsage ru = roomUsageDao.findByGuestRoomIdAndBusinesskey(gr.getId(), businessKey);
 		if (ru != null) {
 			if (!ru.getUsageStatus().equals(status)) {
-				ru.setUsageStatus(status);
-				ru.setHumanCount(1);
-				modify(ru);
-				roomTypeQuantityService.useRoomType(gr.getRoomType(), ru.getStartDateTime().toLocalDate(),
-						ru.getEndDateTime().toLocalDate(), status);
+				if (ru.getHumanCount() > 1) {// 当前在住人数大于1
+					ru.setHumanCount(ru.getHumanCount() - 1);
+					modify(ru);
+					return true;
+				}else {
+					roomTypeQuantityService.changeRoomTypeQuantity(gr.getRoomType(), ru.getStartDateTime().toLocalDate(),
+							ru.getEndDateTime().toLocalDate(), ru.getUsageStatus(), status, 1);
+					ru.setUsageStatus(status);
+					ru.setHumanCount(1);
+					modify(ru);
+				}
 			} else {
 				ru.setHumanCount(ru.getHumanCount() + 1);
 				modify(ru);
@@ -134,6 +175,7 @@ public class RoomUsageServiceImpl implements RoomUsageService {
 		if (ru != null) {
 			if (ru.getHumanCount() > 1) {// 当前在住人数大于1
 				ru.setHumanCount(ru.getHumanCount() - 1);
+				modify(ru);
 				return true;
 			}
 			if (endTime == null) {
@@ -398,17 +440,12 @@ public class RoomUsageServiceImpl implements RoomUsageService {
 		return response.addData(data);
 	}
 
-	private String fetchPreStatus(String currentStatus) {
-		switch (currentStatus) {
-		case Constants.Status.ROOM_USAGE_CHECK_IN:
-			return Constants.Status.ROOM_USAGE_ASSIGN;
-		case Constants.Status.ROOM_USAGE_ASSIGN:
-			return Constants.Status.ROOM_USAGE_BOOK;
-		case Constants.Status.ROOM_USAGE_BOOK:
-			return null;
-		default:
-			return null;
+	@Override
+	public boolean freeCheck(GuestRoom gr, LocalDateTime startTime, LocalDateTime endDateTime) {
+		if(endDateTime!=null) {
+			
 		}
+		return false;
 	}
 
 }

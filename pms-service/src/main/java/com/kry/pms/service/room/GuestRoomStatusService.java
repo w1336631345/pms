@@ -63,6 +63,8 @@ public interface GuestRoomStatusService extends BaseService<GuestRoomStatus> {
 	boolean lockGuestRoom(String id, RoomLockRecord record);
 
 	void changeStatus(UseInfoAble info);
+
+	public GuestRoomStatusVo detailGuestRoomNum(String num);
 	
 	
 }

@@ -64,6 +64,12 @@ public class GuestRoomStatusController extends BaseController<GuestRoomStatus> {
 		rep.setData(guestRoomStatusService.detailGuestRoom(id));
 		return rep;
 	}
+	@GetMapping(path = "/detail/roomNum/{num}")
+	public HttpResponse<GuestRoomStatusVo> detailGuestRoomNum(@PathVariable("num")String num) {
+		HttpResponse<GuestRoomStatusVo> rep = new HttpResponse<>();
+		rep.setData(guestRoomStatusService.detailGuestRoomNum(num));
+		return rep;
+	}
 
 	@GetMapping
 	public HttpResponse<PageResponse<GuestRoomStatus>> query(HttpServletRequest request)

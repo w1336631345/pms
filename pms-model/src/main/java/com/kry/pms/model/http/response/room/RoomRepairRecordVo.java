@@ -23,6 +23,9 @@ public class RoomRepairRecordVo {
 	private Boolean autoReOpen;
 
 	public static List<RoomRepairRecordVo> convert(List<RoomRepairRecord> lockRecords) {
+		if (lockRecords == null || lockRecords.isEmpty()) {
+			return null;
+		}
 		ArrayList<RoomRepairRecordVo> data = new ArrayList<>();
 		for (RoomRepairRecord r : lockRecords) {
 			data.add(convert(r));
@@ -31,6 +34,9 @@ public class RoomRepairRecordVo {
 	}
 
 	public static RoomRepairRecordVo convert(RoomRepairRecord rlr) {
+		if (rlr == null) {
+			return null;
+		}
 		RoomRepairRecordVo rlrv = new RoomRepairRecordVo();
 		BeanUtils.copyProperties(rlr, rlrv);
 		rlrv.setRoomId(rlr.getGuestRoom().getId());

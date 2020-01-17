@@ -42,5 +42,5 @@ public class BusinessSeq implements Serializable {
 	@Column
 	private Integer snLength;
 	@Column
-	private Integer yearLength =2;
+	private Integer yearLength;
 }

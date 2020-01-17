@@ -189,6 +189,51 @@ public class RoomTypeQuantityServiceImpl implements RoomTypeQuantityService {
 			break;
 		}
 	}
+
+	@Override
+	public void changeRoomTypeQuantity(RoomType roomType, LocalDate startDate, LocalDate endDate, String oldUsageStatus,
+			String newUsageStatus, int quantity) {
+		RoomTypeQuantity rtq = null;
+		LocalDate currentDate = startDate;
+		while (currentDate.isBefore(endDate)) {
+			rtq = findByRoomTypeAndQuantityDateForUpdate(roomType, currentDate);
+			plusQuantity(rtq, oldUsageStatus, -quantity);
+			plusQuantity(rtq, newUsageStatus, quantity);
+			currentDate = currentDate.plusDays(1);
+			modify(rtq);
+		}
+
+	}
+
+	private void plusQuantity(RoomTypeQuantity rtq, String status, int quantity) {
+		switch (status) {
+		case Constants.Status.ROOM_USAGE_CHECK_IN:
+			rtq.setUsedTotal(rtq.getUsedTotal() + quantity);
+			break;
+		case Constants.Status.ROOM_USAGE_ASSIGN:
+			rtq.setBookingTotal(rtq.getBookingTotal() + quantity);
+			break;
+		case Constants.Status.ROOM_USAGE_BOOK:
+			rtq.setReserveTotal(rtq.getReserveTotal() + quantity);
+			break;
+		case Constants.Status.ROOM_USAGE_FREE:
+			rtq.setAvailableTotal(rtq.getAvailableTotal() + quantity);
+			break;
+		case Constants.Status.ROOM_USAGE_CHECK_OUT:
+			rtq.setPredictableTotal(rtq.getPredictableTotal() + quantity);
+			break;
+		case Constants.Status.ROOM_USAGE_LOCKED:
+			rtq.setLockedTotal(rtq.getLockedTotal() + quantity);
+			break;
+		case Constants.Status.ROOM_USAGE_REPARIE:
+			rtq.setRepairTotal(rtq.getRepairTotal() + quantity);
+			break;
+		default:
+			break;
+		}
+
+	}
+
 	private void unCheckInRoomType(RoomType roomType, LocalDate startDate, LocalDate endDate, int quantity) {
 		RoomTypeQuantity rtq = null;
 		LocalDate currentDate = startDate;
@@ -200,7 +245,7 @@ public class RoomTypeQuantityServiceImpl implements RoomTypeQuantityService {
 			modify(rtq);
 		}
 	}
-	
+
 	private void bookRoomType(RoomType roomType, LocalDate startDate, LocalDate endDate, int quantity) {
 		RoomTypeQuantity rtq = null;
 		LocalDate currentDate = startDate;

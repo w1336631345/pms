@@ -30,6 +30,9 @@ public class CheckInRecordVo {
 	}
 
 	public static CheckInRecordVo convert(CheckInRecord cir) {
+		if(cir==null) {
+			return null;
+		}
 		CheckInRecordVo cirv = new CheckInRecordVo();
 		BeanUtils.copyProperties(cir, cirv);
 		if (cir.getCustomer() != null) {
@@ -44,6 +47,9 @@ public class CheckInRecordVo {
 	}
 
 	public static List<CheckInRecordVo> convert(List<CheckInRecord> currentCheckInRecords) {
+		if (currentCheckInRecords == null || currentCheckInRecords.isEmpty()) {
+			return null;
+		}
 		List<CheckInRecordVo> data = new ArrayList<CheckInRecordVo>();
 		for (CheckInRecord checkInRecord : currentCheckInRecords) {
 			data.add(convert(checkInRecord));
