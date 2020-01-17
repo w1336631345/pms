@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.kry.pms.api.BaseController;
+import com.kry.pms.base.Constants;
 import com.kry.pms.base.HttpResponse;
 import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
@@ -67,7 +68,13 @@ public class GuestRoomStatusController extends BaseController<GuestRoomStatus> {
 	@GetMapping(path = "/detail/roomNum/{num}")
 	public HttpResponse<GuestRoomStatusVo> detailGuestRoomNum(@PathVariable("num")String num) {
 		HttpResponse<GuestRoomStatusVo> rep = new HttpResponse<>();
-		rep.setData(guestRoomStatusService.detailGuestRoomNum(num));
+		GuestRoomStatusVo grsv = guestRoomStatusService.detailGuestRoomNum(num,getCurrentHotleCode());
+		if(grsv==null) {
+			rep.setStatus(Constants.BusinessCode.CODE_PARAMETER_INVALID);
+			rep.setMessage("找不到对应的房间信息");
+		}else {			
+			rep.setData(grsv);
+		}
 		return rep;
 	}
 

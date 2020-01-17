@@ -59,7 +59,8 @@ public class Constants {
 		public static final String ROOM_USAGE_CHECK_OUT = "O";
 		public static final String ROOM_USAGE_ASSIGN = "A";
 		public static final String ROOM_USAGE_LOCKED = "L";
-		public static final String ROOM_USAGE_BOOK = "R";
+		public static final String ROOM_USAGE_BOOK = "B";
+		public static final String ROOM_USAGE_RESERVATION = "R";
 		public static final String ROOM_USAGE_REPARIE = "p";
 
 		public static final String ACCOUNT_IN = "I";

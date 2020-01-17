@@ -154,9 +154,10 @@ public class RoomUsageServiceImpl implements RoomUsageService {
 					ru.setHumanCount(ru.getHumanCount() - 1);
 					modify(ru);
 					return true;
-				}else {
-					roomTypeQuantityService.changeRoomTypeQuantity(gr.getRoomType(), ru.getStartDateTime().toLocalDate(),
-							ru.getEndDateTime().toLocalDate(), ru.getUsageStatus(), status, 1);
+				} else {
+					roomTypeQuantityService.changeRoomTypeQuantity(gr.getRoomType(),
+							ru.getStartDateTime().toLocalDate(), ru.getEndDateTime().toLocalDate(), ru.getUsageStatus(),
+							status, 1);
 					ru.setUsageStatus(status);
 					ru.setHumanCount(1);
 					modify(ru);
@@ -170,7 +171,7 @@ public class RoomUsageServiceImpl implements RoomUsageService {
 	}
 
 	@Override
-	public boolean unUse(GuestRoom gr, String businessKey, LocalDateTime endTime) {
+	public boolean unUse(GuestRoom gr, String businessKey, LocalDateTime endTime, String roomTypeUsage) {
 		RoomUsage ru = roomUsageDao.findByGuestRoomIdAndBusinesskey(gr.getId(), businessKey);
 		if (ru != null) {
 			if (ru.getHumanCount() > 1) {// 当前在住人数大于1
@@ -181,9 +182,9 @@ public class RoomUsageServiceImpl implements RoomUsageService {
 			if (endTime == null) {
 				endTime = ru.getStartDateTime();
 			}
+			roomTypeQuantityService.changeRoomTypeQuantity(gr.getRoomType(), endTime.toLocalDate(),
+					ru.getEndDateTime().toLocalDate(), ru.getUsageStatus(), roomTypeUsage, 1);
 			if (!ru.getStartDateTime().isBefore(endTime)) { // 开始时间前释放资源 相当于直接取消
-				roomTypeQuantityService.unUseRoomType(gr.getRoomType(), ru.getStartDateTime().toLocalDate(),
-						ru.getEndDateTime().toLocalDate(), ru.getUsageStatus());
 				RoomUsage pru = ru.getPreRoomUsage();
 				RoomUsage npru = ru.getPostRoomUsage();
 				if (pru.getUsageStatus().equals(Constants.Status.ROOM_USAGE_FREE)) {
@@ -257,6 +258,11 @@ public class RoomUsageServiceImpl implements RoomUsageService {
 			return false;
 		}
 		return true;
+	}
+
+	@Override
+	public boolean unUse(GuestRoom gr, String businessKey, LocalDateTime endTime) {
+		return unUse(gr, businessKey, endTime, Constants.Status.ROOM_USAGE_FREE);
 
 	}
 
@@ -442,8 +448,7 @@ public class RoomUsageServiceImpl implements RoomUsageService {
 
 	@Override
 	public boolean freeCheck(GuestRoom gr, LocalDateTime startTime, LocalDateTime endDateTime) {
-		if(endDateTime!=null) {
-			
+		if (endDateTime != null) {
 		}
 		return false;
 	}

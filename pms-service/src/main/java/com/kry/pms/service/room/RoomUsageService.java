@@ -80,4 +80,6 @@ public interface RoomUsageService extends BaseService<RoomUsage> {
 
 	public boolean freeCheck(GuestRoom gr, LocalDateTime startTime, LocalDateTime endDateTime);
 
+	boolean unUse(GuestRoom gr, String businessKey, LocalDateTime endTime, String roomTypeUsage);
+
 }

@@ -27,14 +27,15 @@ public class RoomStatisticsServiceImpl implements RoomStatisticsService {
 
 	@Override
 	public boolean reserve(UseInfoAble info) {
-		roomTypeQuantityService.useRoomType(info,Constants.Status.ROOM_USAGE_BOOK);
+		roomTypeQuantityService.useRoomType(info, Constants.Status.ROOM_USAGE_BOOK);
 		return true;
 	}
 
 	@Override
 	public boolean cancleReserve(UseInfoAble info) {
-		roomTypeQuantityService.unUseRoomType(info.roomType(), info.getStartTime().toLocalDate(),
-				info.getEndTime().toLocalDate(), Constants.Status.ROOM_USAGE_BOOK);
+		roomTypeQuantityService.changeRoomTypeQuantity(info.roomType(), info.getStartTime().toLocalDate(),
+				info.getEndTime().toLocalDate(), Constants.Status.ROOM_USAGE_RESERVATION,
+				Constants.Status.ROOM_USAGE_FREE, info.getRoomCount());
 		return true;
 	}
 
@@ -48,7 +49,7 @@ public class RoomStatisticsServiceImpl implements RoomStatisticsService {
 
 	@Override
 	public boolean cancleAssign(UseInfoAble info) {
-		roomUsageService.changeUseStatus(info.guestRoom(),info.getBusinessKey(),Constants.Status.ROOM_USAGE_BOOK);
+		roomUsageService.unUse(info.guestRoom(), info.getBusinessKey(), null, Constants.Status.ROOM_USAGE_RESERVATION);
 		guestRoomStatusService.changeStatus(info);
 		return true;
 	}
@@ -63,12 +64,13 @@ public class RoomStatisticsServiceImpl implements RoomStatisticsService {
 		// TODO Auto-generated method stub
 		return false;
 	}
+
 	@Override
 	public boolean checkIn(UseInfoAble info) {
 //		roomUsageService.changeUseStatus(info.guestRoom(), info.getBusinessKey(),
 //				Constants.Status.ROOM_USAGE_CHECK_IN);
 //		
-		if(info.guestRoom()!=null) {
+		if (info.guestRoom() != null) {
 			roomUsageService.checkIn(info);
 			guestRoomStatusService.changeStatus(info);
 		}
@@ -77,9 +79,9 @@ public class RoomStatisticsServiceImpl implements RoomStatisticsService {
 
 	@Override
 	public boolean cancleCheckIn(UseInfoAble info) {
-		//未判断是否为同时离开
+		// 未判断是否为同时离开
 //		roomUsageService.unUse(info.guestRoom(), info.getBusinessKey(), null);
-		
+
 		roomUsageService.changeUseStatus(info.guestRoom(), info.getBusinessKey(), Constants.Status.ROOM_USAGE_ASSIGN);
 		guestRoomStatusService.changeStatus(info);
 		return true;
@@ -94,8 +96,7 @@ public class RoomStatisticsServiceImpl implements RoomStatisticsService {
 
 	@Override
 	public boolean cancelCheckOut(UseInfoAble info) {
-		roomUsageService.changeUseStatus(info.guestRoom(), info.getBusinessKey(),
-				Constants.Status.ROOM_USAGE_CHECK_IN);
+		roomUsageService.changeUseStatus(info.guestRoom(), info.getBusinessKey(), Constants.Status.ROOM_USAGE_CHECK_IN);
 		return false;
 	}
 

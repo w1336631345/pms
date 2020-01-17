@@ -468,8 +468,11 @@ public class GuestRoomStatusServiceImpl implements GuestRoomStatusService {
 	}
 
 	@Override
-	public GuestRoomStatusVo detailGuestRoomNum(String num) {
-		GuestRoomStatus status = guestRoomStatusDao.findTopByRoomNum(num);
+	public GuestRoomStatusVo detailGuestRoomNum(String num,String hotleCode) {
+		GuestRoomStatus status = guestRoomStatusDao.findTopByRoomNumAndHotelCode(num,hotleCode);
+		if(status==null) {
+			return null;
+		}
 		inflatRecordInfo(status);
 		return GuestRoomStatusVo.covert(status);
 	}

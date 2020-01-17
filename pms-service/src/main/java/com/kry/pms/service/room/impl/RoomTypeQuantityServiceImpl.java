@@ -228,6 +228,9 @@ public class RoomTypeQuantityServiceImpl implements RoomTypeQuantityService {
 		case Constants.Status.ROOM_USAGE_REPARIE:
 			rtq.setRepairTotal(rtq.getRepairTotal() + quantity);
 			break;
+		case Constants.Status.ROOM_USAGE_RESERVATION:
+			rtq.setReserveTotal(rtq.getReserveTotal() + quantity);
+			break;
 		default:
 			break;
 		}

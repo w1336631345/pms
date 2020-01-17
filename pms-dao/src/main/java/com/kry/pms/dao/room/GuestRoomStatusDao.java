@@ -27,6 +27,6 @@ public interface GuestRoomStatusDao extends BaseDao<GuestRoomStatus> {
 			"a.personal, a.group, a.linkedRoom, a.repairRoom, a.overdued, a.ota) from GuestRoomStatus a ,GuestRoom b,Floor c,RoomType d where a.guestRoom = b and b.floor = c and b.roomType = d and c.id = ?1 and a.deleted=0")
 	List<GuestRoomStatusVo> queryViewByFloorId(String floorId);
 
-	GuestRoomStatus findTopByRoomNum(String num);
+	GuestRoomStatus findTopByRoomNumAndHotelCode(String num, String hotleCode);
 
 }
