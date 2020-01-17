@@ -3,6 +3,7 @@ package com.kry.pms.dao.room;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.kry.pms.model.persistence.room.GuestRoom;
 import org.springframework.data.jpa.repository.Query;
 
 import com.kry.pms.dao.BaseDao;
@@ -22,4 +23,6 @@ public interface RoomUsageDao extends BaseDao<RoomUsage> {
 	public RoomUsage findByGuestRoomIdAndBusinesskey(String id, String businessKey);
 
 	public RoomUsage findByGuestRoomIdAndBusinesskeyAndUsageStatus(String id, String businesskey, String usageStatus);
+
+	int deleteByGuestRoom(GuestRoom gr);
 }

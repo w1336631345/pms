@@ -67,6 +67,9 @@ public class CheckInRecord extends PersistenceModel {
 	@Column
 	private LocalDateTime arriveTime;// 到达时间
 	@Column
+	private LocalDateTime actualTimeOfArrive;//实际到达时间
+	private LocalDateTime actualTimeOfLeave;//实际离开时间
+	@Column
 	private LocalDate startDate;// 开始时间
 	@Column
 	private Double purchasePrice;// 成交价格
@@ -132,9 +135,13 @@ public class CheckInRecord extends PersistenceModel {
 	private List<Arrangement> arrangements;//房间布置
 	@Column
 	private Boolean isSecrecy;//房价是否保密
-	public Boolean isSecrecy() { return isSecrecy; }
-	public void setSecrecy(Boolean secrecy) { isSecrecy = secrecy; }
+	public Boolean getIsSecrecy() { return isSecrecy; }
+	public void setIsSecrecy(Boolean isSecrecy) { this.isSecrecy = isSecrecy; }
 
+	public LocalDateTime getActualTimeOfArrive() { return actualTimeOfArrive; }
+	public void setActualTimeOfArrive(LocalDateTime actualTimeOfArrive) { this.actualTimeOfArrive = actualTimeOfArrive; }
+	public LocalDateTime getActualTimeOfLeave() { return actualTimeOfLeave; }
+	public void setActualTimeOfLeave(LocalDateTime actualTimeOfLeave) { this.actualTimeOfLeave = actualTimeOfLeave; }
 
 	public List<Arrangement> getArrangements() { return arrangements; }
 	public void setArrangements(List<Arrangement> arrangements) { this.arrangements = arrangements; }
@@ -537,10 +544,6 @@ public class CheckInRecord extends PersistenceModel {
 
 	public void setLinkNum(String linkNum) {
 		this.linkNum = linkNum;
-	}
-
-	public void setUpdateTime(boolean isUpdateTime) {
-		this.isUpdateTime = isUpdateTime;
 	}
 
 }

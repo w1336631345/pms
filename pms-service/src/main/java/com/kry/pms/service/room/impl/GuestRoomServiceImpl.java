@@ -1,12 +1,21 @@
 package com.kry.pms.service.room.impl;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.transaction.Transactional;
 
+import com.kry.pms.base.*;
+import com.kry.pms.dao.room.GuestRoomStatusDao;
+import com.kry.pms.dao.room.RoomTypeQuantityDao;
+import com.kry.pms.dao.room.RoomUsageDao;
+import com.kry.pms.model.persistence.room.*;
+import com.kry.pms.service.room.*;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
@@ -14,27 +23,18 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
-import com.kry.pms.base.Constants;
-import com.kry.pms.base.DtoResponse;
-import com.kry.pms.base.PageRequest;
-import com.kry.pms.base.PageResponse;
 import com.kry.pms.dao.room.GuestRoomDao;
 import com.kry.pms.model.http.request.busi.GuestRoomOperation;
 import com.kry.pms.model.persistence.busi.RoomLockRecord;
 import com.kry.pms.model.persistence.busi.RoomRepairRecord;
 import com.kry.pms.model.persistence.dict.RoomLockReason;
 import com.kry.pms.model.persistence.dict.RoomRepairReason;
-import com.kry.pms.model.persistence.room.Floor;
-import com.kry.pms.model.persistence.room.GuestRoom;
-import com.kry.pms.model.persistence.room.RoomUsage;
 import com.kry.pms.service.busi.RoomLockRecordService;
 import com.kry.pms.service.busi.RoomRecordService;
 import com.kry.pms.service.busi.RoomRepairRecordService;
 import com.kry.pms.service.dict.RoomLockReasonService;
 import com.kry.pms.service.dict.RoomRepairReasonService;
-import com.kry.pms.service.room.GuestRoomService;
-import com.kry.pms.service.room.GuestRoomStatusService;
-import com.kry.pms.service.room.RoomUsageService;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 @Service
 public class GuestRoomServiceImpl implements GuestRoomService {
@@ -42,6 +42,8 @@ public class GuestRoomServiceImpl implements GuestRoomService {
 	GuestRoomDao guestRoomDao;
 	@Autowired
 	GuestRoomStatusService guestRoomStatusService;
+	@Autowired
+	GuestRoomStatusDao guestRoomStatusDao;
 	@Autowired
 	RoomRecordService roomRecordService;
 	@Autowired
@@ -54,14 +56,36 @@ public class GuestRoomServiceImpl implements GuestRoomService {
 	RoomLockReasonService roomLockReasonService;
 	@Autowired
 	RoomUsageService roomUsageService;
+	@Autowired
+	RoomUsageDao roomUsageDao;
+	@Autowired
+	RoomTypeService roomTypeService;
+	@Autowired
+	RoomTypeQuantityDao roomTypeQuantityDao;
 
 	public static final String OP_OPEN_REPAIR = "_ROO";
 	public static final String OP_OPEN_LOCK = "_ROS";
 
 	@Override
+	@Transactional
 	public GuestRoom add(GuestRoom guestRoom) {
+		guestRoom.setStatus(Constants.Status.NORMAL);
 		guestRoom = guestRoomDao.saveAndFlush(guestRoom);
 		guestRoomStatusService.initNewGuestRoomStatus(guestRoom);
+		return guestRoom;
+	}
+
+	@Override
+	@org.springframework.transaction.annotation.Transactional(rollbackFor = Exception.class)
+	public GuestRoom addRoomAndResources(GuestRoom guestRoom){
+		try {
+			guestRoom.setStatus(Constants.Status.NORMAL);
+			guestRoom = guestRoomDao.saveAndFlush(guestRoom);
+			//		guestRoomStatusService.initNewGuestRoomStatus(guestRoom);
+			addRoomRelated(guestRoom);
+		}catch (Exception e) {
+			throw new RuntimeException(e.getMessage());
+		}
 		return guestRoom;
 	}
 
@@ -125,7 +149,7 @@ public class GuestRoomServiceImpl implements GuestRoomService {
 					continue;
 				} else {
 					gr.setRoomNum(rn);
-					add(gr);
+					addRoomAndResources(gr);
 					list.add(gr);
 				}
 			}
@@ -134,6 +158,80 @@ public class GuestRoomServiceImpl implements GuestRoomService {
 			}
 		}
 		return rep.addData(list);
+	}
+
+	@Transactional
+	public void addRoomRelated(GuestRoom gr){
+		guestRoomStatusService.initNewGuestRoomStatus(gr);
+		RoomType rt = roomTypeService.findById(gr.getRoomType().getId());
+		rt.setRoomCount(rt.getRoomCount()+1);
+		roomTypeService.modify(rt);
+		LocalDate date = LocalDate.now();
+		DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+		String dateStr = date.format(fmt);
+		int i = roomTypeQuantityDao.updateAddTotal(gr.getRoomType().getId(), dateStr);
+		RoomUsage ru = new RoomUsage();
+		ru.setStartDateTime(LocalDateTime.now());
+		ru.setEndDateTime(LocalDateTime.now().plus(1, ChronoUnit.YEARS));
+		ru.setUsageStatus(Constants.Status.ROOM_USAGE_FREE);
+		long d = Duration.between(ru.getStartDateTime(), ru.getEndDateTime()).get(ChronoUnit.SECONDS);
+		ru.setDuration(d / 3600);
+		ru.setGuestRoom(gr);
+		roomUsageDao.saveAndFlush(ru);
+	}
+
+	@Transactional
+	@Override
+	public DtoResponse<GuestRoom> removeRoomRelated(String id){
+		GuestRoom gr = findById(id);
+		DtoResponse<GuestRoom> rep = new DtoResponse<GuestRoom>();
+		boolean isUse = roomUsageService.freeCheck(gr, LocalDateTime.now(), null);
+		if(isUse){
+			rep.setStatus(Constants.BusinessCode.CODE_PARAMETER_INVALID);
+			rep.setCode(Constants.CODE_SHOW_LEVEL_ERROR);
+			rep.setMessage("房间"+gr.getRoomNum()+"被占用或被预订");
+		}else{
+			LocalDate date = LocalDate.now();
+			DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+			String dateStr = date.format(fmt);
+			int i = roomTypeQuantityDao.deletedAddTotal(gr.getRoomType().getId(), dateStr);
+
+			guestRoomStatusDao.deleteByGuestRoom(gr);
+
+			RoomType rt = roomTypeService.findById(gr.getRoomType().getId());
+			rt.setRoomCount(rt.getRoomCount() - 1);
+			roomTypeService.modify(rt);
+
+			roomUsageDao.deleteByGuestRoom(gr);
+
+			guestRoomDao.delete(gr);
+
+		}
+		return rep;
+	}
+	@Transactional
+	@Override
+	public HttpResponse updateRoom(GuestRoom guestRoom){
+		HttpResponse hr = new HttpResponse();
+		GuestRoom gr = guestRoomDao.getOne(guestRoom.getId());
+		if(!gr.getRoomType().getId().equals(guestRoom.getRoomType().getId())){
+			boolean isUse = roomUsageService.freeCheck(gr, LocalDateTime.now(), null);
+			if(isUse){
+				hr.error("房间"+gr.getRoomNum()+"被占用或被预订");
+				return hr;
+			}else {
+				removeRoomRelated(gr.getId());
+				GuestRoom grl = new GuestRoom();
+				guestRoom.setId(null);
+				BeanUtils.copyProperties(guestRoom, grl);
+				grl.setTags(guestRoom.getTags());
+				addRoomAndResources(guestRoom);
+				hr.setData(grl);
+			}
+		}else {
+			modify(guestRoom);
+		}
+		return hr;
 	}
 
 	@Override
@@ -146,7 +244,7 @@ public class GuestRoomServiceImpl implements GuestRoomService {
 			rep.setCode(Constants.CODE_SHOW_LEVEL_ERROR);
 			rep.setMessage("房间编号重复：" + guestRoom.getRoomNum());
 		} else {
-			rep.addData(add(guestRoom));
+			rep.addData(addRoomAndResources(guestRoom));
 		}
 		return rep;
 	}

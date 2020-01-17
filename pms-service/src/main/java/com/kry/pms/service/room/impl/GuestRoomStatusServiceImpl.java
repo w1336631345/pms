@@ -99,6 +99,7 @@ public class GuestRoomStatusServiceImpl implements GuestRoomStatusService {
 		status.setRoomTypeName(guestRoom.getRoomType().getName());
 		status.setGuestRoom(guestRoom);
 		status.setRoomNum(guestRoom.getRoomNum());
+		status.setCreateDate(LocalDateTime.now());
 		initStatus(status);
 		status = add(status);
 		return status;

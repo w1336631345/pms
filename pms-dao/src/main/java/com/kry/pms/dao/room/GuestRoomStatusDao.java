@@ -2,6 +2,7 @@ package com.kry.pms.dao.room;
 
 import java.util.List;
 
+import com.kry.pms.model.persistence.room.GuestRoom;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
@@ -28,5 +29,7 @@ public interface GuestRoomStatusDao extends BaseDao<GuestRoomStatus> {
 	List<GuestRoomStatusVo> queryViewByFloorId(String floorId);
 
 	GuestRoomStatus findTopByRoomNumAndHotelCode(String num, String hotleCode);
+
+	int deleteByGuestRoom(GuestRoom gr);
 
 }

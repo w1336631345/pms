@@ -23,7 +23,7 @@ public class RoomTypeServiceImpl implements RoomTypeService {
 	RoomTypeDao roomTypeDao;
 
 	@Override
-	@CacheEvict(value = "room_type", key = "targetClass+#p0.hotelCode")
+//	@CacheEvict(value = "room_type", key = "targetClass+#p0.hotelCode")
 	public RoomType add(RoomType roomType) {
 		return roomTypeDao.saveAndFlush(roomType);
 	}
@@ -37,7 +37,7 @@ public class RoomTypeServiceImpl implements RoomTypeService {
 		modify(roomType);
 	}
 
-	@CacheEvict(value = "room_type", key = "targetClass+#p0.hotelCode")
+//	@CacheEvict(value = "room_type", key = "targetClass+#p0.hotelCode")
 	@Override
 	public RoomType modify(RoomType roomType) {
 		return roomTypeDao.saveAndFlush(roomType);
@@ -49,7 +49,7 @@ public class RoomTypeServiceImpl implements RoomTypeService {
 	}
 
 	@Override
-	@Cacheable(value = "room_type", key = "targetClass+#p0")
+//	@Cacheable(value = "room_type", key = "targetClass+#p0")
 	public List<RoomType> getAllByHotelCode(String code) {
 		return roomTypeDao.findByHotelCode(code);
 	}

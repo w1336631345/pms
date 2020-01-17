@@ -32,6 +32,7 @@ public class GuestRoomController extends BaseController<GuestRoom> {
 	GuestRoomService guestRoomService;
 	@PostMapping
 	public HttpResponse<GuestRoom> add(@RequestBody GuestRoom guestRoom) {
+		guestRoom.setHotelCode(getCurrentHotleCode());
 		HttpResponse<GuestRoom> rep = getDefaultResponse();
 		BeanUtils.copyProperties(guestRoomService.addWithDto(guestRoom), rep);
 		return rep;
@@ -40,14 +41,26 @@ public class GuestRoomController extends BaseController<GuestRoom> {
 	public HttpResponse<GuestRoom> modify(@RequestBody GuestRoom guestRoom) {
 		return getDefaultResponse().addData(guestRoomService.modify(guestRoom));
 	}
+	@PutMapping(path = "/modifyRoom")
+	public HttpResponse<GuestRoom> modifyRoom(@RequestBody GuestRoom guestRoom) {
+		HttpResponse hr = guestRoomService.updateRoom(guestRoom);
+		return hr;
+	}
 	@DeleteMapping
 	public HttpResponse<String> delete(String id) {
 		HttpResponse<String> rep = new HttpResponse<>();
 		guestRoomService.delete(id);
 		return rep;
 	}
+	@DeleteMapping(path = "/remove")
+	public HttpResponse<GuestRoom> deletedRoom(String id) {
+		HttpResponse<GuestRoom> rep = getDefaultResponse();
+		BeanUtils.copyProperties(guestRoomService.removeRoomRelated(id), rep);
+		return rep;
+	}
 	@PostMapping(path="/batch")
 	public HttpResponse<List<GuestRoom>> batchAdd(@RequestBody GuestRoom guestRoom) {
+		guestRoom.setHotelCode(getCurrentHotleCode());
 		HttpResponse<List<GuestRoom>> rep = new HttpResponse<List<GuestRoom>>();
 		BeanUtils.copyProperties(guestRoomService.batchAdd(guestRoom), rep);
 		return rep;

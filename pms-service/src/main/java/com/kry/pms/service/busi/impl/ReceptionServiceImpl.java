@@ -1,5 +1,6 @@
 package com.kry.pms.service.busi.impl;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -205,6 +206,7 @@ public class ReceptionServiceImpl implements ReceptionService {
 	public DtoResponse<String> checkInM(String id) {
 		DtoResponse<String> rep = new DtoResponse<>();
 		CheckInRecord cir = checkInRecordService.findById(id);
+		cir.setActualTimeOfArrive(LocalDateTime.now());
 		if (cir != null) {
 			// 预留单不能入住
 			if ((Constants.Type.CHECK_IN_RECORD_RESERVE).equals(cir.getType())) {

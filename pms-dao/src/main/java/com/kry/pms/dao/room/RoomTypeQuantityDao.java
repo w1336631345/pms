@@ -7,12 +7,15 @@ import java.util.List;
 import javax.persistence.LockModeType;
 
 import org.springframework.data.jpa.repository.Lock;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import com.kry.pms.dao.BaseDao;
 import com.kry.pms.model.http.response.room.RoomTypeQuantityVo;
 import com.kry.pms.model.persistence.room.RoomType;
 import com.kry.pms.model.persistence.room.RoomTypeQuantity;
+import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 public interface RoomTypeQuantityDao extends BaseDao<RoomTypeQuantity> {
 
@@ -32,5 +35,19 @@ public interface RoomTypeQuantityDao extends BaseDao<RoomTypeQuantity> {
 	List<RoomTypeQuantity> queryByDay(String currentHotleCode, LocalDate startDate, LocalDate endDate);
 
 	List<RoomTypeQuantity> findByHotelCodeAndQuantityDate(String hotleCode, LocalDate date);
+
+	@Transactional
+	@Modifying
+	@Query(nativeQuery = true, value = " update t_room_type_quantity " +
+			" set room_count = room_count + 1, predictable_total = predictable_total + 1, available_total = available_total + 1 " +
+			" where room_type_id = :roomTypeId and DATE_FORMAT(quantity_date, '%Y-%m-%d') >= :nowDate ")
+	int updateAddTotal(@Param("roomTypeId") String roomTypeId, @Param("nowDate")String nowDate);
+
+    @Transactional
+    @Modifying
+    @Query(nativeQuery = true, value = " update t_room_type_quantity " +
+			" set room_count = room_count - 1, predictable_total = predictable_total - 1, available_total = available_total - 1 " +
+            " where room_type_id = :roomTypeId and DATE_FORMAT(quantity_date, '%Y-%m-%d') >= :nowDate ")
+    int deletedAddTotal(@Param("roomTypeId") String roomTypeId, @Param("nowDate")String nowDate);
 
 }

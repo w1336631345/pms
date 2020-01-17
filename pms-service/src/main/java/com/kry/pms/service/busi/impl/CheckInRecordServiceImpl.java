@@ -1289,6 +1289,8 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 	public CheckInRecord updateReserve(CheckInRecord cir){
 		CheckInRecord oldCir = checkInRecordDao.getOne(cir.getId());
 		CheckInRecordWrapper cirw = new CheckInRecordWrapper(oldCir);
+		oldCir.setDeleted(Constants.DELETED_TRUE);
+		checkInRecordDao.saveAndFlush(oldCir);
 		roomStatisticsService.cancleReserve(cirw);//先取消以前预留
 		CheckInRecord checkInRecord = new CheckInRecord();
 		cir.setId(null);
