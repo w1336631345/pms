@@ -2,6 +2,7 @@ package com.kry.pms.service.guest.impl;
 
 import java.util.List;
 
+import com.kry.pms.service.sys.BusinessSeqService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
@@ -26,9 +27,13 @@ public class CustomerServiceImpl implements CustomerService {
 	CustomerDao customerDao;
 	@Autowired
 	GuestInfoService guestInfoService;
+	@Autowired
+	BusinessSeqService businessSeqService;
 
 	@Override
 	public Customer add(Customer customer) {
+		String num = businessSeqService.fetchNextSeqNum(customer.getHotelCode(), Constants.Key.CUSTOMER_NUM);
+		customer.setNumCode(num);
 		return customerDao.saveAndFlush(customer);
 	}
 

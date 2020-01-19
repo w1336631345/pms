@@ -1071,7 +1071,8 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 			arrangements1.add(arrangements.get(i));
 		}
 		checkInRecord.setArrangements(arrangements1);
-		//浅拷贝处理完毕
+		//以上浅拷贝处理完毕
+
 		if (null != cir.getDemands() && !cir.getDemands().isEmpty()) {
 			List<RoomTag> demands = new ArrayList<>();
 			for (int i = 0; i < demands.size(); i++) {
@@ -1099,7 +1100,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 				CheckInRecord cirT = list.get(i);
 				cirT.setTogetherCode(togetherNum);
 				update(cirT);
-			}
+		}
 			checkInRecord.setTogetherCode(togetherNum);
 		} else {
 			checkInRecord.setTogetherCode(cir.getTogetherCode());

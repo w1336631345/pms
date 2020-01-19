@@ -5,15 +5,11 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 import com.kry.pms.model.persistence.PersistenceModel;
 
+import com.kry.pms.model.persistence.goods.SetMeal;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -36,4 +32,6 @@ public class RoomPriceScheme extends PersistenceModel {
 	private Boolean isDefault;
 	@OneToMany(cascade = CascadeType.ALL)
 	private List<RoomPriceSchemeItem> items;
+	@OneToOne
+	private SetMeal setMeal;
 }

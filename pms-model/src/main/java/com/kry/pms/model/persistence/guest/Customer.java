@@ -1,12 +1,9 @@
 package com.kry.pms.model.persistence.guest;
 
+import java.time.LocalDate;
 import java.util.List;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 import com.kry.pms.model.persistence.PersistenceModel;
 import com.kry.pms.model.persistence.busi.CheckInRecord;
@@ -56,4 +53,14 @@ public class Customer extends PersistenceModel {
 	private Integer age;//年龄
 	@Column
 	private String address;//地址
+	@Column
+	private LocalDate birthday;//生日
+	@Column
+	private String language;//语言
+	@Column
+	private LocalDate effectiveDate;//有效日期
+	@Column
+	private String numCode;//编号
+	@ManyToOne
+	private CustomerType customerType;//类型
 }
