@@ -22,6 +22,7 @@ import com.kry.pms.service.marketing.MarketingSourcesService;
 import com.kry.pms.service.org.HotelService;
 import com.kry.pms.service.room.RoomTagService;
 import com.kry.pms.service.room.RoomTypeService;
+import com.kry.pms.service.sys.SystemConfigService;
 
 @Service
 public class HotelServiceImpl implements HotelService {
@@ -37,6 +38,8 @@ public class HotelServiceImpl implements HotelService {
 	DistributionChannelService distributionChannelService;
 	@Autowired
 	RoomTagService roomTagService;
+	@Autowired
+	SystemConfigService systemConfigService;
 
 	@Override
 	public Hotel add(Hotel hotel) {
@@ -89,12 +92,12 @@ public class HotelServiceImpl implements HotelService {
 
 	@Override
 	public HotelInfoVo getHotelInfo(String currentHotleCode) {
-		Hotel hotel = getByHotelCode(currentHotleCode);
 		HotelInfoVo hv = new HotelInfoVo();
 		hv.setRoomTypes(roomTypeService.getAllByHotelCode(currentHotleCode, Constants.DELETED_FALSE));
 		hv.setMarketingSources(marketingSourcesService.getAllByHotelCode(currentHotleCode,Constants.DELETED_FALSE));
 		hv.setDiscountSchemes(discountSchemeService.getAllByHotelCode(currentHotleCode,Constants.DELETED_FALSE));
 		hv.setRoomTags(roomTagService.getAllByHotelCode(currentHotleCode,Constants.DELETED_FALSE));
+		hv.setConfigs(systemConfigService.getWebConfig(currentHotleCode));
 		hv.setDistributionChannels(distributionChannelService.getAllByHotelCode(currentHotleCode,Constants.DELETED_FALSE));
 		return hv;
 	}

@@ -67,9 +67,6 @@ public class RoomStatisticsServiceImpl implements RoomStatisticsService {
 
 	@Override
 	public boolean checkIn(UseInfoAble info) {
-//		roomUsageService.changeUseStatus(info.guestRoom(), info.getBusinessKey(),
-//				Constants.Status.ROOM_USAGE_CHECK_IN);
-//		
 		if (info.guestRoom() != null) {
 			roomUsageService.checkIn(info);
 			guestRoomStatusService.changeStatus(info);
@@ -80,8 +77,6 @@ public class RoomStatisticsServiceImpl implements RoomStatisticsService {
 	@Override
 	public boolean cancleCheckIn(UseInfoAble info) {
 		// 未判断是否为同时离开
-//		roomUsageService.unUse(info.guestRoom(), info.getBusinessKey(), null);
-
 		roomUsageService.changeUseStatus(info.guestRoom(), info.getBusinessKey(), Constants.Status.ROOM_USAGE_ASSIGN);
 		guestRoomStatusService.changeStatus(info);
 		return true;

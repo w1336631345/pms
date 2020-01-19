@@ -1,7 +1,10 @@
 package com.kry.pms.service.sys.impl;
 
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
@@ -97,6 +100,16 @@ public class SystemConfigServiceImpl implements SystemConfigService {
 	@Override
 	public int getCurrentSeq(String key) {
 		return 0;
+	}
+
+	@Override
+	public Map<String, String> getWebConfig(String hotelCode) {
+		List<SystemConfig> configs = systemConfigDao.findByHotelCodeAndUseOnWeb(hotelCode,true);
+		Map<String,String> data = new HashMap<String, String>();
+		for(SystemConfig c : configs) {
+			data.put(c.getKey(), c.getValue());
+		}
+		return data;
 	}
 
 }

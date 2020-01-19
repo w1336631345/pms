@@ -21,7 +21,7 @@ public class CheckInRecordWrapper implements UseInfoAble {
 	@JsonIgnore
 	@Override
 	public String getSummaryInfo() {
-		return null;
+		return this.checkInRecord.getName();
 	}
 
 	@JsonIgnore

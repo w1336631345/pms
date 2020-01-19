@@ -1,7 +1,5 @@
 package com.kry.pms.api.org;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,8 +11,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.kry.pms.api.BaseController;
 import com.kry.pms.base.HttpResponse;
-import com.kry.pms.base.PageRequest;
-import com.kry.pms.base.PageResponse;
 import com.kry.pms.model.persistence.org.Hotel;
 import com.kry.pms.service.org.HotelService;
 

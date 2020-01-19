@@ -1,4 +1,4 @@
-package com.kry.pms.model.persistence.sys;
+ package com.kry.pms.model.persistence.sys;
 
 import java.util.List;
 

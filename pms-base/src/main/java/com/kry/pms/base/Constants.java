@@ -86,6 +86,10 @@ public class Constants {
 
 	public interface Type {
 
+		public static final String CONFIG_USER="U";
+		public static final String CONFIG_OPERATION="O";
+		public static final String CONFIG_SYSTEM="S";
+		
 		public static final String BILL_CHECK_TYPE_ALL = "ALL";
 		public static final String BILL_CHECK_TYPE_PART = "PART";
 
