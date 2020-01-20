@@ -25,6 +25,7 @@ public class CustomerController extends BaseController<Customer> {
 	CustomerService customerService;
 	@PostMapping
 	public HttpResponse<Customer> add(@RequestBody Customer customer) {
+		customer.setHotelCode(getCurrentHotleCode());
 		return getDefaultResponse().addData(customerService.add(customer));
 	}
 

@@ -19,21 +19,23 @@ import lombok.Setter;
 @Table(name = "t_set_meal")
 public class SetMeal extends PersistenceModel {
 	@Column
-	private String name;
+	private String name;//
 	@Column
-	private String description;
+	private String description;//描述
 	@Column
-	private String code;
+	private String code;//
 	@OneToOne
-	private Product product;
+	private Product product;//
+	@OneToOne
+	private Goods goods;//对应商品（如：早餐、矿泉水、方便面等）
 	@Column
-	private Integer quantity;
+	private Integer quantity;//数量
 	@Column
-	private Double originalPrice;
+	private Double originalPrice;//原价（单价）
 	@Column
-	private Double discountPrice;
+	private Double discountPrice;//折扣
 	@Column
-	private Double total;
+	private Double total;//总价
 	@Column
 	private String type;
 	@Column(columnDefinition = "varchar(400) default NUll COMMENT '主图'")
