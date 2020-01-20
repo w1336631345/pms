@@ -46,8 +46,7 @@ public class  SetMealServiceImpl implements  SetMealService{
 
 	@Override
 	public List<SetMeal> getAllByHotelCode(String code) {
-		return null;//默认不实现
-		//return setMealDao.findByHotelCode(code);
+		return setMealDao.findByHotelCode(code);
 	}
 
 	@Override

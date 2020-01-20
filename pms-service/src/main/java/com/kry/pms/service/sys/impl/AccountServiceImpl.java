@@ -299,4 +299,10 @@ public class AccountServiceImpl implements AccountService {
 		}
 		return info;
 	}
+
+	@Override
+	public List<Account> findByHotelCodeAndType(String hotelCode){
+		List<Account> list = accountDao.findByHotelCodeAndType(hotelCode, Constants.Type.ACCOUNT_INNER);
+		return list;
+	}
 }

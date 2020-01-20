@@ -18,6 +18,8 @@ import com.kry.pms.base.PageResponse;
 import com.kry.pms.model.persistence.goods.SetMeal;
 import com.kry.pms.service.goods.SetMealService;
 
+import java.util.List;
+
 @RestController
 @RequestMapping(path = "/api/v1/goods/setMeal")
 public class SetMealController extends BaseController<SetMeal> {
@@ -46,5 +48,11 @@ public class SetMealController extends BaseController<SetMeal> {
 		PageRequest<SetMeal> req = parse2PageRequest(request);
 		return rep.addData(setMealService.listPage(req));
 	}
+	@GetMapping(path = "/list")
+	public HttpResponse<List<SetMeal>> list(HttpServletRequest request){
+		HttpResponse<List<SetMeal>> rep = new HttpResponse<List<SetMeal>>();
+		return rep.addData(setMealService.getAllByHotelCode(getCurrentHotleCode()));
+	}
+
 
 }

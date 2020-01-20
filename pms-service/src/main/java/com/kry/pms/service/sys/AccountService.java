@@ -1,6 +1,7 @@
 package com.kry.pms.service.sys;
 
 import java.util.Collection;
+import java.util.List;
 
 import com.kry.pms.base.DtoResponse;
 import com.kry.pms.model.http.request.busi.BillCheckBo;
@@ -35,4 +36,5 @@ public interface AccountService extends BaseService<Account> {
 
 	SettleInfoVo getSettleInfo(String type, String id);
 
+	List<Account> findByHotelCodeAndType(String hotelCode);
 }

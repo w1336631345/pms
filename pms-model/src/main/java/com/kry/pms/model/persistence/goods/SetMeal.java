@@ -2,14 +2,11 @@ package com.kry.pms.model.persistence.goods;
 
 import java.util.List;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 import com.kry.pms.model.persistence.PersistenceModel;
 
+import com.kry.pms.model.persistence.sys.Account;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -42,4 +39,7 @@ public class SetMeal extends PersistenceModel {
 	private String mainPicture;
 	@Column(columnDefinition = "varchar(400) default NUll COMMENT '缩略图'")
 	private String thumbnail;
+	@ManyToOne
+	private Account account;
+
 }

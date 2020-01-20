@@ -17,4 +17,6 @@ public interface AccountDao extends BaseDao<Account> {
 	public Collection<Account> findAccountByOrderNumAndStatusAndCheckInType(String orderNum, String checkInType,
 			String status);
 
+	List<Account> findByHotelCodeAndType(String hotelCode, String type);
+
 }

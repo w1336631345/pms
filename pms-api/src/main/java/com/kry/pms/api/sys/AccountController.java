@@ -23,6 +23,8 @@ import com.kry.pms.model.persistence.sys.Account;
 import com.kry.pms.service.org.EmployeeService;
 import com.kry.pms.service.sys.AccountService;
 
+import java.util.List;
+
 @RestController
 @RequestMapping(path = "/api/v1/sys/account")
 public class AccountController extends BaseController<Account> {
@@ -70,5 +72,20 @@ public class AccountController extends BaseController<Account> {
 		PageRequest<Account> req = parse2PageRequest(request);
 		return rep.addData(accountService.listPage(req));
 	}
+
+	/**
+	 * 功能描述: <br>查询包价所需的入账账户
+	 * 〈〉
+	 * @Param: [request]
+	 * @Return: com.kry.pms.base.HttpResponse<java.util.List<com.kry.pms.model.persistence.sys.Account>>
+	 * @Author: huanghaibin
+	 * @Date: 2020/1/20 16:35
+	 */
+	@GetMapping(path = "/getInner")
+	public HttpResponse<List<Account>> list(HttpServletRequest request){
+		HttpResponse<List<Account>> rep = new HttpResponse<List<Account>>();
+		return rep.addData(accountService.findByHotelCodeAndType(getCurrentHotleCode()));
+	}
+
 
 }

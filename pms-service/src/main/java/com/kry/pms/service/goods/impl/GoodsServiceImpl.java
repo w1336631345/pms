@@ -23,7 +23,7 @@ public class GoodsServiceImpl implements GoodsService {
 
 	@Override
 	public Goods add(Goods entity) {
-		return null;
+		return goodsDao.save(entity);
 	}
 
 	@Override
@@ -33,7 +33,7 @@ public class GoodsServiceImpl implements GoodsService {
 
 	@Override
 	public Goods modify(Goods goods) {
-		return null;
+		return goodsDao.saveAndFlush(goods);
 	}
 
 	@Override

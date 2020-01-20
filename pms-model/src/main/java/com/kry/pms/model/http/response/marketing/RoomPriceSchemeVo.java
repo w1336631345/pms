@@ -18,11 +18,13 @@ public class RoomPriceSchemeVo {
 	private String name;
 	private String code;
 	private List<SchemeItemVo> items;
+	private SetMeal setMeal;
 
 	public RoomPriceSchemeVo(RoomPriceScheme rps) {
 		this.name = rps.getName();
 		this.code = rps.getCode();
 		this.id = rps.getId();
+		this.setMeal = rps.getSetMeal();
 		SchemeItemVo item;
 		SetMealVo smv;
 		if (rps.getItems() != null) {
