@@ -1,5 +1,7 @@
 package com.kry.pms.api.sys;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +47,11 @@ public class FunctionController extends BaseController<Function> {
 		HttpResponse<PageResponse<Function>> rep = new HttpResponse<PageResponse<Function>>();
 		PageRequest<Function> req = parse2PageRequest(request);
 		return rep.addData(functionService.listPage(req));
+	}
+	@GetMapping(path="/all")
+	public HttpResponse<List<Function>> all() throws InstantiationException, IllegalAccessException{
+		HttpResponse<List<Function>> rep = new HttpResponse<List<Function>>();
+		return rep.addData(functionService.listAll());
 	}
 
 }

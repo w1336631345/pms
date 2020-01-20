@@ -62,8 +62,8 @@ public class  FunctionServiceImpl implements  FunctionService{
 		}
 		return convent(functionDao.findAll(ex, req));
 	}
-	 
-	 
-	 
-	 
+	@Override
+	public List<Function> listAll(){
+		return functionDao.findByStatusAndDeleted(Constants.Status.NORMAL,Constants.DELETED_FALSE);
+	} 
 }
