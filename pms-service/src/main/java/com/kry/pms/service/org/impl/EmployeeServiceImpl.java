@@ -18,6 +18,7 @@ import com.kry.pms.model.persistence.sys.Account;
 import com.kry.pms.model.persistence.sys.User;
 import com.kry.pms.service.org.EmployeeService;
 import com.kry.pms.service.sys.AccountService;
+import com.kry.pms.service.sys.RoleService;
 import com.kry.pms.service.sys.SystemConfigService;
 import com.kry.pms.service.sys.UserService;
 
@@ -29,6 +30,8 @@ public class EmployeeServiceImpl implements EmployeeService {
 	SystemConfigService systemConfigService;
 	@Autowired
 	UserService userService;
+	@Autowired
+	RoleService roleService;
 
 	@Override
 	public Employee add(Employee employee) {

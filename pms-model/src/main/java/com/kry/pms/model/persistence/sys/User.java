@@ -5,6 +5,7 @@ import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -29,8 +30,8 @@ public class User extends PersistenceModel {
 	private String password;
 	@Column(name = "type_")
 	private String type;
-	@ManyToMany
-	private List<Role> roles;
+	@OneToOne
+	private Role role;
 	@Column
 	private String avatar;
 	@Column(columnDefinition = "varchar(32) default 'normal' COMMENT '是否允许登录（normal：正常可登录状态，audit：夜审不可登录）'")
