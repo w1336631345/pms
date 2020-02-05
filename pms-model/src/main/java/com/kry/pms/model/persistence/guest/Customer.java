@@ -22,25 +22,23 @@ public class Customer extends PersistenceModel {
 	@OneToMany
 	private List<CustomerInvoiceInfo> invoiceInfos;
 	@OneToOne
-	private CustomerLevel customerLevel;
+	private CustomerLevel customerLevel;//客户等级
 	@OneToOne
 	private User user;
-	@Column
-	private String mobile;
 	@OneToOne
-	private GuestInfo guestInfo;
+	private GuestInfo guestInfo;//房间信息
 	@Column
-	private Integer checkInCount;
+	private Integer checkInCount;//入住人数
 	@Column
-	private String currentStatus;
+	private String currentStatus;//
 	@OneToOne
-	private CheckInRecord currentRecord;
+	private CheckInRecord currentRecord;//入住记录
 	@Column
 	private Double costTotal;
 	@Column
-	private String certificateType;
+	private String certificateType;//证件类型
 	@Column
-	private String idCardNum;
+	private String idCardNum;//身份证号码
 	@Column
 	private String credit;//信用
 	@Column
@@ -63,4 +61,33 @@ public class Customer extends PersistenceModel {
 	private String numCode;//编号
 	@ManyToOne
 	private CustomerType customerType;//类型
+
+	@Column
+	private String education;//学历
+	@Column
+	private String graduateSchool;//毕业学校
+	@Column
+	private String vip;
+	@Column
+	private String compNum;//单位编号
+	@Column
+	private String comp;//单位
+	@Column
+	private String job;//工作职业
+	@Column
+	private String position;//职位
+	@Column
+	private String email;//邮箱
+	@Column
+	private String mobile;//电话
+	@Column
+	private String landline; //座机
+	@Column
+	private String fax;//传真
+	@Column
+	private String zipCode;//邮编
+	@Column
+	private String others;//其他
+
+
 }
