@@ -32,8 +32,10 @@ public class CustomerServiceImpl implements CustomerService {
 
 	@Override
 	public Customer add(Customer customer) {
-		String num = businessSeqService.fetchNextSeqNum(customer.getHotelCode(), Constants.Key.CUSTOMER_NUM);
-		customer.setNumCode(num);
+		if(customer.getId() == null){
+			String num = businessSeqService.fetchNextSeqNum(customer.getHotelCode(), Constants.Key.CUSTOMER_NUM);
+			customer.setNumCode(num);
+		}
 		return customerDao.saveAndFlush(customer);
 	}
 

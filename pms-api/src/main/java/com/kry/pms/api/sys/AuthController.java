@@ -42,14 +42,14 @@ public class AuthController {
 	ShiftService shiftService;
 
 	@RequestMapping(path = "/admin/login", method = RequestMethod.POST)
-	public HttpResponse<String> loginTest(String username, String password,String hotleCode,String shift) {
+	public HttpResponse<String> loginTest(String username, String password,String hotelCode,String shift) {
 		HttpResponse<String> response = new HttpResponse<>();
-		password = MD5Utils.encrypt(username,hotleCode, password);
+		password = MD5Utils.encrypt(username,hotelCode, password);
 		UsernamePasswordToken token = new UsernamePasswordToken(username, password);
 		Subject subject = SecurityUtils.getSubject();
 		try {
 			subject.login(token);
-			String hotelCode = ShiroUtils.getUser().getHotelCode();
+			String hotelCodet = ShiroUtils.getUser().getHotelCode();
 			Shift newShift = shiftService.createOrUpdate(shift,ShiroUtils.getUser());
 			subject.getSession().setAttribute(Constants.Key.SESSION_ATTR_SHIFT_CODE,newShift.getShiftCode());
 			String id = (String)subject.getSession().getId();
