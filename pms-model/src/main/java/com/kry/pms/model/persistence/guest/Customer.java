@@ -66,8 +66,8 @@ public class Customer extends PersistenceModel {
 	private String education;//学历
 	@Column
 	private String graduateSchool;//毕业学校
-	@Column
-	private String vip;
+	@ManyToOne
+	private VipType vipType;
 	@Column
 	private String compNum;//单位编号
 	@Column

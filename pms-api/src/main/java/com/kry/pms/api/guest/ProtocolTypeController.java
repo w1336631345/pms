@@ -5,13 +5,12 @@ import com.kry.pms.base.HttpResponse;
 import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
 import com.kry.pms.model.persistence.guest.ProtocolType;
-import com.kry.pms.model.persistence.guest.VipType;
 import com.kry.pms.service.guest.ProtocolTypeService;
-import com.kry.pms.service.guest.VipTypeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 @RestController
 @RequestMapping(path = "/api/v1/guest/protocolType")
@@ -41,6 +40,13 @@ public class ProtocolTypeController extends BaseController<ProtocolType> {
 		HttpResponse<PageResponse<ProtocolType>> rep = new HttpResponse<PageResponse<ProtocolType>>();
 		PageRequest<ProtocolType> req = parse2PageRequest(request);
 		return rep.addData(protocolTypeService.listPage(req));
+	}
+
+	@GetMapping(path = "/list")
+	public HttpResponse<List<ProtocolType>> getByHotelCode(HttpServletRequest request){
+		HttpResponse<List<ProtocolType>> rep = new HttpResponse<List<ProtocolType>>();
+		List<ProtocolType> list = protocolTypeService.getAllByHotelCode(getCurrentHotleCode());
+		return rep.addData(list);
 	}
 
 }

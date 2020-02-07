@@ -4,14 +4,13 @@ import com.kry.pms.api.BaseController;
 import com.kry.pms.base.HttpResponse;
 import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
-import com.kry.pms.model.persistence.guest.Customer;
 import com.kry.pms.model.persistence.guest.VipType;
-import com.kry.pms.service.guest.CustomerService;
 import com.kry.pms.service.guest.VipTypeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 @RestController
 @RequestMapping(path = "/api/v1/guest/vipType")
@@ -41,6 +40,13 @@ public class VipTypeController extends BaseController<VipType> {
 		HttpResponse<PageResponse<VipType>> rep = new HttpResponse<PageResponse<VipType>>();
 		PageRequest<VipType> req = parse2PageRequest(request);
 		return rep.addData(vipTypeService.listPage(req));
+	}
+
+	@GetMapping(path = "/list")
+	public HttpResponse<List<VipType>> getByHotelCode(HttpServletRequest request){
+		HttpResponse<List<VipType>> rep = new HttpResponse<List<VipType>>();
+		List<VipType> list = vipTypeService.getAllByHotelCode(getCurrentHotleCode());
+		return rep.addData(list);
 	}
 
 }
