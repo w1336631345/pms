@@ -1,5 +1,7 @@
 package com.kry.pms.model.persistence.sys;
 
+import java.time.LocalDate;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.OneToOne;
@@ -32,17 +34,23 @@ public class Account extends PersistenceModel {
 	@Column(name="type_")
 	private String type;
 	@Column
-	private Double cost;
+	private LocalDate startDate;//有效期起
+	@Column
+	private LocalDate endDate;//有效期止
+	@Column
+	private Double cost;//消费
 	@Column
 	private String contactName;
 	@Column
 	private String contactMobile;
 	@Column
-	private Double pay;
+	private Boolean holdArrow;//允许记账
 	@Column
-	private Double creditLimit ;
+	private Double pay;//付款
 	@Column
-	private Double availableCreditLimit;
+	private Double creditLimit ; //信用额度
+	@Column
+	private Double availableCreditLimit;//可用信用额度
 	@OneToOne
 	private Employee operationEmployee;
 	@Column(columnDefinition = "varchar(255) COMMENT '操作员备注'")
