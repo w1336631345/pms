@@ -57,4 +57,11 @@ public class RoomTypeController extends BaseController<RoomType> {
 		return rep;
 	}
 
+	@GetMapping(path="/list")
+	public HttpResponse<List<RoomType>> codeAndDeleted() {
+		HttpResponse<List<RoomType>> rep = new HttpResponse<List<RoomType>>();
+		rep.addData(roomTypeService.getAllByHotelCode(getCurrentHotleCode(),0));
+		return rep;
+	}
+
 }
