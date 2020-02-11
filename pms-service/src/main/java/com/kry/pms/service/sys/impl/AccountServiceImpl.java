@@ -56,8 +56,19 @@ public class AccountServiceImpl implements AccountService {
 
 	@Override
 	public Account add(Account account) {
+		if(account.getTotal()==null) {			
+			initAccount(account);
+		}
 		return accountDao.saveAndFlush(account);
 	}
+	
+	private void initAccount(Account account) {
+		account.setPay(0.0);
+		account.setCost(0.0);
+		account.setCurrentBillSeq(0);
+		account.setTotal(0.0);
+	}
+	
 
 	@Override
 	public void delete(String id) {

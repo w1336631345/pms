@@ -62,6 +62,7 @@ public class Constants {
 		public static final String ROOM_USAGE_BOOK = "B";
 		public static final String ROOM_USAGE_RESERVATION = "R";
 		public static final String ROOM_USAGE_REPARIE = "p";
+		public static final String ROOM_USAGE_PREDICTABLE = "PR";
 
 		public static final String ACCOUNT_IN = "I";
 		public static final String ACCOUNT_SETTLE = "S";
@@ -82,15 +83,15 @@ public class Constants {
 		public static final String BUSINESS_BUSINESS_CUSTOMER_ACCOUNT_SEQ_KEY = "CUSTOMER_ACCOUNT_NUM";
 		public static final String BUSINESS_BUSINESS_GROUP_ACCOUNT_SEQ_KEY = "GROUP_ACCOUNT_NUM";
 		public static final String TOGETHER_NUM_KEY = "TOGETHER_NUM";
-		public static final String CUSTOMER_NUM = "CUSTOMER_NUM";//客户编码
+		public static final String CUSTOMER_NUM = "CUSTOMER_NUM";// 客户编码
 	}
 
 	public interface Type {
 
-		public static final String CONFIG_USER="U";
-		public static final String CONFIG_OPERATION="O";
-		public static final String CONFIG_SYSTEM="S";
-		
+		public static final String CONFIG_USER = "U";
+		public static final String CONFIG_OPERATION = "O";
+		public static final String CONFIG_SYSTEM = "S";
+
 		public static final String BILL_CHECK_TYPE_ALL = "ALL";
 		public static final String BILL_CHECK_TYPE_PART = "PART";
 

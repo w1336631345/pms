@@ -219,8 +219,10 @@ public class RoomTypeQuantityServiceImpl implements RoomTypeQuantityService {
 		case Constants.Status.ROOM_USAGE_FREE:
 			rtq.setAvailableTotal(rtq.getAvailableTotal() + quantity);
 			break;
+		case Constants.Status.ROOM_USAGE_PREDICTABLE:
+			rtq.setPredictableTotal(rtq.getPredictableTotal()+quantity);
 		case Constants.Status.ROOM_USAGE_CHECK_OUT:
-			rtq.setPredictableTotal(rtq.getPredictableTotal() + quantity);
+//			rtq.setPredictableTotal(rtq.getPredictableTotal() + quantity);
 			break;
 		case Constants.Status.ROOM_USAGE_LOCKED:
 			rtq.setLockedTotal(rtq.getLockedTotal() + quantity);

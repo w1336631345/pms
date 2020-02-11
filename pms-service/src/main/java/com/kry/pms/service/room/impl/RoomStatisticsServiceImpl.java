@@ -25,6 +25,7 @@ public class RoomStatisticsServiceImpl implements RoomStatisticsService {
 	@Autowired
 	GuestRoomStatusService guestRoomStatusService;
 
+	
 	@Override
 	public boolean reserve(UseInfoAble info) {
 		roomTypeQuantityService.useRoomType(info, Constants.Status.ROOM_USAGE_BOOK);
@@ -35,7 +36,7 @@ public class RoomStatisticsServiceImpl implements RoomStatisticsService {
 	public boolean cancleReserve(UseInfoAble info) {
 		roomTypeQuantityService.changeRoomTypeQuantity(info.roomType(), info.getStartTime().toLocalDate(),
 				info.getEndTime().toLocalDate(), Constants.Status.ROOM_USAGE_RESERVATION,
-				Constants.Status.ROOM_USAGE_FREE, info.getRoomCount());
+				Constants.Status.ROOM_USAGE_PREDICTABLE, info.getRoomCount());
 		return true;
 	}
 
