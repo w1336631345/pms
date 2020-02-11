@@ -26,6 +26,7 @@ D:\kry\server\pms-server\pms-service\src\main\java\com\kry\pms\service\report\im
 D:\kry\server\pms-server\pms-service\src\main\java\com\kry\pms\service\sys\impl\SystemConfigServiceImpl.java
 D:\kry\server\pms-server\pms-service\src\main\java\com\kry\pms\service\dict\impl\RoomLockReasonServiceImpl.java
 D:\kry\server\pms-server\pms-service\src\main\java\com\kry\pms\service\report\BusinessReportService.java
+D:\kry\server\pms-server\pms-service\src\main\java\com\kry\pms\service\guest\impl\ProtocolTypeServiceImpl.java
 D:\kry\server\pms-server\pms-service\src\main\java\com\kry\pms\service\busi\ArrangementService.java
 D:\kry\server\pms-server\pms-service\src\main\java\com\kry\pms\service\room\impl\FloorServiceImpl.java
 D:\kry\server\pms-server\pms-service\src\main\java\com\kry\pms\service\busi\RoomRepairRecordService.java
@@ -72,6 +73,7 @@ D:\kry\server\pms-server\pms-service\src\main\java\com\kry\pms\service\sys\impl\
 D:\kry\server\pms-server\pms-service\src\main\java\com\kry\pms\service\quratz\impl\QuartzSetService.java
 D:\kry\server\pms-server\pms-service\src\main\java\com\kry\pms\service\dict\impl\AreaServiceImpl.java
 D:\kry\server\pms-server\pms-service\src\main\java\com\kry\pms\service\room\impl\BuildingServiceImpl.java
+D:\kry\server\pms-server\pms-service\src\main\java\com\kry\pms\service\guest\VipTypeService.java
 D:\kry\server\pms-server\pms-service\src\main\java\com\kry\pms\service\dict\CountryOrRegionService.java
 D:\kry\server\pms-server\pms-service\src\main\java\com\kry\pms\service\busi\ReceptionService.java
 D:\kry\server\pms-server\pms-service\src\main\java\com\kry\pms\service\guest\impl\CustomerTypeServiceImpl.java
@@ -85,6 +87,7 @@ D:\kry\server\pms-server\pms-service\src\main\java\com\kry\pms\service\dict\Room
 D:\kry\server\pms-server\pms-service\src\main\java\com\kry\pms\service\dict\impl\RoomChangeReasonServiceImpl.java
 D:\kry\server\pms-server\pms-service\src\main\java\com\kry\pms\service\dict\impl\RoomRepairReasonServiceImpl.java
 D:\kry\server\pms-server\pms-service\src\main\java\com\kry\pms\service\marketing\impl\DistributionChannelServiceImpl.java
+D:\kry\server\pms-server\pms-service\src\main\java\com\kry\pms\service\guest\ProtocolTypeService.java
 D:\kry\server\pms-server\pms-service\src\main\java\com\kry\pms\service\report\FrontReceiveReportService.java
 D:\kry\server\pms-server\pms-service\src\main\java\com\kry\pms\service\goods\ProductCategoryService.java
 D:\kry\server\pms-server\pms-service\src\main\java\com\kry\pms\service\busi\CheckInRecordService.java
@@ -133,6 +136,7 @@ D:\kry\server\pms-server\pms-service\src\main\java\com\kry\pms\service\busi\Chan
 D:\kry\server\pms-server\pms-service\src\main\java\com\kry\pms\service\busi\impl\ChangeRoomRecordServiceImpl.java
 D:\kry\server\pms-server\pms-service\src\main\java\com\kry\pms\service\dict\AreaService.java
 D:\kry\server\pms-server\pms-service\src\main\java\com\kry\pms\service\busi\impl\RoomRepairRecordServiceImpl.java
+D:\kry\server\pms-server\pms-service\src\main\java\com\kry\pms\service\guest\impl\VipTypeServiceImpl.java
 D:\kry\server\pms-server\pms-service\src\main\java\com\kry\pms\service\sys\impl\BusinessSeqServiceImpl.java
 D:\kry\server\pms-server\pms-service\src\main\java\com\kry\pms\service\room\impl\GuestRoomStatusServiceImpl.java
 D:\kry\server\pms-server\pms-service\src\main\java\com\kry\pms\service\report\RoomReportService.java

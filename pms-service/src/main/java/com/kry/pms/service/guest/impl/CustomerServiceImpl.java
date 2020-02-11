@@ -32,7 +32,7 @@ public class CustomerServiceImpl implements CustomerService {
 
 	@Override
 	public Customer add(Customer customer) {
-		if(customer.getId() == null){
+		if(customer.getNumCode() == null){
 			String num = businessSeqService.fetchNextSeqNum(customer.getHotelCode(), Constants.Key.CUSTOMER_NUM);
 			customer.setNumCode(num);
 		}

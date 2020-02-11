@@ -299,6 +299,10 @@ public class AccountServiceImpl implements AccountService {
 		}
 		return info;
 	}
+	
+	private String createAccountCode(String hotleCode,String type) {
+		return null;
+	}
 
 	@Override
 	public List<Account> findByHotelCodeAndType(String hotelCode){
