@@ -2,6 +2,7 @@ package com.kry.pms.service.marketing.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
@@ -53,7 +54,11 @@ public class  RoomPriceSchemeServiceImpl implements  RoomPriceSchemeService{
 	@Override
 	public List<RoomPriceScheme> getAllByHotelCode(String code) {
 		return null;//默认不实现
-		//return roomPriceSchemeDao.findByHotelCode(code);
+//		return roomPriceSchemeDao.findByHotelCode(code);
+	}
+	@Override
+	public List<Map<String, Object>> getByHotelCode(String code) {
+		return roomPriceSchemeDao.getSql(code);
 	}
 
 	@Override

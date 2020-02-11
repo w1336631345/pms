@@ -3,6 +3,7 @@ package com.kry.pms.dao.room;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 import javax.persistence.LockModeType;
 
@@ -35,6 +36,20 @@ public interface RoomTypeQuantityDao extends BaseDao<RoomTypeQuantity> {
 	List<RoomTypeQuantity> queryByDay(String currentHotleCode, LocalDate startDate, LocalDate endDate);
 
 	List<RoomTypeQuantity> findByHotelCodeAndQuantityDate(String hotleCode, LocalDate date);
+
+	@Query(nativeQuery = true, value = "select  t.room_type_id, t.room_type_name, t.room_type_code, t.predictable_total from t_room_type_quantity t  " +
+			" where 1=1 " +
+			"  and if(:hotelCode is not null && :hotelCode != '', t.hotel_code=:hotelCode, 1=1 ) " +
+			"  and if(:times is not null && :times != '', DATE_FORMAT(t.quantity_date, '%Y-%m-%d') =:times, 1=1 ) " +
+			"  and if(:roomTypeId is not null && :roomTypeId != '', t.room_type_id=:roomTypeId, 1=1 ) " )
+	List<Map<String, Object>> getByTimeAndRoomType(@Param("hotelCode") String hotelCode, @Param("times")String time, @Param("roomTypeId")String roomTypeId);
+
+	@Query(nativeQuery = true, value = "select  t.room_type_id, t.room_type_name, t.room_type_code, t.predictable_total from t_room_type_quantity t  " +
+			" where 1=1 " +
+			"  and if(:hotelCode is not null && :hotelCode != '', t.hotel_code=:hotelCode, 1=1 ) " +
+			"  and if(:times is not null && :times != '', DATE_FORMAT(t.quantity_date, '%Y-%m-%d') =:times, 1=1 ) " +
+			"  and if(:roomTypeId is not null && :roomTypeId != '', t.room_type_id=:roomTypeId, 1=1 ) " )
+	Map<String, Object> mapByTimeAndRoomType(@Param("hotelCode") String hotelCode, @Param("times")String time, @Param("roomTypeId")String roomTypeId);
 
 	@Transactional
 	@Modifying

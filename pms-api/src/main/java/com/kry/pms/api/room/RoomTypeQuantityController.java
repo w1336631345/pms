@@ -2,6 +2,7 @@ package com.kry.pms.api.room;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -104,6 +105,13 @@ public class RoomTypeQuantityController extends BaseController<RoomTypeQuantity>
 		HttpResponse<PageResponse<RoomTypeQuantity>> rep = new HttpResponse<PageResponse<RoomTypeQuantity>>();
 		PageRequest<RoomTypeQuantity> req = parse2PageRequest(request);
 		return rep.addData(roomTypeQuantityService.listPage(req));
+	}
+
+	@GetMapping(path="/roomPriceByShecme")
+	public HttpResponse<List<Map<String, Object>>> roomPriceByShecme(String times, String roomTypeId){
+		HttpResponse<List<Map<String, Object>>> rep = new HttpResponse<>();
+		List<Map<String, Object>> data = roomTypeQuantityService.getByTimeAndRoomType(getCurrentHotleCode(),times, roomTypeId);
+		return rep.addData(data);
 	}
 
 }

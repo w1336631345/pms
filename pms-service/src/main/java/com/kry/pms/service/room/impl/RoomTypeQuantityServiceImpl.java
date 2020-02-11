@@ -1,10 +1,20 @@
 package com.kry.pms.service.room.impl;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-
+import com.kry.pms.base.Constants;
+import com.kry.pms.base.PageRequest;
+import com.kry.pms.base.PageResponse;
+import com.kry.pms.dao.marketing.RoomPriceSchemeDao;
+import com.kry.pms.dao.room.RoomTypeQuantityDao;
+import com.kry.pms.model.func.UseInfoAble;
+import com.kry.pms.model.http.response.busi.RoomTypeQuantityPredictableVo;
+import com.kry.pms.model.http.response.room.RoomTypeQuantityVo;
+import com.kry.pms.model.persistence.marketing.RoomPriceScheme;
+import com.kry.pms.model.persistence.room.GuestRoom;
+import com.kry.pms.model.persistence.room.RoomType;
+import com.kry.pms.model.persistence.room.RoomTypeQuantity;
+import com.kry.pms.service.room.RoomTypeQuantityService;
+import com.kry.pms.service.room.RoomTypeService;
+import org.apache.commons.collections4.MapUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
@@ -13,18 +23,12 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.kry.pms.base.Constants;
-import com.kry.pms.base.PageRequest;
-import com.kry.pms.base.PageResponse;
-import com.kry.pms.dao.room.RoomTypeQuantityDao;
-import com.kry.pms.model.func.UseInfoAble;
-import com.kry.pms.model.http.response.busi.RoomTypeQuantityPredictableVo;
-import com.kry.pms.model.http.response.room.RoomTypeQuantityVo;
-import com.kry.pms.model.persistence.room.GuestRoom;
-import com.kry.pms.model.persistence.room.RoomType;
-import com.kry.pms.model.persistence.room.RoomTypeQuantity;
-import com.kry.pms.service.room.RoomTypeQuantityService;
-import com.kry.pms.service.room.RoomTypeService;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class RoomTypeQuantityServiceImpl implements RoomTypeQuantityService {
@@ -32,6 +36,8 @@ public class RoomTypeQuantityServiceImpl implements RoomTypeQuantityService {
 	RoomTypeQuantityDao roomTypeQuantityDao;
 	@Autowired
 	RoomTypeService roomTypeService;
+	@Autowired
+	RoomPriceSchemeDao roomPriceSchemeDao;
 
 	@Override
 	public RoomTypeQuantity add(RoomTypeQuantity roomTypeQuantity) {
@@ -419,5 +425,37 @@ public class RoomTypeQuantityServiceImpl implements RoomTypeQuantityService {
 			data.add(rv);
 		}
 		return data;
+	}
+
+	@Override
+	public List<Map<String, Object>> getByTimeAndRoomType(String hotelCode, String times, String roomTypeId) {
+		List<Map<String, Object>> list = roomPriceSchemeDao.getSql(hotelCode);
+		List<Map<String, Object>> relist = new ArrayList<>();
+//		List<Map<String, Object>> totle = roomTypeQuantityDao.getByTimeAndRoomType(hotelCode, times, roomTypeId);
+		String schemeId = null;
+		List<Map<String, Object>> schmes = roomPriceSchemeDao.getByRoomType(schemeId, roomTypeId);
+		for(int i=0; i<list.size(); i++){
+			Map<String, Object> newMap = new HashMap<>();
+			Map map = list.get(i);
+			newMap.putAll(map);
+			String fId = MapUtils.getString(map, "id");
+			for(int j=0; j<schmes.size(); j++){
+				String id = MapUtils.getString(schmes.get(j), "id");
+				if(fId.equals(id)){
+					String code = MapUtils.getString(schmes.get(j), "code");
+					String typeCode = MapUtils.getString(schmes.get(j), "typeCode");
+					String roomTypeName = MapUtils.getString(schmes.get(j), "roomTypeName");
+					String name = MapUtils.getString(schmes.get(j), "name");
+					String price = MapUtils.getString(schmes.get(j), "price");
+					String room_type_id = MapUtils.getString(schmes.get(j), "room_type_id");
+					newMap.put("price_"+typeCode, price);
+					newMap.put("typeName_"+typeCode, roomTypeName);
+					Map<String, Object> tMap = roomTypeQuantityDao.mapByTimeAndRoomType(hotelCode, times, room_type_id);
+					newMap.put("total_"+typeCode, MapUtils.getString(tMap, "predictable_total"));
+				}
+			}
+			relist.add(newMap);
+		}
+		return relist;
 	}
 }

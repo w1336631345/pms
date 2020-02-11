@@ -408,7 +408,8 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 
 		} else {
 			Customer customer = checkInRecord.getCustomer();
-			if (customer != null && customer.getId() == null) {
+			if (customer == null || customer.getId() == null) {
+				customer = new Customer();
 				customer = customerService.add(customer);
 			}
 			checkInRecord.setCustomer(customer);
@@ -732,9 +733,12 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 	}
 
 	@Override
+	@Transactional
 	public List<CheckInRecord> addReserve(List<CheckInRecord> checkInRecords) {
 		for (CheckInRecord cir : checkInRecords) {
 			cir = addReserve(cir);
+			//新增预留占用资源
+			roomStatisticsService.reserve(new CheckInRecordWrapper(cir));
 		}
 		return checkInRecords;
 	}
@@ -825,8 +829,8 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 			}
 			cir.setDeleted(Constants.DELETED_TRUE);
 			// 修改选中的数据状态，排房记录改为删除
-			modify(cir);
 			roomStatisticsService.cancleAssign(new CheckInRecordWrapper(cir));
+			modify(cir);
 			// 取消排房成功，修改房间状态
 			// 修改排放记录状态为删除后，查询此房间是否还有其他人在住
 			List<CheckInRecord> list = checkInRecordDao.findByOrderNumAndGuestRoomAndDeleted(cir.getOrderNum(),
@@ -871,24 +875,29 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 					cird.setDeleted(Constants.DELETED_TRUE);
 //					String statusR = cird.getStatus();
 					if((Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN).equals(cird.getStatus())){
-						roomStatisticsService.checkIn(new CheckInRecordWrapper(cird));
+						roomStatisticsService.cancleCheckIn(new CheckInRecordWrapper(cird));
 					}
-					if((Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION).equals(cird.getStatus())){
-						roomStatisticsService.booking(new CheckInRecordWrapper(cird));
+//					if((Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION).equals(cird.getStatus())){
+//						roomStatisticsService.cancelBooking(new CheckInRecordWrapper(cird));
+//					}
+					if((Constants.Type.CHECK_IN_RECORD_CUSTOMER).equals(cird.getType())){
+						roomStatisticsService.cancleAssign(new CheckInRecordWrapper(cird));
 					}
 					cird.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_CANCLE_BOOK);
 					modify(cird);
+					roomStatisticsService.cancleReserve(new CheckInRecordWrapper(cird));//取消预留
 				}
 			}
 			cir.setDeleted(Constants.DELETED_TRUE);
 			String status = cir.getStatus();
 			if((Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN).equals(status)){
-				roomStatisticsService.checkIn(new CheckInRecordWrapper(cir));
+				roomStatisticsService.cancleCheckIn(new CheckInRecordWrapper(cir));
 			}
-			if((Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION).equals(status)){
-				roomStatisticsService.booking(new CheckInRecordWrapper(cir));
-			}
+//			if((Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION).equals(status)){
+//				roomStatisticsService.cancelBooking(new CheckInRecordWrapper(cir));
+//			}
 			cir.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_CANCLE_BOOK);
+			roomStatisticsService.cancleReserve(new CheckInRecordWrapper(cir));
 			modify(cir);
 			// 查出所有的预留记录id，放入集合
 			if (cir.getReserveId() != null) {

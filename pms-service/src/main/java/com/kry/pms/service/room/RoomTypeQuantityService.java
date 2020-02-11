@@ -3,6 +3,7 @@ package com.kry.pms.service.room;
 import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import com.kry.pms.model.func.UseInfoAble;
 import com.kry.pms.model.http.response.busi.RoomTypeQuantityPredictableVo;
@@ -30,4 +31,5 @@ public interface RoomTypeQuantityService extends BaseService<RoomTypeQuantity>{
 	void changeRoomTypeQuantity(RoomType roomType, LocalDate startDate, LocalDate endDate, String oldUsageStatus,
 			String newUsageStatus, int quantity);
 
+    List<Map<String, Object>> getByTimeAndRoomType(String hotelCode, String times, String roomTypeId);
 }
