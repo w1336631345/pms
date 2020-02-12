@@ -65,8 +65,8 @@ public class Bill extends PersistenceModel {
 	private String remark;
 	@Column
 	private String transferFlag;
-	@OneToOne
-	private Bill sourceBill;
+//	@OneToOne
+//	private Bill sourceBill;
 	@Column
 	private String currentSettleAccountRecordNum;
 	@Column

@@ -65,6 +65,8 @@ public class AccountServiceImpl implements AccountService {
 	private void initAccount(Account account) {
 		account.setPay(0.0);
 		account.setCost(0.0);
+		
+		
 		account.setCurrentBillSeq(0);
 		account.setTotal(0.0);
 	}

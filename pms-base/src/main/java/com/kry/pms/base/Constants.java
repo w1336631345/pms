@@ -54,15 +54,15 @@ public class Constants {
 		public static final String BILL_INVALID = "INVALID";
 		public static final String BILL_TRANSFER = "TRANSFER";
 
-		public static final String ROOM_USAGE_FREE = "F";
-		public static final String ROOM_USAGE_CHECK_IN = "I";
-		public static final String ROOM_USAGE_CHECK_OUT = "O";
-		public static final String ROOM_USAGE_ASSIGN = "A";
-		public static final String ROOM_USAGE_LOCKED = "L";
-		public static final String ROOM_USAGE_BOOK = "B";
-		public static final String ROOM_USAGE_RESERVATION = "R";
-		public static final String ROOM_USAGE_REPARIE = "p";
-		public static final String ROOM_USAGE_PREDICTABLE = "PR";
+		public static final String ROOM_USAGE_FREE = "F";  //空闲
+		public static final String ROOM_USAGE_CHECK_IN = "I"; //入住
+		public static final String ROOM_USAGE_CHECK_OUT = "O";//退房
+		public static final String ROOM_USAGE_ASSIGN = "A";//分房
+		public static final String ROOM_USAGE_LOCKED = "L";//锁定
+		public static final String ROOM_USAGE_BOOK = "B";//预定
+		public static final String ROOM_USAGE_RESERVATION = "R";//预留
+		public static final String ROOM_USAGE_REPARIE = "p";//维修
+		public static final String ROOM_USAGE_PREDICTABLE = "PR";//可预留
 
 		public static final String ACCOUNT_IN = "I";
 		public static final String ACCOUNT_SETTLE = "S";
