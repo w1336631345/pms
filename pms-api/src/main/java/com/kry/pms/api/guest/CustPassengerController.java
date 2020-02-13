@@ -15,7 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @RestController
-@RequestMapping(path = "/api/v1/guest/vipType")
+@RequestMapping(path = "/api/v1/guest/custPassenger")
 public class CustPassengerController extends BaseController<CustPassenger> {
 	@Autowired
 	CustPassengerService custPassengerService;
