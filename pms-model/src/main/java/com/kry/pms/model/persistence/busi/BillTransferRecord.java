@@ -9,6 +9,7 @@ import javax.persistence.ManyToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+import com.kry.pms.model.persistence.PersistenceModel;
 import com.kry.pms.model.persistence.org.Employee;
 
 import lombok.Getter;
@@ -18,7 +19,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Table(name = "t_bill_transfer_record")
-public class BillTransferRecord {
+public class BillTransferRecord extends PersistenceModel{
 	@Column
 	private Double cost;
 	@Column
