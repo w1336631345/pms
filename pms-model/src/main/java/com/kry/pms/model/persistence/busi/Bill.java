@@ -7,7 +7,6 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
@@ -16,7 +15,6 @@ import com.kry.pms.model.persistence.PersistenceModel;
 import com.kry.pms.model.persistence.goods.Product;
 import com.kry.pms.model.persistence.org.Employee;
 import com.kry.pms.model.persistence.sys.Account;
-import com.kry.pms.model.persistence.sys.Shift;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -32,6 +30,8 @@ public class Bill extends PersistenceModel {
 	private Account account;
 	@Column
 	private Double total;
+	@OneToOne
+	private Account targetAccount;
 	@Column
 	private Integer quantity;
 	@OneToOne

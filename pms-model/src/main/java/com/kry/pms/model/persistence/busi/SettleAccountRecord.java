@@ -28,6 +28,8 @@ public class SettleAccountRecord extends PersistenceModel {
 	private String recordNum;
 	@OneToOne
 	private Account account;
+	@Column
+	private String type;
 	@OneToOne
 	private Employee operationEmployee;
 	@Column
