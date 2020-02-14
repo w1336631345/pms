@@ -68,4 +68,12 @@ public class RoomPriceSchemeController extends BaseController<RoomPriceScheme> {
 		return rep.addData(roomPriceSchemeService.listPage(req));
 	}
 
+	@GetMapping(path = "/byCorpId")
+	public HttpResponse<List<RoomPriceScheme>> getByCorpation(String protocolCId) {
+		HttpResponse<List<RoomPriceScheme>> rep = new HttpResponse<>();
+		List<RoomPriceScheme> data = roomPriceSchemeService.getByCorpation(protocolCId);
+		rep.addData(data);
+		return rep;
+	}
+
 }

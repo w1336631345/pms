@@ -92,7 +92,10 @@ public interface CheckInRecordService extends BaseService<CheckInRecord> {
 	// 取消预订
 	HttpResponse callOffReserve(String[] ids);
 
-	HttpResponse updateCount(List<String> reserveIds, String mainRecordId);
+    @Transactional
+    HttpResponse offReserve(String id);
+
+    HttpResponse updateCount(List<String> reserveIds, String mainRecordId);
 
 	PageResponse<CheckInRecord> getNRoomLink(int pageIndex, int pageSize, String name, String roomNum, String hotelCode,
 			String groupType);

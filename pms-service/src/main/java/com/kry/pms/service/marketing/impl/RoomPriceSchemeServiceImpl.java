@@ -111,6 +111,12 @@ public class  RoomPriceSchemeServiceImpl implements  RoomPriceSchemeService{
 			}
 			return data;
 	 }
+
+	@Override
+	public List<RoomPriceScheme> getByCorpation(String protocolCId) {
+		List<RoomPriceScheme> list = roomPriceSchemeDao.getByCorpation(protocolCId);
+		return list;
+	}
 	 
 	 
 }

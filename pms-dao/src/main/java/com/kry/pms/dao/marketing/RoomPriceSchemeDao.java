@@ -10,10 +10,17 @@ import java.util.Map;
 
 public interface RoomPriceSchemeDao extends BaseDao<RoomPriceScheme>{
 
-    @Query(nativeQuery = true, value = " select id, code, `name` from t_room_price_scheme " +
-            " where 1=1 " +
-            " and if(:hotelCode is not null && :hotelCode != '', hotel_code=:hotelCode, 1=1 ) ")
+    @Query(nativeQuery = true, value = " select trp.id, trp.code, trp.`name`, tms.type  " +
+            " from t_room_price_scheme trp left join t_marketing_sources tms " +
+            " on trp.marketing_sources_id = tms.id  where 1=1 " +
+            " and if(:hotelCode is not null && :hotelCode != '', trp.hotel_code=:hotelCode, 1=1 ) ")
     List<Map<String, Object>> getSql(@Param("hotelCode")String hotelCode);
+
+    @Query(nativeQuery = true, value = " select trp.* " +
+            " from t_room_price_scheme trp, t_protocol_corpation_room_price_schemes tpc " +
+            " where trp.id = tpc.room_price_schemes_id " +
+            " and tpc.protocol_corpation_id = ?1 ")
+    List<RoomPriceScheme> getByCorpation(String protocolCId);
 
     @Query(nativeQuery = true, value = " SELECT trp.id, " +
             " trp.`code`, " +

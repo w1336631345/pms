@@ -911,6 +911,27 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 	}
 
 	@Override
+	@Transactional
+	public HttpResponse offReserve(String id) {
+		HttpResponse hr = new HttpResponse();
+		List<String> reserveIds = new ArrayList<>();
+		String mainRecordId = null;
+		CheckInRecord cir = checkInRecordDao.getOne(id);
+		if (cir.getMainRecord() != null) {
+			mainRecordId = cir.getMainRecord().getId();
+		}
+		List<CheckInRecord> list = checkInRecordDao.findByReserveIdAndDeleted(cir.getId(),Constants.DELETED_FALSE);
+		if(list.size()>0){//说嘛预留记录被分房
+			hr.error("预留记录已经有分房操作，不能删除");
+		}
+		cir.setDeleted(Constants.DELETED_TRUE);
+		cir.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_CANCLE_BOOK);
+		modify(cir);
+		roomStatisticsService.cancleReserve(new CheckInRecordWrapper(cir));//取消预
+		return hr.ok();
+	}
+
+	@Override
 	public HttpResponse updateCount(List<String> reserveIds, String mainRecordId) {
 		HttpResponse hr = new HttpResponse();
 		// 修改预留记录的已排房数量

@@ -194,6 +194,18 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
 	}
 
 	/**
+	 * 修改预留的删除（其实就是取消预留）
+	 * @param id
+	 * @return
+	 */
+	@GetMapping(path = "/offReserve")
+	public HttpResponse offReserve(String id) {
+		HttpResponse rep = new HttpResponse();
+		rep = checkInRecordService.offReserve(id);
+		return rep;
+	}
+
+	/**
 	 * 功能描述: <br>房态图批量操作的，快速入住
 	 * 〈〉
 	 * @Param: [checkInRecordListBo]

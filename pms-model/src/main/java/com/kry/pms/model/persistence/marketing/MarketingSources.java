@@ -25,4 +25,6 @@ public class MarketingSources extends PersistenceModel {
 	private String description;
 	@OneToOne
 	private RoomPriceScheme roomPriceScheme;
+	@Column
+	private String type;//Y团队，N散客
 }

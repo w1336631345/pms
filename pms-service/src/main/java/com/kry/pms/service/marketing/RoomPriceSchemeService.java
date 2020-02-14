@@ -15,4 +15,6 @@ public interface RoomPriceSchemeService extends BaseService<RoomPriceScheme>{
 
     List<RoomPriceSchemeVo> findDefaultScheme(String hotelCode);
 
+    List<RoomPriceScheme> getByCorpation(String protocolCId);
+
 }

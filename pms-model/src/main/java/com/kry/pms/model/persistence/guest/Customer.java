@@ -7,6 +7,7 @@ import javax.persistence.*;
 
 import com.kry.pms.model.persistence.PersistenceModel;
 import com.kry.pms.model.persistence.busi.CheckInRecord;
+import com.kry.pms.model.persistence.marketing.ProtocolCorpation;
 import com.kry.pms.model.persistence.sys.User;
 
 import lombok.Getter;
@@ -88,6 +89,8 @@ public class Customer extends PersistenceModel {
 	private String zipCode;//邮编
 	@Column
 	private String others;//其他
+	@ManyToOne
+	private ProtocolCorpation protocolCorpation;//客户公司
 
 
 }
