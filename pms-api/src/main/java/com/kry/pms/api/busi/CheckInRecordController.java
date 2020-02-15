@@ -209,7 +209,7 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
 	 * 功能描述: <br>房态图批量操作的，快速入住
 	 * 〈〉
 	 * @Param: [checkInRecordListBo]
-	 * @Return: com.kry.pms.base.HttpResponse
+	 * @Return: com.kry.pms.base.HttpResponse63
 	 * @Author: huanghaibin
 	 * @Date: 2020/1/9 10:22
 	 */
