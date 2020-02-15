@@ -24,6 +24,7 @@ import com.kry.pms.model.func.UseInfoAble;
 import com.kry.pms.model.http.response.busi.CheckInRecordVo;
 import com.kry.pms.model.http.response.room.RoomLockRecordVo;
 import com.kry.pms.model.http.response.room.RoomRepairRecordVo;
+import com.kry.pms.model.http.response.room.RoomUsageListVo;
 import com.kry.pms.model.http.response.room.RoomUsageVo;
 import com.kry.pms.model.persistence.busi.BookingItem;
 import com.kry.pms.model.persistence.busi.BookingRecord;
@@ -90,17 +91,10 @@ public class RoomUsageServiceImpl implements RoomUsageService {
 	}
 
 	@Override
-	public List<RoomUsageVo> queryUsableGuestRooms(String roomTypeId, LocalDateTime startTime,
+	public List<RoomUsageListVo> queryUsableGuestRooms(String roomTypeId, LocalDateTime startTime,
 			LocalDateTime endDateTime) {
-		List<RoomUsage> list = roomUsageDao.queryUsableGuestRooms(roomTypeId, startTime, endDateTime);
-		List<RoomUsageVo> data = new ArrayList<RoomUsageVo>();
-		if (list != null && !list.isEmpty()) {
-			for (RoomUsage ru : list) {
-				data.add(new RoomUsageVo(ru));
-			}
-			return data;
-		}
-		return null;
+		List<RoomUsageListVo> list = roomUsageDao.queryUsableRoomTypeGuestRooms(roomTypeId, startTime, endDateTime);
+		return list;
 	}
 
 	private void inflateRoomUsageVo(RoomUsageVo roomUsageVo, RoomUsage ru) {
@@ -279,7 +273,7 @@ public class RoomUsageServiceImpl implements RoomUsageService {
 	}
 
 	@Override
-	public List<RoomUsageVo> queryUsableGuestRoomsByBookItemId(String bookItemId) {
+	public List<RoomUsageListVo> queryUsableGuestRoomsByBookItemId(String bookItemId) {
 		BookingRecord br = bookingRecordService.findByBookingItemId(bookItemId);
 		CheckInRecord cir = checkInRecordService.findById(bookItemId);
 		List<RoomUsageVo> data = new ArrayList<RoomUsageVo>();
@@ -287,7 +281,7 @@ public class RoomUsageServiceImpl implements RoomUsageService {
 	}
 
 	@Override
-	public List<RoomUsageVo> queryUsableGuestRoomsByCheckInRecordId(String cid) {
+	public List<RoomUsageListVo> queryUsableGuestRoomsByCheckInRecordId(String cid) {
 		CheckInRecord cir = checkInRecordService.findById(cid);
 		List<RoomUsageVo> data = new ArrayList<RoomUsageVo>();
 		if (cir != null) {
@@ -297,9 +291,9 @@ public class RoomUsageServiceImpl implements RoomUsageService {
 	}
 
 	@Override
-	public List<RoomUsageVo> queryUsableGuestRoomsByCheckInRecordId(String cid, String roomTypeId, String roomNum) {
+	public List<RoomUsageListVo> queryUsableGuestRoomsByCheckInRecordId(String cid, String roomTypeId, String roomNum) {
 		CheckInRecord cir = checkInRecordService.findById(cid);
-		List<RoomUsageVo> data = new ArrayList<RoomUsageVo>();
+		List<RoomUsageListVo> data = new ArrayList<RoomUsageListVo>();
 		if (cir != null) {
 			LocalDateTime startTime = LocalDateTime.now();
 			if (cir.getArriveTime().isAfter(startTime)) {
@@ -310,7 +304,7 @@ public class RoomUsageServiceImpl implements RoomUsageService {
 				list = roomUsageDao.queryRoomUsable(roomNum, startTime);
 				if (list != null && !list.isEmpty()) {
 					for (RoomUsage ru : list) {
-						data.add(new RoomUsageVo(ru));
+						data.add(new RoomUsageListVo(ru));
 					}
 					return data;
 				}

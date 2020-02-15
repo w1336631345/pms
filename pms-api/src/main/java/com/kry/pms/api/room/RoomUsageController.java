@@ -18,6 +18,7 @@ import com.kry.pms.api.BaseController;
 import com.kry.pms.base.HttpResponse;
 import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
+import com.kry.pms.model.http.response.room.RoomUsageListVo;
 import com.kry.pms.model.http.response.room.RoomUsageVo;
 import com.kry.pms.model.persistence.room.RoomUsage;
 import com.kry.pms.service.room.RoomUsageService;
@@ -46,21 +47,21 @@ public class RoomUsageController extends BaseController<RoomUsage> {
 		return rep;
 	}
 	@GetMapping(path="/roomType/{id}")
-	public HttpResponse<List<RoomUsageVo>> queryUsableGuestRooms(@PathVariable("id")String roomTypeId, String startTime, String endTime) {
-		HttpResponse<List<RoomUsageVo>> rep = new HttpResponse<List<RoomUsageVo>>();
+	public HttpResponse<List<RoomUsageListVo>> queryUsableGuestRooms(@PathVariable("id")String roomTypeId, String startTime, String endTime) {
+		HttpResponse<List<RoomUsageListVo>> rep = new HttpResponse<List<RoomUsageListVo>>();
 		rep.addData(roomUsageService.queryUsableGuestRooms(roomTypeId, DateTimeUtil.parse(startTime),
 				DateTimeUtil.parse(endTime)));
 		return rep;
 	}
 	@GetMapping(path = "/bookItem/{id}")
-	public HttpResponse<List<RoomUsageVo>> queryUsableGuestRoomsByBookItemId(@PathVariable("id")String bookItemId) {
-		HttpResponse<List<RoomUsageVo>> rep = new HttpResponse<List<RoomUsageVo>>();
+	public HttpResponse<List<RoomUsageListVo>> queryUsableGuestRoomsByBookItemId(@PathVariable("id")String bookItemId) {
+		HttpResponse<List<RoomUsageListVo>> rep = new HttpResponse<List<RoomUsageListVo>>();
 		rep.addData(roomUsageService.queryUsableGuestRoomsByBookItemId(bookItemId));
 		return rep;
 	}
 	@GetMapping(path = "/checkInRecord/{id}")
-	public HttpResponse<List<RoomUsageVo>> queryUsableGuestRoomsByCheckInRecordId(@PathVariable("id")String checkInRecordId,String roomTypeId,String roomNum) {
-		HttpResponse<List<RoomUsageVo>> rep = new HttpResponse<List<RoomUsageVo>>();
+	public HttpResponse<List<RoomUsageListVo>> queryUsableGuestRoomsByCheckInRecordId(@PathVariable("id")String checkInRecordId,String roomTypeId,String roomNum) {
+		HttpResponse<List<RoomUsageListVo>> rep = new HttpResponse<List<RoomUsageListVo>>();
 		rep.addData(roomUsageService.queryUsableGuestRoomsByCheckInRecordId(checkInRecordId,roomTypeId,roomNum));
 		return rep;
 	}

@@ -8,6 +8,7 @@ import org.springframework.cglib.core.Local;
 
 import com.kry.pms.base.DtoResponse;
 import com.kry.pms.model.func.UseInfoAble;
+import com.kry.pms.model.http.response.room.RoomUsageListVo;
 import com.kry.pms.model.http.response.room.RoomUsageVo;
 import com.kry.pms.model.persistence.room.GuestRoom;
 import com.kry.pms.model.persistence.room.RoomUsage;
@@ -18,13 +19,13 @@ public interface RoomUsageService extends BaseService<RoomUsage> {
 	public RoomUsage use(GuestRoom gr, String status, LocalDateTime startTime, int days, String businesskey,
 			String businessInfo, DtoResponse<String> response);
 
-	List<RoomUsageVo> queryUsableGuestRooms(String roomTypeId, LocalDateTime startTime, LocalDateTime endDateTime);
+	List<RoomUsageListVo> queryUsableGuestRooms(String roomTypeId, LocalDateTime startTime, LocalDateTime endDateTime);
 
-	public List<RoomUsageVo> queryUsableGuestRoomsByBookItemId(String bookItemId);
+	public List<RoomUsageListVo> queryUsableGuestRoomsByBookItemId(String bookItemId);
 
-	public List<RoomUsageVo> queryUsableGuestRoomsByCheckInRecordId(String bookItemId);
+	public List<RoomUsageListVo> queryUsableGuestRoomsByCheckInRecordId(String bookItemId);
 
-	public List<RoomUsageVo> queryUsableGuestRoomsByCheckInRecordId(String bookItemId, String roomTypeId,
+	public List<RoomUsageListVo> queryUsableGuestRoomsByCheckInRecordId(String bookItemId, String roomTypeId,
 			String roomNum);
 
 	/**

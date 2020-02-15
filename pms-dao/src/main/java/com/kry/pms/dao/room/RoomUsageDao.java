@@ -3,6 +3,8 @@ package com.kry.pms.dao.room;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.kry.pms.model.http.response.room.GuestRoomStatusVo;
+import com.kry.pms.model.http.response.room.RoomUsageListVo;
 import com.kry.pms.model.persistence.room.GuestRoom;
 import org.springframework.data.jpa.repository.Query;
 
@@ -25,4 +27,10 @@ public interface RoomUsageDao extends BaseDao<RoomUsage> {
 	public RoomUsage findByGuestRoomIdAndBusinesskeyAndUsageStatus(String id, String businesskey, String usageStatus);
 
 	int deleteByGuestRoom(GuestRoom gr);
+	@Query(value = "select new com.kry.pms.model.http.response.room.RoomUsageListVo(a.id, b.roomNum, a.startDateTime, a.endDateTime," + 
+			"d.name, a.usageStatus, a.businesskey, a.businessInfo, a.duration,b.id) from RoomUsage a ,GuestRoom b,RoomType d where a.guestRoom = b and b.roomType = d and a.usageStatus='F"
+			+ ""
+			+ "' and d.id = ?1 and a.startDateTime<?2 and a.endDateTime>?3")
+	List<RoomUsageListVo> queryUsableRoomTypeGuestRooms(String roomTypeId, LocalDateTime startTime, LocalDateTime endDateTime);
+	
 }

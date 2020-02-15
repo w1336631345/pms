@@ -41,6 +41,7 @@ D:\kry\server\pms-server\pms-service\src\main\java\com\kry\pms\service\sys\UserS
 D:\kry\server\pms-server\pms-service\src\main\java\com\kry\pms\service\sys\impl\UserServiceImpl.java
 D:\kry\server\pms-server\pms-service\src\main\java\com\kry\pms\service\goods\impl\SetMealServiceImpl.java
 D:\kry\server\pms-server\pms-service\src\main\java\com\kry\pms\service\org\impl\DepartmentServiceImpl.java
+D:\kry\server\pms-server\pms-service\src\main\java\com\kry\pms\service\busi\BillTransferRecordService.java
 D:\kry\server\pms-server\pms-service\src\main\java\com\kry\pms\service\busi\impl\BillItemServiceImpl.java
 D:\kry\server\pms-server\pms-service\src\main\java\com\kry\pms\service\guest\CustomerTypeService.java
 D:\kry\server\pms-server\pms-service\src\main\java\com\kry\pms\service\busi\impl\RoomChangeRecordServiceImpl.java
@@ -100,6 +101,7 @@ D:\kry\server\pms-server\pms-service\src\main\java\com\kry\pms\service\marketing
 D:\kry\server\pms-server\pms-service\src\main\java\com\kry\pms\service\report\AuditReportService.java
 D:\kry\server\pms-server\pms-service\src\main\java\com\kry\pms\service\sys\AccountService.java
 D:\kry\server\pms-server\pms-service\src\main\java\com\kry\pms\service\room\RoomTagService.java
+D:\kry\server\pms-server\pms-service\src\main\java\com\kry\pms\service\busi\impl\BillTransferRecordServiceImpl.java
 D:\kry\server\pms-server\pms-service\src\main\java\com\kry\pms\service\report\impl\FrontReceiveReportServiceImpl.java
 D:\kry\server\pms-server\pms-service\src\main\java\com\kry\pms\service\org\CorporationService.java
 D:\kry\server\pms-server\pms-service\src\main\java\com\kry\pms\service\marketing\MarketingSourcesService.java
@@ -110,6 +112,7 @@ D:\kry\server\pms-server\pms-service\src\main\java\com\kry\pms\service\busi\Deal
 D:\kry\server\pms-server\pms-service\src\main\java\com\kry\pms\service\dict\impl\CertificateTypeServiceImpl.java
 D:\kry\server\pms-server\pms-service\src\main\java\com\kry\pms\service\dict\CertificateTypeService.java
 D:\kry\server\pms-server\pms-service\src\main\java\com\kry\pms\service\sys\impl\ShiftServiceImpl.java
+D:\kry\server\pms-server\pms-service\src\main\java\com\kry\pms\service\guest\CustPassengerService.java
 D:\kry\server\pms-server\pms-service\src\main\java\com\kry\pms\service\sys\impl\NationalityServiceImpl.java
 D:\kry\server\pms-server\pms-service\src\main\java\com\kry\pms\service\goods\impl\ProductServiceImpl.java
 D:\kry\server\pms-server\pms-service\src\main\java\com\kry\pms\service\room\impl\RoomUsageServiceImpl.java
@@ -143,6 +146,7 @@ D:\kry\server\pms-server\pms-service\src\main\java\com\kry\pms\service\sys\impl\
 D:\kry\server\pms-server\pms-service\src\main\java\com\kry\pms\service\room\impl\GuestRoomStatusServiceImpl.java
 D:\kry\server\pms-server\pms-service\src\main\java\com\kry\pms\service\report\RoomReportService.java
 D:\kry\server\pms-server\pms-service\src\main\java\com\kry\pms\service\busi\CreditGrantingRecordService.java
+D:\kry\server\pms-server\pms-service\src\main\java\com\kry\pms\service\guest\impl\CustPassengerServiceImpl.java
 D:\kry\server\pms-server\pms-service\src\main\java\com\kry\pms\service\busi\SettleAccountRecordService.java
 D:\kry\server\pms-server\pms-service\src\main\java\com\kry\pms\service\room\RoomStatusQuantityService.java
 D:\kry\server\pms-server\pms-service\src\main\java\com\kry\pms\service\busi\BillService.java
