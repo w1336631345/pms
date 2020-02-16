@@ -1,6 +1,8 @@
 D:\kry\server\pms-server\pms-service\src\main\java\com\kry\pms\service\org\DepartmentService.java
 D:\kry\server\pms-server\pms-service\src\main\java\com\kry\pms\service\sys\RoleService.java
 D:\kry\server\pms-server\pms-service\src\main\java\com\kry\pms\service\guest\GuestInfoService.java
+D:\kry\server\pms-server\pms-service\src\main\java\com\kry\pms\service\guest\MemberRoomTypeService.java
+D:\kry\server\pms-server\pms-service\src\main\java\com\kry\pms\service\guest\MemberTypeService.java
 D:\kry\server\pms-server\pms-service\src\main\java\com\kry\pms\service\guest\impl\CustomerPointsServiceImpl.java
 D:\kry\server\pms-server\pms-service\src\main\java\com\kry\pms\service\busi\RoomLockRecordService.java
 D:\kry\server\pms-server\pms-service\src\main\java\com\kry\pms\service\room\RoomStatisticsService.java
@@ -23,8 +25,10 @@ D:\kry\server\pms-server\pms-service\src\main\java\com\kry\pms\service\report\im
 D:\kry\server\pms-server\pms-service\src\main\java\com\kry\pms\service\goods\impl\ProductTypeServiceImpl.java
 D:\kry\server\pms-server\pms-service\src\main\java\com\kry\pms\service\busi\RoomRecordService.java
 D:\kry\server\pms-server\pms-service\src\main\java\com\kry\pms\service\guest\CustomerService.java
+D:\kry\server\pms-server\pms-service\src\main\java\com\kry\pms\service\guest\impl\MemberTypeServiceImpl.java
 D:\kry\server\pms-server\pms-service\src\main\java\com\kry\pms\service\report\impl\GenerateReportsLogServiceImpl.java
 D:\kry\server\pms-server\pms-service\src\main\java\com\kry\pms\service\sys\impl\SystemConfigServiceImpl.java
+D:\kry\server\pms-server\pms-service\src\main\java\com\kry\pms\service\guest\impl\MemberRoomTypeServiceImpl.java
 D:\kry\server\pms-server\pms-service\src\main\java\com\kry\pms\service\dict\impl\RoomLockReasonServiceImpl.java
 D:\kry\server\pms-server\pms-service\src\main\java\com\kry\pms\service\report\BusinessReportService.java
 D:\kry\server\pms-server\pms-service\src\main\java\com\kry\pms\service\guest\VipRoomTypeService.java

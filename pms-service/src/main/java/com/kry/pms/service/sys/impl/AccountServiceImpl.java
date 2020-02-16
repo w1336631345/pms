@@ -56,21 +56,28 @@ public class AccountServiceImpl implements AccountService {
 
 	@Override
 	public Account add(Account account) {
-		if(account.getTotal()==null) {			
+		if (account.getTotal() == null) {
 			initAccount(account);
 		}
 		return accountDao.saveAndFlush(account);
 	}
-	
+
 	private void initAccount(Account account) {
 		account.setPay(0.0);
 		account.setCost(0.0);
-		
-		
 		account.setCurrentBillSeq(0);
 		account.setTotal(0.0);
+		if (account.getCode() == null) {
+			account.setCode(fetchAccountCode(account.getHotelCode(), account.getType()));
+		}
 	}
-	
+
+	private String fetchAccountCode(String hotelCode, String type) {
+		if (type != null && hotelCode != null) {
+			return businessSeqService.fetchNextSeqNum(hotelCode, Constants.Key.BUSINESS_BUSINESS_ACCOUNT_SEQ + type);
+		}
+		return null;
+	}
 
 	@Override
 	public void delete(String id) {
@@ -312,13 +319,13 @@ public class AccountServiceImpl implements AccountService {
 		}
 		return info;
 	}
-	
-	private String createAccountCode(String hotleCode,String type) {
+
+	private String createAccountCode(String hotleCode, String type) {
 		return null;
 	}
 
 	@Override
-	public List<Account> findByHotelCodeAndType(String hotelCode){
+	public List<Account> findByHotelCodeAndType(String hotelCode) {
 		List<Account> list = accountDao.findByHotelCodeAndType(hotelCode, Constants.Type.ACCOUNT_INNER);
 		return list;
 	}

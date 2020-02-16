@@ -27,7 +27,7 @@
     <property name="java.vm.specification.vendor" value="Oracle Corporation"/>
     <property name="user.variant" value=""/>
     <property name="os.name" value="Windows 10"/>
-    <property name="classworlds.conf" value="D:\workspace_kry_2020\.metadata\.plugins\org.eclipse.m2e.launching\launches\m2conf3135187600230448178.tmp"/>
+    <property name="classworlds.conf" value="D:\workspace_kry_2020\.metadata\.plugins\org.eclipse.m2e.launching\launches\m2conf6193335800222107572.tmp"/>
     <property name="jansi.force" value="true"/>
     <property name="sun.jnu.encoding" value="GBK"/>
     <property name="java.library.path" value="C:\Program Files\Java\jdk1.8.0_191\bin;C:\Windows\Sun\Java\bin;C:\Windows\system32;C:\Windows;C:/Program Files/Java/jre1.8.0_191/bin/server;C:/Program Files/Java/jre1.8.0_191/bin;C:/Program Files/Java/jre1.8.0_191/lib/amd64;C:\Program Files (x86)\Common Files\Oracle\Java\javapath;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Windows\System32\OpenSSH\;D:\Program Files\nodejs\;C:\Program Files\Git\cmd;D:\tools\apache-maven-3.6.3\bin;C:\Program Files\Java\jdk1.8.0_191\bin;;C:\Program Files (x86)\Bitvise SSH Client;C:\Users\Administrator\AppData\Local\Microsoft\WindowsApps;;D:\Program Files\Microsoft VS Code\bin;C:\Users\Administrator\AppData\Roaming\npm;D:\tools\sts-4.5.1.RELEASE;;."/>

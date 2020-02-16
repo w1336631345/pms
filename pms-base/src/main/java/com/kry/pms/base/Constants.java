@@ -82,6 +82,7 @@ public class Constants {
 		public static final String BUSINESS_BUSINESS_SETTLE_SEQ_KEY = "SETTLE_NUM";
 		public static final String BUSINESS_BUSINESS_CUSTOMER_ACCOUNT_SEQ_KEY = "CUSTOMER_ACCOUNT_NUM";
 		public static final String BUSINESS_BUSINESS_GROUP_ACCOUNT_SEQ_KEY = "GROUP_ACCOUNT_NUM";
+		public static final String BUSINESS_BUSINESS_ACCOUNT_SEQ="ACCOUNT_SEQ_";
 		public static final String TOGETHER_NUM_KEY = "TOGETHER_NUM";
 		public static final String CUSTOMER_NUM = "CUSTOMER_NUM";// 客户编码
 	}
@@ -124,6 +125,8 @@ public class Constants {
 		public static final String ACCOUNT_GROUP = "GROUP";
 		// 会员账户
 		public static final String ACCOUNT_MEMBER = "MEMBER";
+		// 会员账户
+		public static final String ACCOUNT_TEMP = "TEMP";
 		// 自由定价
 		public static final String PRODUCT_FREE_PRICE = "FREE_PRICE";
 		// 定价商品
