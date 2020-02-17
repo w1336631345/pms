@@ -30,11 +30,19 @@ public class RoomPriceSchemeController extends BaseController<RoomPriceScheme> {
 
 	@PostMapping
 	public HttpResponse<RoomPriceScheme> add(@RequestBody RoomPriceScheme roomPriceScheme) {
-		return getDefaultResponse().addData(roomPriceSchemeService.add(roomPriceScheme));
+		HttpResponse hr = new HttpResponse();
+		roomPriceScheme.setHotelCode(getCurrentHotleCode());
+		RoomPriceScheme rps = roomPriceSchemeService.add(roomPriceScheme);
+		if(rps != null){
+			return hr.addData(rps);
+		}else{
+			return hr.error("房价码代码重复");
+		}
 	}
 
 	@PutMapping
 	public HttpResponse<RoomPriceScheme> modify(@RequestBody RoomPriceScheme roomPriceScheme) {
+		roomPriceScheme.setHotelCode(getCurrentHotleCode());
 		return getDefaultResponse().addData(roomPriceSchemeService.modify(roomPriceScheme));
 	}
 
