@@ -32,10 +32,14 @@ public class RoomPriceScheme extends PersistenceModel {
 	private Boolean isDefault;
 	@OneToMany(cascade = CascadeType.ALL)
 	private List<RoomPriceSchemeItem> items;
-	@OneToOne
-	private SetMeal setMeal;//包价
+//	@OneToOne
+//	private SetMeal setMeal;//包价
 	@ManyToOne
 	private MarketingSources marketingSources;//市场
 	@ManyToOne
 	private DistributionChannel distributionChannel;//渠道
+	@Column
+	private String isShow;//是否展示：Y是，N否
+	@Column
+	private String sortNum;//排序
 }

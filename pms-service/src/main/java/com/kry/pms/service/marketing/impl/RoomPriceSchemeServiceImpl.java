@@ -29,7 +29,12 @@ public class  RoomPriceSchemeServiceImpl implements  RoomPriceSchemeService{
 	 
 	 @Override
 	public RoomPriceScheme add(RoomPriceScheme roomPriceScheme) {
-		return roomPriceSchemeDao.saveAndFlush(roomPriceScheme);
+	 	List<String> codes = roomPriceSchemeDao.getCode(roomPriceScheme.getHotelCode(), Constants.DELETED_FALSE);
+	 	if(codes.contains(roomPriceScheme.getCode())){
+	 		return null;
+		}else {
+			return roomPriceSchemeDao.saveAndFlush(roomPriceScheme);
+		}
 	}
 
 	@Override

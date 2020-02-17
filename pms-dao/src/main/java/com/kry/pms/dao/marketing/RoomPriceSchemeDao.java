@@ -2,6 +2,8 @@ package com.kry.pms.dao.marketing;
 
 import com.kry.pms.dao.BaseDao;
 import com.kry.pms.model.persistence.marketing.RoomPriceScheme;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -36,4 +38,8 @@ public interface RoomPriceSchemeDao extends BaseDao<RoomPriceScheme>{
             " and if(:schemeId is not null && :schemeId != '', trp.id=:schemeId, 1=1 ) " +
             " and if(:roomTypeId is not null && :roomTypeId != '', trpt.room_type_id=:roomTypeId, 1=1 ) ")
     List<Map<String, Object>> getByRoomType(@Param("schemeId")String schemeId, @Param("roomTypeId")String roomTypeId);
+
+    @Query(nativeQuery = true, value = " select code from t_room_price_scheme where hotel_code = ?1 and deleted = ?2 ")
+    List<String> getCode(String hotelCode, int delelted);
+
 }

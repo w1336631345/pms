@@ -24,7 +24,7 @@ public class RoomPriceSchemeVo {
 		this.name = rps.getName();
 		this.code = rps.getCode();
 		this.id = rps.getId();
-		this.setMeal = rps.getSetMeal();
+//		this.setMeal = rps.getSetMeal();
 		SchemeItemVo item;
 		SetMealVo smv;
 		if (rps.getItems() != null) {
@@ -33,9 +33,9 @@ public class RoomPriceSchemeVo {
 				item = new SchemeItemVo();
 				BeanUtils.copyProperties(i, item);
 				item.setRoomTypeId(i.getRoomType().getId());
-				if (i.getExtra() != null) {
+				if (i.getSetMeal() != null) {
 					smv = new SetMealVo();
-					BeanUtils.copyProperties(i.getExtra(),smv);
+					BeanUtils.copyProperties(i.getSetMeal(),smv);
 					item.setExtrs(smv);
 				}
 				this.items.add(item);
