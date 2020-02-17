@@ -23,5 +23,4 @@ public class ApiApplication {
 	public static void main(String[] args) throws Exception {
 		SpringApplication.run(ApiApplication.class, args);
 	}
-
 }

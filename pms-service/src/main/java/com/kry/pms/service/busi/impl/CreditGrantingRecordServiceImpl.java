@@ -95,12 +95,11 @@ public class CreditGrantingRecordServiceImpl implements CreditGrantingRecordServ
 					&& gAccount.getAvailableCreditLimit() > creditGrantingRecord.getGrantingLimit()) {
 				gAccount.setAvailableCreditLimit(BigDecimalUtil.sub(gAccount.getAvailableCreditLimit(),
 						creditGrantingRecord.getGrantingLimit()));
-				if(account.getAvailableCreditLimit()==null) {
-					account.setAvailableCreditLimit(creditGrantingRecord.getGrantingLimit());
-				}else {
-					account.setAvailableCreditLimit(BigDecimalUtil.add(account.getAvailableCreditLimit(),
-									creditGrantingRecord.getGrantingLimit()));
-				}
+				account.setAvailableCreditLimit(
+						BigDecimalUtil.add(account.getAvailableCreditLimit() == null ? 0 : account.getAvailableCreditLimit(),
+								creditGrantingRecord.getGrantingLimit()));
+				account.setCreditLimit(BigDecimalUtil.add(account.getCreditLimit() == null ? 0 : account.getCreditLimit(),
+								creditGrantingRecord.getGrantingLimit()));
 				accountService.modify(account);
 				accountService.modify(gAccount);
 				rep.addData(add(creditGrantingRecord));
@@ -120,6 +119,8 @@ public class CreditGrantingRecordServiceImpl implements CreditGrantingRecordServ
 		Account account = accountService.findById(creditGrantingRecord.getAccount().getId());
 		account.setAvailableCreditLimit(
 				BigDecimalUtil.add(account.getAvailableCreditLimit() == null ? 0 : account.getAvailableCreditLimit(),
+						creditGrantingRecord.getGrantingLimit()));
+		account.setCreditLimit(BigDecimalUtil.add(account.getCreditLimit() == null ? 0 : account.getCreditLimit(),
 						creditGrantingRecord.getGrantingLimit()));
 		accountService.modify(account);
 		rep.addData(add(creditGrantingRecord));
