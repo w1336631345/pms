@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.print.attribute.standard.SheetCollate;
 import javax.transaction.Transactional;
 
 import org.springframework.beans.BeanUtils;
@@ -170,9 +171,62 @@ public class AccountServiceImpl implements AccountService {
 		return accountDao.findAccountByOrderNumAndStatusAndCheckInType(orderNum, checkInType, status);
 	}
 
+	private DtoResponse<Account> transferBill(BillCheckBo billCheckBo) {
+		DtoResponse<Account> rep = new DtoResponse<Account>();
+		String targetAccountId = billCheckBo.getTargetAccountId();
+		Account account = findById(billCheckBo.getAccountId());
+
+		if (account != null && targetAccountId != null) {
+			Account targetAccount = findById(targetAccountId);
+			if (targetAccount != null) {
+				if (limitCheck(targetAccount, billCheckBo.getTotal())) {
+					List<Bill> flatBills = new ArrayList<>();
+					SettleAccountRecord settleAccountRecord = settleAccountRecordService.create(billCheckBo, account,
+							targetAccount);
+					for (String bid : billCheckBo.getBillIds()) {
+						DtoResponse<List<Bill>> itemRep = billService.transfer(bid, targetAccount,
+								billCheckBo.getShiftCode(), billCheckBo.getOperationEmployee(),settleAccountRecord.getRecordNum());
+						if (itemRep.getStatus() != 0) {
+							BeanUtils.copyProperties(itemRep, rep);
+							TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+							break;
+						} else {
+							flatBills.addAll(itemRep.getData());
+						}
+					}
+					List<Bill> bills = billService.checkBillIds(billCheckBo.getBillIds(), rep,
+							settleAccountRecord.getRecordNum());
+					if (rep.getStatus() == 0) {
+						settleAccountRecord.setBills(bills);
+						settleAccountRecord.setFlatBills(flatBills);
+						settleAccountRecordService.modify(settleAccountRecord);
+					}
+				} else {
+					rep.error(Constants.BusinessCode.CODE_PARAMETER_INVALID, "转账目标账户额度不足，请重新选择");
+				}
+			} else {
+				rep.error(Constants.BusinessCode.CODE_PARAMETER_INVALID, "转账目标账户有误，请重新选择");
+			}
+		} else {
+			rep.error(Constants.BusinessCode.CODE_PARAMETER_INVALID, "转账目标账户有误，请重新选择");
+		}
+		return rep;
+	}
+
+	private boolean limitCheck(Account account, double limit) {
+		if (limit <= 0 && account.getAvailableCreditLimit() != null && account.getAvailableCreditLimit() > limit) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
 	@Transactional
 	@Override
 	public DtoResponse<Account> checkCustomerBill(BillCheckBo billCheckBo) {
+		if (Constants.Type.BILL_CHECK_WAY_TRANSFER.equals(billCheckBo.getCheckWay())) {
+			return transferBill(billCheckBo);
+		}
 		DtoResponse<Account> rep = new DtoResponse<Account>();
 		Account account = findById(billCheckBo.getAccountId());
 		List<Bill> bills = null;
@@ -196,11 +250,10 @@ public class AccountServiceImpl implements AccountService {
 						settleAccountRecord.getRecordNum());
 			}
 			if (rep.getStatus() == 0) {
-				if (rep.getStatus() == 0) {
-					settleAccountRecord.setBills(bills);
-					settleAccountRecord.setFlatBills(flatBills);
-					settleAccountRecordService.modify(settleAccountRecord);
-				}
+				settleAccountRecord.setBills(bills);
+				settleAccountRecord.setFlatBills(flatBills);
+				settleAccountRecordService.modify(settleAccountRecord);
+
 			}
 		} else {
 			rep.setStatus(Constants.BusinessCode.CODE_PARAMETER_INVALID);

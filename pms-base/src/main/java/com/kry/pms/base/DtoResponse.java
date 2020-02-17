@@ -20,4 +20,8 @@ public class DtoResponse<T> {
 		this.data = data;
 		return this;
 	}
+	public void error(int status,String message) {
+		this.status = status;
+		this.message = message;
+	}
 }

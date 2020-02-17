@@ -40,7 +40,7 @@ public interface BillService extends BaseService<Bill> {
 
 	public List<Bill> addFlatBills(List<Bill> bills, Employee employee,String shiftCode, String recordNum);
 
-	public DtoResponse<String> offset(String id);
+	public DtoResponse<Bill> offset(String id);
 
 	/**
 	 * 调整，入一笔帐，val为金额，其他信息与id对应的数据一致
@@ -48,7 +48,7 @@ public interface BillService extends BaseService<Bill> {
 	 * @param val 如果为null 表示直接冲掉，其他未调整部分
 	 * @return
 	 */
-	DtoResponse<String> adjust(String id, Double val);
+	DtoResponse<Bill> adjust(String id, Double val,boolean shiftCheck,String shiftCode);
 	/**
 	 * 拆账   冲掉原来的帐，重新入两笔一样的 金额分别是val1，val2
 	 * @param id
@@ -56,10 +56,14 @@ public interface BillService extends BaseService<Bill> {
 	 * @param val2
 	 * @return
 	 */
-	DtoResponse<String> split(String id, Double val1,Double val2);
+	DtoResponse<Bill> split(String id, Double val1,Double val2);
 	
 	
 
-	public DtoResponse<String> operation(BillOperationBo bob);
+	public DtoResponse<Bill> operation(BillOperationBo bob);
+
+	DtoResponse<List<Bill>> transfer(String bid, Account targetAccount, String shiftCode, Employee employee, String recordNum);
+
+	public List<Bill> checkBillIds(List<String> billIds, DtoResponse<Account> rep, String recordNum);
 
 }

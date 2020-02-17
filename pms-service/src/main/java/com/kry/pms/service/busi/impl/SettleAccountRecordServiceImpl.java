@@ -35,10 +35,10 @@ public class SettleAccountRecordServiceImpl implements SettleAccountRecordServic
 
 	@Override
 	public SettleAccountRecord add(SettleAccountRecord settleAccountRecord) {
-		if(settleAccountRecord.getStatus()==null) {
+		if (settleAccountRecord.getStatus() == null) {
 			settleAccountRecord.setStatus(Constants.Status.NORMAL);
 		}
-		if(settleAccountRecord.getHotelCode()==null) {
+		if (settleAccountRecord.getHotelCode() == null) {
 			settleAccountRecord.setHotelCode(settleAccountRecord.getAccount().getHotelCode());
 		}
 		return settleAccountRecordDao.saveAndFlush(settleAccountRecord);
@@ -118,13 +118,13 @@ public class SettleAccountRecordServiceImpl implements SettleAccountRecordServic
 					rebill.setAccount(fb.getAccount());
 					rebill.setCurrentSettleAccountRecordNum(null);
 					rebill.setStatus(Constants.Status.BILL_INVALID);
-					if(fb.getCost()!=null) {						
+					if (fb.getCost() != null) {
 						rebill.setCost(-fb.getCost());
 					}
-					if(fb.getPay()!=null) {						
+					if (fb.getPay() != null) {
 						rebill.setPay(-fb.getPay());
 					}
-					if(fb.getTotal()!=null) {						
+					if (fb.getTotal() != null) {
 						rebill.setTotal(-fb.getTotal());
 					}
 					rebill.setOperationEmployee(fb.getOperationEmployee());
@@ -140,6 +140,21 @@ public class SettleAccountRecordServiceImpl implements SettleAccountRecordServic
 		sar.setStatus(Constants.Status.SETTLE_ACCOUNT_CANCLE);
 		modify(sar);
 		return rep;
+	}
+
+	@Override
+	public SettleAccountRecord create(BillCheckBo billCheckBo, Account account, Account targetAccount) {
+		SettleAccountRecord scr = new SettleAccountRecord();
+		scr.setRecordNum(businessSeqService.fetchNextSeqNum(billCheckBo.getHotelCode(),
+				Constants.Key.BUSINESS_BUSINESS_TRANSFER_SEQ_KEY));
+		scr.setShiftCode(billCheckBo.getShiftCode());
+		scr.setAccount(account);
+		scr.setSettleWay(billCheckBo.getCheckWay());
+		scr.setTargetAccount(targetAccount);
+		scr.setHotelCode(account.getHotelCode());
+		scr.setOperationEmployee(billCheckBo.getOperationEmployee());
+		scr.setSettleTime(LocalDateTime.now());
+		return add(scr);
 	}
 
 }

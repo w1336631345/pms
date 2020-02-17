@@ -2,12 +2,15 @@ package com.kry.pms.service.busi.impl;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Transient;
 import javax.transaction.Transactional;
 
 import com.kry.pms.service.busi.RoomRecordService;
+
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Sort;
@@ -184,6 +187,21 @@ public class BillServiceImpl implements BillService {
 		return checkBills(bills, total, rep, recordNum);
 	}
 
+	public List<Bill> checkBillIds(List<String> billIds, DtoResponse<Account> rep, String recordNum) {
+		List<Bill> bills = billDao.findAllById(billIds);
+		for (Bill b : bills) {
+			if (Constants.Status.BILL_NEED_SETTLED.equals(b.getStatus())) {
+				b.setStatus(Constants.Status.BILL_SETTLED);
+				b.setCurrentSettleAccountRecordNum(recordNum);
+			} else {
+				rep.setStatus(Constants.BusinessCode.CODE_ILLEGAL_OPERATION);
+				break;
+			}
+		}
+		return bills;
+
+	}
+
 	private List<Bill> checkBills(List<Bill> bills, double total, DtoResponse<Account> rep, String recordNum) {
 		for (Bill b : bills) {
 			if (Constants.Status.BILL_NEED_SETTLED.equals(b.getStatus())) {
@@ -215,10 +233,7 @@ public class BillServiceImpl implements BillService {
 			bill.setOperationEmployee(employee);
 			bill.setShiftCode(shiftCode);
 			bill.setCurrentSettleAccountRecordNum(orderNum);
-			
-			
-			
-			
+
 			bill = add(bill);
 		}
 		return list;
@@ -287,41 +302,47 @@ public class BillServiceImpl implements BillService {
 
 	@Transactional
 	@Override
-	public DtoResponse<String> adjust(String id, Double val) {
-		DtoResponse<String> rep = new DtoResponse<String>();
+	public DtoResponse<Bill> adjust(String id, Double val, boolean shiftCheck, String shiftCode) {
+		DtoResponse<Bill> rep = new DtoResponse<Bill>();
 		Bill bill = findById(id);
-		if (bill != null) {
-			Bill offsetBill = null;
-			offsetBill = copyBill(bill);
-			offsetBill.setId(null);
-			offsetBill.setProduct(bill.getProduct());
-			offsetBill.setAccount(bill.getAccount());
-			offsetBill.setTotal(val != null ? val : -bill.getTotal());
-			if (val == null) {
-				offsetBill.setStatus(Constants.Status.BILL_INVALID);
-				bill.setStatus(Constants.Status.BILL_INVALID);
-				modify(bill);
+		if (bill != null && bill.getStatus().equals(Constants.Status.BILL_NEED_SETTLED)) {
+			if (!shiftCheck || adjustShiftCheck(bill, val, shiftCode)) {// 不需要确认班次或者班次确认成功
+				Bill offsetBill = null;
+				offsetBill = copyBill(bill);
+				offsetBill.setId(null);
+				offsetBill.setProduct(bill.getProduct());
+				offsetBill.setAccount(bill.getAccount());
+				offsetBill.setTotal(val != null ? val : -bill.getTotal());
+				if (val == null) {
+					offsetBill.setStatus(Constants.Status.BILL_INVALID);
+					bill.setStatus(Constants.Status.BILL_INVALID);
+					modify(bill);
+				}
+				offsetBill = add(offsetBill);
 			}
-			offsetBill = add(offsetBill);
 
 		} else {
 			rep.setStatus(Constants.BusinessCode.CODE_PARAMETER_INVALID);
-			rep.setMessage("找不到对应的订单");
+			rep.setMessage("找不到对应的未结的账");
 		}
 		return rep;
 	}
 
-	@Transactional
-	@Override
-	public DtoResponse<String> offset(String id) {
-		return adjust(id, null);
+	private boolean adjustShiftCheck(Bill bill, double val, String shiftCode) {
+		return true;
 	}
 
 	@Transactional
 	@Override
-	public DtoResponse<String> split(String id, Double val1, Double val2) {
-		DtoResponse<String> rep = new DtoResponse<String>();
-		rep = adjust(id, null);
+	public DtoResponse<Bill> offset(String id) {
+		return adjust(id, null, true, null);
+	}
+
+	@Transactional
+	@Override
+	public DtoResponse<Bill> split(String id, Double val1, Double val2) {
+		DtoResponse<Bill> rep = new DtoResponse<Bill>();
+		rep = adjust(id, null, false, null);
 		if (rep.getStatus() == 0) {
 			Bill bill = findById(id);
 			Bill newBill1 = null;
@@ -354,10 +375,10 @@ public class BillServiceImpl implements BillService {
 	}
 
 	@Override
-	public DtoResponse<String> operation(BillOperationBo bob) {
+	public DtoResponse<Bill> operation(BillOperationBo bob) {
 		switch (bob.getOp()) {
 		case BILL_OP_ADJUST:
-			return adjust(bob.getId(), bob.getVal1());
+			return adjust(bob.getId(), bob.getVal1(), true, bob.getShiftCode());
 		case BILL_OP_OFFSET:
 			return offset(bob.getId());
 		case BILL_OP_SPLIT:
@@ -366,5 +387,31 @@ public class BillServiceImpl implements BillService {
 			break;
 		}
 		return null;
+	}
+
+	@Override
+	public DtoResponse<List<Bill>> transfer(String bid, Account targetAccount, String shiftCode, Employee employee,
+			String recordNum) {
+		DtoResponse<List<Bill>> rep = new DtoResponse<List<Bill>>();
+		DtoResponse<Bill> adjustRep = adjust(bid, null, false, null);
+		if (adjustRep.getStatus() == 0) {
+			List<Bill> data = new ArrayList<Bill>();
+			Bill bill = findById(bid);
+			Bill targetBill = copyBill(bill);
+			targetBill.setShiftCode(shiftCode);
+			targetBill.setBusinessDate(businessSeqService.getBuinessDate(bill.getHotelCode()));
+			targetBill.setOperationEmployee(employee);
+			targetBill.setAccount(targetAccount);
+			targetBill.setStatus(Constants.Status.BILL_SETTLED);
+			targetBill.setCurrentSettleAccountRecordNum(recordNum);
+			adjustRep.getData().setStatus(Constants.Status.BILL_SETTLED);
+			adjustRep.getData().setCurrentSettleAccountRecordNum(recordNum);
+			data.add(modify(adjustRep.getData()));
+			data.add(add(targetBill));
+			return rep.addData(data);
+		} else {
+			BeanUtils.copyProperties(adjustRep, rep);
+			return rep;
+		}
 	}
 }

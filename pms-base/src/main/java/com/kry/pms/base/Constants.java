@@ -80,6 +80,7 @@ public class Constants {
 		public static final String BUSINESS_ORDER_NUM_SEQ_KEY = "ORDER_NUM";
 		public static final String BUSINESS_BUSINESS_DATE_SEQ_KEY = "BUINESS_DATE";
 		public static final String BUSINESS_BUSINESS_SETTLE_SEQ_KEY = "SETTLE_NUM";
+		public static final String BUSINESS_BUSINESS_TRANSFER_SEQ_KEY = "TRANSFER_NUM";
 		public static final String BUSINESS_BUSINESS_CUSTOMER_ACCOUNT_SEQ_KEY = "CUSTOMER_ACCOUNT_NUM";
 		public static final String BUSINESS_BUSINESS_GROUP_ACCOUNT_SEQ_KEY = "GROUP_ACCOUNT_NUM";
 		public static final String BUSINESS_BUSINESS_ACCOUNT_SEQ="ACCOUNT_SEQ_";
@@ -146,6 +147,11 @@ public class Constants {
 		public static final String SETTLE_TYPE_IGROUP = "IG";
 		public static final String SETTLE_TYPE_ROOM = "ROOM";
 		public static final String SETTLE_TYPE_NONE = "NONE";
+		
+		public static final String BILL_CHECK_WAY_SETTLED = "S";
+		public static final String BILL_CHECK_WAY_TRANSFER = "T";
+		
+		public static final String CREDIT_GRANT_EMPLOYEE="E";
 
 	}
 

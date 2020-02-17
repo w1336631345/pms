@@ -25,9 +25,13 @@ public class SettleAccountRecord extends PersistenceModel {
 	@Column
 	private String shiftCode;
 	@Column
+	private String settleWay;
+	@Column
 	private String recordNum;
 	@OneToOne
 	private Account account;
+	@OneToOne
+	private Account targetAccount;
 	@Column
 	private String type;
 	@OneToOne
