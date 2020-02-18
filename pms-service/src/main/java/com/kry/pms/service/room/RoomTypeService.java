@@ -9,4 +9,6 @@ public interface RoomTypeService extends BaseService<RoomType>{
 
 	List<RoomType> getAllByHotelCode(String code, int deleted);
 
+	void plusRoomQuantity(RoomType roomType, int size);
+
 }

@@ -64,5 +64,14 @@ public interface RoomTypeQuantityDao extends BaseDao<RoomTypeQuantity> {
 			" set room_count = room_count - 1, predictable_total = predictable_total - 1, available_total = available_total - 1 " +
             " where room_type_id = :roomTypeId and DATE_FORMAT(quantity_date, '%Y-%m-%d') >= :nowDate ")
     int deletedAddTotal(@Param("roomTypeId") String roomTypeId, @Param("nowDate")String nowDate);
+    
+    
+    @Transactional
+    @Modifying
+    @Query(nativeQuery = true, value = " update t_room_type_quantity " +
+			" set room_count = room_count +:quantity, predictable_total = predictable_total +:quantity, available_total = available_total +:quantity " +
+            " where room_type_id = :roomTypeId and DATE_FORMAT(quantity_date, '%Y-%m-%d') >= CURRENT_DATE ")
+    int plusRoomTypeQuantity(@Param("roomTypeId") String roomTypeId, @Param("quantity")int quantity);
+    
 
 }

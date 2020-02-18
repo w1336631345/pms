@@ -79,6 +79,7 @@ public class Constants {
 		public static final String SESSION_ATTR_SHIFT_CODE = "SHIFT";
 		public static final String BUSINESS_ORDER_NUM_SEQ_KEY = "ORDER_NUM";
 		public static final String BUSINESS_BUSINESS_DATE_SEQ_KEY = "BUINESS_DATE";
+		public static final String BUSINESS_PLAN_DATE_SEQ_KEY = "PLAN_DATE";
 		public static final String BUSINESS_BUSINESS_SETTLE_SEQ_KEY = "SETTLE_NUM";
 		public static final String BUSINESS_BUSINESS_TRANSFER_SEQ_KEY = "TRANSFER_NUM";
 		public static final String BUSINESS_BUSINESS_CUSTOMER_ACCOUNT_SEQ_KEY = "CUSTOMER_ACCOUNT_NUM";

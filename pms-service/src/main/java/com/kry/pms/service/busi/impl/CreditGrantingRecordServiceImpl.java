@@ -29,6 +29,7 @@ public class CreditGrantingRecordServiceImpl implements CreditGrantingRecordServ
 	private static final String TYPE_MEMBER = "M";
 	private static final String TYPE_AR = "AR";
 	private static final String TYPE_CARD = "CC";
+	private static final String TYPE_EMPLOYEE = "E";
 
 	@Override
 	public CreditGrantingRecord add(CreditGrantingRecord creditGrantingRecord) {
@@ -136,6 +137,8 @@ public class CreditGrantingRecordServiceImpl implements CreditGrantingRecordServ
 			return addArOrMemberCreditGrantingRecord(creditGrantingRecord);
 		case TYPE_CARD:
 			return addCreditCardGrantingRecord(creditGrantingRecord);
+		case TYPE_EMPLOYEE:
+			return addCreditCardGrantingRecord(creditGrantingRecord);//不涉及其他账户操作，使用信用卡授权一致方法
 		default:
 			DtoResponse<CreditGrantingRecord> rep = new DtoResponse<CreditGrantingRecord>();
 			rep.setStatus(Constants.BusinessCode.CODE_PARAMETER_INVALID);

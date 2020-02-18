@@ -3,6 +3,7 @@ package com.kry.pms.service.room.impl;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -16,6 +17,8 @@ import com.kry.pms.dao.room.RoomTypeQuantityDao;
 import com.kry.pms.dao.room.RoomUsageDao;
 import com.kry.pms.model.persistence.room.*;
 import com.kry.pms.service.room.*;
+import com.kry.pms.service.sys.BusinessSeqService;
+
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
@@ -62,6 +65,8 @@ public class GuestRoomServiceImpl implements GuestRoomService {
 	RoomTypeService roomTypeService;
 	@Autowired
 	RoomTypeQuantityDao roomTypeQuantityDao;
+	@Autowired
+	BusinessSeqService businessSeqService;
 
 	public static final String OP_OPEN_REPAIR = "_ROO";
 	public static final String OP_OPEN_LOCK = "_ROS";
@@ -157,22 +162,24 @@ public class GuestRoomServiceImpl implements GuestRoomService {
 				rep.setMessage(repeatRoomNum.append("房间号重复！！").toString());
 			}
 		}
+		roomTypeService.plusRoomQuantity(guestRoom.getRoomType(),list.size());
 		return rep.addData(list);
 	}
 
 	@Transactional
 	public void addRoomRelated(GuestRoom gr){
 		guestRoomStatusService.initNewGuestRoomStatus(gr);
-		RoomType rt = roomTypeService.findById(gr.getRoomType().getId());
-		rt.setRoomCount(rt.getRoomCount()+1);
-		roomTypeService.modify(rt);
-		LocalDate date = LocalDate.now();
-		DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-		String dateStr = date.format(fmt);
-		int i = roomTypeQuantityDao.updateAddTotal(gr.getRoomType().getId(), dateStr);
+		//上级处理
+//		RoomType rt = roomTypeService.findById(gr.getRoomType().getId());
+//		rt.setRoomCount(rt.getRoomCount()+1);
+//		roomTypeService.modify(rt);
+//		LocalDate date = LocalDate.now();
+//		DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+//		String dateStr = date.format(fmt);
+//		int i = roomTypeQuantityDao.updateAddTotal(gr.getRoomType().getId(), dateStr);
 		RoomUsage ru = new RoomUsage();
 		ru.setStartDateTime(LocalDateTime.now());
-		ru.setEndDateTime(LocalDateTime.now().plus(1, ChronoUnit.YEARS));
+		ru.setEndDateTime(LocalDateTime.of(businessSeqService.getPlanDate(gr.getHotelCode()), LocalTime.MAX));
 		ru.setUsageStatus(Constants.Status.ROOM_USAGE_FREE);
 		long d = Duration.between(ru.getStartDateTime(), ru.getEndDateTime()).get(ChronoUnit.SECONDS);
 		ru.setDuration(d / 3600);

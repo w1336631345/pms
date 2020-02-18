@@ -149,4 +149,14 @@ public class BusinessSeqServiceImpl implements BusinessSeqService {
 		return sb.toString();
 	}
 
+	@Override
+	public LocalDate getPlanDate(String hotelCode) {
+		BusinessSeq bs = businessSeqDao.findByHotelCodeAndSeqKey(hotelCode,
+				Constants.Key.BUSINESS_PLAN_DATE_SEQ_KEY);
+		if (bs != null) {
+			return LocalDate.parse(bs.getCurrentSeq().toString(), DateTimeFormatter.ofPattern("yyyyMMdd"));
+		}
+		return null;
+	}
+
 }

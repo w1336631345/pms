@@ -1,6 +1,7 @@
 package com.kry.pms.service.room.impl;
 
 import com.kry.pms.base.Constants;
+import com.kry.pms.base.Constants.BusinessCode;
 import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
 import com.kry.pms.dao.marketing.RoomPriceSchemeDao;
@@ -9,11 +10,15 @@ import com.kry.pms.model.func.UseInfoAble;
 import com.kry.pms.model.http.response.busi.RoomTypeQuantityPredictableVo;
 import com.kry.pms.model.http.response.room.RoomTypeQuantityVo;
 import com.kry.pms.model.persistence.marketing.RoomPriceScheme;
+import com.kry.pms.model.persistence.org.Employee;
 import com.kry.pms.model.persistence.room.GuestRoom;
 import com.kry.pms.model.persistence.room.RoomType;
 import com.kry.pms.model.persistence.room.RoomTypeQuantity;
+import com.kry.pms.model.persistence.sys.BusinessSeq;
 import com.kry.pms.service.room.RoomTypeQuantityService;
 import com.kry.pms.service.room.RoomTypeService;
+import com.kry.pms.service.sys.BusinessSeqService;
+
 import org.apache.commons.collections4.MapUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +35,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.persistence.EntityManager;
+
 @Service
 public class RoomTypeQuantityServiceImpl implements RoomTypeQuantityService {
 	@Autowired
@@ -38,6 +45,10 @@ public class RoomTypeQuantityServiceImpl implements RoomTypeQuantityService {
 	RoomTypeService roomTypeService;
 	@Autowired
 	RoomPriceSchemeDao roomPriceSchemeDao;
+	@Autowired
+	BusinessSeqService businessSeqService;
+	@Autowired
+	EntityManager entityManager;
 
 	@Override
 	public RoomTypeQuantity add(RoomTypeQuantity roomTypeQuantity) {
@@ -115,9 +126,17 @@ public class RoomTypeQuantityServiceImpl implements RoomTypeQuantityService {
 		rtq.setRoomTypeCode(roomType.getCode());
 		rtq.setRoomTypeName(roomType.getName());
 		rtq.setQuantityDate(quantityDate);
-		rtq.setAvailableTotal(roomType.getOverReservation());
-		rtq.setPredictableTotal(roomType.getOverReservation());
-		rtq.setRoomCount(roomType.getRoomCount());
+		rtq.setUsedTotal(0);
+		rtq.setWillArriveTotal(0);
+		rtq.setHseTotal(0);
+		rtq.setRepairTotal(0);
+		rtq.setLockedTotal(0);
+		rtq.setHotelCode(roomType.getHotelCode());
+		rtq.setWillLeaveTotal(0);
+		rtq.setBookingTotal(0);
+		rtq.setAvailableTotal(roomType.getOverReservation()!=null?roomType.getOverReservation():0);
+		rtq.setPredictableTotal(roomType.getOverReservation()!=null?roomType.getOverReservation():0);
+		rtq.setRoomCount(roomType.getRoomCount()!=null?roomType.getRoomCount():0);
 		return rtq;
 	}
 
@@ -226,7 +245,7 @@ public class RoomTypeQuantityServiceImpl implements RoomTypeQuantityService {
 			rtq.setAvailableTotal(rtq.getAvailableTotal() + quantity);
 			break;
 		case Constants.Status.ROOM_USAGE_PREDICTABLE:
-			rtq.setPredictableTotal(rtq.getPredictableTotal()+quantity);
+			rtq.setPredictableTotal(rtq.getPredictableTotal() + quantity);
 		case Constants.Status.ROOM_USAGE_CHECK_OUT:
 //			rtq.setPredictableTotal(rtq.getPredictableTotal() + quantity);
 			break;
@@ -434,28 +453,45 @@ public class RoomTypeQuantityServiceImpl implements RoomTypeQuantityService {
 //		List<Map<String, Object>> totle = roomTypeQuantityDao.getByTimeAndRoomType(hotelCode, times, roomTypeId);
 		String schemeId = null;
 		List<Map<String, Object>> schmes = roomPriceSchemeDao.getByRoomType(schemeId, roomTypeId);
-		for(int i=0; i<list.size(); i++){
+		for (int i = 0; i < list.size(); i++) {
 			Map<String, Object> newMap = new HashMap<>();
 			Map map = list.get(i);
 			newMap.putAll(map);
 			String fId = MapUtils.getString(map, "id");
-			for(int j=0; j<schmes.size(); j++){
+			for (int j = 0; j < schmes.size(); j++) {
 				String id = MapUtils.getString(schmes.get(j), "id");
-				if(fId.equals(id)){
+				if (fId.equals(id)) {
 					String code = MapUtils.getString(schmes.get(j), "code");
 					String typeCode = MapUtils.getString(schmes.get(j), "typeCode");
 					String roomTypeName = MapUtils.getString(schmes.get(j), "roomTypeName");
 					String name = MapUtils.getString(schmes.get(j), "name");
 					String price = MapUtils.getString(schmes.get(j), "price");
 					String room_type_id = MapUtils.getString(schmes.get(j), "room_type_id");
-					newMap.put("price_"+typeCode, price);
-					newMap.put("typeName_"+typeCode, roomTypeName);
+					newMap.put("price_" + typeCode, price);
+					newMap.put("typeName_" + typeCode, roomTypeName);
 					Map<String, Object> tMap = roomTypeQuantityDao.mapByTimeAndRoomType(hotelCode, times, room_type_id);
-					newMap.put("total_"+typeCode, MapUtils.getString(tMap, "predictable_total"));
+					newMap.put("total_" + typeCode, MapUtils.getString(tMap, "predictable_total"));
 				}
 			}
 			relist.add(newMap);
 		}
 		return relist;
+	}
+
+	@Override
+	public void initNewType(RoomType roomType) {
+		LocalDate planDate = businessSeqService.getPlanDate(roomType.getHotelCode());
+		LocalDate quantityDate = LocalDate.now();
+		while (planDate.isAfter(quantityDate)) {
+			entityManager.persist(initRoomTypeQuantity(roomType, quantityDate));
+			quantityDate = quantityDate.plusDays(1);
+		}
+		entityManager.flush();
+		entityManager.clear();
+	}
+
+	@Override
+	public void addRoomQuantity(RoomType roomType, int quantity) {
+		roomTypeQuantityDao.plusRoomTypeQuantity(roomType.getId(), quantity);
 	}
 }
