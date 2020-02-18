@@ -19,6 +19,8 @@ import com.kry.pms.base.PageResponse;
 import com.kry.pms.model.persistence.room.Building;
 import com.kry.pms.service.room.BuildingService;
 
+import java.util.List;
+
 @RestController
 @RequestMapping(path = "/api/v1/room/building")
 public class BuildingController extends BaseController<Building> {
@@ -47,6 +49,15 @@ public class BuildingController extends BaseController<Building> {
 		PageRequest<Building> req = parse2PageRequest(request);
 		return rep.addData(buildingService.listPage(req));
 	}
+
+	@GetMapping(path = "/list")
+	public HttpResponse<List<Building>> list(HttpServletRequest request) throws InstantiationException, IllegalAccessException{
+		HttpResponse<List<Building>> rep = new HttpResponse<List<Building>>();
+		List<Building> list = buildingService.getAllByHotelCode(getCurrentHotleCode());
+		rep.setData(list);
+		return rep;
+	}
+
 	
 
 }

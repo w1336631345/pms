@@ -14,7 +14,7 @@ public interface RoomPriceSchemeDao extends BaseDao<RoomPriceScheme>{
 
     @Query(nativeQuery = true, value = " select trp.id, trp.code, trp.`name`, tms.type  " +
             " from t_room_price_scheme trp left join t_marketing_sources tms " +
-            " on trp.marketing_sources_id = tms.id  where 1=1 " +
+            " on trp.marketing_sources_id = tms.id  where trp.deleted = 0 " +
             " and if(:hotelCode is not null && :hotelCode != '', trp.hotel_code=:hotelCode, 1=1 ) ")
     List<Map<String, Object>> getSql(@Param("hotelCode")String hotelCode);
 
@@ -38,8 +38,26 @@ public interface RoomPriceSchemeDao extends BaseDao<RoomPriceScheme>{
             " and if(:schemeId is not null && :schemeId != '', trp.id=:schemeId, 1=1 ) " +
             " and if(:roomTypeId is not null && :roomTypeId != '', trpt.room_type_id=:roomTypeId, 1=1 ) ")
     List<Map<String, Object>> getByRoomType(@Param("schemeId")String schemeId, @Param("roomTypeId")String roomTypeId);
+    @Query(nativeQuery = true, value = " SELECT trp.id, " +
+            " trp.`code`, " +
+            " trp.`name`, " +
+            " trpt.price, " +
+            " trpt.room_type_id, " +
+            " trt.`name` roomTypeName, " +
+            " trt.`code` typeCode " +
+            " from  " +
+            " t_room_price_scheme trp, t_room_price_scheme_item trpt, t_room_price_scheme_items trps,t_room_type trt  " +
+            " where trp.id = trps.room_price_scheme_id and trpt.id = trps.items_id " +
+            " and trpt.room_type_id = trt.id " +
+            " and if(:schemeId is not null && :schemeId != '', trp.id=:schemeId, 1=1 ) " +
+            " and if(coalesce (:roomTypeIds,null) is not null, trpt.room_type_id in (:roomTypeIds), 1=1 ) ")
+    List<Map<String, Object>> getByRoomType2(@Param("schemeId")String schemeId, @Param("roomTypeIds")List<String> roomTypeIds);
 
     @Query(nativeQuery = true, value = " select code from t_room_price_scheme where hotel_code = ?1 and deleted = ?2 ")
     List<String> getCode(String hotelCode, int delelted);
+
+    List<RoomPriceScheme> findByHotelCodeAndIsShowAndDeleted(String hotelCode, String isShow, int deleted);
+
+
 
 }
