@@ -50,6 +50,20 @@ public interface RoomTypeQuantityDao extends BaseDao<RoomTypeQuantity> {
 			"  and if(:times is not null && :times != '', DATE_FORMAT(t.quantity_date, '%Y-%m-%d') =:times, 1=1 ) " +
 			"  and if(:roomTypeId is not null && :roomTypeId != '', t.room_type_id=:roomTypeId, 1=1 ) " )
 	Map<String, Object> mapByTimeAndRoomType(@Param("hotelCode") String hotelCode, @Param("times")String time, @Param("roomTypeId")String roomTypeId);
+	@Query(nativeQuery = true, value = " select count(t.guest_room_id) total, trt.id, trt.`name` from t_guest_room tgr, t_room_type trt, t_building tb, " +
+			" (select DISTINCT guest_room_id, usage_status " +
+			" from t_room_usage tru " +
+			" where 1=1" +
+			" and if(:times is not null && :times != '', DATE_FORMAT(start_date_time, '%Y-%m-%d %H:%i') <=:times, 1=1 ) " +
+			" and if(:times is not null && :times != '', DATE_FORMAT(end_date_time, '%Y-%m-%d %H:%i') >=:times, 1=1 ) " +
+			" and usage_status = 'F') t " +
+			" where tgr.id = t.guest_room_id and tgr.room_type_id = trt.id and tgr.building_id = tb.id " +
+			" and if(:hotelCode is not null && :hotelCode != '', tgr.hotel_code=:hotelCode, 1=1 ) " +
+			" and if(coalesce(:buildIds, null) is not null, tb.id in (:buildIds), 1=1 ) " +
+			" and if(:roomTypeId is not null && :roomTypeId != '', trt.id =:roomTypeId, 1=1 ) " +
+			" group by trt.id, trt.`name` " )
+	Map<String, Object> mapByTimeAndRoomType2(@Param("hotelCode")String hotelCode, @Param("times")String times,
+											  @Param("buildIds")List<String> buildIds, @Param("roomTypeId")String roomTypeId);
 
 	@Transactional
 	@Modifying

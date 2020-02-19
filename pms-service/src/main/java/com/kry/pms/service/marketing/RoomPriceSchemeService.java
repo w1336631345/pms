@@ -17,4 +17,7 @@ public interface RoomPriceSchemeService extends BaseService<RoomPriceScheme>{
 
     List<RoomPriceScheme> getByCorpation(String protocolCId);
 
+    RoomPriceScheme mIsShow(String id, String isShow);
+
+    List<RoomPriceScheme> findByHotelCodeAndIsShowAndDeleted(String hotelCode, String isShow);
 }

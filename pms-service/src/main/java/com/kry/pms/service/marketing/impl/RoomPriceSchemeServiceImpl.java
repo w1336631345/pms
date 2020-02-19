@@ -122,6 +122,18 @@ public class  RoomPriceSchemeServiceImpl implements  RoomPriceSchemeService{
 		List<RoomPriceScheme> list = roomPriceSchemeDao.getByCorpation(protocolCId);
 		return list;
 	}
-	 
+
+	@Override
+	public RoomPriceScheme mIsShow(String id, String isShow){
+	 	RoomPriceScheme rps = roomPriceSchemeDao.getOne(id);
+	 	rps.setIsShow(isShow);
+	 	return roomPriceSchemeDao.saveAndFlush(rps);
+	}
+
+	@Override
+	public List<RoomPriceScheme> findByHotelCodeAndIsShowAndDeleted(String hotelCode, String isShow){
+	 	List<RoomPriceScheme> list = roomPriceSchemeDao.findByHotelCodeAndIsShowAndDeleted(hotelCode, isShow, Constants.DELETED_FALSE);
+	 	return list;
+	}
 	 
 }

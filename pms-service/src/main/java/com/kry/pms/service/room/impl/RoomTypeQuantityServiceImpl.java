@@ -31,6 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -135,9 +136,9 @@ public class RoomTypeQuantityServiceImpl implements RoomTypeQuantityService {
 		rtq.setHotelCode(roomType.getHotelCode());
 		rtq.setWillLeaveTotal(0);
 		rtq.setBookingTotal(0);
-		rtq.setAvailableTotal(roomType.getOverReservation()!=null?roomType.getOverReservation():0);
-		rtq.setPredictableTotal(roomType.getOverReservation()!=null?roomType.getOverReservation():0);
-		rtq.setRoomCount(roomType.getRoomCount()!=null?roomType.getRoomCount():0);
+		rtq.setAvailableTotal(roomType.getOverReservation() != null ? roomType.getOverReservation() : 0);
+		rtq.setPredictableTotal(roomType.getOverReservation() != null ? roomType.getOverReservation() : 0);
+		rtq.setRoomCount(roomType.getRoomCount() != null ? roomType.getRoomCount() : 0);
 		return rtq;
 	}
 
@@ -472,6 +473,52 @@ public class RoomTypeQuantityServiceImpl implements RoomTypeQuantityService {
 					newMap.put("typeName_" + typeCode, roomTypeName);
 					Map<String, Object> tMap = roomTypeQuantityDao.mapByTimeAndRoomType(hotelCode, times, room_type_id);
 					newMap.put("total_" + typeCode, MapUtils.getString(tMap, "predictable_total"));
+				}
+			}
+			relist.add(newMap);
+		}
+		return relist;
+	}
+
+	@Override
+	public List<Map<String, Object>> getByTimeAndRoomType2(String hotelCode, String times, String[] buildIds,
+			String[] roomTypeIds) {
+		List<String> bIds = null;
+		if (buildIds != null) {
+			bIds = Arrays.asList(buildIds);
+		}
+		List<String> rtIds = null;
+		if (roomTypeIds != null) {
+			rtIds = Arrays.asList(roomTypeIds);
+		}
+		List<Map<String, Object>> list = roomPriceSchemeDao.getSql(hotelCode);
+		List<Map<String, Object>> relist = new ArrayList<>();
+//		List<Map<String, Object>> totle = roomTypeQuantityDao.getByTimeAndRoomType(hotelCode, times, roomTypeId);
+		String schemeId = null;
+		List<Map<String, Object>> schmes = roomPriceSchemeDao.getByRoomType2(schemeId, rtIds);
+		for (int i = 0; i < list.size(); i++) {
+			Map<String, Object> newMap = new HashMap<>();
+			Map map = list.get(i);
+			newMap.putAll(map);
+			String fId = MapUtils.getString(map, "id");
+			for (int j = 0; j < schmes.size(); j++) {
+				String id = MapUtils.getString(schmes.get(j), "id");
+				if (fId.equals(id)) {
+					String code = MapUtils.getString(schmes.get(j), "code");
+					String typeCode = MapUtils.getString(schmes.get(j), "typeCode");
+					String roomTypeName = MapUtils.getString(schmes.get(j), "roomTypeName");
+					String name = MapUtils.getString(schmes.get(j), "name");
+					String price = MapUtils.getString(schmes.get(j), "price");
+					String room_type_id = MapUtils.getString(schmes.get(j), "room_type_id");
+					newMap.put("price_" + typeCode, price);
+					newMap.put("typeName_" + typeCode, roomTypeName);
+					Map<String, Object> tMap = roomTypeQuantityDao.mapByTimeAndRoomType2(hotelCode, times, bIds,
+							room_type_id);
+					if (tMap == null || tMap.isEmpty()) {
+						newMap.put("total_" + typeCode, 0);
+					} else {
+						newMap.put("total_" + typeCode, MapUtils.getString(tMap, "total"));
+					}
 				}
 			}
 			relist.add(newMap);

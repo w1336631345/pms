@@ -83,5 +83,36 @@ public class RoomPriceSchemeController extends BaseController<RoomPriceScheme> {
 		rep.addData(data);
 		return rep;
 	}
+	/**
+	 * 功能描述: <br>仅修改是否展示电子价牌
+	 * 〈〉
+	 * @Param: [id, isShow]
+	 * @Return: com.kry.pms.base.HttpResponse<com.kry.pms.model.persistence.marketing.RoomPriceScheme>
+	 * @Author: huanghaibin
+	 * @Date: 2020/2/18 10:08
+	 */
+	@GetMapping(path = "/mIsShow")
+	public HttpResponse<RoomPriceScheme> modifyIsShow(String id, String isShow) {
+		HttpResponse hr = new HttpResponse();
+		RoomPriceScheme rps = roomPriceSchemeService.mIsShow(id, isShow);
+		hr.setData(rps);
+		return hr;
+	}
+
+	/**
+	 * 功能描述: <br>查询是否展示电子价牌的
+	 * 〈〉
+	 * @Param: [isShow]
+	 * @Return: com.kry.pms.base.HttpResponse<com.kry.pms.model.persistence.marketing.RoomPriceScheme>
+	 * @Author: huanghaibin
+	 * @Date: 2020/2/18 10:56
+	 */
+	@GetMapping(path = "/listIsShow")
+	public HttpResponse<RoomPriceScheme> list(String isShow) {
+		HttpResponse hr = new HttpResponse();
+		List<RoomPriceScheme> list = roomPriceSchemeService.findByHotelCodeAndIsShowAndDeleted(getCurrentHotleCode(), isShow);
+		hr.setData(list);
+		return hr;
+	}
 
 }
