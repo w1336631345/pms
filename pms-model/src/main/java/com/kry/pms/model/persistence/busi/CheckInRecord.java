@@ -2,6 +2,7 @@ package com.kry.pms.model.persistence.busi;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.kry.pms.model.persistence.PersistenceModel;
+import com.kry.pms.model.persistence.goods.SetMeal;
 import com.kry.pms.model.persistence.guest.Customer;
 import com.kry.pms.model.persistence.marketing.*;
 import com.kry.pms.model.persistence.org.Employee;
@@ -42,6 +43,8 @@ public class CheckInRecord extends PersistenceModel {
 //	@JoinColumn(name="main_record_id")
 	@Transient
 	private List<CheckInRecord> subRecords;// 子单
+	@ManyToOne
+	private SetMeal setMeal;//包价，这个只有上面子单用到
 	@Column
 	private String orderNum;// 订单编号
 	@Column
@@ -118,9 +121,8 @@ public class CheckInRecord extends PersistenceModel {
 	@Transient
 	private String mainRecordId;// 主单id
 	@OneToOne
-	// 预留记录id
 	private DiscountScheme discountScheme;// 优惠方案
-
+	// 预留记录id
 	@Column
 	private String reserveId;
 	// 联房id
@@ -545,5 +547,9 @@ public class CheckInRecord extends PersistenceModel {
 	public void setLinkNum(String linkNum) {
 		this.linkNum = linkNum;
 	}
+
+	public SetMeal getSetMeal() { return setMeal; }
+
+	public void setSetMeal(SetMeal setMeal) { this.setMeal = setMeal; }
 
 }

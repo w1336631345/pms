@@ -3,10 +3,7 @@ package com.kry.pms.model.persistence;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
-import javax.persistence.Column;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.MappedSuperclass;
+import javax.persistence.*;
 
 import org.hibernate.annotations.GenericGenerator;
 
@@ -14,6 +11,9 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 /**
  * 
@@ -23,6 +23,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @MappedSuperclass
+@EntityListeners(AuditingEntityListener.class)
 @JsonIgnoreProperties(value = { "hibernateLazyInitializer", "handler","updateDate","createUser","updateUser" })
 public class PersistenceModel implements Serializable,Cloneable {
 	@Id
@@ -30,10 +31,12 @@ public class PersistenceModel implements Serializable,Cloneable {
 	@GenericGenerator(name = "uuid", strategy = "uuid")
 	@Column(columnDefinition = "varchar(64)")
 	protected String id;
-	@Column(columnDefinition = "datetime NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间'")
+	@CreatedDate
+	@Column(updatable = false, columnDefinition = "datetime NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间'")
 	protected LocalDateTime createDate;
 	@Column(columnDefinition = "varchar(255) COMMENT '创建人'")
 	protected String createUser;
+	@LastModifiedDate
 	@Column(columnDefinition = "datetime NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间'")
 	protected LocalDateTime updateDate;
 	@Column(columnDefinition = "varchar(255) COMMENT '修改人'")

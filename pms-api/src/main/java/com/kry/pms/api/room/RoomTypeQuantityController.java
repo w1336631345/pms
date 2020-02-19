@@ -61,7 +61,7 @@ public class RoomTypeQuantityController extends BaseController<RoomTypeQuantity>
 	}
 
 	@GetMapping(path = "/predictable")
-	public HttpResponse<List<RoomTypeQuantityPredictableVo>> queryPredictable(String startDate, String endDate) {
+	public HttpResponse<List<RoomTypeQuantityPredictableVo>> queryPredictable(String startDate, String endDate, String roomPriceSchemeId) {
 		HttpResponse<List<RoomTypeQuantityPredictableVo>> response = new HttpResponse<List<RoomTypeQuantityPredictableVo>>();
 		LocalDate sDate = LocalDate.parse(startDate);
 		LocalDate eDate = LocalDate.parse(endDate);
@@ -73,7 +73,7 @@ public class RoomTypeQuantityController extends BaseController<RoomTypeQuantity>
 			response.setMessage("到离店时间错误，请重新选择");
 		} else {
 			List<RoomTypeQuantityPredictableVo> data = roomTypeQuantityService.queryPredictable(getCurrentHotleCode(),
-					sDate, eDate);
+					sDate, eDate, roomPriceSchemeId);
 			response.addData(data);
 		}
 		return response;

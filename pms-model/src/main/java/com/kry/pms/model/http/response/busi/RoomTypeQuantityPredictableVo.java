@@ -10,5 +10,8 @@ public class RoomTypeQuantityPredictableVo {
 	private Double price;
 	private Integer availableTotal;
 	private String roomTypeId;
+	private String roomPriceSchemeId;
+	private String setMealId;
+	private String setMealName;
 	
 }

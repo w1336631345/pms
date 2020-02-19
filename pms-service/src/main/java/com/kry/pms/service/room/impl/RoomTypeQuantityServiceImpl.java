@@ -376,7 +376,7 @@ public class RoomTypeQuantityServiceImpl implements RoomTypeQuantityService {
 
 	@Override
 	public List<RoomTypeQuantityPredictableVo> queryPredictable(String hotelCode, LocalDate startDate,
-			LocalDate endDate) {
+			LocalDate endDate, String roomPriceSchemeId) {
 		List<RoomType> types = roomTypeService.getAllByHotelCode(hotelCode, Constants.DELETED_FALSE);
 		List<RoomTypeQuantityPredictableVo> data = new ArrayList<>();
 		RoomTypeQuantityPredictableVo rtpv = null;
@@ -384,12 +384,20 @@ public class RoomTypeQuantityServiceImpl implements RoomTypeQuantityService {
 			RoomTypeQuantity rtq = roomTypeQuantityDao.queryPredictable(type.getId(), startDate, endDate);
 			if (rtq != null) {
 				rtpv = new RoomTypeQuantityPredictableVo();
+				if(roomPriceSchemeId != null && !"".equals(roomPriceSchemeId)){
+					Map<String, Object> map = roomPriceSchemeDao.roomTypeAndPriceScheme(type.getId(), roomPriceSchemeId);
+					String id = MapUtils.getString(map, "id");
+					rtpv.setRoomPriceSchemeId(id);
+					rtpv.setSetMealId(MapUtils.getString(map, "setMealId"));
+					rtpv.setSetMealName(MapUtils.getString(map, "setMealName"));
+				}
 				rtpv.setPrice(type.getPrice());
 				rtpv.setRoomTypeName(type.getName());
 				rtpv.setRoomTypeId(type.getId());
 				rtpv.setStartDate(startDate);
 				rtpv.setEndDate(endDate);
 				rtpv.setAvailableTotal(rtq.getPredictableTotal());
+
 				data.add(rtpv);
 			}
 		}

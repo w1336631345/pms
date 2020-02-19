@@ -57,6 +57,13 @@ public interface RoomPriceSchemeDao extends BaseDao<RoomPriceScheme>{
     List<String> getCode(String hotelCode, int delelted);
 
     List<RoomPriceScheme> findByHotelCodeAndIsShowAndDeleted(String hotelCode, String isShow, int deleted);
+    @Query(nativeQuery = true, value = " select " +
+            " trp.id, trp.`name`, tsm.id setMealId, tsm.`name` setMealName, trpt.room_type_id " +
+            " from t_room_price_scheme trp, t_room_price_scheme_item trpt, t_room_price_scheme_items trpts, t_set_meal tsm " +
+            " where trp.id = trpts.room_price_scheme_id  and trpt.id = trpts.items_id and trpt.set_meal_id = tsm.id " +
+            " and if(:roomTypeId is not null && :roomTypeId != '', trpt.room_type_id=:roomTypeId, 1=1 ) " +
+            " and if(:roomPriceSchemeId is not null && :roomPriceSchemeId != '', trpts.room_price_scheme_id=:roomPriceSchemeId, 1=1 ) ")
+    Map<String, Object> roomTypeAndPriceScheme(@Param("roomTypeId")String roomTypeId, @Param("roomPriceSchemeId")String roomPriceSchemeId);
 
 
 

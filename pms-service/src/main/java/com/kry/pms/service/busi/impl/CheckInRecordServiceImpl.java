@@ -151,6 +151,8 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 //									return hr.error("房类资源不够");
 //								}
 							}
+							//修改所有主单下数据的房价码
+							cir.setRoomPriceScheme(checkInRecord.getRoomPriceScheme());
 							cir.setArriveTime(checkInRecord.getArriveTime());
 							cir.setLeaveTime(checkInRecord.getLeaveTime());
 							checkInRecordDao.saveAndFlush(cir);
@@ -383,6 +385,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 					item.setDays(checkInRecord.getDays());
 					item.setContactName(checkInRecord.getContactName());
 					item.setMarketEmployee(checkInRecord.getMarketEmployee());
+					item.setMarketingSources(checkInRecord.getMarketingSources());
 					item.setDistributionChannel(checkInRecord.getDistributionChannel());
 					item.setContactMobile(checkInRecord.getContactMobile());
 					item.setRoomType(roomTypeService.findById(item.getRoomTypeId()));
@@ -926,6 +929,10 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 		cir.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_CANCLE_BOOK);
 		modify(cir);
 		roomStatisticsService.cancleReserve(new CheckInRecordWrapper(cir));//取消预
+		CheckInRecord mainRecord = checkInRecordDao.getOne(mainRecordId);//获取主单信息
+		mainRecord.setRoomCount(mainRecord.getRoomCount() - cir.getRoomCount());
+		mainRecord.setHumanCount(mainRecord.getHumanCount() - cir.getHumanCount());
+		update(mainRecord);//删除了预留，必须修改主单预订房数和人数
 		return hr.ok();
 	}
 
