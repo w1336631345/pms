@@ -130,6 +130,7 @@ public class RoomTypeQuantityServiceImpl implements RoomTypeQuantityService {
 		rtq.setWillArriveTotal(0);
 		rtq.setHseTotal(0);
 		rtq.setRepairTotal(0);
+		rtq.setReserveTotal(0);
 		rtq.setLockedTotal(0);
 		rtq.setHotelCode(roomType.getHotelCode());
 		rtq.setWillLeaveTotal(0);

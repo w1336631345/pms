@@ -8,9 +8,6 @@ import java.util.List;
 import javax.persistence.Transient;
 import javax.transaction.Transactional;
 
-import com.kry.pms.service.busi.RoomRecordService;
-
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Sort;
@@ -32,15 +29,13 @@ import com.kry.pms.model.persistence.busi.RoomRecord;
 import com.kry.pms.model.persistence.goods.Product;
 import com.kry.pms.model.persistence.org.Employee;
 import com.kry.pms.model.persistence.sys.Account;
-import com.kry.pms.model.persistence.sys.BusinessSeq;
 import com.kry.pms.service.busi.BillItemService;
 import com.kry.pms.service.busi.BillService;
+import com.kry.pms.service.busi.RoomRecordService;
 import com.kry.pms.service.goods.ProductService;
 import com.kry.pms.service.sys.AccountService;
 import com.kry.pms.service.sys.BusinessSeqService;
 import com.kry.pms.util.BigDecimalUtil;
-
-import antlr.CppCodeGenerator;
 
 @Service
 public class BillServiceImpl implements BillService {
@@ -193,8 +188,9 @@ public class BillServiceImpl implements BillService {
 			if (Constants.Status.BILL_NEED_SETTLED.equals(b.getStatus())) {
 				b.setStatus(Constants.Status.BILL_SETTLED);
 				b.setCurrentSettleAccountRecordNum(recordNum);
+				modify(b);
 			} else {
-				rep.setStatus(Constants.BusinessCode.CODE_ILLEGAL_OPERATION);
+				rep.error(Constants.BusinessCode.CODE_ILLEGAL_OPERATION, "存在已结账账务");
 				break;
 			}
 		}
@@ -319,6 +315,7 @@ public class BillServiceImpl implements BillService {
 					modify(bill);
 				}
 				offsetBill = add(offsetBill);
+				rep.addData(offsetBill);
 			}
 
 		} else {
@@ -328,7 +325,7 @@ public class BillServiceImpl implements BillService {
 		return rep;
 	}
 
-	private boolean adjustShiftCheck(Bill bill, double val, String shiftCode) {
+	private boolean adjustShiftCheck(Bill bill, Double val, String shiftCode) {
 		return true;
 	}
 
@@ -389,29 +386,51 @@ public class BillServiceImpl implements BillService {
 		return null;
 	}
 
+	private Bill strikeBill(Bill bill,Account targetAccount, String shiftCode, Employee employee, String recordNum) {
+		Bill offsetBill = null;
+		offsetBill = copyBill(bill);
+		offsetBill.setId(null);
+		offsetBill.setProduct(bill.getProduct());
+		offsetBill.setAccount(bill.getAccount());
+		offsetBill.setTotal(-bill.getTotal());
+		offsetBill.setTranferRemark("To "+ targetAccount.getCode());
+		offsetBill.setStatus(Constants.Status.BILL_INVALID);
+		bill.setStatus(Constants.Status.BILL_INVALID);
+		modify(bill);
+		offsetBill = add(offsetBill);
+		return offsetBill;
+	}
+
 	@Override
 	public DtoResponse<List<Bill>> transfer(String bid, Account targetAccount, String shiftCode, Employee employee,
 			String recordNum) {
+		Bill bill = findById(bid);
+		return transfer(bill, targetAccount, shiftCode, employee, recordNum);
+
+	}
+
+	@Override
+	public List<Bill> findByIds(List<String> ids) {
+		return billDao.findAllById(ids);
+	}
+
+	@Override
+	public DtoResponse<List<Bill>> transfer(Bill bill, Account targetAccount, String shiftCode,
+			Employee operationEmployee, String recordNum) {
 		DtoResponse<List<Bill>> rep = new DtoResponse<List<Bill>>();
-		DtoResponse<Bill> adjustRep = adjust(bid, null, false, null);
-		if (adjustRep.getStatus() == 0) {
-			List<Bill> data = new ArrayList<Bill>();
-			Bill bill = findById(bid);
-			Bill targetBill = copyBill(bill);
-			targetBill.setShiftCode(shiftCode);
-			targetBill.setBusinessDate(businessSeqService.getBuinessDate(bill.getHotelCode()));
-			targetBill.setOperationEmployee(employee);
-			targetBill.setAccount(targetAccount);
-			targetBill.setStatus(Constants.Status.BILL_SETTLED);
-			targetBill.setCurrentSettleAccountRecordNum(recordNum);
-			adjustRep.getData().setStatus(Constants.Status.BILL_SETTLED);
-			adjustRep.getData().setCurrentSettleAccountRecordNum(recordNum);
-			data.add(modify(adjustRep.getData()));
-			data.add(add(targetBill));
-			return rep.addData(data);
-		} else {
-			BeanUtils.copyProperties(adjustRep, rep);
-			return rep;
-		}
+		Bill strikeBill = strikeBill(bill,targetAccount, shiftCode, operationEmployee, recordNum);
+		List<Bill> data = new ArrayList<Bill>();
+		Bill targetBill = copyBill(bill);
+		targetBill.setShiftCode(shiftCode);
+		targetBill.setBusinessDate(businessSeqService.getBuinessDate(bill.getHotelCode()));
+		targetBill.setOperationEmployee(operationEmployee);
+		targetBill.setAccount(targetAccount);
+		targetBill.setTransferFlag(Constants.FLAG_YES);
+		targetBill.setTranferRemark("From:"+bill.getAccount().getCode());
+		targetBill.setStatus(Constants.Status.BILL_NEED_SETTLED);
+		targetBill.setCurrentSettleAccountRecordNum(recordNum);
+		data.add(strikeBill);
+		data.add(add(targetBill));
+		return rep.addData(data);
 	}
 }

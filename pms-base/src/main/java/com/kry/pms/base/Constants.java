@@ -87,6 +87,7 @@ public class Constants {
 		public static final String BUSINESS_BUSINESS_ACCOUNT_SEQ="ACCOUNT_SEQ_";
 		public static final String TOGETHER_NUM_KEY = "TOGETHER_NUM";
 		public static final String CUSTOMER_NUM = "CUSTOMER_NUM";// 客户编码
+		public static final String BUSINESS_CANCLE_SETTLE_SEQ_KEY = "CANCLE_SETTLE_NUM";
 	}
 
 	public interface Type {
@@ -161,6 +162,7 @@ public class Constants {
 	public static final int CODE_SHOW_LEVEL_ERROR = 2;
 	public static final int CODE_SHOW_LEVEL_WARING = 1;
 	public static final int CODE_SHOW_LEVEL_SUCCESS = 0;
+	public static final String FLAG_YES = "Y";
 
 	public interface ErrorCode {
 		public static final int REQUIRED_PARAMETER_MISSING = 600;

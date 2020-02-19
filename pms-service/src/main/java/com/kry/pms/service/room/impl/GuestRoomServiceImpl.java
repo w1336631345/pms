@@ -138,6 +138,13 @@ public class GuestRoomServiceImpl implements GuestRoomService {
 	public DtoResponse<List<GuestRoom>> batchAdd(GuestRoom guestRoom) {
 		DtoResponse<List<GuestRoom>> rep = new DtoResponse<List<GuestRoom>>();
 		String roomNums = guestRoom.getRoomNum();
+		RoomType roomType = roomTypeService.findById(guestRoom.getRoomType().getId());
+		if(roomType==null) {
+			rep.error(Constants.BusinessCode.CODE_PARAMETER_INVALID, "房间类型错误");
+			return rep;
+		}else {
+			guestRoom.setHotelCode(roomType.getHotelCode());
+		}
 		List<GuestRoom> list = new ArrayList<GuestRoom>();
 		StringBuilder repeatRoomNum = new StringBuilder();
 		if (roomNums.contains(",")) {

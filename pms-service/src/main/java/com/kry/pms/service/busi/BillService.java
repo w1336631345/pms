@@ -28,6 +28,8 @@ public interface BillService extends BaseService<Bill> {
 	public boolean checkAndPayBill(BillSettleBo bsb);
 
 	public List<Bill> findByAccountId(String id);
+	
+	public List<Bill> findByIds(List<String> ids);
 
 	//夜审手动入账
 	void putAcount(List<RoomRecord> ids, LocalDate businessDate, Employee emp, String shiftCode);
@@ -65,5 +67,8 @@ public interface BillService extends BaseService<Bill> {
 	DtoResponse<List<Bill>> transfer(String bid, Account targetAccount, String shiftCode, Employee employee, String recordNum);
 
 	public List<Bill> checkBillIds(List<String> billIds, DtoResponse<Account> rep, String recordNum);
+
+	public DtoResponse<List<Bill>> transfer(Bill bill, Account targetAccount, String shiftCode,
+			Employee operationEmployee, String recordNum);
 
 }

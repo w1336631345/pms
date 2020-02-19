@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.print.attribute.standard.SheetCollate;
 import javax.transaction.Transactional;
 
 import org.springframework.beans.BeanUtils;
@@ -27,10 +26,10 @@ import com.kry.pms.model.http.response.busi.AccountSummaryVo;
 import com.kry.pms.model.http.response.busi.SettleInfoVo;
 import com.kry.pms.model.persistence.busi.Bill;
 import com.kry.pms.model.persistence.busi.CheckInRecord;
-import com.kry.pms.model.persistence.busi.CreditGrantingRecord;
 import com.kry.pms.model.persistence.busi.RoomRecord;
 import com.kry.pms.model.persistence.busi.SettleAccountRecord;
 import com.kry.pms.model.persistence.guest.Customer;
+import com.kry.pms.model.persistence.org.Employee;
 import com.kry.pms.model.persistence.sys.Account;
 import com.kry.pms.service.busi.BillService;
 import com.kry.pms.service.busi.CheckInRecordService;
@@ -171,34 +170,50 @@ public class AccountServiceImpl implements AccountService {
 		return accountDao.findAccountByOrderNumAndStatusAndCheckInType(orderNum, checkInType, status);
 	}
 
+	@Override
+	public DtoResponse<List<Bill>> transferBill(List<Bill> bills, Double total, Account account, Account targetAccount,
+			String shiftCode, Employee operationEmployee, String recordNum) {
+		DtoResponse<List<Bill>> rep = new DtoResponse<List<Bill>>();
+		if (limitCheck(targetAccount, total)) {
+			List<Bill> flatBills = new ArrayList<>();
+			for (Bill bill : bills) {
+				DtoResponse<List<Bill>> itemRep = billService.transfer(bill, targetAccount, shiftCode,
+						operationEmployee, recordNum);
+				if (itemRep.getStatus() != 0) {
+					BeanUtils.copyProperties(itemRep, rep);
+					TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+					break;
+				} else {
+					flatBills.addAll(itemRep.getData());
+				}
+			}
+			if (rep.getStatus() == 0) {
+				rep.addData(flatBills);
+			}
+		} else {
+			rep.error(Constants.BusinessCode.CODE_PARAMETER_INVALID, "转账目标账户额度不足，请重新选择");
+		}
+
+		return rep;
+	}
+
 	private DtoResponse<Account> transferBill(BillCheckBo billCheckBo) {
 		DtoResponse<Account> rep = new DtoResponse<Account>();
 		String targetAccountId = billCheckBo.getTargetAccountId();
 		Account account = findById(billCheckBo.getAccountId());
-
 		if (account != null && targetAccountId != null) {
 			Account targetAccount = findById(targetAccountId);
 			if (targetAccount != null) {
 				if (limitCheck(targetAccount, billCheckBo.getTotal())) {
-					List<Bill> flatBills = new ArrayList<>();
 					SettleAccountRecord settleAccountRecord = settleAccountRecordService.create(billCheckBo, account,
 							targetAccount);
-					for (String bid : billCheckBo.getBillIds()) {
-						DtoResponse<List<Bill>> itemRep = billService.transfer(bid, targetAccount,
-								billCheckBo.getShiftCode(), billCheckBo.getOperationEmployee(),settleAccountRecord.getRecordNum());
-						if (itemRep.getStatus() != 0) {
-							BeanUtils.copyProperties(itemRep, rep);
-							TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-							break;
-						} else {
-							flatBills.addAll(itemRep.getData());
-						}
-					}
-					List<Bill> bills = billService.checkBillIds(billCheckBo.getBillIds(), rep,
+					List<Bill> bills = billService.findByIds(billCheckBo.getBillIds());
+					DtoResponse<List<Bill>> crep = transferBill(bills, billCheckBo.getTotal(), account, targetAccount,
+							billCheckBo.getShiftCode(), billCheckBo.getOperationEmployee(),
 							settleAccountRecord.getRecordNum());
-					if (rep.getStatus() == 0) {
+					if (crep.getStatus() == 0) {
 						settleAccountRecord.setBills(bills);
-						settleAccountRecord.setFlatBills(flatBills);
+						settleAccountRecord.setFlatBills(crep.getData());
 						settleAccountRecordService.modify(settleAccountRecord);
 					}
 				} else {
@@ -213,11 +228,16 @@ public class AccountServiceImpl implements AccountService {
 		return rep;
 	}
 
-	private boolean limitCheck(Account account, double limit) {
-		if (limit <= 0 && account.getAvailableCreditLimit() != null && account.getAvailableCreditLimit() > limit) {
-			return true;
+	private boolean limitCheck(Account account, Double limit) {
+		if (account.getType().equals(Constants.Type.ACCOUNT_AR)
+				|| account.getType().equals(Constants.Type.ACCOUNT_MEMBER)) {
+			if (limit <= 0 && account.getAvailableCreditLimit() != null && account.getAvailableCreditLimit() > limit) {
+				return true;
+			} else {
+				return false;
+			}
 		} else {
-			return false;
+			return true;
 		}
 	}
 
@@ -371,10 +391,6 @@ public class AccountServiceImpl implements AccountService {
 			}
 		}
 		return info;
-	}
-
-	private String createAccountCode(String hotleCode, String type) {
-		return null;
 	}
 
 	@Override

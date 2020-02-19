@@ -467,8 +467,6 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 		CheckInRecord cir = add(checkInRecord);
 		if((Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN).equals(checkInRecord.getStatus())){
 			roomStatisticsService.checkIn(new CheckInRecordWrapper(checkInRecord));
-		}else if((Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION).equals(checkInRecord.getStatus())){
-			roomStatisticsService.booking(new CheckInRecordWrapper(checkInRecord));
 		}
 		roomRecordService.createRoomRecord(cir);
 		return cir;

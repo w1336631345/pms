@@ -51,6 +51,8 @@ public class Bill extends PersistenceModel {
 	@Column
 	private String paymentStatus;
 	@Column
+	private String tranferRemark;
+	@Column
 	private Integer billSeq;
 	@Column
 	private String settlementStatus;

@@ -35,21 +35,21 @@ public interface RoomStatisticsService {
 	 */
 	public boolean cancleAssign(UseInfoAble info);
 
-	/**
-	 * 
-	 * @param cir checkInRecord的包装类实现了该接口，请使用CheckInRecordWrapper 
-	 * @return
-	 */
-
-	public boolean booking(UseInfoAble info);
-
-	/**
-	 * 
-	 * @param cir
-	 * @return
-	 */
-
-	public boolean cancelBooking(UseInfoAble info);
+//	/**
+//	 * 
+//	 * @param cir checkInRecord的包装类实现了该接口，请使用CheckInRecordWrapper 
+//	 * @return
+//	 */
+//
+//	public boolean booking(UseInfoAble info);
+//
+//	/**
+//	 * 
+//	 * @param cir
+//	 * @return
+//	 */
+//
+//	public boolean cancelBooking(UseInfoAble info);
 
 	/**
 	 * 入住 调整客房类型统计表，房间状态表，房间状态统计表

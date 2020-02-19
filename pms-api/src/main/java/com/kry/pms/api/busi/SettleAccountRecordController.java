@@ -56,7 +56,7 @@ public class SettleAccountRecordController extends BaseController<SettleAccountR
 	@GetMapping(path = "/cancle/{id}")
 	public HttpResponse<String> cancle(@PathVariable("id") String id) {
 		HttpResponse<String> rep = new HttpResponse<String>();
-		BeanUtils.copyProperties(settleAccountRecordService.cancle(id), rep);
+		BeanUtils.copyProperties(settleAccountRecordService.cancle(id, getShiftCode(), getCurrentEmployee()), rep);
 		return rep;
 	}
 

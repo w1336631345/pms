@@ -43,6 +43,10 @@ public class SettleAccountRecord extends PersistenceModel {
 	@Column
 	private LocalDateTime cancleTime;
 	@Column
+	private String cancleNum;
+	@Column
+	private String cancleShiftCode;
+	@Column
 	private String remark;
 	@Column
 	private Double total;

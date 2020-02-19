@@ -1,6 +1,5 @@
 package com.kry.pms.service.room.impl;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,16 +54,16 @@ public class RoomStatisticsServiceImpl implements RoomStatisticsService {
 		return true;
 	}
 
-	@Override
-	public boolean booking(UseInfoAble info) {
-		return false;
-	}
-
-	@Override
-	public boolean cancelBooking(UseInfoAble info) {
-		// TODO Auto-generated method stub
-		return false;
-	}
+//	@Override
+//	public boolean booking(UseInfoAble info) {
+//		return false;
+//	}
+//
+//	@Override
+//	public boolean cancelBooking(UseInfoAble info) {
+//		// TODO Auto-generated method stub
+//		return false;
+//	}
 
 	@Override
 	public boolean checkIn(UseInfoAble info) {

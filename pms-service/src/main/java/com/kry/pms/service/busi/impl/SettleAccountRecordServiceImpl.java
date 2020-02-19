@@ -4,7 +4,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import javax.persistence.Transient;
+import javax.transaction.Transactional;
 
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Sort;
@@ -19,9 +21,11 @@ import com.kry.pms.dao.busi.SettleAccountRecordDao;
 import com.kry.pms.model.http.request.busi.BillCheckBo;
 import com.kry.pms.model.persistence.busi.Bill;
 import com.kry.pms.model.persistence.busi.SettleAccountRecord;
+import com.kry.pms.model.persistence.org.Employee;
 import com.kry.pms.model.persistence.sys.Account;
 import com.kry.pms.service.busi.BillService;
 import com.kry.pms.service.busi.SettleAccountRecordService;
+import com.kry.pms.service.sys.AccountService;
 import com.kry.pms.service.sys.BusinessSeqService;
 
 @Service
@@ -30,6 +34,8 @@ public class SettleAccountRecordServiceImpl implements SettleAccountRecordServic
 	SettleAccountRecordDao settleAccountRecordDao;
 	@Autowired
 	BusinessSeqService businessSeqService;
+	@Autowired
+	AccountService accountService;
 	@Autowired
 	BillService billService;
 
@@ -95,9 +101,7 @@ public class SettleAccountRecordServiceImpl implements SettleAccountRecordServic
 		return add(scr);
 	}
 
-	@Transient
-	@Override
-	public DtoResponse<String> cancle(String id) {
+	private DtoResponse<String> cancleSettle(String id, String shiftCode, Employee operationEmployee) {
 		DtoResponse<String> rep = new DtoResponse<String>();
 		SettleAccountRecord sar = findById(id);
 		if (sar != null) {
@@ -127,7 +131,8 @@ public class SettleAccountRecordServiceImpl implements SettleAccountRecordServic
 					if (fb.getTotal() != null) {
 						rebill.setTotal(-fb.getTotal());
 					}
-					rebill.setOperationEmployee(fb.getOperationEmployee());
+					rebill.setOperationEmployee(operationEmployee);
+					rebill.setShiftCode(shiftCode);
 					billService.add(rebill);
 				} catch (CloneNotSupportedException e) {
 					e.printStackTrace();
@@ -135,24 +140,57 @@ public class SettleAccountRecordServiceImpl implements SettleAccountRecordServic
 				billService.modify(fb);
 			}
 		}
-		sar.setCancleTime(LocalDateTime.now());
-		sar.setCancleEmployee(sar.getOperationEmployee());
-		sar.setStatus(Constants.Status.SETTLE_ACCOUNT_CANCLE);
 		modify(sar);
+		return rep;
+	}
+
+	@Transactional
+	@Override
+	public DtoResponse<String> cancle(String id, String shiftCode, Employee operationEmployee) {
+		SettleAccountRecord sar = findById(id);
+		if (sar != null) {
+			sar.setCancleNum(businessSeqService.fetchNextSeqNum(sar.getHotelCode(),
+					Constants.Key.BUSINESS_CANCLE_SETTLE_SEQ_KEY));
+			sar.setCancleEmployee(operationEmployee);
+			sar.setCancleTime(LocalDateTime.now());
+			sar.setCancleShiftCode(shiftCode);
+			sar.setStatus(Constants.Status.SETTLE_ACCOUNT_CANCLE);
+			if (sar.getSettleWay().equals(Constants.Type.BILL_CHECK_WAY_TRANSFER)) {
+				return cancleTransfer(sar, shiftCode, operationEmployee);
+			} else {
+				return cancleSettle(id,shiftCode,operationEmployee);
+			}
+		}
+
+		return null;
+	}
+
+	private DtoResponse<String> cancleTransfer(SettleAccountRecord sar, String shiftCode, Employee operationEmployee) {
+		DtoResponse<String> rep = new DtoResponse<String>();
+		DtoResponse<List<Bill>> crep = accountService.transferBill(sar.getFlatBills(), sar.getTotal(), sar.getAccount(),
+				sar.getTargetAccount(), shiftCode, operationEmployee, sar.getCancleNum());
+		BeanUtils.copyProperties(crep, rep);
 		return rep;
 	}
 
 	@Override
 	public SettleAccountRecord create(BillCheckBo billCheckBo, Account account, Account targetAccount) {
+		return create(account, targetAccount, billCheckBo.getOperationEmployee(), billCheckBo.getShiftCode(),
+				billCheckBo.getCheckWay());
+	}
+
+	@Override
+	public SettleAccountRecord create(Account account, Account targetAccount, Employee employee, String shiftCode,
+			String checkWay) {
 		SettleAccountRecord scr = new SettleAccountRecord();
-		scr.setRecordNum(businessSeqService.fetchNextSeqNum(billCheckBo.getHotelCode(),
+		scr.setRecordNum(businessSeqService.fetchNextSeqNum(employee.getHotelCode(),
 				Constants.Key.BUSINESS_BUSINESS_TRANSFER_SEQ_KEY));
-		scr.setShiftCode(billCheckBo.getShiftCode());
+		scr.setShiftCode(shiftCode);
 		scr.setAccount(account);
-		scr.setSettleWay(billCheckBo.getCheckWay());
+		scr.setSettleWay(checkWay);
 		scr.setTargetAccount(targetAccount);
-		scr.setHotelCode(account.getHotelCode());
-		scr.setOperationEmployee(billCheckBo.getOperationEmployee());
+		scr.setHotelCode(employee.getHotelCode());
+		scr.setOperationEmployee(employee);
 		scr.setSettleTime(LocalDateTime.now());
 		return add(scr);
 	}

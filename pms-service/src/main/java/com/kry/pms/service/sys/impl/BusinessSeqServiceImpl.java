@@ -116,6 +116,9 @@ public class BusinessSeqServiceImpl implements BusinessSeqService {
 		BusinessSeq dbs = businessSeqDao.findByHotelCodeAndSeqKey(hotelCode,
 				Constants.Key.BUSINESS_BUSINESS_DATE_SEQ_KEY);
 		BusinessSeq bs = businessSeqDao.findByHotelCodeAndSeqKey(hotelCode, seqKey);
+		if(bs==null) {
+			throw new NullPointerException("请配置hotel:"+hotelCode+"businessSeq:"+seqKey);
+		}
 		bs.setCurrentSeq(bs.getCurrentSeq() + 1);
 		int seq = bs.getCurrentSeq();
 		modify(bs);
