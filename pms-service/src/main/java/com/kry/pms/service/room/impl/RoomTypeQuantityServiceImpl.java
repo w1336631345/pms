@@ -390,6 +390,7 @@ public class RoomTypeQuantityServiceImpl implements RoomTypeQuantityService {
 					rtpv.setRoomPriceSchemeId(id);
 					rtpv.setSetMealId(MapUtils.getString(map, "setMealId"));
 					rtpv.setSetMealName(MapUtils.getString(map, "setMealName"));
+					rtpv.setPurchasePrice(MapUtils.getDouble(map, "price"));
 				}
 				rtpv.setPrice(type.getPrice());
 				rtpv.setRoomTypeName(type.getName());
@@ -397,7 +398,7 @@ public class RoomTypeQuantityServiceImpl implements RoomTypeQuantityService {
 				rtpv.setStartDate(startDate);
 				rtpv.setEndDate(endDate);
 				rtpv.setAvailableTotal(rtq.getPredictableTotal());
-
+				rtpv.setOverReservation(type.getOverReservation());
 				data.add(rtpv);
 			}
 		}

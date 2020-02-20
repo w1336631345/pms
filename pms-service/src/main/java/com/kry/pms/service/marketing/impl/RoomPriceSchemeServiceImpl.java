@@ -82,7 +82,7 @@ public class  RoomPriceSchemeServiceImpl implements  RoomPriceSchemeService{
 	public List<RoomPriceSchemeVo> findDefaultScheme(String hotelCode){
 		RoomPriceScheme rps = new RoomPriceScheme();
 		rps.setHotelCode(hotelCode);
-		rps.setIsDefault(true);
+//		rps.setIsDefault(true);
 		rps.setDeleted(Constants.DELETED_FALSE);
 		Example<RoomPriceScheme> ex = Example.of(rps);
 		List<RoomPriceScheme> rpsc = roomPriceSchemeDao.findAll(ex);
