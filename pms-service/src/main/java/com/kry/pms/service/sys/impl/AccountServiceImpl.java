@@ -231,7 +231,7 @@ public class AccountServiceImpl implements AccountService {
 	private boolean limitCheck(Account account, Double limit) {
 		if (account.getType().equals(Constants.Type.ACCOUNT_AR)
 				|| account.getType().equals(Constants.Type.ACCOUNT_MEMBER)) {
-			if (limit <= 0 && account.getAvailableCreditLimit() != null && account.getAvailableCreditLimit() > limit) {
+			if (limit <= 0 ||( account.getAvailableCreditLimit() != null && account.getAvailableCreditLimit() > limit)) {
 				return true;
 			} else {
 				return false;

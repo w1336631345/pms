@@ -82,13 +82,13 @@ public class GuestRoomServiceImpl implements GuestRoomService {
 
 	@Override
 	@org.springframework.transaction.annotation.Transactional(rollbackFor = Exception.class)
-	public GuestRoom addRoomAndResources(GuestRoom guestRoom){
+	public GuestRoom addRoomAndResources(GuestRoom guestRoom) {
 		try {
 			guestRoom.setStatus(Constants.Status.NORMAL);
 			guestRoom = guestRoomDao.saveAndFlush(guestRoom);
-			//		guestRoomStatusService.initNewGuestRoomStatus(guestRoom);
+			// guestRoomStatusService.initNewGuestRoomStatus(guestRoom);
 			addRoomRelated(guestRoom);
-		}catch (Exception e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e.getMessage());
 		}
 		return guestRoom;
@@ -137,46 +137,43 @@ public class GuestRoomServiceImpl implements GuestRoomService {
 	@Override
 	public DtoResponse<List<GuestRoom>> batchAdd(GuestRoom guestRoom) {
 		DtoResponse<List<GuestRoom>> rep = new DtoResponse<List<GuestRoom>>();
-		String roomNums = guestRoom.getRoomNum();
 		RoomType roomType = roomTypeService.findById(guestRoom.getRoomType().getId());
-		if(roomType==null) {
+		if (roomType == null) {
 			rep.error(Constants.BusinessCode.CODE_PARAMETER_INVALID, "房间类型错误");
 			return rep;
-		}else {
+		} else {
 			guestRoom.setHotelCode(roomType.getHotelCode());
 		}
 		List<GuestRoom> list = new ArrayList<GuestRoom>();
 		StringBuilder repeatRoomNum = new StringBuilder();
-		if (roomNums.contains(",")) {
-			String[] rns = roomNums.split(",");
-			for (String rn : rns) {
-				GuestRoom gr = new GuestRoom();
-				BeanUtils.copyProperties(guestRoom, gr);
-				GuestRoom ogr = guestRoomDao.findByHotelCodeAndRoomNumAndDeleted(gr.getHotelCode(), rn,
-						Constants.DELETED_FALSE);
-				if (ogr != null) {
-					rep.setCode(Constants.CODE_SHOW_LEVEL_ERROR);
-					repeatRoomNum.append(" ");
-					repeatRoomNum.append(rn);
-					continue;
-				} else {
-					gr.setRoomNum(rn);
-					addRoomAndResources(gr);
-					list.add(gr);
-				}
-			}
-			if (rep.getCode() == Constants.CODE_SHOW_LEVEL_ERROR) {
-				rep.setMessage(repeatRoomNum.append("房间号重复！！").toString());
+		for (String rn : guestRoom.getRoomNums()) {
+			GuestRoom gr = new GuestRoom();
+			BeanUtils.copyProperties(guestRoom, gr);
+			GuestRoom ogr = guestRoomDao.findByHotelCodeAndRoomNumAndDeleted(gr.getHotelCode(), rn,
+					Constants.DELETED_FALSE);
+			if (ogr != null) {
+				rep.setCode(Constants.CODE_SHOW_LEVEL_ERROR);
+				repeatRoomNum.append(" ");
+				repeatRoomNum.append(rn);
+				continue;
+			} else {
+				gr.setRoomNum(rn);
+				addRoomAndResources(gr);
+				list.add(gr);
 			}
 		}
-		roomTypeService.plusRoomQuantity(guestRoom.getRoomType(),list.size());
+		if (rep.getCode() == Constants.CODE_SHOW_LEVEL_ERROR) {
+			rep.setMessage(repeatRoomNum.append("房间号重复！！").toString());
+		}
+
+		roomTypeService.plusRoomQuantity(guestRoom.getRoomType(), list.size());
 		return rep.addData(list);
 	}
 
 	@Transactional
-	public void addRoomRelated(GuestRoom gr){
+	public void addRoomRelated(GuestRoom gr) {
 		guestRoomStatusService.initNewGuestRoomStatus(gr);
-		//上级处理
+		// 上级处理
 //		RoomType rt = roomTypeService.findById(gr.getRoomType().getId());
 //		rt.setRoomCount(rt.getRoomCount()+1);
 //		roomTypeService.modify(rt);
@@ -196,15 +193,15 @@ public class GuestRoomServiceImpl implements GuestRoomService {
 
 	@Transactional
 	@Override
-	public DtoResponse<GuestRoom> removeRoomRelated(String id){
+	public DtoResponse<GuestRoom> removeRoomRelated(String id) {
 		GuestRoom gr = findById(id);
 		DtoResponse<GuestRoom> rep = new DtoResponse<GuestRoom>();
 		boolean isUse = roomUsageService.freeCheck(gr, LocalDateTime.now(), null);
-		if(isUse){
+		if (isUse) {
 			rep.setStatus(Constants.BusinessCode.CODE_PARAMETER_INVALID);
 			rep.setCode(Constants.CODE_SHOW_LEVEL_ERROR);
-			rep.setMessage("房间"+gr.getRoomNum()+"被占用或被预订");
-		}else{
+			rep.setMessage("房间" + gr.getRoomNum() + "被占用或被预订");
+		} else {
 			LocalDate date = LocalDate.now();
 			DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 			String dateStr = date.format(fmt);
@@ -223,17 +220,18 @@ public class GuestRoomServiceImpl implements GuestRoomService {
 		}
 		return rep;
 	}
+
 	@Transactional
 	@Override
-	public HttpResponse updateRoom(GuestRoom guestRoom){
+	public HttpResponse updateRoom(GuestRoom guestRoom) {
 		HttpResponse hr = new HttpResponse();
 		GuestRoom gr = guestRoomDao.getOne(guestRoom.getId());
-		if(!gr.getRoomType().getId().equals(guestRoom.getRoomType().getId())){
+		if (!gr.getRoomType().getId().equals(guestRoom.getRoomType().getId())) {
 			boolean isUse = roomUsageService.freeCheck(gr, LocalDateTime.now(), null);
-			if(isUse){
-				hr.error("房间"+gr.getRoomNum()+"被占用或被预订");
+			if (isUse) {
+				hr.error("房间" + gr.getRoomNum() + "被占用或被预订");
 				return hr;
-			}else {
+			} else {
 				removeRoomRelated(gr.getId());
 				GuestRoom grl = new GuestRoom();
 				guestRoom.setId(null);
@@ -242,7 +240,7 @@ public class GuestRoomServiceImpl implements GuestRoomService {
 				addRoomAndResources(guestRoom);
 				hr.setData(grl);
 			}
-		}else {
+		} else {
 			modify(guestRoom);
 		}
 		return hr;

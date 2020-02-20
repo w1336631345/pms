@@ -30,5 +30,7 @@ public class GuestRoom extends PersistenceModel {
 	private Integer bedCount;
 	@Column(columnDefinition = "int(8) COMMENT '允许入住人数'")
 	private Integer occupantCapacity;
+	@Transient
+	private List<String> roomNums;
 	
 }

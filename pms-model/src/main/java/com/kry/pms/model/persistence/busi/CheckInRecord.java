@@ -71,6 +71,7 @@ public class CheckInRecord extends PersistenceModel {
 	private LocalDateTime arriveTime;// 到达时间
 	@Column
 	private LocalDateTime actualTimeOfArrive;//实际到达时间
+	@Column
 	private LocalDateTime actualTimeOfLeave;//实际离开时间
 	@Column
 	private LocalDate startDate;// 开始时间
@@ -95,7 +96,7 @@ public class CheckInRecord extends PersistenceModel {
 	@Column(name = "type_")
 	private String type;
 	@Column
-	private String groupType;// 团队还是散客
+	private String groupType;// Y : 真是团队，N 散客团队
 	@ManyToOne
 	private Group group;// 团队信息
 	@OneToOne(cascade = CascadeType.PERSIST)

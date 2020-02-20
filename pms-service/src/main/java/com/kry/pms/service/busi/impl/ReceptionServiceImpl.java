@@ -249,22 +249,22 @@ public class ReceptionServiceImpl implements ReceptionService {
 		CheckInRecord cir = checkInRecordService.findById(id);
 		AccountSummaryVo asv = null;
 		if (cir != null && cir.getGroupType() != null) {
-			switch (cir.getGroupType()) {
-			case Constants.Type.CHECK_IN_RECORD_GROUP_TYPE_YES:
+			switch (cir.getType()) {
+			case Constants.Type.CHECK_IN_RECORD_GROUP:
 				asv = new AccountSummaryVo();
 				asv.setName("团队所有账务");
 				asv.setType("temp");
 				asv.setSettleType(Constants.Type.SETTLE_TYPE_NONE);
 				asv.setChildren(new ArrayList<>());
 				Account account = cir.getAccount();
-				AccountSummaryVo group = new AccountSummaryVo(account);
+				AccountSummaryVo group = new AccountSummaryVo(cir);
 				group.setRoomStatus(cir.getStatus());
 				group.setSettleType(Constants.Type.SETTLE_TYPE_GROUP);
 				asv.getChildren().add(group);
 				asv.getChildren().addAll((checkInRecordService.getAccountSummaryByOrderNum(cir.getOrderNum(),
 						Constants.Type.CHECK_IN_RECORD_CUSTOMER)));
 				break;
-			case Constants.Type.CHECK_IN_RECORD_GROUP_TYPE_NO:
+			case Constants.Type.CHECK_IN_RECORD_CUSTOMER:
 				if (cir.getRoomLinkId() == null) {// 散客
 					Collection<AccountSummaryVo> data = checkInRecordService
 							.getAccountSummaryByOrderNum(cir.getOrderNum(), Constants.Type.CHECK_IN_RECORD_CUSTOMER);

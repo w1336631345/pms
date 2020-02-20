@@ -1,5 +1,6 @@
 package com.kry.pms.model.http.response.busi;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 
 import com.kry.pms.base.Constants;
@@ -22,6 +23,9 @@ public class AccountSummaryVo {
 	private Double availableCreditLimit;
 	private String settleType;
 	private String roomStatus;
+	private String accountCode;
+	private LocalDateTime arriveTime;
+	private LocalDateTime leaveTime;
 	private Collection<AccountSummaryVo> children;
 
 	public AccountSummaryVo() {
@@ -40,6 +44,7 @@ public class AccountSummaryVo {
 		if (acc.getType().equals(Constants.Type.ACCOUNT_CUSTOMER)) {
 			this.settleType = Constants.Type.SETTLE_TYPE_ACCOUNT;
 		}
+		this.accountCode = acc.getCode();
 		this.type = acc.getType();
 		this.cost = acc.getCost();
 		this.pay = acc.getPay();
@@ -52,5 +57,7 @@ public class AccountSummaryVo {
 		this(cir.getAccount(), null);
 		this.roomStatus = cir.getStatus();
 		this.orderNum = cir.getOrderNum();
+		this.arriveTime = cir.getActualTimeOfArrive()!=null?cir.getActualTimeOfArrive():cir.getArriveTime();
+		this.leaveTime = cir.getActualTimeOfLeave() !=null?cir.getActualTimeOfLeave():cir.getLeaveTime();
 	}
 }
