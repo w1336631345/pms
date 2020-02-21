@@ -1,23 +1,31 @@
 package com.kry.pms.service.busi.impl;
 
-import java.text.DecimalFormat;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Path;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
-import javax.transaction.Transactional;
-
+import com.kry.pms.base.*;
+import com.kry.pms.dao.busi.CheckInRecordDao;
+import com.kry.pms.dao.busi.RoomLinkDao;
+import com.kry.pms.model.http.request.busi.*;
+import com.kry.pms.model.http.response.busi.AccountSummaryVo;
+import com.kry.pms.model.http.response.busi.CheckInRecordListVo;
+import com.kry.pms.model.other.wrapper.CheckInRecordWrapper;
 import com.kry.pms.model.persistence.busi.Arrangement;
+import com.kry.pms.model.persistence.busi.CheckInRecord;
+import com.kry.pms.model.persistence.busi.RoomLink;
+import com.kry.pms.model.persistence.guest.Customer;
+import com.kry.pms.model.persistence.room.GuestRoom;
+import com.kry.pms.model.persistence.room.RoomTag;
+import com.kry.pms.model.persistence.sys.Account;
+import com.kry.pms.model.persistence.sys.User;
+import com.kry.pms.service.busi.CheckInRecordService;
+import com.kry.pms.service.busi.RoomRecordService;
+import com.kry.pms.service.guest.CustomerService;
+import com.kry.pms.service.room.GuestRoomService;
+import com.kry.pms.service.room.RoomStatisticsService;
+import com.kry.pms.service.room.RoomTypeService;
+import com.kry.pms.service.room.RoomUsageService;
+import com.kry.pms.service.sys.AccountService;
+import com.kry.pms.service.sys.BusinessSeqService;
+import com.kry.pms.service.sys.SystemConfigService;
+import com.kry.pms.service.util.UpdateUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
@@ -28,44 +36,13 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import com.kry.pms.base.Constants;
-import com.kry.pms.base.DtoResponse;
-import com.kry.pms.base.HttpResponse;
-import com.kry.pms.base.PageRequest;
-import com.kry.pms.base.PageResponse;
-import com.kry.pms.base.ParamSpecification;
-import com.kry.pms.dao.busi.CheckInRecordDao;
-import com.kry.pms.dao.busi.RoomLinkDao;
-import com.kry.pms.model.http.request.busi.CheckInBo;
-import com.kry.pms.model.http.request.busi.CheckInItemBo;
-import com.kry.pms.model.http.request.busi.CheckInRecordListBo;
-import com.kry.pms.model.http.request.busi.CheckUpdateItemTestBo;
-import com.kry.pms.model.http.request.busi.TogetherBo;
-import com.kry.pms.model.http.response.busi.AccountSummaryVo;
-import com.kry.pms.model.http.response.busi.CheckInRecordListVo;
-import com.kry.pms.model.other.wrapper.CheckInRecordWrapper;
-import com.kry.pms.model.persistence.busi.CheckInRecord;
-import com.kry.pms.model.persistence.busi.RoomLink;
-import com.kry.pms.model.persistence.guest.Customer;
-import com.kry.pms.model.persistence.room.GuestRoom;
-import com.kry.pms.model.persistence.room.RoomTag;
-import com.kry.pms.model.persistence.room.RoomUsage;
-import com.kry.pms.model.persistence.sys.Account;
-import com.kry.pms.model.persistence.sys.User;
-import com.kry.pms.service.busi.CheckInRecordService;
-import com.kry.pms.service.busi.RoomRecordService;
-import com.kry.pms.service.guest.CustomerService;
-import com.kry.pms.service.room.GuestRoomService;
-import com.kry.pms.service.room.GuestRoomStatusService;
-import com.kry.pms.service.room.RoomStatisticsService;
-import com.kry.pms.service.room.RoomStatusQuantityService;
-import com.kry.pms.service.room.RoomTypeQuantityService;
-import com.kry.pms.service.room.RoomTypeService;
-import com.kry.pms.service.room.RoomUsageService;
-import com.kry.pms.service.sys.AccountService;
-import com.kry.pms.service.sys.BusinessSeqService;
-import com.kry.pms.service.sys.SystemConfigService;
-import com.kry.pms.service.util.UpdateUtil;
+import javax.persistence.criteria.*;
+import javax.transaction.Transactional;
+import java.text.DecimalFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.*;
 
 @Service
 public class CheckInRecordServiceImpl implements CheckInRecordService {
@@ -706,6 +683,23 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 	@Override
 	public List<CheckInRecord> findByOrderNum(String orderNum) {
 		return checkInRecordDao.findByOrderNumAndDeleted(orderNum, Constants.DELETED_FALSE);
+	}
+	@Override
+	public List<Map<String, Object>> findByOrderNum2(String orderNum) {
+		List<CheckInRecord> list =  checkInRecordDao.findByOrderNumAndDeleted(orderNum, Constants.DELETED_FALSE);
+		List<Map<String, Object>> results = new ArrayList<>();
+		for(int i=0; i<list.size(); i++){
+			Map<String, Object> map = new HashMap<>();
+			map.put("test",list.get(i));
+			results.add(map);
+		}
+		return results;
+	}
+
+	@Override
+	public List<Map<String, Object>> sqlOrderNum(String orderNum) {
+		List<Map<String, Object>> list = checkInRecordDao.sqlOrderNumAndDeleted(orderNum, Constants.DELETED_FALSE);
+		return list;
 	}
 
 	@Override

@@ -1,10 +1,5 @@
 package com.kry.pms.service.busi;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-
-import com.kry.pms.base.Constants;
 import com.kry.pms.base.DtoResponse;
 import com.kry.pms.base.HttpResponse;
 import com.kry.pms.base.PageRequest;
@@ -15,14 +10,15 @@ import com.kry.pms.model.http.request.busi.CheckUpdateItemTestBo;
 import com.kry.pms.model.http.request.busi.TogetherBo;
 import com.kry.pms.model.http.response.busi.AccountSummaryVo;
 import com.kry.pms.model.http.response.busi.CheckInRecordListVo;
-import com.kry.pms.model.persistence.busi.BookingItem;
-import com.kry.pms.model.persistence.busi.BookingRecord;
 import com.kry.pms.model.persistence.busi.CheckInRecord;
 import com.kry.pms.model.persistence.room.GuestRoom;
 import com.kry.pms.model.persistence.sys.User;
 import com.kry.pms.service.BaseService;
 
 import javax.transaction.Transactional;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 public interface CheckInRecordService extends BaseService<CheckInRecord> {
 	
@@ -72,6 +68,10 @@ public interface CheckInRecordService extends BaseService<CheckInRecord> {
 	public Collection<AccountSummaryVo> getAccountSummaryByLinkNum(String orderNum, String accountCustomer);
 
 	public List<CheckInRecord> findByOrderNum(String orderNum);
+
+	List<Map<String, Object>> findByOrderNum2(String orderNum);
+
+	List<Map<String, Object>> sqlOrderNum(String orderNum);
 
 	public CheckInRecord addReserve(CheckInRecord checkInRecord);
 

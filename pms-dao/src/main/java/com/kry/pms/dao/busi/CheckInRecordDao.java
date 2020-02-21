@@ -1,18 +1,16 @@
 package com.kry.pms.dao.busi;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
-
+import com.kry.pms.dao.BaseDao;
+import com.kry.pms.model.persistence.busi.CheckInRecord;
 import com.kry.pms.model.persistence.room.GuestRoom;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
-
-import com.kry.pms.dao.BaseDao;
-import com.kry.pms.model.persistence.busi.CheckInRecord;
 import org.springframework.data.repository.query.Param;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Map;
 
 public interface CheckInRecordDao extends BaseDao<CheckInRecord> {
 	@Query(value = "select a.* from t_checkin_record a where a.booking_record_id=?1", nativeQuery = true)
@@ -43,6 +41,7 @@ public interface CheckInRecordDao extends BaseDao<CheckInRecord> {
 
 	List<CheckInRecord> findByOrderNumAndTypeAndDeleted(String orderNum, String type, int deletedFalse);
 
+//	@EntityGraph(value = "CheckInRecord.roomPriceScheme", type = EntityGraph.EntityGraphType.FETCH)
 	List<CheckInRecord> findByOrderNumAndDeleted(String orderNum, int deletedFalse);
 
 	List<CheckInRecord> findByHotelCodeAndOrderNumAndGuestRoomId(String hotelCode, String orderNum, String id);
@@ -87,4 +86,68 @@ public interface CheckInRecordDao extends BaseDao<CheckInRecord> {
 
 	List<CheckInRecord> findByGuestRoomIdAndStatusAndDeletedAndStartDate(String id, String status, int deleted,
 			LocalDate now);
+
+	@Query(nativeQuery = true, value = "select " +
+			" id, " +
+			" corporation_code corporationCode," +
+			" DATE_FORMAT(tcr.create_date,'%Y-%m-%d %T') createDate," +
+			" create_user createUser, " +
+			" deleted, " +
+			" hotel_code hotelCode," +
+			" status," +
+			" DATE_FORMAT(tcr.update_date,'%Y-%m-%d %T') updateDate," +
+			" update_user updateUser, " +
+			" DATE_FORMAT(tcr.arrive_time,'%Y-%m-%d %T') arriveTime, " +
+			" check_in_count checkInCount, " +
+			" check_in_sn checkInSn," +
+			" chrildren_count childCount, " +
+			" contact_mobile contactMobile, " +
+			" contact_name contactName, " +
+			" days, " +
+			" discount, " +
+			" group_type groupType, " +
+			" hold_time holdTime, " +
+			" human_count humanCount, " +
+			" DATE_FORMAT(tcr.leave_time,'%Y-%m-%d %T') leaveTime, " +
+			" link_num linkNum, " +
+			" linked linked, " +
+			" name_ name, " +
+			" order_num orderNum, " +
+			" order_type orderType,  " +
+			" personal_percentage personalPercentage, " +
+			" personal_price personalPrice, " +
+			" purchase_price purchasePrice, " +
+			" regular_price regularPrice,  " +
+			" remark,  " +
+			" reserve_id reserveId,  " +
+			" room_count roomCount, " +
+			" room_link_id roomLinkId,  " +
+			" single_room_count singleRoomCount,  " +
+			" DATE_FORMAT(tcr.start_date,'%Y-%m-%d') startDate,  " +
+			" together_code togetherCode,  " +
+			" type_ type,  " +
+			" booking_record_id bookingRecordId,  " +
+			" account_id accountId,  " +
+			" customer_id customerId,  " +
+			" discount_scheme_id discountSchemeId,  " +
+			" distribution_channel_id distributionChannelId,  " +
+			" group_id groupId,  " +
+			" guest_room_id guestRoomId,  " +
+			" main_record_id mainRecordId,  " +
+			" market_employee_id marketEmployeeId,  " +
+			" marketing_sources_id marketingSourcesId,  " +
+			" operation_employee_id operationEmployeeId,  " +
+			" price_scheme_item_id priceSchemeItemId, " +
+			" protocol_corpation_id protocolCorpationId,  " +
+			" room_price_scheme_id roomPriceSchemeId,  " +
+			" room_type_id roomTypeId,  " +
+			" adult_count adultCount,  " +
+			" child_count chrildrenCount, " +
+			" is_secrecy isSecrecy,  " +
+			" DATE_FORMAT(tcr.actual_time_of_arrive,'%Y-%m-%d %T') actualTimeOfArrive,  " +
+			" DATE_FORMAT(tcr.actual_time_of_leave,'%Y-%m-%d %T') actualTimeOfLeave,  " +
+			" set_meal_id setMealId " +
+			" from t_checkin_record tcr where order_num = ?1 and deleted = ?2")
+	List<Map<String, Object>> sqlOrderNumAndDeleted(String orderNum, int deletedFalse);
+
 }

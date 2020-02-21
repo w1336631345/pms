@@ -8,7 +8,8 @@ server:
   port: 8090
   servlet:
     context-path: /pms
-management:  endpoint:
+management:
+  endpoint:
     shutdown:
       enabled: true
 spring:
@@ -26,6 +27,9 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+    properties:
+      hibernate:
+        enable_lazy_load_no_trans: true
   redis:
     database: 1
     host: 127.0.0.1
