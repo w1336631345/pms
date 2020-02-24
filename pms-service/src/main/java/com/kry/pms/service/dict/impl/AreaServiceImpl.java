@@ -20,7 +20,7 @@ public class  AreaServiceImpl implements  AreaService{
 	@Autowired
 	 AreaDao areaDao;
 	 
-	 @Override
+	@Override
 	public Area add(Area area) {
 		return areaDao.saveAndFlush(area);
 	}
@@ -29,7 +29,7 @@ public class  AreaServiceImpl implements  AreaService{
 	public void delete(String id) {
 		Area area = areaDao.findById(id).get();
 		if (area != null) {
-			area.setDeleted(Constants.DELETED_TRUE);
+//			area.setDeleted(Constants.DELETED_TRUE);
 		}
 		areaDao.saveAndFlush(area);
 	}

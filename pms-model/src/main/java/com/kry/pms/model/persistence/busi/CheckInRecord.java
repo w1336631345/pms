@@ -115,8 +115,10 @@ public class CheckInRecord extends PersistenceModel {
 	private Employee operationEmployee;// 操作人
 	@OneToOne
 	private DistributionChannel distributionChannel;// 市场渠道
+//	@OneToOne
+//	private Employee marketEmployee;// 销售员
 	@OneToOne
-	private Employee marketEmployee;// 销售员
+	private SalesMen salesMen;
 	@Column
 	private String remark;
 	@Transient
@@ -282,18 +284,24 @@ public class CheckInRecord extends PersistenceModel {
 		this.distributionChannel = distributionChannel;
 	}
 
-	public Employee getMarketEmployee() {
-		return marketEmployee;
-	}
-
-	public void setMarketEmployee(Employee marketEmployee) {
-		this.marketEmployee = marketEmployee;
-	}
+//	public Employee getMarketEmployee() {
+//		return marketEmployee;
+//	}
+//
+//	public void setMarketEmployee(Employee marketEmployee) {
+//		this.marketEmployee = marketEmployee;
+//	}
 
 	public RoomPriceScheme getRoomPriceScheme() {
 		return roomPriceScheme;
 	}
 
+	public SalesMen getSalesMen() {
+		return salesMen;
+	}
+	public void setSalesMen(SalesMen salesMen) {
+		this.salesMen = salesMen;
+	}
 	public void setRoomPriceScheme(RoomPriceScheme roomPriceScheme) {
 		this.roomPriceScheme = roomPriceScheme;
 	}

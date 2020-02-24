@@ -384,7 +384,8 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 					item.setLeaveTime(checkInRecord.getLeaveTime());
 					item.setDays(checkInRecord.getDays());
 					item.setContactName(checkInRecord.getContactName());
-					item.setMarketEmployee(checkInRecord.getMarketEmployee());
+//					item.setMarketEmployee(checkInRecord.getMarketEmployee());
+					item.setSalesMen(checkInRecord.getSalesMen());
 					item.setMarketingSources(checkInRecord.getMarketingSources());
 					item.setDistributionChannel(checkInRecord.getDistributionChannel());
 					item.setContactMobile(checkInRecord.getContactMobile());
@@ -516,7 +517,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 					item.setLeaveTime(checkInRecord.getLeaveTime());
 					item.setDays(checkInRecord.getDays());
 					item.setContactName(checkInRecord.getContactName());
-					item.setMarketEmployee(checkInRecord.getMarketEmployee());
+					item.setSalesMen(checkInRecord.getSalesMen());
 					item.setDistributionChannel(checkInRecord.getDistributionChannel());
 					item.setContactMobile(checkInRecord.getContactMobile());
 					item.setRoomType(roomTypeService.findById(item.getRoomTypeId()));
@@ -715,7 +716,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 			checkInRecord.setHoldTime(mainCheckInRecord.getHoldTime());
 			checkInRecord.setDays(mainCheckInRecord.getDays());
 			checkInRecord.setContactName(mainCheckInRecord.getContactName());
-			checkInRecord.setMarketEmployee(mainCheckInRecord.getMarketEmployee());
+			checkInRecord.setSalesMen(mainCheckInRecord.getSalesMen());
 			checkInRecord.setDistributionChannel(mainCheckInRecord.getDistributionChannel());
 			checkInRecord.setContactMobile(mainCheckInRecord.getContactMobile());
 			checkInRecord.setOrderNum(mainCheckInRecord.getOrderNum());

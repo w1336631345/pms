@@ -36,6 +36,8 @@ public class Employee extends PersistenceModel{
 	@NotBlank(message="电话号码不为空")
 	@Column(columnDefinition = "varchar(40) default NULL COMMENT '电话'")
 	private String mobile;
+	@Column
+	private String type;
 	@OneToOne
 	private User user;
 	@ManyToOne
