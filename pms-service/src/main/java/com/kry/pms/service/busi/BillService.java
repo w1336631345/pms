@@ -4,7 +4,9 @@ import java.time.LocalDate;
 import java.util.List;
 
 import com.kry.pms.base.DtoResponse;
+import com.kry.pms.base.PageResponse;
 import com.kry.pms.model.http.request.busi.BillOperationBo;
+import com.kry.pms.model.http.request.busi.BillQueryBo;
 import com.kry.pms.model.http.request.busi.BillSettleBo;
 import com.kry.pms.model.persistence.busi.Bill;
 import com.kry.pms.model.persistence.busi.CheckInRecord;
@@ -70,5 +72,7 @@ public interface BillService extends BaseService<Bill> {
 
 	public DtoResponse<List<Bill>> transfer(Bill bill, Account targetAccount, String shiftCode,
 			Employee operationEmployee, String recordNum);
+
+	public PageResponse<Bill> queryByBo(BillQueryBo query);
 
 }

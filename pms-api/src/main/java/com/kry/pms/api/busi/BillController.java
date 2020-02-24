@@ -22,6 +22,7 @@ import com.kry.pms.base.HttpResponse;
 import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
 import com.kry.pms.model.http.request.busi.BillOperationBo;
+import com.kry.pms.model.http.request.busi.BillQueryBo;
 import com.kry.pms.model.persistence.busi.Bill;
 import com.kry.pms.service.busi.BillService;
 
@@ -69,14 +70,18 @@ public class BillController extends BaseController<Bill> {
 		rep.setData(data);
 		return rep;
 	}
-
-
 	@GetMapping
 	public HttpResponse<PageResponse<Bill>> query(HttpServletRequest request) throws InstantiationException, IllegalAccessException{
 		HttpResponse<PageResponse<Bill>> rep = new HttpResponse<PageResponse<Bill>>();
 		PageRequest<Bill> req = parse2PageRequest(request);
 		return rep.addData(billService.listPage(req));
 	}
+	@GetMapping(path="/all")
+	public HttpResponse<PageResponse<Bill>> queryByBo(BillQueryBo query) throws InstantiationException, IllegalAccessException{
+		HttpResponse<PageResponse<Bill>> rep = new HttpResponse<PageResponse<Bill>>();
+		return rep.addData(billService.queryByBo(query));
+	}
+	
 	@GetMapping(path = "/offset/{id}")
 	public HttpResponse<String> offset(@PathVariable String id) throws InstantiationException, IllegalAccessException{
 		HttpResponse<String> rep = new HttpResponse<String>();

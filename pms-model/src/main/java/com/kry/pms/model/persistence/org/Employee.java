@@ -42,4 +42,6 @@ public class Employee extends PersistenceModel{
 	private User user;
 	@ManyToOne
 	private Role role;
+	@Column
+	private Boolean isSalesMen;
 }

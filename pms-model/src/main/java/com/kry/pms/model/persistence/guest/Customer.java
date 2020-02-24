@@ -8,6 +8,7 @@ import javax.persistence.*;
 import com.kry.pms.model.persistence.PersistenceModel;
 import com.kry.pms.model.persistence.busi.CheckInRecord;
 import com.kry.pms.model.persistence.marketing.ProtocolCorpation;
+import com.kry.pms.model.persistence.marketing.SalesMen;
 import com.kry.pms.model.persistence.sys.User;
 
 import lombok.Getter;
@@ -58,11 +59,12 @@ public class Customer extends PersistenceModel {
 	private String language;//语言
 	@Column
 	private LocalDate effectiveDate;//有效日期
+	@OneToOne
+	private SalesMen salesMen;
 	@Column
 	private String numCode;//编号
 	@ManyToOne
 	private CustomerType customerType;//类型
-
 	@Column
 	private String education;//学历
 	@Column

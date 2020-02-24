@@ -21,6 +21,7 @@ import com.kry.pms.base.PageResponse;
 import com.kry.pms.dao.busi.BillDao;
 import com.kry.pms.model.http.request.busi.BillBo;
 import com.kry.pms.model.http.request.busi.BillOperationBo;
+import com.kry.pms.model.http.request.busi.BillQueryBo;
 import com.kry.pms.model.http.request.busi.BillSettleBo;
 import com.kry.pms.model.persistence.busi.Bill;
 import com.kry.pms.model.persistence.busi.BillItem;
@@ -432,5 +433,12 @@ public class BillServiceImpl implements BillService {
 		data.add(strikeBill);
 		data.add(add(targetBill));
 		return rep.addData(data);
+	}
+
+	@Override
+	public PageResponse<Bill> queryByBo(BillQueryBo query) {
+		org.springframework.data.domain.PageRequest req = org.springframework.data.domain.PageRequest.of(1, 10);
+//		 return convent(billDao.querByBo(query,req));
+		return  null;
 	}
 }

@@ -9,19 +9,26 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
 import com.kry.pms.base.Constants;
+import com.kry.pms.base.Constants.BusinessCode;
 import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
 import com.kry.pms.dao.marketing.SalesMenDao;
 import com.kry.pms.model.persistence.marketing.SalesMen;
+import com.kry.pms.model.persistence.org.Employee;
 import com.kry.pms.service.marketing.SalesMenService;
+import com.kry.pms.service.sys.BusinessSeqService;
 
 @Service
-public class  SalesMenServiceImpl implements  SalesMenService{
+public class SalesMenServiceImpl implements SalesMenService {
 	@Autowired
-	 SalesMenDao salesMenDao;
-	 
-	 @Override
+	SalesMenDao salesMenDao;
+	@Autowired
+	BusinessSeqService businessSeqService;
+
+	@Override
 	public SalesMen add(SalesMen salesMen) {
+		salesMen.setCode(businessSeqService.fetchNextSeqNum(salesMen.getHotelCode(),
+				Constants.Key.BUSINESS_BUSINESS_SALES_MEN_SEQ));
 		return salesMenDao.saveAndFlush(salesMen);
 	}
 
@@ -46,8 +53,8 @@ public class  SalesMenServiceImpl implements  SalesMenService{
 
 	@Override
 	public List<SalesMen> getAllByHotelCode(String code) {
-		return null;//默认不实现
-		//return salesMenDao.findByHotelCode(code);
+		return null;// 默认不实现
+		// return salesMenDao.findByHotelCode(code);
 	}
 
 	@Override
@@ -62,8 +69,13 @@ public class  SalesMenServiceImpl implements  SalesMenService{
 		}
 		return convent(salesMenDao.findAll(ex, req));
 	}
-	 
-	 
-	 
-	 
+
+	@Override
+	public SalesMen createByEmployee(Employee employee) {
+		SalesMen salesMen = new SalesMen();
+		salesMen.setName(employee.getName());
+		salesMen.setContactMobile(employee.getMobile());
+		return add(salesMen);
+	}
+
 }

@@ -3,6 +3,7 @@ package com.kry.pms.model.persistence.marketing;
 import java.time.LocalDate;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.ManyToMany;
@@ -41,7 +42,7 @@ public class SalesMen extends PersistenceModel{
 	private String email;// 邮件
 	@Column
 	private String type;// 类型     F 全职       H  兼职
-	@ManyToMany
+	@ManyToMany(cascade = CascadeType.PERSIST)
 	private List<Area> saleAreas;//销售区域
 	@Column
 	private LocalDate effectiveDate;//生效时间

@@ -13,9 +13,11 @@ import com.kry.pms.base.DtoResponse;
 import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
 import com.kry.pms.dao.org.EmployeeDao;
+import com.kry.pms.model.persistence.marketing.SalesMen;
 import com.kry.pms.model.persistence.org.Employee;
 import com.kry.pms.model.persistence.sys.Account;
 import com.kry.pms.model.persistence.sys.User;
+import com.kry.pms.service.marketing.SalesMenService;
 import com.kry.pms.service.org.EmployeeService;
 import com.kry.pms.service.sys.AccountService;
 import com.kry.pms.service.sys.RoleService;
@@ -32,6 +34,8 @@ public class EmployeeServiceImpl implements EmployeeService {
 	UserService userService;
 	@Autowired
 	RoleService roleService;
+	@Autowired
+	SalesMenService salesMenService;
 
 	@Override
 	public Employee add(Employee employee) {
@@ -60,7 +64,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 	@Override
 	public List<Employee> getAllByHotelCode(String code) {
 //		return null;// 默认不实现
-		 return employeeDao.findByHotelCode(code);
+		return employeeDao.findByHotelCode(code);
 	}
 
 	@Override
@@ -101,13 +105,16 @@ public class EmployeeServiceImpl implements EmployeeService {
 				.getValue());
 		user = userService.add(user);
 		employee.setUser(user);
-		add(employee);
+		employee = add(employee);
+		if (employee.getIsSalesMen()) {
+			salesMenService.createByEmployee(employee);
+		}
 		return rep.addData(employee);
 	}
 
 	@Override
 	public List<Employee> findEmployeeByDeptCode(String deptMarketingDefaultCode, String currentHotleCode) {
-		return employeeDao.findByDepartmentCodeAndHotelCode(deptMarketingDefaultCode,currentHotleCode);
+		return employeeDao.findByDepartmentCodeAndHotelCode(deptMarketingDefaultCode, currentHotleCode);
 	}
 
 }
