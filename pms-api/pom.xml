@@ -97,6 +97,12 @@
 			<scope>runtime</scope>
 		</dependency>
 
+		<dependency>
+			<groupId>com.fasterxml.jackson.datatype</groupId>
+			<artifactId>jackson-datatype-hibernate5</artifactId>
+			<version>2.9.8</version>
+		</dependency>
+
 	</dependencies>
 	<build>
 		<resources>

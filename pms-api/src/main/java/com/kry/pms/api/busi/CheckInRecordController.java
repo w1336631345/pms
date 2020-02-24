@@ -1,34 +1,24 @@
 package com.kry.pms.api.busi;
 
-import java.util.List;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-
-import com.kry.pms.model.http.request.busi.CheckInRecordListBo;
-import org.springframework.beans.BeanUtils;
-import com.kry.pms.model.http.request.busi.CheckUpdateItemBo;
-import com.kry.pms.model.http.request.busi.CheckUpdateItemTestBo;
-import com.kry.pms.model.persistence.sys.User;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.kry.pms.api.BaseController;
 import com.kry.pms.base.DtoResponse;
 import com.kry.pms.base.HttpResponse;
 import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
+import com.kry.pms.model.http.request.busi.CheckInRecordListBo;
+import com.kry.pms.model.http.request.busi.CheckUpdateItemTestBo;
 import com.kry.pms.model.http.request.busi.TogetherBo;
 import com.kry.pms.model.http.response.busi.CheckInRecordListVo;
 import com.kry.pms.model.persistence.busi.CheckInRecord;
+import com.kry.pms.model.persistence.sys.User;
 import com.kry.pms.service.busi.CheckInRecordService;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping(path = "/api/v1/busi/checkInRecord")
@@ -121,6 +111,12 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
 	public HttpResponse<List<CheckInRecord>> findDetailByOrderNum(@PathVariable("orderNum") String orderNum){
 		HttpResponse<List<CheckInRecord>> rep = new HttpResponse<List<CheckInRecord>>();
 		rep.addData(checkInRecordService.findByOrderNum(orderNum));
+		return rep;
+	}
+	@GetMapping(path="/orderNum2/{orderNum}")
+	public HttpResponse<List<Map<String, Object>>> findDetailByOrderNumSQL(@PathVariable("orderNum") String orderNum){
+		HttpResponse<List<Map<String, Object>>> rep = new HttpResponse<List<Map<String, Object>>>();
+		rep.addData(checkInRecordService.findByOrderNum2(orderNum));
 		return rep;
 	}
 	@PostMapping(path="/together")

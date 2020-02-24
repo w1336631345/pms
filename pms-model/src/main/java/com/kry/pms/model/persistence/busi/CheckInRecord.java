@@ -1,6 +1,7 @@
 package com.kry.pms.model.persistence.busi;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kry.pms.model.persistence.PersistenceModel;
 import com.kry.pms.model.persistence.goods.SetMeal;
 import com.kry.pms.model.persistence.guest.Customer;
@@ -18,19 +19,23 @@ import java.util.List;
 
 @Entity
 @Table(name = "t_checkin_record")
+//@NamedEntityGraph(name = "CheckInRecord.roomPriceScheme", attributeNodes = {@NamedAttributeNode("roomPriceScheme")})
 public class CheckInRecord extends PersistenceModel {
 	@OneToOne(cascade = CascadeType.DETACH)
 	private Customer customer;// 客户
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne
 	@JoinColumn(name = "booking_record_id")
 	private BookingRecord BookingRecord;// 预订记录id
+
 	@OneToOne
 	private RoomPriceSchemeItem priceSchemeItem;// 房价方案
-	@OneToOne
+	@OneToOne(fetch = FetchType.LAZY)
 	private GuestRoom guestRoom;// 房间
 	@Column(name = "name_")
 	private String name;// 姓名
 	@OneToOne
+	@JsonIgnoreProperties(value={"hibernateLazyInitializer","handler","fieldHandler"})
+//	@JsonIgnore
 	private RoomPriceScheme roomPriceScheme;// 房价方案
 	@OneToOne
 	private RoomType roomType;// 房间类型
