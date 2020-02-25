@@ -6,6 +6,8 @@ import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -61,6 +63,12 @@ public class BaseController<T> {
 		}
 		if (params.containsKey(Constants.KEY_PAGE_NUM)) {
 			pr.setPageNum(Integer.valueOf(params.get(Constants.KEY_PAGE_NUM)[0]) - 1);
+		}
+		if(params.containsKey(Constants.KEY_ORDER)){
+			pr.setOrderBy(Arrays.asList(params.get(Constants.KEY_ORDER)));
+		}
+		if(params.containsKey(Constants.KEY_SHORT_ASC)){
+			pr.setAsc(Boolean.valueOf(params.get(Constants.KEY_SHORT_ASC)[0]));
 		}
 		pr.setExb(parse2Exb(params));
 		return pr;

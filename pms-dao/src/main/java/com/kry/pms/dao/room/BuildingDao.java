@@ -9,6 +9,6 @@ public interface BuildingDao extends BaseDao<Building>{
 
 	List<Building> findByHotelCode(String code);
 
-	List<Building> findByHotelCodeAndStatus(String code, String normal);
+	List<Building> findByHotelCodeAndStatusOrderBySortNum(String code, String normal);
 
 }

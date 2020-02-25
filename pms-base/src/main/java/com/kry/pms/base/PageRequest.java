@@ -1,6 +1,7 @@
 package com.kry.pms.base;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 
@@ -12,7 +13,7 @@ public class PageRequest<T> {
 	T exb;
 	private int pageSize = 10;
 	private int pageNum = 0;
-	private ArrayList<String> orderBy;
+	private List<String> orderBy;
 	private boolean isAsc = true;
 
 	public T getExb() {
@@ -46,17 +47,18 @@ public class PageRequest<T> {
 		this.pageNum = pageNum;
 	}
 
-	public ArrayList<String> getOrderBy() {
+	public List<String> getOrderBy() {
 		return orderBy;
 	}
 
-	public void setOrderBy(ArrayList<String> orderBy) {
+	public void setOrderBy(List<String> orderBy) {
 		this.orderBy = orderBy;
 	}
 
 	public boolean isAsc() {
 		return isAsc;
 	}
+
 
 	public void setAsc(boolean isAsc) {
 		this.isAsc = isAsc;
