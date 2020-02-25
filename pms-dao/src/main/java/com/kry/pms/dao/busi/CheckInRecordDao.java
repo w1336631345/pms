@@ -147,7 +147,12 @@ public interface CheckInRecordDao extends BaseDao<CheckInRecord> {
 			" DATE_FORMAT(tcr.actual_time_of_arrive,'%Y-%m-%d %T') actualTimeOfArrive,  " +
 			" DATE_FORMAT(tcr.actual_time_of_leave,'%Y-%m-%d %T') actualTimeOfLeave,  " +
 			" set_meal_id setMealId " +
-			" from t_checkin_record tcr where order_num = ?1 and deleted = ?2")
+			" from t_checkin_record tcr where order_num = ?1 and deleted = ?2 ")
 	List<Map<String, Object>> sqlOrderNumAndDeleted(String orderNum, int deletedFalse);
+
+	@Query(nativeQuery = true, value = " select count(1) " +
+			" from t_checkin_record tcr " +
+			" where tcr.deleted = ?1 and tcr.hotel_code = ?2  and tcr.guest_room_id = ?3 ")
+	int countTogetherRoom(int deletedFalse, String hotelCode, String roomId);
 
 }

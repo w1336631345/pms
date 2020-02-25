@@ -113,6 +113,12 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
 		rep.addData(checkInRecordService.findByOrderNum(orderNum));
 		return rep;
 	}
+	@GetMapping(path="/orderNumC/{orderNum}")
+	public HttpResponse<List<CheckInRecord>> findDetailByOrderNumC(@PathVariable("orderNum") String orderNum){
+		HttpResponse<List<CheckInRecord>> rep = new HttpResponse<List<CheckInRecord>>();
+		rep.addData(checkInRecordService.findByOrderNumC(orderNum));
+		return rep;
+	}
 	@GetMapping(path="/orderNum2/{orderNum}")
 	public HttpResponse<List<Map<String, Object>>> findDetailByOrderNumSQL(@PathVariable("orderNum") String orderNum){
 		HttpResponse<List<Map<String, Object>>> rep = new HttpResponse<List<Map<String, Object>>>();

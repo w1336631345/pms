@@ -170,7 +170,8 @@ public class ReceptionServiceImpl implements ReceptionService {
 		CheckInRecord cir = checkInRecordService.findById(checkInRecordId);
 		if (cir != null) {
 			if (cir.getType().equals(Constants.Type.CHECK_IN_RECORD_RESERVE)) {
-				if (roomAssignBo.getRoomId().length <= (cir.getRoomCount() - cir.getCheckInCount())) {
+//				if (roomAssignBo.getRoomId().length <= (cir.getRoomCount() - cir.getCheckInCount())) {//原来是不变预订数，增加已排房数
+				if (roomAssignBo.getRoomId().length <= cir.getRoomCount()) {
 					for (String roomId : roomAssignBo.getRoomId()) {
 						GuestRoom gr = guestRoomService.findById(roomId);
 						checkInRecordService.checkInByTempName(cir.getSingleRoomCount(), cir, gr, response);
@@ -182,7 +183,9 @@ public class ReceptionServiceImpl implements ReceptionService {
 
 				if (response.getStatus() == 0) {
 					cir.setCheckInCount(cir.getCheckInCount() + roomAssignBo.getRoomId().length);
-					if (cir.getRoomCount() == cir.getCheckInCount()) {
+					cir.setRoomCount(cir.getRoomCount() - roomAssignBo.getRoomId().length);
+//					if (cir.getRoomCount() == cir.getCheckInCount()) {
+					if (cir.getRoomCount() == 0) {
 						cir.setDeleted(Constants.DELETED_TRUE);
 					}
 					checkInRecordService.modify(cir);

@@ -69,7 +69,10 @@ public interface CheckInRecordService extends BaseService<CheckInRecord> {
 
 	public List<CheckInRecord> findByOrderNum(String orderNum);
 
-	List<Map<String, Object>> findByOrderNum2(String orderNum);
+    //只查询宾客的数据（不查询主单和预订单）
+    List<CheckInRecord> findByOrderNumC(String orderNum);
+
+    List<Map<String, Object>> findByOrderNum2(String orderNum);
 
 	List<Map<String, Object>> sqlOrderNum(String orderNum);
 

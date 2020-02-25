@@ -44,6 +44,7 @@ public class Constants {
 		public static final String ROOM_RECORD_STATUS_DAILY_VERIFY_PASS = "daily_verif_pass";
 		public static final String ROOM_RECORD_STATUS_CHECK_OUT = "check_out";
 		public static final String CHECKIN_RECORD_STATUS_RESERVATION = "R";// 预订
+		public static final String CHECKIN_RECORD_STATUS_ASSIGN = "A";// 排房
 		public static final String CHECKIN_RECORD_STATUS_CHECK_IN = "I";// 入住
 		public static final String CHECKIN_RECORD_STATUS_CHECK_OUT = "O";// 退房
 		public static final String CHECKIN_RECORD_STATUS_DEPARTURE_YESTERDAY = "D";// 历史订单
@@ -86,6 +87,7 @@ public class Constants {
 		public static final String BUSINESS_BUSINESS_TRANSFER_SEQ_KEY = "TRANSFER_NUM";
 		public static final String BUSINESS_BUSINESS_CUSTOMER_ACCOUNT_SEQ_KEY = "CUSTOMER_ACCOUNT_NUM";
 		public static final String BUSINESS_BUSINESS_GROUP_ACCOUNT_SEQ_KEY = "GROUP_ACCOUNT_NUM";
+		public static final String BUSINESS_BUSINESS_GROUP_CUSTOMER_ACCOUNT_SEQ_KEY = "GROUP_CUSTOMER_ACCOUNT_NUM";
 		public static final String BUSINESS_BUSINESS_ACCOUNT_SEQ="ACCOUNT_SEQ_";
 		public static final String BUSINESS_BUSINESS_SALES_MEN_SEQ="SALES_MEN_SEQ";
 		public static final String TOGETHER_NUM_KEY = "TOGETHER_NUM";
