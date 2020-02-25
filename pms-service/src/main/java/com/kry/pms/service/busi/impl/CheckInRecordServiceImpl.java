@@ -303,6 +303,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 			} catch (CloneNotSupportedException e) {
 				e.printStackTrace();
 			}
+			ncir.setHumanCount(1);
 			ncir.setDemands(tags);
 			ncir.setPersonalPrice(cir.getPurchasePrice());
 			ncir.setPersonalPercentage(1.0);
@@ -731,10 +732,19 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 	@Override
 	@Transactional
 	public List<CheckInRecord> addReserve(List<CheckInRecord> checkInRecords) {
+		String mainId = null;
+		int humanCount = 0;
 		for (CheckInRecord cir : checkInRecords) {
 			cir = addReserve(cir);
 			//新增预留占用资源
 			roomStatisticsService.reserve(new CheckInRecordWrapper(cir));
+			mainId = cir.getMainRecordId();
+			humanCount = humanCount + cir.getHumanCount();
+		}
+		if( mainId != null){
+			CheckInRecord main = checkInRecordDao.getOne(mainId);
+			main.setHumanCount(main.getHumanCount() + humanCount);
+			checkInRecordDao.saveAndFlush(main);
 		}
 		return checkInRecords;
 	}
@@ -1116,6 +1126,14 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 		}
 		checkInRecord.setSubRecords(null);
 		Customer customer = customerService.findById(customerId);
+		Account account = new Account(0, 0);
+		account.setRoomNum(cir.getGuestRoom().getRoomNum());
+		account.setCustomer(customer);
+		account.setCode(businessSeqService.fetchNextSeqNum(cir.getHotelCode(),
+				Constants.Key.BUSINESS_BUSINESS_CUSTOMER_ACCOUNT_SEQ_KEY));
+		account.setType(Constants.Type.ACCOUNT_CUSTOMER);
+		checkInRecord.setAccount(null);
+		checkInRecord.setAccount(account);
 		checkInRecord.setId(null);
 		if (status != null && status != "") {
 			checkInRecord.setStatus(status);

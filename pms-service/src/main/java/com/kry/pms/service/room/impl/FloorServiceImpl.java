@@ -96,7 +96,7 @@ public class FloorServiceImpl implements FloorService {
 		floor.setDeleted(deleted);
 		floor.setBuilding(building);
 		Example<Floor> ex = Example.of(floor);
-		return floorDao.findAll(ex);
+		return floorDao.findAll(ex,Sort.by("sortNum"));
 	}
 
 }

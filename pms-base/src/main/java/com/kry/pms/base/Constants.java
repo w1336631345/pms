@@ -5,6 +5,8 @@ import java.time.LocalTime;
 public class Constants {
 	public static final String KEY_PAGE_SIZE = "pageSize";
 	public static final String KEY_PAGE_NUM = "pageNum";
+	public static final String KEY_ORDER = "order";
+	public static final String KEY_SHORT_ASC = "asc";
 	public static final String KEY_METHOD_SET_PRE = "set";
 	public static final String KEY_METHOD_GET_PRE = "get";
 	public static final String KEY_DEFAULT_SEPARATOR = ",";

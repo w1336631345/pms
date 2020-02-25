@@ -29,7 +29,7 @@ public class CheckInRecord extends PersistenceModel {
 
 	@OneToOne
 	private RoomPriceSchemeItem priceSchemeItem;// 房价方案
-	@OneToOne(fetch = FetchType.LAZY)
+	@OneToOne
 	private GuestRoom guestRoom;// 房间
 	@Column(name = "name_")
 	private String name;// 姓名
