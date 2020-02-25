@@ -18,6 +18,6 @@ public class SqlTemplate extends PersistenceModel {
 	private String entityName;
 	@Column
 	private String methodName;
-	@Column
+	@Column(name = "sql_")
 	private String sql;
 }

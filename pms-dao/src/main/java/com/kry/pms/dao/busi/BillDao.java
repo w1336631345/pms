@@ -9,6 +9,7 @@ import com.kry.pms.dao.BaseDao;
 import com.kry.pms.model.http.request.busi.BillQueryBo;
 import com.kry.pms.model.persistence.busi.Bill;
 import com.kry.pms.model.persistence.sys.Account;
+import org.springframework.data.jpa.repository.Query;
 
 public interface BillDao extends BaseDao<Bill> {
 
@@ -18,6 +19,5 @@ public interface BillDao extends BaseDao<Bill> {
 
 	public List<Bill> findByAccountAndStatus(Account account, String status);
 
-//	public Page<Bill> querByBo(BillQueryBo billQueryBo, Pageable pageable);
 
 }

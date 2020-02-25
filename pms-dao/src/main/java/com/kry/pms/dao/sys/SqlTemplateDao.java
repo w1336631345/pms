@@ -5,4 +5,5 @@ import com.kry.pms.model.persistence.sys.SqlTemplate;
 
 public interface SqlTemplateDao extends BaseDao<SqlTemplate>{
 
+    SqlTemplate findByHotelCodeAndEntityNameAndMethodName(String hotelCode, String entityName, String methodName);
 }

@@ -14,6 +14,7 @@ import javax.persistence.Table;
 import com.kry.pms.model.persistence.PersistenceModel;
 import com.kry.pms.model.persistence.goods.Product;
 import com.kry.pms.model.persistence.org.Employee;
+import com.kry.pms.model.persistence.room.GuestRoom;
 import com.kry.pms.model.persistence.sys.Account;
 
 import lombok.Getter;
@@ -34,6 +35,8 @@ public class Bill extends PersistenceModel {
 	private Account targetAccount;
 	@Column
 	private Integer quantity;
+	@OneToOne
+	private GuestRoom guestRoom;
 	@OneToOne
 	private Product product;
 	@Column

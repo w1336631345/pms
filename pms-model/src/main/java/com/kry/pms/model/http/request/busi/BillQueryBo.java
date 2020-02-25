@@ -4,6 +4,7 @@ import lombok.Data;
 
 @Data
 public class BillQueryBo {
+	private String hotelCode;
 	private String billDateType;// T Y H 今日 昨日 历史
 	private String key;
 	private String shift;// 班次

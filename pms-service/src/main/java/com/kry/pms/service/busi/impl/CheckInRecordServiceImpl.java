@@ -24,6 +24,7 @@ import com.kry.pms.service.room.RoomTypeService;
 import com.kry.pms.service.room.RoomUsageService;
 import com.kry.pms.service.sys.AccountService;
 import com.kry.pms.service.sys.BusinessSeqService;
+import com.kry.pms.service.sys.SqlTemplateService;
 import com.kry.pms.service.sys.SystemConfigService;
 import com.kry.pms.service.util.UpdateUtil;
 import org.springframework.beans.BeanUtils;
@@ -68,6 +69,8 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 	AccountService accountService;
 	@Autowired
 	RoomLinkDao roomLinkDao;
+	@Autowired
+	SqlTemplateService sqlTemplateService;
 
 	@Override
 	public CheckInRecord add(CheckInRecord checkInRecord) {
@@ -695,6 +698,8 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 
 	@Override
 	public List<CheckInRecord> findByOrderNum(String orderNum) {
+
+
 		return checkInRecordDao.findByOrderNumAndDeleted(orderNum, Constants.DELETED_FALSE);
 	}
 	//只查询宾客的数据（不查询主单和预订单）
@@ -703,15 +708,8 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 		return checkInRecordDao.findByOrderNumAndTypeAndDeleted(orderNum,Constants.Type.CHECK_IN_RECORD_CUSTOMER, Constants.DELETED_FALSE);
 	}
 	@Override
-	public List<Map<String, Object>> findByOrderNum2(String orderNum) {
-		List<CheckInRecord> list =  checkInRecordDao.findByOrderNumAndDeleted(orderNum, Constants.DELETED_FALSE);
-		List<Map<String, Object>> results = new ArrayList<>();
-		for(int i=0; i<list.size(); i++){
-			Map<String, Object> map = new HashMap<>();
-			map.put("test",list.get(i));
-			results.add(map);
-		}
-		return results;
+	public List<Map<String, Object>> findByOrderNum2(String hotelCode,String orderNum) {
+		return sqlTemplateService.processTemplateQuery(hotelCode,CheckInRecordService.class.getSimpleName(),"findByOrderNum2",orderNum);
 	}
 
 	@Override

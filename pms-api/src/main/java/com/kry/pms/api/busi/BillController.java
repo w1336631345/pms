@@ -1,6 +1,7 @@
 package com.kry.pms.api.busi;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -77,8 +78,9 @@ public class BillController extends BaseController<Bill> {
 		return rep.addData(billService.listPage(req));
 	}
 	@GetMapping(path="/all")
-	public HttpResponse<PageResponse<Bill>> queryByBo(BillQueryBo query) throws InstantiationException, IllegalAccessException{
-		HttpResponse<PageResponse<Bill>> rep = new HttpResponse<PageResponse<Bill>>();
+	public HttpResponse<List> queryByBo(BillQueryBo query) throws InstantiationException, IllegalAccessException{
+		query.setHotelCode(getCurrentHotleCode());
+		HttpResponse<List> rep = new HttpResponse<List>();
 		return rep.addData(billService.queryByBo(query));
 	}
 	

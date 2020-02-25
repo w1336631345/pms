@@ -67,12 +67,11 @@ public interface CheckInRecordService extends BaseService<CheckInRecord> {
 
 	public Collection<AccountSummaryVo> getAccountSummaryByLinkNum(String orderNum, String accountCustomer);
 
+	public List<CheckInRecord> findByOrderNumC(String orderNum);
+
 	public List<CheckInRecord> findByOrderNum(String orderNum);
 
-    //只查询宾客的数据（不查询主单和预订单）
-    List<CheckInRecord> findByOrderNumC(String orderNum);
-
-    List<Map<String, Object>> findByOrderNum2(String orderNum);
+	List<Map<String, Object>> findByOrderNum2(String hotelCode,String orderNum);
 
 	List<Map<String, Object>> sqlOrderNum(String orderNum);
 
