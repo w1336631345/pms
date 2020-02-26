@@ -25,7 +25,7 @@ public interface GuestRoomStatusDao extends BaseDao<GuestRoomStatus> {
 	
 	@Query(value = "select new com.kry.pms.model.http.response.room.GuestRoomStatusVo(d.name,a.id, b.roomNum, a.summary, b.id," + 
 			"a.roomStatus, a.locked, a.willLeave, a.willArrive, a.hourRoom, a.free," + 
-			"a.personal, a.group, a.linkedRoom, a.repairRoom, a.overdued, a.ota) from GuestRoomStatus a ,GuestRoom b,Floor c,RoomType d where a.guestRoom = b and b.floor = c and b.roomType = d and c.id = ?1 and a.deleted=0")
+			"a.personal, a.group, a.linkedRoom, a.repairRoom, a.overdued, a.ota) from GuestRoomStatus a ,GuestRoom b,Floor c,RoomType d where a.guestRoom = b and b.floor = c and b.roomType = d and c.id = ?1 and a.deleted=0 order by b.sortNum")
 	List<GuestRoomStatusVo> queryViewByFloorId(String floorId);
 
 	GuestRoomStatus findTopByRoomNumAndHotelCode(String num, String hotleCode);

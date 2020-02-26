@@ -33,6 +33,6 @@ public class GuestRoom extends PersistenceModel {
 	@Transient
 	private List<String> roomNums;
 	@Column
-	private Integer shortNum;
+	private String sortNum;
 	
 }

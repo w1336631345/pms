@@ -158,6 +158,7 @@ public class GuestRoomServiceImpl implements GuestRoomService {
 				continue;
 			} else {
 				gr.setRoomNum(rn);
+				gr.setSortNum(rn);
 				addRoomAndResources(gr);
 				list.add(gr);
 			}
