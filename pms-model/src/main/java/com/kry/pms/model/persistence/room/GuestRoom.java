@@ -32,5 +32,7 @@ public class GuestRoom extends PersistenceModel {
 	private Integer occupantCapacity;
 	@Transient
 	private List<String> roomNums;
+	@Column
+	private Integer shortNum;
 	
 }

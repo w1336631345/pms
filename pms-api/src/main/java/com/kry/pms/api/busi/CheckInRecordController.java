@@ -123,7 +123,7 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
 	public HttpResponse<List<Map<String, Object>>> findDetailByOrderNumSQL(@PathVariable("orderNum") String orderNum){
 		HttpResponse<List<Map<String, Object>>> rep = new HttpResponse<List<Map<String, Object>>>();
 
-		rep.addData(checkInRecordService.findByOrderNum2(orderNum,getCurrentHotleCode()));
+		rep.addData(checkInRecordService.findByOrderNum2(getCurrentHotleCode(),orderNum));
 		return rep;
 	}
 	@PostMapping(path="/together")
