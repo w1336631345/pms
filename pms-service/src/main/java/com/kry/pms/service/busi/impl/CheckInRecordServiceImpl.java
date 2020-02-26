@@ -460,9 +460,39 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 		Account account = accountService.createAccount(customer, null);
 		checkInRecord.setAccount(account);
 		CheckInRecord cir = add(checkInRecord);
+		roomStatisticsService.reserve(new CheckInRecordWrapper(cir));
 		if((Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN).equals(checkInRecord.getStatus())){
 			roomStatisticsService.checkIn(new CheckInRecordWrapper(checkInRecord));
 		}
+		roomRecordService.createRoomRecord(cir);
+		return cir;
+	}
+	//单房预订
+	@Override
+	@Transactional
+	public CheckInRecord singleRoom(CheckInRecord checkInRecord) {
+		GuestRoom gr = guestRoomService.findById(checkInRecord.getGuestRoom().getId());
+		Customer customer = null;
+		if(checkInRecord.getCustomer() == null){
+			customer = customerService.createTempCustomer(checkInRecord.getHotelCode(), gr.getRoomNum() + "#1");
+		}
+		checkInRecord.setCustomer(customer);
+		String orderNum = businessSeqService.fetchNextSeqNum(checkInRecord.getHotelCode(),
+				Constants.Key.BUSINESS_ORDER_NUM_SEQ_KEY);
+		checkInRecord.setOrderNum(orderNum);
+		checkInRecord.setHumanCount(1);
+		checkInRecord.setCheckInCount(1);
+		checkInRecord.setRoomCount(1);
+		checkInRecord.setSingleRoomCount(1);
+		checkInRecord.setType(Constants.Type.CHECK_IN_RECORD_CUSTOMER);
+		checkInRecord.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_ASSIGN);
+		checkInRecord.setGroupType(Constants.Type.CHECK_IN_RECORD_GROUP_TYPE_NO);
+
+		Account account = accountService.createAccount(customer, gr.getRoomNum());
+		checkInRecord.setAccount(account);
+		CheckInRecord cir = add(checkInRecord);
+
+		roomStatisticsService.reserve(new CheckInRecordWrapper(cir));
 		roomRecordService.createRoomRecord(cir);
 		return cir;
 	}

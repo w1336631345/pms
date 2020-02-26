@@ -53,7 +53,10 @@ public interface CheckInRecordService extends BaseService<CheckInRecord> {
     @Transactional
 	CheckInRecord bookByRoomTypeTest(CheckInRecord checkInRecord);
 
-	PageResponse<CheckInRecord> notYet(int pageCount, int pageSize, String status, User user);
+    //单房预订
+    CheckInRecord singleRoom(CheckInRecord checkInRecord);
+
+    PageResponse<CheckInRecord> notYet(int pageCount, int pageSize, String status, User user);
 
 	PageResponse<CheckInRecord> accountEntryList(int pageIndex, int pageSize, User user);
 

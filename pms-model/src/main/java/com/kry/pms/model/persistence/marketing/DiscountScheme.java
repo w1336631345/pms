@@ -2,10 +2,7 @@ package com.kry.pms.model.persistence.marketing;
 
 import java.util.List;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 import com.kry.pms.model.persistence.PersistenceModel;
 import com.kry.pms.model.persistence.goods.ProductCategory;
@@ -24,16 +21,18 @@ public class DiscountScheme extends PersistenceModel{
 	private String code;
 	@Column
 	private String description;
+	@ManyToOne
+	private DiscountType discountType;
 	@Column
-	private String type;
+	private Double guestRoom;//客房
 	@Column
-	private String mode;
+	private Double restaurant;//餐饮
 	@Column
-	private String value;
+	private Double entertainment;//娱乐
 	@Column
-	private Double ceiling;
+	private Double others;//其它
 	@Column
-	private Double floor;
-	@OneToMany
-	private List<ProductCategory> categories;
+	private Double entertain;//款待
+	@Column
+	private String isUsed;//是否启用
 }
