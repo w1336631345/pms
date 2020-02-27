@@ -20,7 +20,7 @@ public class DictData extends PersistenceModel {
     private String name;//名称
     @Column
     private String description; //描述
-    @OneToOne
+    @Column
     private String dictTypeCode;//类型
     @Column
     private Integer sortNum;//排序
