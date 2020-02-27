@@ -8,6 +8,7 @@ import javax.persistence.*;
 import com.kry.pms.model.persistence.PersistenceModel;
 import com.kry.pms.model.persistence.busi.CheckInRecord;
 import com.kry.pms.model.persistence.marketing.ProtocolCorpation;
+import com.kry.pms.model.persistence.marketing.RoomPriceScheme;
 import com.kry.pms.model.persistence.marketing.SalesMen;
 import com.kry.pms.model.persistence.sys.User;
 
@@ -94,5 +95,7 @@ public class Customer extends PersistenceModel {
 	@ManyToOne
 	private ProtocolCorpation protocolCorpation;//客户公司
 
+	@ManyToMany
+	private List<RoomPriceScheme> roomPriceSchemes;//客户类型是团队才有的销售策略（房价方案）
 
 }

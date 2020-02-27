@@ -53,8 +53,8 @@ public class SalesMenServiceImpl implements SalesMenService {
 
 	@Override
 	public List<SalesMen> getAllByHotelCode(String code) {
-		return null;// 默认不实现
-		// return salesMenDao.findByHotelCode(code);
+//		return null;// 默认不实现
+	 	return salesMenDao.findByHotelCodeAndDeleted(code, Constants.DELETED_FALSE);
 	}
 
 	@Override

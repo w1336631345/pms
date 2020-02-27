@@ -10,6 +10,7 @@ import com.kry.pms.model.other.wrapper.CheckInRecordWrapper;
 import com.kry.pms.model.persistence.busi.Arrangement;
 import com.kry.pms.model.persistence.busi.CheckInRecord;
 import com.kry.pms.model.persistence.busi.RoomLink;
+import com.kry.pms.model.persistence.busi.RoomRecord;
 import com.kry.pms.model.persistence.guest.Customer;
 import com.kry.pms.model.persistence.room.GuestRoom;
 import com.kry.pms.model.persistence.room.RoomTag;
@@ -333,6 +334,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
             Account account = new Account(0, 0);
             account.setRoomNum(gr.getRoomNum());
             account.setCustomer(customer);
+            account.setName(customer.getName());//设置账号名和用户名相同
             account.setCode(businessSeqService.fetchNextSeqNum(gr.getHotelCode(),
                     Constants.Key.BUSINESS_BUSINESS_CUSTOMER_ACCOUNT_SEQ_KEY));
             ncir.setCheckInCount(1);
@@ -959,6 +961,11 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
             if (together == 0) {//表明房间没有人住，需要释放资源
                 roomStatisticsService.cancleReserve(new CheckInRecordWrapper(cir));
                 roomCount = roomCount + 1;
+            }
+            //需要删除roomRecord的记录
+            List<RoomRecord> list = roomRecordService.findByHotelCodeAndCheckInRecord(cir.getHotelCode(), cir.getId());
+            for(int r=0; r<list.size(); r++){
+                roomRecordService.deleteTrue(list.get(r).getId());
             }
         }
         main.setRoomCount(main.getRoomCount() - roomCount);

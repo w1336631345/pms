@@ -135,5 +135,17 @@ public class  RoomPriceSchemeServiceImpl implements  RoomPriceSchemeService{
 	 	List<RoomPriceScheme> list = roomPriceSchemeDao.findByHotelCodeAndIsShowAndDeleted(hotelCode, isShow, Constants.DELETED_FALSE);
 	 	return list;
 	}
+
+	@Override
+	public List<RoomPriceScheme> findByHotelCodeAndDeleted(String hotelCode) {
+		List<RoomPriceScheme> list = roomPriceSchemeDao.findByHotelCodeAndDeleted(hotelCode, Constants.DELETED_FALSE);
+		return list;
+	}
+
+	@Override
+	public List<RoomPriceScheme> getByCustomerId(String custId) {
+		List<RoomPriceScheme> list = roomPriceSchemeDao.getByCustomerId(custId);
+		return list;
+	}
 	 
 }

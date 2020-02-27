@@ -2,6 +2,7 @@ package com.kry.pms.service.guest.impl;
 
 import java.util.List;
 
+import com.kry.pms.model.persistence.marketing.RoomPriceScheme;
 import com.kry.pms.service.sys.BusinessSeqService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,6 +58,14 @@ public class CustomerServiceImpl implements CustomerService {
 			}
 		}
 		return customerDao.saveAndFlush(customer);
+	}
+
+	@Override
+	public Customer salesStrategy(Customer customer) {
+		Customer cust = customerDao.getOne(customer.getId());
+//		List<String> roomPriceIds = customerDao.getByCustId(customer.getId());
+		cust.setRoomPriceSchemes(customer.getRoomPriceSchemes());
+		return customerDao.saveAndFlush(cust);
 	}
 
 	@Override

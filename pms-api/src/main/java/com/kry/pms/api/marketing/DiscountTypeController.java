@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 @RestController
 @RequestMapping(path = "/api/v1/marketing/discountType")
@@ -38,6 +39,15 @@ public class DiscountTypeController extends BaseController<DiscountType> {
 		HttpResponse<PageResponse<DiscountType>> rep = new HttpResponse<PageResponse<DiscountType>>();
 		PageRequest<DiscountType> req = parse2PageRequest(request);
 		return rep.addData(discountTypeService.listPage(req));
+	}
+
+	@GetMapping(path = "/list")
+	public HttpResponse<List<DiscountType>> list(HttpServletRequest request) {
+		HttpResponse hr = new HttpResponse();
+		HttpResponse<List<DiscountType>> rep = new HttpResponse<List<DiscountType>>();
+		List<DiscountType> list = discountTypeService.getAllByHotelCode(getCurrentHotleCode());
+		hr.setData(list);
+		return hr;
 	}
 
 }

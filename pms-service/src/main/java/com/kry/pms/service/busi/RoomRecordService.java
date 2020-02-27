@@ -12,7 +12,9 @@ import com.kry.pms.service.BaseService;
 
 public interface RoomRecordService extends BaseService<RoomRecord> {
 
-	void createRoomRecord(CheckInRecord cir);
+    void deleteTrue(String id);
+
+    void createRoomRecord(CheckInRecord cir);
 	void dailyVerify(String hotelCode, LocalDate recordDate, DailyVerify dv);
 	void checkOut(List<CheckInRecord> crs);
 

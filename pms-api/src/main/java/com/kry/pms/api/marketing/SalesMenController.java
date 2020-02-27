@@ -1,22 +1,16 @@
 package com.kry.pms.api.marketing;
 
-import javax.servlet.http.HttpServletRequest;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.kry.pms.api.BaseController;
 import com.kry.pms.base.HttpResponse;
 import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
 import com.kry.pms.model.persistence.marketing.SalesMen;
 import com.kry.pms.service.marketing.SalesMenService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 @RestController
 @RequestMapping(path = "/api/v1/marketing/salesMen")
@@ -45,6 +39,13 @@ public class SalesMenController extends BaseController<SalesMen> {
 		HttpResponse<PageResponse<SalesMen>> rep = new HttpResponse<PageResponse<SalesMen>>();
 		PageRequest<SalesMen> req = parse2PageRequest(request);
 		return rep.addData(salesMenService.listPage(req));
+	}
+
+	@GetMapping(path = "/list")
+	public HttpResponse<List<SalesMen>> getByHotelCode(HttpServletRequest request){
+		HttpResponse<List<SalesMen>> rep = new HttpResponse<List<SalesMen>>();
+		List<SalesMen> list = salesMenService.getAllByHotelCode(getCurrentHotleCode());
+		return rep.addData(list);
 	}
 
 }

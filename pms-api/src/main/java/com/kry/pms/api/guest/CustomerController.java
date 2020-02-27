@@ -34,6 +34,11 @@ public class CustomerController extends BaseController<Customer> {
 		return getDefaultResponse().addData(customerService.modify(customer));
 	}
 
+	@PutMapping(path = "/salesStrategy")
+	public HttpResponse<Customer> salesStrategy(@RequestBody Customer customer) {
+		return getDefaultResponse().addData(customerService.salesStrategy(customer));
+	}
+
 	@DeleteMapping
 	public HttpResponse<String> delete(String id) {
 		HttpResponse<String> rep = new HttpResponse<>();

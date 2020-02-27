@@ -72,6 +72,11 @@ public class RoomRecordServiceImpl implements RoomRecordService {
 	}
 
 	@Override
+	public void deleteTrue(String id) {
+		roomRecordDao.deleteById(id);
+	}
+
+	@Override
 	public RoomRecord modify(RoomRecord roomRecord) {
 		return roomRecordDao.saveAndFlush(roomRecord);
 	}

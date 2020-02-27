@@ -108,11 +108,28 @@ public class RoomPriceSchemeController extends BaseController<RoomPriceScheme> {
 	 * @Date: 2020/2/18 10:56
 	 */
 	@GetMapping(path = "/listIsShow")
-	public HttpResponse<RoomPriceScheme> list(String isShow) {
+	public HttpResponse<RoomPriceScheme> listIsShow(String isShow) {
 		HttpResponse hr = new HttpResponse();
 		List<RoomPriceScheme> list = roomPriceSchemeService.findByHotelCodeAndIsShowAndDeleted(getCurrentHotleCode(), isShow);
 		hr.setData(list);
 		return hr;
 	}
+
+	@GetMapping(path = "/list")
+	public HttpResponse<RoomPriceScheme> list() {
+		HttpResponse hr = new HttpResponse();
+		List<RoomPriceScheme> list = roomPriceSchemeService.findByHotelCodeAndDeleted(getCurrentHotleCode());
+		hr.setData(list);
+		return hr;
+	}
+
+	@GetMapping(path = "/getByCustomerId")
+	public HttpResponse<RoomPriceScheme> getByCustomerId(String id) {
+		HttpResponse hr = new HttpResponse();
+		List<RoomPriceScheme> list = roomPriceSchemeService.getByCustomerId(id);
+		hr.setData(list);
+		return hr;
+	}
+
 
 }

@@ -66,5 +66,11 @@ public interface RoomPriceSchemeDao extends BaseDao<RoomPriceScheme>{
     Map<String, Object> roomTypeAndPriceScheme(@Param("roomTypeId")String roomTypeId, @Param("roomPriceSchemeId")String roomPriceSchemeId);
 
 
+    List<RoomPriceScheme> findByHotelCodeAndDeleted(String hotelCode, int deletedFalse);
 
+    @Query(nativeQuery = true, value = " select tr.* " +
+            " from t_customer_room_price_schemes t, t_room_price_scheme tr " +
+            " where t.room_price_schemes_id = tr.id " +
+            " and t.customer_id = ?1")
+    List<RoomPriceScheme> getByCustomerId(String custId);
 }
