@@ -264,13 +264,13 @@ public class ReceptionServiceImpl implements ReceptionService {
 				group.setRoomStatus(cir.getStatus());
 				group.setSettleType(Constants.Type.SETTLE_TYPE_GROUP);
 				asv.getChildren().add(group);
-				asv.getChildren().addAll((checkInRecordService.getAccountSummaryByOrderNum(cir.getOrderNum(),
+				asv.getChildren().addAll((checkInRecordService.getAccountSummaryByOrderNum2(cir.getOrderNum(),
 						Constants.Type.CHECK_IN_RECORD_CUSTOMER)));
 				break;
 			case Constants.Type.CHECK_IN_RECORD_CUSTOMER:
 				if (cir.getRoomLinkId() == null) {// 散客
 					Collection<AccountSummaryVo> data = checkInRecordService
-							.getAccountSummaryByOrderNum(cir.getOrderNum(), Constants.Type.CHECK_IN_RECORD_CUSTOMER);
+							.getAccountSummaryByOrderNum2(cir.getOrderNum(), Constants.Type.CHECK_IN_RECORD_CUSTOMER);
 					if (data != null && !data.isEmpty()) {
 						asv = (AccountSummaryVo) data.toArray()[0];
 					}

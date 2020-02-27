@@ -686,7 +686,6 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                 Constants.DELETED_FALSE);
         return checkInRecordToAccountSummaryVo(cirs);
     }
-    @Override
     public Collection<AccountSummaryVo> getAccountSummaryByOrderNum2(String orderNum, String type) {
         List<AccountSummaryVo> list = checkInRecordDao.querySummeryByOrderNumAndTypeAndDeleted(orderNum, type, Constants.DELETED_FALSE);
         return accountListToTree(list);
