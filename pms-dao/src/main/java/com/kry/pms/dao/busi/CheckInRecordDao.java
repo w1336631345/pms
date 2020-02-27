@@ -1,6 +1,7 @@
 package com.kry.pms.dao.busi;
 
 import com.kry.pms.dao.BaseDao;
+import com.kry.pms.model.http.response.busi.AccountSummaryVo;
 import com.kry.pms.model.persistence.busi.CheckInRecord;
 import com.kry.pms.model.persistence.room.GuestRoom;
 import org.springframework.data.domain.Page;
@@ -154,5 +155,12 @@ public interface CheckInRecordDao extends BaseDao<CheckInRecord> {
 			" from t_checkin_record tcr " +
 			" where tcr.deleted = ?1 and tcr.hotel_code = ?2  and tcr.guest_room_id = ?3 ")
 	int countTogetherRoom(int deletedFalse, String hotelCode, String roomId);
+
+	@Query(value = "select new com.kry.pms.model.http.response.busi.AccountSummaryVo(b.orderNum, a.id, d.name,a.total, c.roomNum," +
+			"a.type, a.pay, a.cost, a.creditLimit, a.availableCreditLimit," +
+			"b.status, a.code, b.arriveTime, b.leaveTime,c.id) from Account a,CheckInRecord b,GuestRoom c,Customer d" +
+			" where b.account=a and b.guestRoom = c and a.customer = d and b.orderNum = ?1 and b.deleted=?3 and b.type=?2")
+	List<AccountSummaryVo> querySummeryByOrderNumAndTypeAndDeleted(String orderNum,String type, int deletedFalse);
+
 
 }

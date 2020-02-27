@@ -21,7 +21,9 @@ import java.util.List;
 import java.util.Map;
 
 public interface CheckInRecordService extends BaseService<CheckInRecord> {
-	
+
+	Collection<AccountSummaryVo> getAccountSummaryByOrderNum2(String orderNum, String type);
+
 	public PageResponse<CheckInRecordListVo> querySummaryList(PageRequest<CheckInRecord> req);
 
     @Transactional
@@ -138,7 +140,6 @@ public interface CheckInRecordService extends BaseService<CheckInRecord> {
 	public List<CheckInRecord> findByLinkId(String id);
 
     List<Map<String, Object>> getGroup(String hotelCode, String arriveTime, String leaveTime, String name_, String code_);
-
     void inGroup(String[] cId, String gId, Boolean isFollowGroup);
 
     void outGroup(String[] cId, String gId, Boolean isFollowGroup);
