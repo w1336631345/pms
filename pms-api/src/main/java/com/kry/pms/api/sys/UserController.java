@@ -96,6 +96,8 @@ public class UserController extends BaseController<User> {
 		HotelSummaryVo hsv = new HotelSummaryVo();
 		BeanUtils.copyProperties(hotel, hsv);
 		hsv.setWechatCodeUrl(hotel.getWechatCodeUrl());
+		hsv.setAddress(hotel.getAddress());
+		hsv.setMobile(hotel.getTel());
 		userInfoVo.setHotel(hsv);
 		userInfoVo.setEmployee(esv);
 		userInfoVo.setBusinessDate(businessSeqService.getBuinessDate(user.getHotelCode()));

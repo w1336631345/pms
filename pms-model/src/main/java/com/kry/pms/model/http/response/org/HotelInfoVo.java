@@ -17,6 +17,8 @@ import lombok.Setter;
 public class HotelInfoVo {
 	private String hotelName;
 	private String wechatCodeUrl;
+	private String address;
+	private String mobile;
 	private List<RoomType> roomTypes;
 	private List<DiscountScheme> discountSchemes;
 	private List<MarketingSources> marketingSources;
