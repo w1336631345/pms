@@ -26,4 +26,10 @@ public class DictData extends PersistenceModel {
     private Integer sortNum;//排序
     @Column
     private Boolean isGroupCode;//集团码
+    @Column
+    private String description1;
+    @Column
+    private String description2;
+    @Column
+    private String description3;
 }
