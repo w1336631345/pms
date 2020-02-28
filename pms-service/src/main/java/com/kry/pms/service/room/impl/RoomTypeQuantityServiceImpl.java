@@ -392,6 +392,7 @@ public class RoomTypeQuantityServiceImpl implements RoomTypeQuantityService {
 					rtpv.setSetMealName(MapUtils.getString(map, "setMealName"));
 					rtpv.setPurchasePrice(MapUtils.getDouble(map, "price"));
 				}
+				rtpv.setRoomCode(type.getCode());
 				rtpv.setPrice(type.getPrice());
 				rtpv.setRoomTypeName(type.getName());
 				rtpv.setRoomTypeId(type.getId());

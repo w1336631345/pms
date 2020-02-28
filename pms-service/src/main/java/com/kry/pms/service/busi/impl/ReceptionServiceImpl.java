@@ -218,7 +218,7 @@ public class ReceptionServiceImpl implements ReceptionService {
 				return rep;
 			}
 			rep = checkIn(cir);
-			// 是主单
+			// 不是主单，只要有人员入住，主单改为入住状态
 			if (!(Constants.Type.CHECK_IN_RECORD_GROUP).equals(cir.getType())) {
 				String mainRecordId = cir.getMainRecord().getId();
 				CheckInRecord cirMain = checkInRecordService.findById(mainRecordId);
@@ -321,11 +321,11 @@ public class ReceptionServiceImpl implements ReceptionService {
 				return rep;
 			}
 			rep = checkIn(cir);
-			// 是主单G
+			// 不是主单G
 			if (!(Constants.Type.CHECK_IN_RECORD_GROUP).equals(cir.getType())) {
 				String mainRecordId = cir.getMainRecord().getId();
 				CheckInRecord cirMain = checkInRecordService.findById(mainRecordId);
-				if (!(Constants.Status.ACCOUNT_IN).equals(cirMain.getStatus())) {
+				if (!(Constants.Status.ACCOUNT_IN).equals(cirMain.getStatus())) {//主单如果不是入住状态，主单跟着入住
 					rep = checkIn(cirMain);
 				}
 			}

@@ -75,6 +75,14 @@ public class ReceptionController extends BaseController<String> {
 		BeanUtils.copyProperties(receptionService.checkInAll(ids), rep);
 		return rep;
 	}
+	/**
+	 * 功能描述: <br>入住（在用）
+	 * 〈〉
+	 * @Param: [id]
+	 * @Return: com.kry.pms.base.HttpResponse<java.lang.String>
+	 * @Author: huanghaibin
+	 * @Date: 2020/2/28 10:42
+	 */
 	@GetMapping(path = "/checkIn/{id}")
 	public HttpResponse<String> checkIn(@PathVariable String id) {
 		HttpResponse<String> rep = new HttpResponse<String>();

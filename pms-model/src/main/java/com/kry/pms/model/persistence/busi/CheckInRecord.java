@@ -101,7 +101,9 @@ public class CheckInRecord extends PersistenceModel {
 	@Column(name = "type_")
 	private String type;
 	@Column
-	private String groupType;// Y : 真是团队，N 散客团队
+	private String groupType;// Y : 真是团队，N 散客
+	@Column
+	private String fitType;//散客类别 T：散客团， P 散客
 	@ManyToOne
 	private Group group;// 团队信息
 	@OneToOne(cascade = CascadeType.PERSIST)
@@ -145,17 +147,22 @@ public class CheckInRecord extends PersistenceModel {
 	private List<Arrangement> arrangements;//房间布置
 	@Column
 	private Boolean isSecrecy;//房价是否保密
+
+	@Transient
+	private String isGOrU;//预订来至团队（G）还是多人（U）
+
+	public String getFitType() { return fitType; }
+	public void setFitType(String fitType) { this.fitType = fitType; }
+	public String getIsGOrU() { return isGOrU; }
+	public void setIsGOrU(String isGOrU) { this.isGOrU = isGOrU; }
 	public Boolean getIsSecrecy() { return isSecrecy; }
 	public void setIsSecrecy(Boolean isSecrecy) { this.isSecrecy = isSecrecy; }
-
 	public LocalDateTime getActualTimeOfArrive() { return actualTimeOfArrive; }
 	public void setActualTimeOfArrive(LocalDateTime actualTimeOfArrive) { this.actualTimeOfArrive = actualTimeOfArrive; }
 	public LocalDateTime getActualTimeOfLeave() { return actualTimeOfLeave; }
 	public void setActualTimeOfLeave(LocalDateTime actualTimeOfLeave) { this.actualTimeOfLeave = actualTimeOfLeave; }
-
 	public List<Arrangement> getArrangements() { return arrangements; }
 	public void setArrangements(List<Arrangement> arrangements) { this.arrangements = arrangements; }
-
 	public Integer getAdultCount() { return adultCount; }
 	public void setAdultCount(Integer adultCount) { this.adultCount = adultCount; }
 	public Integer getChildCount() { return childCount; }

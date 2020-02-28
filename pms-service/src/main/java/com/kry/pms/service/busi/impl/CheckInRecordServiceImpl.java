@@ -475,25 +475,31 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
     @Override
     @Transactional
     public CheckInRecord singleRoom(CheckInRecord checkInRecord) {
-        GuestRoom gr = guestRoomService.findById(checkInRecord.getGuestRoom().getId());
-        Customer customer = null;
-        if (checkInRecord.getCustomer() == null) {
-            customer = customerService.createTempCustomer(checkInRecord.getHotelCode(), gr.getRoomNum() + "#1");
+        if(checkInRecord.getGuestRoom() != null){
+            checkInRecord.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_ASSIGN);
+            GuestRoom gr = guestRoomService.findById(checkInRecord.getGuestRoom().getId());
+            Customer customer = null;
+            if (checkInRecord.getCustomer() == null) {
+                customer = customerService.createTempCustomer(checkInRecord.getHotelCode(), gr.getRoomNum() + "#1");
+            }
+            Account account = accountService.createAccount(customer, gr.getRoomNum());
+            checkInRecord.setAccount(account);
+            checkInRecord.setCustomer(customer);
+            checkInRecord.setCheckInCount(1);
+            checkInRecord.setType(Constants.Type.CHECK_IN_RECORD_CUSTOMER);
+        }else {
+            checkInRecord.setType(Constants.Type.CHECK_IN_RECORD_RESERVE);
+            checkInRecord.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION);
         }
-        checkInRecord.setCustomer(customer);
         String orderNum = businessSeqService.fetchNextSeqNum(checkInRecord.getHotelCode(),
                 Constants.Key.BUSINESS_ORDER_NUM_SEQ_KEY);
         checkInRecord.setOrderNum(orderNum);
         checkInRecord.setHumanCount(1);
-        checkInRecord.setCheckInCount(1);
         checkInRecord.setRoomCount(1);
         checkInRecord.setSingleRoomCount(1);
-        checkInRecord.setType(Constants.Type.CHECK_IN_RECORD_CUSTOMER);
-        checkInRecord.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_ASSIGN);
         checkInRecord.setGroupType(Constants.Type.CHECK_IN_RECORD_GROUP_TYPE_NO);
 
-        Account account = accountService.createAccount(customer, gr.getRoomNum());
-        checkInRecord.setAccount(account);
+
         CheckInRecord cir = add(checkInRecord);
 
         roomStatisticsService.reserve(new CheckInRecordWrapper(cir));
@@ -593,8 +599,13 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
         if (checkInRecord.getGroup() != null) {
             account.setGroup(checkInRecord.getGroup());
         }
-        account.setCode(businessSeqService.fetchNextSeqNum(checkInRecord.getHotelCode(), Constants.Key.BUSINESS_BUSINESS_GROUP_ACCOUNT_SEQ_KEY));
-        account.setType(Constants.Type.ACCOUNT_GROUP);
+        if((Constants.Type.CHECK_IN_RECORD_GROUP).equals(checkInRecord.getIsGOrU())){
+            account.setCode(businessSeqService.fetchNextSeqNum(checkInRecord.getHotelCode(), Constants.Key.BUSINESS_BUSINESS_GROUP_ACCOUNT_SEQ_KEY));
+            account.setType(Constants.Type.ACCOUNT_GROUP);
+        }else {
+            account.setCode(businessSeqService.fetchNextSeqNum(checkInRecord.getHotelCode(), Constants.Key.BUSINESS_BUSINESS_GROUP_CUSTOMER_ACCOUNT_SEQ_KEY));
+            account.setType(Constants.Type.ACCOUNT_GROUP_CUSTOMER);
+        }
         account.setName(checkInRecord.getName());
         checkInRecord.setAccount(account);
     }

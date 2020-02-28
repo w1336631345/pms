@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import lombok.Data;
 @Data
 public class RoomTypeQuantityPredictableVo {
+	private String roomCode;
 	private String roomTypeName;
 	private LocalDate startDate;
 	private LocalDate endDate;
