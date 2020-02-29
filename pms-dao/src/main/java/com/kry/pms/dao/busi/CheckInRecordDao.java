@@ -162,5 +162,52 @@ public interface CheckInRecordDao extends BaseDao<CheckInRecord> {
 			" where b.account=a and b.guestRoom = c and a.customer = d and b.orderNum = ?1 and b.deleted=?3 and b.type=?2")
 	List<AccountSummaryVo> querySummeryByOrderNumAndTypeAndDeleted(String orderNum,String type, int deletedFalse);
 
+	@Query(nativeQuery = true, value = " select \n" +
+			" tcr.id, \n" +
+			" tcr.name_ name, \n" +
+			" tcr.status, \n" +
+			" tcr.order_num orderNum, \n" +
+			" tcr.order_type orderType, \n" +
+			" tcr.human_count humanCount, \n" +
+			" tcr.room_count roomCount, \n" +
+			" tcr.chrildren_count chrildrenCount, \n" +
+			" DATE_FORMAT(tcr.arrive_time,'%Y-%m-%d %T') arriveTime, \n" +
+			" DATE_FORMAT(tcr.leave_time,'%Y-%m-%d %T') leaveTime, \n" +
+			" tcr.days, \n" +
+			" tcr.hold_time holdTime,\n" +
+			" tcr.type_ type, \n" +
+			" tcr.contact_name contactName, \n" +
+			" tcr.contact_mobile contactMobile, \n" +
+			" tcr.protocol_corpation_id, \n" +
+			" tpc.`name` corpName, \n" +
+			" tcr.remark, \n" +
+			" tcr.group_type groupType, \n" +
+			" tcr.room_link_id roomLinkId, \n" +
+			" DATE_FORMAT(tcr.create_date,'%Y-%m-%d %T') createDate, \n" +
+			" tsm.`name` setMealName, \n" +
+			" trp.`name` roomPriceSchemeName \n" +
+			" from t_checkin_record tcr left join t_customer tc on tcr.customer_id = tc.id \n" +
+			" left join t_protocol_corpation tpc on tcr.protocol_corpation_id = tpc.id \n" +
+			" left join t_set_meal tsm on tcr.set_meal_id = tsm.id \n" +
+			" left join t_room_price_scheme trp on tcr.room_price_scheme_id = trp.id \n" +
+			" where tcr.deleted = 0 \n" +
+			" and if(:hotelCode is not null && :hotelCode != '', tcr.hotel_code=:hotelCode, 1=1 )  \n" +
+			" and (if(:tType is not null && :tType != '', tcr.type_=:tType, 1=2 ) OR if(:fitType is not null && :fitType != '', tcr.fit_type=:fitType, 1=2 ))  \n" +
+			" and if(:status is not null && :status != '', if(:fitType = 'P', tcr.status in (:status,'R'), tcr.status=:status ), 1=1 ) \n" +
+			" and if(:groupType is not null && :groupType != '',  tcr.group_type=:groupType, 1=1 ) ",
+			countQuery = " select \n" +
+					" count(tcr.id) \n" +
+					" from t_checkin_record tcr left join t_customer tc on tcr.customer_id = tc.id \n" +
+					" left join t_protocol_corpation tpc on tcr.protocol_corpation_id = tpc.id \n" +
+					" left join t_set_meal tsm on tcr.set_meal_id = tsm.id \n" +
+					" left join t_room_price_scheme trp on tcr.room_price_scheme_id = trp.id \n" +
+					" where tcr.deleted = 0 \n" +
+					" and if(:hotelCode is not null && :hotelCode != '', tcr.hotel_code=:hotelCode, 1=1 )  \n" +
+					" and (if(:tType is not null && :tType != '', tcr.type_=:tType, 1=2 ) OR if(:fitType is not null && :fitType != '', tcr.fit_type=:fitType, 1=2 ))  \n" +
+					" and if(:status is not null && :status != '', if(:fitType = 'P', tcr.status in (:status,'R'), tcr.status=:status ), 1=1 ) \n" +
+					" and if(:groupType is not null && :groupType != '',  tcr.group_type=:groupType, 1=1 ) ")
+	Page<Map<String, Object>> resverList(Pageable page, @Param("hotelCode") String hotelCode, @Param("tType") String type, @Param("fitType") String fitType,
+										 @Param("status") String status, @Param("groupType") String groupType);
+
 
 }

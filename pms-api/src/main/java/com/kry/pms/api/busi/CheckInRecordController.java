@@ -255,11 +255,33 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
 		PageRequest<CheckInRecord> req = parse2PageRequest(request);
 		return rep.addData(checkInRecordService.listPage(req));
 	}
+	/**
+	 * 功能描述: <br>预订列表（old）
+	 * 〈〉
+	 * @Param: [request]
+	 * @Return: com.kry.pms.base.HttpResponse<com.kry.pms.base.PageResponse<com.kry.pms.model.http.response.busi.CheckInRecordListVo>>
+	 * @Author: huanghaibin
+	 * @Date: 2020/2/29 14:54
+	 */
 	@GetMapping(path = "/summary")
 	public HttpResponse<PageResponse<CheckInRecordListVo>> querySummaryList(HttpServletRequest request) throws InstantiationException, IllegalAccessException{
 		HttpResponse<PageResponse<CheckInRecordListVo>> rep = new HttpResponse<PageResponse<CheckInRecordListVo>>();
 		PageRequest<CheckInRecord> req = parse2PageRequest(request);
 		return rep.addData(checkInRecordService.querySummaryList(req));
+	}
+	/**
+	 * 功能描述: <br>预订列表（new）
+	 * 〈〉
+	 * @Param: [request]
+	 * @Return: com.kry.pms.base.HttpResponse<com.kry.pms.base.PageResponse<com.kry.pms.model.http.response.busi.CheckInRecordListVo>>
+	 * @Author: huanghaibin
+	 * @Date: 2020/2/29 14:55
+	 */
+	@GetMapping(path = "/summaryTo")
+	public HttpResponse<PageResponse<Map<String, Object>>> querySummaryListTo(HttpServletRequest request) throws InstantiationException, IllegalAccessException{
+		HttpResponse<PageResponse<Map<String, Object>>> rep = new HttpResponse<PageResponse<Map<String, Object>>>();
+		PageRequest<CheckInRecord> req = parse2PageRequest(request);
+		return rep.addData(checkInRecordService.querySummaryListTo(req));
 	}
 
 	/**

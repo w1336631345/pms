@@ -74,7 +74,9 @@ public interface CheckInRecordService extends BaseService<CheckInRecord> {
 
 	public List<CheckInRecord> findByOrderNumC(String orderNum);
 
-	public List<CheckInRecord> findByOrderNum(String orderNum);
+    PageResponse<Map<String, Object>> querySummaryListTo(PageRequest<CheckInRecord> prq);
+
+    public List<CheckInRecord> findByOrderNum(String orderNum);
 
 	List<Map<String, Object>> findByOrderNum2(String hotelCode,String orderNum);
 
