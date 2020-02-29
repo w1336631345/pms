@@ -25,4 +25,5 @@ public class HotelInfoVo {
 	private List<DistributionChannel> distributionChannels;
 	private List<RoomTag> roomTags;
 	private Map<String,String> configs;
+	private Map<String,Map<String,String>> dict;
 }

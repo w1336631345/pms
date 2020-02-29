@@ -2,6 +2,7 @@ package com.kry.pms.service.org.impl;
 
 import java.util.List;
 
+import com.kry.pms.service.dict.DictDataService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Sort;
@@ -40,6 +41,8 @@ public class HotelServiceImpl implements HotelService {
 	RoomTagService roomTagService;
 	@Autowired
 	SystemConfigService systemConfigService;
+	@Autowired
+	DictDataService dictDataService;
 
 	@Override
 	public Hotel add(Hotel hotel) {
@@ -99,6 +102,7 @@ public class HotelServiceImpl implements HotelService {
 		hv.setRoomTags(roomTagService.getAllByHotelCode(currentHotleCode,Constants.DELETED_FALSE));
 		hv.setConfigs(systemConfigService.getWebConfig(currentHotleCode));
 		hv.setDistributionChannels(distributionChannelService.getAllByHotelCode(currentHotleCode,Constants.DELETED_FALSE));
+		hv.setDict(dictDataService.getWebDict(currentHotleCode));
 		return hv;
 	}
 	
