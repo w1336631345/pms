@@ -67,8 +67,4 @@ public class  RoomTagServiceImpl implements  RoomTagService{
 	public List<RoomTag> getAllByHotelCode(String currentHotleCode, int deleted) {
 		return roomTagDao.findByHotelCodeAndDeleted(currentHotleCode,deleted);
 	}
-	 
-	 
-	 
-	 
 }

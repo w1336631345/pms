@@ -27,6 +27,8 @@ public class DictData extends PersistenceModel {
     @Column
     private Boolean isGroupCode;//集团码
     @Column
+    private Integer safeLevel;
+    @Column
     private String description1;
     @Column
     private String description2;
