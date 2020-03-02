@@ -33,6 +33,7 @@ public class RoomPriceSchemeVo {
 				item = new SchemeItemVo();
 				BeanUtils.copyProperties(i, item);
 				item.setRoomTypeId(i.getRoomType().getId());
+				item.setRoomTypePrice(i.getRoomType().getPrice());
 				if (i.getSetMeal() != null) {
 					smv = new SetMealVo();
 					BeanUtils.copyProperties(i.getSetMeal(),smv);

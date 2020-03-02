@@ -311,7 +311,6 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
             arrangements.add(cir.getArrangements().get(i));
         }
         for (int i = 1; i <= humanCount; i++) {
-
             CheckInRecord ncir = null;
             try {
                 ncir = (CheckInRecord) cir.clone();
@@ -341,8 +340,17 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
             }
             ncir.setHumanCount(1);
             ncir.setDemands(tags);
-            ncir.setPersonalPrice(cir.getPurchasePrice());
-            ncir.setPersonalPercentage(1.0);
+            if(i == 1){//排房时，一房多人，默认第一个人承担房价，后面人承担0
+                ncir.setOriginalPrice(gr.getRoomType().getPrice());//原价
+                ncir.setPersonalPrice(cir.getPurchasePrice());
+                ncir.setPersonalPercentage(1.0);
+            }else {
+                ncir.setOriginalPrice(0.0);
+                ncir.setPersonalPrice(0.0);
+                ncir.setPersonalPercentage(0.0);
+            }
+//            ncir.setPersonalPrice(cir.getPurchasePrice());
+//            ncir.setPersonalPercentage(1.0);
             ncir.setId(null);
             ncir.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_ASSIGN);
             ncir.setCustomer(customer);
@@ -393,6 +401,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                     item.setDays(checkInRecord.getDays());
                     item.setContactName(checkInRecord.getContactName());
 //					item.setMarketEmployee(checkInRecord.getMarketEmployee());
+                    item.setPersonalPrice(item.getPurchasePrice());
                     item.setSalesMen(checkInRecord.getSalesMen());
                     item.setMarketingSources(checkInRecord.getMarketingSources());
                     item.setDistributionChannel(checkInRecord.getDistributionChannel());
@@ -1246,6 +1255,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
             checkInRecord.setStatus(status);
         }
         // 新增同住默认房价为零
+        checkInRecord.setOriginalPrice(0.0);
         checkInRecord.setPersonalPrice(0.0);
         checkInRecord.setPersonalPercentage(0.0);
         checkInRecord.setCustomer(customer);
@@ -1277,13 +1287,15 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
             CheckInRecord cir = list.get(i);
             String custId = cir.getCustomer().getId();
             if (!customerId.equals(custId)) {
+                cir.setOriginalPrice(0.0);
                 cir.setPersonalPrice(0.0);
-                cir.setPersonalPercentage(1.0);
-                update(cir);
+                cir.setPersonalPercentage(0.0);
             } else {
+                cir.setOriginalPrice(cir.getPurchasePrice());
                 cir.setPersonalPrice(cir.getPurchasePrice());
                 cir.setPersonalPercentage(1.0);// 因为是独单房价，占比1
             }
+            update(cir);
 
         }
     }
@@ -1296,14 +1308,17 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
         if (list != null && !list.isEmpty()) {
             int peopleCount = list.size();
             Double roomPrice = list.get(0).getPurchasePrice();
+            Double oPrice = list.get(0).getOriginalPrice();
             DecimalFormat df = new DecimalFormat("####0.00");
             Double avg = roomPrice / peopleCount;
             Double personalPrice = Double.parseDouble(df.format(avg));
             Double personalPercentage = Double.parseDouble(df.format(1 / peopleCount));
+            Double originalPrice = Double.parseDouble(df.format(oPrice/peopleCount));
             for (int i = 0; i < list.size(); i++) {
                 CheckInRecord cir = list.get(i);
                 cir.setPersonalPrice(personalPrice);
                 cir.setPersonalPercentage(personalPercentage);
+                cir.setOriginalPrice(originalPrice);
                 update(cir);
             }
         }
