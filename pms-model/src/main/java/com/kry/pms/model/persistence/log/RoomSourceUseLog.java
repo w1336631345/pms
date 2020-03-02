@@ -21,6 +21,7 @@ public class RoomSourceUseLog {
     private LocalDateTime logTime;
     private Integer roomCount;
     private String roomType;
+    private String operationName;
     private String roomNum;
     private String summaryInfo;
     private String businessKey;
@@ -31,7 +32,8 @@ public class RoomSourceUseLog {
 
     }
 
-    public RoomSourceUseLog(UseInfoAble info) {
+    public RoomSourceUseLog(UseInfoAble info,String operationName) {
+        this.operationName = operationName;
         this.logTime = LocalDateTime.now();
         this.roomCount = info.getRoomCount();
         if(info.roomType()!=null){
