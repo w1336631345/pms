@@ -42,6 +42,9 @@ public class CheckInRecordVo {
 			cirv.setProtocolCorpationId(cir.getProtocolCorpation().getId());
 			cirv.setProtocolCorpationName(cir.getProtocolCorpation().getName());
 		}
+		if(cir.getActualTimeOfLeave()!=null){
+			cirv.setArriveTime(cir.getActualTimeOfArrive());
+		}
 		return cirv;
 
 	}

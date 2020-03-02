@@ -12,120 +12,127 @@ import java.time.LocalDateTime;
 
 public class CheckInRecordWrapper implements UseInfoAble {
 
-	private CheckInRecord checkInRecord;
+    private CheckInRecord checkInRecord;
 
-	public CheckInRecordWrapper(CheckInRecord checkInRecord) {
-		this.checkInRecord = checkInRecord;
-	}
+    public CheckInRecordWrapper(CheckInRecord checkInRecord) {
+        this.checkInRecord = checkInRecord;
+    }
 
-	@JsonIgnore
-	@Override
-	public String getSummaryInfo() {
-		return this.checkInRecord.getName();
-	}
+    @JsonIgnore
+    @Override
+    public String getSummaryInfo() {
+        return this.checkInRecord.getName();
+    }
 
-	@JsonIgnore
-	@Override
-	public String getBusinessKey() {
-		return this.checkInRecord.getOrderNum();
-	}
+    @JsonIgnore
+    @Override
+    public String getBusinessKey() {
+        return this.checkInRecord.getOrderNum();
+    }
 
-	@JsonIgnore
-	@Override
-	public boolean isGroup() {
-		return this.checkInRecord.getGroupType().equals(Constants.Type.CHECK_IN_RECORD_GROUP_TYPE_YES);
-	}
+    @JsonIgnore
+    @Override
+    public boolean isGroup() {
+        return this.checkInRecord.getGroupType().equals(Constants.Type.CHECK_IN_RECORD_GROUP_TYPE_YES);
+    }
 
-	@JsonIgnore
-	@Override
-	public boolean isOTA() {
-		if (this.checkInRecord.getMarketingSources() != null) {
-			return this.checkInRecord.getMarketingSources().getName().equals("OTA");
-		}
-		return false;
-	}
+    @JsonIgnore
+    @Override
+    public boolean isOTA() {
+        if (this.checkInRecord.getMarketingSources() != null) {
+            return this.checkInRecord.getMarketingSources().getName().equals("OTA");
+        }
+        return false;
+    }
 
-	@JsonIgnore
-	@Override
-	public boolean isFree() {
-		return false;
-	}
+    @JsonIgnore
+    @Override
+    public boolean isFree() {
+        return false;
+    }
 
-	@JsonIgnore
-	@Override
-	public boolean isHourRoom() {
-		return false;
-	}
+    @JsonIgnore
+    @Override
+    public boolean isHourRoom() {
+        return false;
+    }
 
-	@JsonIgnore
-	@Override
-	public boolean isArrears() {
-		if (this.checkInRecord.getAccount() != null) {
-			return this.checkInRecord.getAccount().getTotal() < 0;
-		}
-		return false;
-	}
+    @JsonIgnore
+    @Override
+    public boolean isArrears() {
+        if (this.checkInRecord.getAccount() != null) {
+            return this.checkInRecord.getAccount().getTotal() < 0;
+        }
+        return false;
+    }
 
-	@Override
-	public LocalDateTime getStartTime() {
-		return this.checkInRecord.getArriveTime();
-	}
+    @Override
+    public LocalDateTime getStartTime() {
+        if (this.checkInRecord.getActualTimeOfArrive() != null) {
+            return this.checkInRecord.getActualTimeOfArrive();
+        } else {
+            return this.checkInRecord.getArriveTime();
+        }
+    }
 
-	@Override
-	public LocalDateTime getEndTime() {
-		return this.checkInRecord.getLeaveTime();
-	}
+    @Override
+    public LocalDateTime getEndTime() {
+        if(this.checkInRecord.getActualTimeOfLeave()!=null){
+            return this.checkInRecord.getActualTimeOfLeave();
+        }
+        return this.checkInRecord.getLeaveTime();
+    }
 
-	@JsonIgnore
-	@Override
-	public boolean isTodayLeave() {
-		if (this.checkInRecord.getLeaveTime() != null) {
-			return this.checkInRecord.getLeaveTime().toLocalDate().isEqual(LocalDate.now());
-		}
-		return false;
-	}
+    @JsonIgnore
+    @Override
+    public boolean isTodayLeave() {
+        if (this.checkInRecord.getLeaveTime() != null) {
+            return this.checkInRecord.getLeaveTime().toLocalDate().isEqual(LocalDate.now());
+        }
+        return false;
+    }
 
-	@JsonIgnore
-	@Override
-	public boolean isTodayArrive() {
-		if (this.checkInRecord.getArriveTime() != null) {
-			return this.checkInRecord.getLeaveTime().toLocalDate().isEqual(LocalDate.now());
-		}
-		return false;
-	}
+    @JsonIgnore
+    @Override
+    public boolean isTodayArrive() {
+        if (this.checkInRecord.getArriveTime() != null) {
+            return this.checkInRecord.getLeaveTime().toLocalDate().isEqual(LocalDate.now());
+        }
+        return false;
+    }
 
-	@JsonIgnore
-	@Override
-	public RoomType roomType() {
-		return this.checkInRecord.getRoomType();
-	}
+    @JsonIgnore
+    @Override
+    public RoomType roomType() {
+        return this.checkInRecord.getRoomType();
+    }
 
-	@JsonIgnore
-	@Override
-	public GuestRoom guestRoom() {
-		return this.checkInRecord.getGuestRoom();
-	}
+    @JsonIgnore
+    @Override
+    public GuestRoom guestRoom() {
+        return this.checkInRecord.getGuestRoom();
+    }
 
-	@Override
-	public Integer getRoomCount() {
+    @Override
+    public Integer getRoomCount() {
 
-		return checkInRecord.getRoomCount();
-	}
+        return checkInRecord.getRoomCount();
+    }
 
-	@Override
-	public String getRoomStatus() {
-		if (checkInRecord.getStatus() != null) {
-			switch (checkInRecord.getStatus()) {
-			case Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN:
-				return Constants.Status.ROOM_STATUS_OCCUPY_CLEAN;
-			case Constants.Status.CHECKIN_RECORD_STATUS_OUT_UNSETTLED:
-				return Constants.Status.ROOM_STATUS_VACANT_DIRTY;
-			case Constants.Status.CHECKIN_RECORD_STATUS_CHECK_OUT:
-				return Constants.Status.ROOM_STATUS_VACANT_DIRTY;
-			case Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION:
-				return Constants.Status.ROOM_STATUS_VACANT_CLEAN;
-			}
-		}
-		return null;
-	}
+    @Override
+    public String getRoomStatus() {
+        if (checkInRecord.getStatus() != null) {
+            switch (checkInRecord.getStatus()) {
+                case Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN:
+                    return Constants.Status.ROOM_STATUS_OCCUPY_CLEAN;
+                case Constants.Status.CHECKIN_RECORD_STATUS_OUT_UNSETTLED:
+                    return Constants.Status.ROOM_STATUS_VACANT_DIRTY;
+                case Constants.Status.CHECKIN_RECORD_STATUS_CHECK_OUT:
+                    return Constants.Status.ROOM_STATUS_VACANT_DIRTY;
+                case Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION:
+                    return Constants.Status.ROOM_STATUS_VACANT_CLEAN;
+            }
+        }
+        return null;
+    }
 }
