@@ -416,7 +416,7 @@ public class GuestRoomStatusServiceImpl implements GuestRoomStatusService {
 	public void changeStatus(UseInfoAble info) {
 		GuestRoomStatus status = guestRoomStatusDao.findByGuestRoomId(info.guestRoom().getId());
 		if (status != null) {
-			if (info.getStartTime().isBefore(LocalDateTime.now())) {
+			if (!info.getStartTime().isAfter(LocalDateTime.now())) {
 				if (info.getRoomStatus() != null) {
 					if (Constants.Status.ROOM_STATUS_OCCUPY_CLEAN.equals(info.getRoomStatus())) {
 						status.setFree(info.isFree());
