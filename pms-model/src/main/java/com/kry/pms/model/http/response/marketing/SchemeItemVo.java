@@ -7,6 +7,7 @@ import lombok.Data;
 public class SchemeItemVo{
 	SetMealVo extrs;
 	String roomTypeId;
+	Double roomTypePrice;
 	private Double price;
 	String id;
 

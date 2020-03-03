@@ -165,6 +165,7 @@ public interface CheckInRecordDao extends BaseDao<CheckInRecord> {
 	@Query(nativeQuery = true, value = " select \n" +
 			" tcr.id, \n" +
 			" tcr.name_ name, \n" +
+			" ta.`code` accountCode, \n" +
 			" tcr.status, \n" +
 			" tcr.order_num orderNum, \n" +
 			" tcr.order_type orderType, \n" +
@@ -190,10 +191,11 @@ public interface CheckInRecordDao extends BaseDao<CheckInRecord> {
 			" left join t_protocol_corpation tpc on tcr.protocol_corpation_id = tpc.id \n" +
 			" left join t_set_meal tsm on tcr.set_meal_id = tsm.id \n" +
 			" left join t_room_price_scheme trp on tcr.room_price_scheme_id = trp.id \n" +
+			" left join t_account ta on tcr.account_id = ta.id \n" +
 			" where tcr.deleted = 0 \n" +
 			" and if(:hotelCode is not null && :hotelCode != '', tcr.hotel_code=:hotelCode, 1=1 )  \n" +
 			" and (if(:tType is not null && :tType != '', tcr.type_=:tType, 1=2 ) OR if(:fitType is not null && :fitType != '', tcr.fit_type=:fitType, 1=2 ))  \n" +
-			" and if(:status is not null && :status != '', if(:fitType = 'P', tcr.status in (:status,'R'), tcr.status=:status ), 1=1 ) \n" +
+			" and if(:status is not null && :status != '', if(:status = 'A', tcr.status in (:status,'R'), tcr.status=:status ), 1=1 ) \n" +
 			" and if(:groupType is not null && :groupType != '',  tcr.group_type=:groupType, 1=1 ) ",
 			countQuery = " select \n" +
 					" count(tcr.id) \n" +
@@ -201,10 +203,11 @@ public interface CheckInRecordDao extends BaseDao<CheckInRecord> {
 					" left join t_protocol_corpation tpc on tcr.protocol_corpation_id = tpc.id \n" +
 					" left join t_set_meal tsm on tcr.set_meal_id = tsm.id \n" +
 					" left join t_room_price_scheme trp on tcr.room_price_scheme_id = trp.id \n" +
+					" left join t_account ta on tcr.account_id = ta.id \n" +
 					" where tcr.deleted = 0 \n" +
 					" and if(:hotelCode is not null && :hotelCode != '', tcr.hotel_code=:hotelCode, 1=1 )  \n" +
 					" and (if(:tType is not null && :tType != '', tcr.type_=:tType, 1=2 ) OR if(:fitType is not null && :fitType != '', tcr.fit_type=:fitType, 1=2 ))  \n" +
-					" and if(:status is not null && :status != '', if(:fitType = 'P', tcr.status in (:status,'R'), tcr.status=:status ), 1=1 ) \n" +
+					" and if(:status is not null && :status != '', if(:status = 'A', tcr.status in (:status,'R'), tcr.status=:status ), 1=1 ) \n" +
 					" and if(:groupType is not null && :groupType != '',  tcr.group_type=:groupType, 1=1 ) ")
 	Page<Map<String, Object>> resverList(Pageable page, @Param("hotelCode") String hotelCode, @Param("tType") String type, @Param("fitType") String fitType,
 										 @Param("status") String status, @Param("groupType") String groupType);

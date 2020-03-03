@@ -81,6 +81,8 @@ public class CheckInRecord extends PersistenceModel {
 	@Column
 	private LocalDate startDate;// 开始时间
 	@Column
+	private Double originalPrice;//原价
+	@Column
 	private Double purchasePrice;// 成交价格
 	@Column
 	private Double personalPrice;// 个人承担价格
@@ -151,6 +153,8 @@ public class CheckInRecord extends PersistenceModel {
 	@Transient
 	private String isGOrU;//预订来至团队（G）还是多人（U）
 
+	public Double getOriginalPrice() { return originalPrice; }
+	public void setOriginalPrice(Double originalPrice) { this.originalPrice = originalPrice; }
 	public String getFitType() { return fitType; }
 	public void setFitType(String fitType) { this.fitType = fitType; }
 	public String getIsGOrU() { return isGOrU; }
