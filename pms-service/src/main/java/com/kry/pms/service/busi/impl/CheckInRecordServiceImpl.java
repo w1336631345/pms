@@ -3,6 +3,7 @@ package com.kry.pms.service.busi.impl;
 import com.kry.pms.base.*;
 import com.kry.pms.dao.busi.CheckInRecordDao;
 import com.kry.pms.dao.busi.RoomLinkDao;
+import com.kry.pms.dao.marketing.RoomPriceSchemeDao;
 import com.kry.pms.model.http.request.busi.*;
 import com.kry.pms.model.http.response.busi.AccountSummaryVo;
 import com.kry.pms.model.http.response.busi.CheckInRecordListVo;
@@ -11,6 +12,7 @@ import com.kry.pms.model.persistence.busi.Arrangement;
 import com.kry.pms.model.persistence.busi.CheckInRecord;
 import com.kry.pms.model.persistence.busi.RoomLink;
 import com.kry.pms.model.persistence.busi.RoomRecord;
+import com.kry.pms.model.persistence.goods.SetMeal;
 import com.kry.pms.model.persistence.guest.Customer;
 import com.kry.pms.model.persistence.room.GuestRoom;
 import com.kry.pms.model.persistence.room.RoomTag;
@@ -28,6 +30,7 @@ import com.kry.pms.service.sys.BusinessSeqService;
 import com.kry.pms.service.sys.SqlTemplateService;
 import com.kry.pms.service.sys.SystemConfigService;
 import com.kry.pms.service.util.UpdateUtil;
+import org.apache.commons.collections4.MapUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
@@ -72,6 +75,8 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
     RoomLinkDao roomLinkDao;
     @Autowired
     SqlTemplateService sqlTemplateService;
+    @Autowired
+    RoomPriceSchemeDao roomPriceSchemeDao;
 
     @Override
     public CheckInRecord add(CheckInRecord checkInRecord) {
@@ -119,9 +124,13 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                 if(!dbCir.getRoomPriceScheme().getId().equals(checkInRecord.getRoomPriceScheme().getId())){
                     for (int i = 0; i < children.size(); i++) {
                         CheckInRecord cir = children.get(i);
+                        Map<String, Object> map = roomPriceSchemeDao.roomTypeAndPriceScheme(cir.getRoomType().getId(), checkInRecord.getRoomPriceScheme().getId());
+                        String setMealId = MapUtils.getString(map, "setMealId");
+                        SetMeal sm = new SetMeal();
+                        sm.setId(setMealId);
                         //修改所有主单下数据的房价码与包价
                         cir.setRoomPriceScheme(checkInRecord.getRoomPriceScheme());
-                        cir.setSetMeal(checkInRecord.getSetMeal());
+                        cir.setSetMeal(sm);
                         checkInRecordDao.saveAndFlush(cir);
                     }
                 }
@@ -543,7 +552,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                 Constants.Key.BUSINESS_ORDER_NUM_SEQ_KEY);
         checkInRecord.setOrderNum(orderNum);
         if(checkInRecord.getHumanCount() != null ){
-            checkInRecord.setSingleRoomCount(checkInRecord.getRoomCount());
+            checkInRecord.setSingleRoomCount(checkInRecord.getHumanCount());
         }else {
             checkInRecord.setHumanCount(1);
             checkInRecord.setSingleRoomCount(1);
@@ -1029,10 +1038,10 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                 roomStatisticsService.cancleAssign(new CheckInRecordWrapper(cir));//再取消排房
             }
             int together = checkInRecordDao.countTogetherRoom(Constants.DELETED_FALSE, cir.getHotelCode(), cir.getGuestRoom().getId());
-                if (together == 0) {//表明房间没有人住，需要释放资源
+                if (together == 1) {//表明房间没有人住，需要释放资源
                 roomStatisticsService.cancleReserve(new CheckInRecordWrapper(cir));
-                roomCount = roomCount + 1;
             }
+            roomCount = roomCount + 1;
             //需要删除roomRecord的记录
             List<RoomRecord> list = roomRecordService.findByHotelCodeAndCheckInRecord(cir.getHotelCode(), cir.getId());
             for(int r=0; r<list.size(); r++){
