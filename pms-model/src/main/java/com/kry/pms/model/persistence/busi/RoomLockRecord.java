@@ -80,6 +80,12 @@ public class RoomLockRecord extends PersistenceModel implements UseInfoAble{
 	public GuestRoom guestRoom() {
 		return getGuestRoom();
 	}
+
+	@Override
+	public String uniqueId() {
+		return getId();
+	}
+
 	@Override
 	public Integer getRoomCount() {
 		return 1;

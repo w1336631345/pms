@@ -7,7 +7,7 @@ import com.kry.pms.model.persistence.room.RoomType;
 
 public interface UseInfoAble {
 	
-	
+	public String uniqueId();
 	public Integer getRoomCount();
 
 	public boolean isTodayLeave();

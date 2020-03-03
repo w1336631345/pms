@@ -77,10 +77,30 @@ public interface RoomUsageService extends BaseService<RoomUsage> {
 	 */
 	boolean changeUseStatus(GuestRoom gr, String businessKey, String status);
 
-	public boolean checkIn(UseInfoAble info);
+	/**
+	 *
+	 * @param gr 客房
+	 * @param businessKey 可共用资源的编码
+	 * @param unique 唯一编码
+	 * @param status
+	 * @return
+	 */
+	boolean changeUseStatus(GuestRoom gr, String businessKey,String unique, String status);
 
 	public boolean freeCheck(GuestRoom gr, LocalDateTime startTime, LocalDateTime endDateTime);
 
 	boolean unUse(GuestRoom gr, String businessKey, LocalDateTime endTime, String roomTypeUsage);
+
+    public boolean checkIn(UseInfoAble info);
+
+	public boolean cancleCheckIn(UseInfoAble info);
+
+	public boolean assignRoom(UseInfoAble info);
+
+    public boolean cancleAssignRoom(UseInfoAble info);
+
+    public boolean checkOut(UseInfoAble info);
+
+    public boolean cancleCheckOut(UseInfoAble info);
 
 }

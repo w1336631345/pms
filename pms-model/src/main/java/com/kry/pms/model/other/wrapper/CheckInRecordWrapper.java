@@ -114,6 +114,11 @@ public class CheckInRecordWrapper implements UseInfoAble {
     }
 
     @Override
+    public String uniqueId() {
+        return this.checkInRecord.getId();
+    }
+
+    @Override
     public Integer getRoomCount() {
 
         return checkInRecord.getRoomCount();

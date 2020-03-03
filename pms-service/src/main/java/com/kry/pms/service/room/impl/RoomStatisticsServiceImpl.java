@@ -41,15 +41,14 @@ public class RoomStatisticsServiceImpl implements RoomStatisticsService {
 
 	@Override
 	public boolean assignRoom(UseInfoAble info) {
-		roomUsageService.use(info.guestRoom(), Constants.Status.ROOM_USAGE_ASSIGN, info.getStartTime(),
-				info.getEndTime(), info.getBusinessKey(), info.getSummaryInfo());
+		roomUsageService.assignRoom(info);
 		guestRoomStatusService.changeStatus(info);
 		return true;
 	}
 
 	@Override
 	public boolean cancleAssign(UseInfoAble info) {
-		roomUsageService.unUse(info.guestRoom(), info.getBusinessKey(), null, Constants.Status.ROOM_USAGE_RESERVATION);
+		roomUsageService.cancleAssignRoom(info);
 		guestRoomStatusService.changeStatus(info);
 		return true;
 	}
@@ -77,7 +76,7 @@ public class RoomStatisticsServiceImpl implements RoomStatisticsService {
 	@Override
 	public boolean cancleCheckIn(UseInfoAble info) {
 		// 未判断是否为同时离开
-		roomUsageService.changeUseStatus(info.guestRoom(), info.getBusinessKey(), Constants.Status.ROOM_USAGE_ASSIGN);
+		roomUsageService.cancleCheckIn(info);
 		guestRoomStatusService.changeStatus(info);
 		return true;
 	}

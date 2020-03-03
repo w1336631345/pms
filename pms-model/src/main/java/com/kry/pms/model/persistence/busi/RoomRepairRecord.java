@@ -93,6 +93,11 @@ public class RoomRepairRecord extends PersistenceModel implements UseInfoAble {
 	}
 
 	@Override
+	public String uniqueId() {
+		return getId();
+	}
+
+	@Override
 	public Integer getRoomCount() {
 		return 1;
 	}

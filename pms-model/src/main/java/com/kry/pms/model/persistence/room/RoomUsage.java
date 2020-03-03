@@ -2,14 +2,10 @@ package com.kry.pms.model.persistence.room;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Set;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 import org.hibernate.annotations.GenericGenerator;
 
@@ -46,6 +42,8 @@ public class RoomUsage implements Serializable {
 	private String businessInfo;
 	@Column
 	private Long duration;
+	@ElementCollection
+	private Set<String> uniqueIds;
 
 	@Override
 	public Object clone() throws CloneNotSupportedException {
