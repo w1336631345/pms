@@ -209,8 +209,8 @@ public class RoomUsageServiceImpl implements RoomUsageService {
             if (endTime == null) {
                 endTime = ru.getStartDateTime();
             }
-            roomTypeQuantityService.changeRoomTypeQuantity(gr.getRoomType(), endTime.toLocalDate(),
-                    ru.getEndDateTime().toLocalDate(), ru.getUsageStatus(), roomTypeUsage, 1);
+//            roomTypeQuantityService.changeRoomTypeQuantity(gr.getRoomType(), endTime.toLocalDate(),
+//                    ru.getEndDateTime().toLocalDate(), ru.getUsageStatus(), roomTypeUsage, 1);
             if (!ru.getStartDateTime().isBefore(endTime)) { // 开始时间前释放资源 相当于直接取消
                 RoomUsage pru = ru.getPreRoomUsage();
                 RoomUsage npru = ru.getPostRoomUsage();
@@ -467,7 +467,7 @@ public class RoomUsageServiceImpl implements RoomUsageService {
                         unUse(info.guestRoom(),info.getBusinessKey(),LocalDateTime.now());
                     }
                 }
-                modify(ru);
+//                modify(ru);
             }
         }
         return true;
