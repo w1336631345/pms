@@ -215,8 +215,8 @@ public class GuestRoomServiceImpl implements GuestRoomService {
 			roomTypeService.modify(rt);
 
 			roomUsageDao.deleteByGuestRoom(gr);
-
-			guestRoomDao.delete(gr);
+			gr.setDeleted(Constants.DELETED_TRUE);
+			guestRoomDao.saveAndFlush(gr);
 
 		}
 		return rep;

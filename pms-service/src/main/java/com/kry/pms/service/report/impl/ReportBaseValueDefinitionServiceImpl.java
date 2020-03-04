@@ -62,8 +62,10 @@ public class  ReportBaseValueDefinitionServiceImpl implements  ReportBaseValueDe
 		}
 		return convent(reportBaseValueDefinitionDao.findAll(ex, req));
 	}
-	 
-	 
-	 
-	 
+
+
+	@Override
+	public List<ReportBaseValueDefinition> queryAfterNightAudt(String hotelCode) {
+		return reportBaseValueDefinitionDao.findByHotelCodeAndExecuteType(hotelCode,Constants.Key.EXECUTE_TYPE_AFTER_NIGHT_AUDT);
+	}
 }

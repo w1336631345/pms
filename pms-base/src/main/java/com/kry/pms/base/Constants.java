@@ -93,7 +93,8 @@ public class Constants {
 		public static final String TOGETHER_NUM_KEY = "TOGETHER_NUM";
 		public static final String CUSTOMER_NUM = "CUSTOMER_NUM";// 客户编码
 		public static final String BUSINESS_CANCLE_SETTLE_SEQ_KEY = "CANCLE_SETTLE_NUM";
-	}
+		public static final String EXECUTE_TYPE_AFTER_NIGHT_AUDT = "ANA";
+    }
 
 	public interface Type {
 

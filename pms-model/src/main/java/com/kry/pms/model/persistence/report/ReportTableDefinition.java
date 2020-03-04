@@ -12,9 +12,13 @@ import javax.persistence.Table;
 @Table(name = "t_report_table_definition")
 public class ReportTableDefinition extends PersistenceModel {
     @Column
-    private String name;
+    private String code;
     @Column
+    private String name;
+    @Column(name = "type_")
     private String type;
+    @Column
+    private String groupKey;
     @Column
     private String headerType;
     @Column

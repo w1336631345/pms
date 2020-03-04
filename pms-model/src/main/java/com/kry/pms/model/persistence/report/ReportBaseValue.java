@@ -21,8 +21,8 @@ public class ReportBaseValue extends PersistenceModel {
     private String name;
     @Column
     private String code;
-    @Column
+    @Column(name="key_")
     private String key;
-    @Column
+    @Column(name="value_")
     private Double value;
 }

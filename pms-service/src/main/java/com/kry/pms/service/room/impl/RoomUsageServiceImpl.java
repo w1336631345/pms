@@ -605,6 +605,7 @@ public class RoomUsageServiceImpl implements RoomUsageService {
                 } else {
                     RoomUsage npur = new RoomUsage();
                     BeanUtils.copyProperties(ru, npur);
+                    npur.setUniqueIds(null);
                     npur.setPostRoomUsage(ru.getPostRoomUsage());
                     ru.setEndDateTime(endTime);
                     ru.setBusinessInfo(businessInfo);
@@ -622,6 +623,7 @@ public class RoomUsageServiceImpl implements RoomUsageService {
                 if (ru.getEndDateTime().isEqual(endTime)) {
                     RoomUsage npur = new RoomUsage();
                     BeanUtils.copyProperties(ru, npur);
+                    npur.setUniqueIds(null);
                     ru.setEndDateTime(startTime);
                     updateDuration(ru);
                     npur.setStartDateTime(endTime);
@@ -639,6 +641,8 @@ public class RoomUsageServiceImpl implements RoomUsageService {
                     RoomUsage pru = new RoomUsage();
                     BeanUtils.copyProperties(ru, cru);
                     BeanUtils.copyProperties(ru, pru);
+                    cru.setUniqueIds(null);
+                    pru.setUniqueIds(null);
                     cru.setId(null);
                     cru.setStartDateTime(startTime);
                     cru.setEndDateTime(endTime);
