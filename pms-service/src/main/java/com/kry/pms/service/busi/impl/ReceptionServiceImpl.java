@@ -220,10 +220,12 @@ public class ReceptionServiceImpl implements ReceptionService {
 			rep = checkIn(cir);
 			// 不是主单，只要有人员入住，主单改为入住状态
 			if (!(Constants.Type.CHECK_IN_RECORD_GROUP).equals(cir.getType())) {
-				String mainRecordId = cir.getMainRecord().getId();
-				CheckInRecord cirMain = checkInRecordService.findById(mainRecordId);
-				if (!(Constants.Status.ACCOUNT_IN).equals(cirMain.getStatus())) {
-					rep = checkIn(cirMain);
+				if(cir.getMainRecord() != null){
+					String mainRecordId = cir.getMainRecord().getId();
+					CheckInRecord cirMain = checkInRecordService.findById(mainRecordId);
+					if (!(Constants.Status.ACCOUNT_IN).equals(cirMain.getStatus())) {
+						rep = checkIn(cirMain);
+					}
 				}
 			}
 		} else {
