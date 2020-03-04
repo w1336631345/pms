@@ -1,22 +1,16 @@
 package com.kry.pms.api.marketing;
 
-import javax.servlet.http.HttpServletRequest;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.kry.pms.api.BaseController;
 import com.kry.pms.base.HttpResponse;
 import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
 import com.kry.pms.model.persistence.marketing.DiscountScheme;
 import com.kry.pms.service.marketing.DiscountSchemeService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 @RestController
 @RequestMapping(path = "/api/v1/marketing/discountScheme")
@@ -45,6 +39,15 @@ public class DiscountSchemeController extends BaseController<DiscountScheme> {
 		HttpResponse<PageResponse<DiscountScheme>> rep = new HttpResponse<PageResponse<DiscountScheme>>();
 		PageRequest<DiscountScheme> req = parse2PageRequest(request);
 		return rep.addData(discountSchemeService.listPage(req));
+	}
+
+	@GetMapping(path = "/list")
+	public HttpResponse<List<DiscountScheme>> list(HttpServletRequest request) {
+		HttpResponse hr = new HttpResponse();
+		HttpResponse<List<DiscountScheme>> rep = new HttpResponse<List<DiscountScheme>>();
+		List<DiscountScheme> list = discountSchemeService.getAllByHotelCode(getCurrentHotleCode());
+		hr.setData(list);
+		return hr;
 	}
 
 }
