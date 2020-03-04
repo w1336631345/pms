@@ -1,6 +1,8 @@
 package com.kry.pms.service.busi.impl;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -209,6 +211,9 @@ public class ReceptionServiceImpl implements ReceptionService {
 	public DtoResponse<String> checkInM(String id) {
 		DtoResponse<String> rep = new DtoResponse<>();
 		CheckInRecord cir = checkInRecordService.findById(id);
+//		LocalDate businessDate = businessSeqService.getBuinessDate(cir.getHotelCode());
+//		DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
 		cir.setActualTimeOfArrive(LocalDateTime.now());
 		if (cir != null) {
 			// 预留单不能入住

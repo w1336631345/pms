@@ -53,4 +53,11 @@ public class CustomerController extends BaseController<Customer> {
 		return rep.addData(customerService.listPage(req));
 	}
 
+	@GetMapping(path = "/getNum")
+	public HttpResponse<String> getNum(){
+		HttpResponse<String> rep = new HttpResponse<String>();
+		String num = customerService.getNum(getCurrentHotleCode());
+		return rep.addData(num);
+	}
+
 }

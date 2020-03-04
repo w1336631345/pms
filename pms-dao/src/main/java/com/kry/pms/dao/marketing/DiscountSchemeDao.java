@@ -9,4 +9,5 @@ public interface DiscountSchemeDao extends BaseDao<DiscountScheme>{
 
 	List<DiscountScheme> findByHotelCodeAndDeleted(String currentHotleCode, int deleted);
 
+    List<DiscountScheme> findByHotelCode(String code);
 }

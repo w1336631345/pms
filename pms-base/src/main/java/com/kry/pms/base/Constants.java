@@ -108,6 +108,7 @@ public class Constants {
 		public static final String BUSINESS_SEQ_PDS = "PDS";
 		public static final String BUSINESS_SEQ_PS = "PS";
 		public static final String BUSINESS_SEQ_DS = "DS";
+		public static final String BUSINESS_SEQ_S = "S";
 
 		public static final String PRODUCT_TYPE_COST = "cost";
 		public static final String PRODUCT_TYPE_PAY = "pay";

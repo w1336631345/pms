@@ -146,6 +146,9 @@ public class BusinessSeqServiceImpl implements BusinessSeqService {
 			sb.append(bs.getPrefix());
 			sb.append(String.format(snf, bs.getCurrentSeq()));
 			break;
+		case Constants.Type.BUSINESS_SEQ_S:
+			sb.append(String.format(snf, bs.getCurrentSeq()));
+			break;
 		default:
 			break;
 		}

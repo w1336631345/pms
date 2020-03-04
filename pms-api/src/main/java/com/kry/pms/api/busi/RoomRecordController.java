@@ -21,6 +21,7 @@ import com.kry.pms.model.persistence.busi.RoomRecord;
 import com.kry.pms.service.busi.RoomRecordService;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping(path = "/api/v1/busi/roomRecord")
@@ -68,6 +69,21 @@ public class RoomRecordController extends BaseController<RoomRecord> {
 		}
 		List<RoomRecord> list = roomRecordService.findByHotelCodeAndCheckInRecord(user.getHotelCode(), checkInRecordId);
 		return rep.addData(list);
+	}
+
+	/**
+	 * 功能描述: <br>根据时间和入住记录id查询当日房价
+	 * 〈〉
+	 * @Param: [recordDate, checkInRecordId]
+	 * @Return: com.kry.pms.base.HttpResponse
+	 * @Author: huanghaibin
+	 * @Date: 2020/3/4 14:17
+	 */
+	@GetMapping(value = "/recordDateAndRoomPrice")
+	public HttpResponse recordDateAndRoomPrice(String recordDate, String checkInRecordId){
+		HttpResponse rep = new HttpResponse();
+		Map<String, Object> map = roomRecordService.recordDateAndRoomPrice(recordDate, checkInRecordId);
+		return rep.addData(map);
 	}
 
 }

@@ -46,8 +46,8 @@ public class  DiscountSchemeServiceImpl implements  DiscountSchemeService{
 
 	@Override
 	public List<DiscountScheme> getAllByHotelCode(String code) {
-		return null;//默认不实现
-		//return discountSchemeDao.findByHotelCode(code);
+//		return null;//默认不实现
+		return discountSchemeDao.findByHotelCodeAndDeleted(code, Constants.DELETED_FALSE);
 	}
 
 	@Override

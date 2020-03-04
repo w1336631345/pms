@@ -2,6 +2,7 @@ package com.kry.pms.service.busi;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 import com.kry.pms.base.PageResponse;
 import com.kry.pms.model.persistence.busi.CheckInRecord;
@@ -25,4 +26,6 @@ public interface RoomRecordService extends BaseService<RoomRecord> {
     List<RoomRecord> accountEntryListAll(String hotelCode, LocalDate businessDate);
 
     List<RoomRecord> findByHotelCodeAndCheckInRecord(String hotelCode, String checkInRecordId);
+
+    Map<String, Object> recordDateAndRoomPrice(String recordDate, String checkInRecordId);
 }

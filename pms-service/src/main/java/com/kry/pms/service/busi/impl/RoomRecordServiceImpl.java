@@ -207,4 +207,10 @@ public class RoomRecordServiceImpl implements RoomRecordService {
 		return list;
 	}
 
+	@Override
+	public Map<String, Object> recordDateAndRoomPrice(String recordDate, String checkInRecordId){
+		Map<String, Object> map = roomRecordDao.recordDateAndRoomPrice(recordDate, checkInRecordId);
+		return map;
+	}
+
 }

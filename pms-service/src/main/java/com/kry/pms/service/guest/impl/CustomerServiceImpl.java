@@ -7,6 +7,7 @@ import com.kry.pms.service.sys.BusinessSeqService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
@@ -38,6 +39,12 @@ public class CustomerServiceImpl implements CustomerService {
 			customer.setNumCode(num);
 		}
 		return customerDao.saveAndFlush(customer);
+	}
+
+	@Override
+	public String getNum(String hotelCode){
+		String num = businessSeqService.fetchNextSeqNum(hotelCode, Constants.Key.CUSTOMER_NUM);
+		return num;
 	}
 
 	@Override
@@ -81,6 +88,9 @@ public class CustomerServiceImpl implements CustomerService {
 
 	@Override
 	public PageResponse<Customer> listPage(PageRequest<Customer> prq) {
+//		ExampleMatcher matcher = ExampleMatcher.matching()
+//				.withMatcher("name" ,ExampleMatcher.GenericPropertyMatchers.contains())
+//				.withMatcher("address" ,ExampleMatcher.GenericPropertyMatchers.contains());
 		Example<Customer> ex = Example.of(prq.getExb());
 		org.springframework.data.domain.PageRequest req;
 		if (prq.getOrderBy() != null) {
