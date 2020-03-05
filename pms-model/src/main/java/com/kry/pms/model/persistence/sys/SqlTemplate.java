@@ -15,6 +15,8 @@ import lombok.Setter;
 @Table(name = "t_sql_template")
 public class SqlTemplate extends PersistenceModel {
 	@Column
+	private String code;
+	@Column
 	private String entityName;
 	@Column
 	private String methodName;

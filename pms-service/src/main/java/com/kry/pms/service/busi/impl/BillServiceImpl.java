@@ -400,9 +400,11 @@ public class BillServiceImpl implements BillService {
         offsetBill.setProduct(bill.getProduct());
         offsetBill.setAccount(bill.getAccount());
         offsetBill.setTotal(-bill.getTotal());
+        offsetBill.setCurrentSettleAccountRecordNum(recordNum);
         offsetBill.setTranferRemark("To " + targetAccount.getCode());
-        offsetBill.setStatus(Constants.Status.BILL_INVALID);
-        bill.setStatus(Constants.Status.BILL_INVALID);
+        offsetBill.setStatus(Constants.Status.BILL_SETTLED);
+        bill.setStatus(Constants.Status.BILL_SETTLED);
+        bill.setCurrentSettleAccountRecordNum(recordNum);
         modify(bill);
         offsetBill = add(offsetBill);
         return offsetBill;

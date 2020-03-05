@@ -9,15 +9,12 @@ import java.util.Map;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
-import org.hibernate.SQLQuery;
-import org.hibernate.query.NativeQuery;
 import org.hibernate.query.internal.NativeQueryImpl;
 import org.hibernate.transform.Transformers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
-import org.springframework.jdbc.object.SqlQuery;
 import org.springframework.stereotype.Service;
 
 import com.kry.pms.base.Constants;
@@ -138,4 +135,32 @@ public class SqlTemplateServiceImpl implements SqlTemplateService {
         return query.getResultList();
     }
 
+    @Override
+    public List<Map<String, Object>> processTemplateQuery(String templateName, String templateValue, Map<String, String[]> parmrs) throws IOException, TemplateException {
+        StringWriter stringWriter = new StringWriter();
+        Template template = new Template(templateName, templateValue, configuration);
+        template.process(parmrs, stringWriter);
+        String data = stringWriter.toString();
+        Query query = entityManager.createNativeQuery(data);
+        query.unwrap(NativeQueryImpl.class)
+                .setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
+        return query.getResultList();
+    }
+
+    @Override
+    public List<Map<String, Object>> processByCode(String hotelCode, String code, Map<String, Object> parmrs) throws IOException, TemplateException {
+        SqlTemplate st = sqlTemplateDao.findByHotelCodeAndCode(hotelCode, code);
+        if (st != null) {
+            String templateValue = st.getSql();
+            StringWriter stringWriter = new StringWriter();
+            Template template = new Template(hotelCode, templateValue, configuration);
+            template.process(parmrs, stringWriter);
+            String data = stringWriter.toString();
+            Query query = entityManager.createNativeQuery(data);
+            query.unwrap(NativeQueryImpl.class)
+                    .setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
+            return query.getResultList();
+        }
+        return null;
+    }
 }
