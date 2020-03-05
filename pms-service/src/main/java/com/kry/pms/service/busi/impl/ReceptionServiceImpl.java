@@ -235,7 +235,10 @@ public class ReceptionServiceImpl implements ReceptionService {
 				if(cir.getMainRecord() != null){
 					String mainRecordId = cir.getMainRecord().getId();
 					CheckInRecord cirMain = checkInRecordService.findById(mainRecordId);
-					if (!(Constants.Status.ACCOUNT_IN).equals(cirMain.getStatus())) {
+					if (!(Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN).equals(cirMain.getStatus())) {
+						if(cirMain.getActualTimeOfArrive() == null){
+							cirMain.setActualTimeOfArrive(LocalDateTime.now());
+						}
 						rep = checkIn(cirMain);
 					}
 				}
@@ -334,12 +337,16 @@ public class ReceptionServiceImpl implements ReceptionService {
 				rep.setMessage("预留单不能入住");
 				return rep;
 			}
+			cir.setActualTimeOfArrive(LocalDateTime.now());
 			rep = checkIn(cir);
 			// 不是主单G
 			if (!(Constants.Type.CHECK_IN_RECORD_GROUP).equals(cir.getType())) {
 				String mainRecordId = cir.getMainRecord().getId();
 				CheckInRecord cirMain = checkInRecordService.findById(mainRecordId);
-				if (!(Constants.Status.ACCOUNT_IN).equals(cirMain.getStatus())) {//主单如果不是入住状态，主单跟着入住
+				if (!(Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN).equals(cirMain.getStatus())) {//主单如果不是入住状态，主单跟着入住
+				    if(cirMain.getActualTimeOfArrive() == null){
+                        cirMain.setActualTimeOfArrive(LocalDateTime.now());
+                    }
 					rep = checkIn(cirMain);
 				}
 			}
