@@ -1,5 +1,7 @@
 package com.kry.pms.service.sys.impl;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -8,6 +10,9 @@ import java.util.Map;
 
 import javax.transaction.Transactional;
 
+import com.kry.pms.dao.busi.RoomRecordDao;
+import com.kry.pms.service.busi.*;
+import org.apache.commons.collections4.MapUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
@@ -31,10 +36,6 @@ import com.kry.pms.model.persistence.busi.SettleAccountRecord;
 import com.kry.pms.model.persistence.guest.Customer;
 import com.kry.pms.model.persistence.org.Employee;
 import com.kry.pms.model.persistence.sys.Account;
-import com.kry.pms.service.busi.BillService;
-import com.kry.pms.service.busi.CheckInRecordService;
-import com.kry.pms.service.busi.CreditGrantingRecordService;
-import com.kry.pms.service.busi.SettleAccountRecordService;
 import com.kry.pms.service.sys.AccountService;
 import com.kry.pms.service.sys.BusinessSeqService;
 import com.kry.pms.util.BigDecimalUtil;
@@ -53,6 +54,8 @@ public class AccountServiceImpl implements AccountService {
 	CheckInRecordService checkInRecordService;
 	@Autowired
 	BusinessSeqService businessSeqService;
+	@Autowired
+	RoomRecordDao roomRecordDao;
 
 	@Override
 	public Account add(Account account) {
@@ -301,10 +304,21 @@ public class AccountServiceImpl implements AccountService {
 
 	@Override
 	public DtoResponse<Double> queryRoomPrice(String id) {
+		Double result = 0.0;
 		DtoResponse<Double> rep = new DtoResponse<Double>();
 		CheckInRecord cir = checkInRecordService.queryByAccountId(id);
+		LocalDate now = LocalDate.now();
+		DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+		String date = now.format(fmt);
 		if (cir != null) {
-			return rep.addData(cir.getPurchasePrice() == null ? 0.0 : cir.getPurchasePrice());
+			Map<String, Object> map = roomRecordDao.recordDateAndRoomPrice(date, cir.getId());
+			Double price = MapUtils.getDouble(map, "room_price");
+			if(price != null){
+				result = price;
+			}else {
+				result = cir.getPersonalPrice();
+			}
+			return rep.addData(result);
 		} else {
 			rep.setStatus(Constants.BusinessCode.CODE_ILLEGAL_OPERATION);
 			rep.setMessage("找不到对应的订单");
