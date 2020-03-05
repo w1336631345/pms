@@ -12,21 +12,21 @@ import javax.persistence.Table;
 @Table(name = "t_report_table_definition")
 public class ReportTableDefinition extends PersistenceModel {
     @Column
-    private String code;
+    private String code;//编码
     @Column
-    private String name;
+    private String name;//名称
     @Column(name = "type_")
-    private String type;
+    private String type;//类型
     @Column
-    private String groupKey;
+    private String groupKey;//分组
     @Column
-    private String headerType;
+    private String headerType;//头部类型
     @Column
-    private String headerValue;
+    private String headerValue;//表头数据
     @Column
-    private String dataType;
+    private String dataType;//数据类型
     @Column
-    private String dataValue;
+    private String dataValue;//数据值
     @Column
     private String webTemplateType;
     @Column
@@ -36,5 +36,5 @@ public class ReportTableDefinition extends PersistenceModel {
     @Column
     private String exportTempleteType;
     @Column
-    private String params;
+    private String params;//参数 &
 }

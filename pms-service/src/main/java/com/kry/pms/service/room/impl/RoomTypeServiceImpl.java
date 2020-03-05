@@ -81,7 +81,7 @@ public class RoomTypeServiceImpl implements RoomTypeService {
 	@Override
 	public void plusRoomQuantity(RoomType roomType, int size) {
 		roomType = findById(roomType.getId());
-		roomType.setRoomCount(roomType.getRoomCount()==null?0:roomType.getRoomCount() + size);
+		roomType.setRoomCount(roomType.getRoomCount()==null?size:roomType.getRoomCount() + size);
 		roomTypeQuantityService.addRoomQuantity(roomType, size);
 
 	}
