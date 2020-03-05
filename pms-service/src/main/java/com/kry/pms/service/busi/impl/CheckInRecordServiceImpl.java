@@ -526,10 +526,13 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
             Customer customer = null;
             if (checkInRecord.getCustomer() == null) {
                 customer = customerService.createTempCustomer(checkInRecord.getHotelCode(), gr.getRoomNum() + "#1");
+            }else{
+                customer = customerService.findById(checkInRecord.getCustomer().getId());
             }
             Account account = accountService.createAccount(customer, gr.getRoomNum());
             checkInRecord.setAccount(account);
             checkInRecord.setCustomer(customer);
+            checkInRecord.setName(customer.getName());
             checkInRecord.setCheckInCount(1);
         }else {
             Customer customer = null;
@@ -542,9 +545,13 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                     customer = customerService.createTempCustomer(checkInRecord.getHotelCode(),  "No Room");
                     account = accountService.createAccount(customer, "No Room");
                 }
+            }else{
+                customer = customerService.findById(checkInRecord.getCustomer().getId());
+                account = accountService.createAccount(customer, "No Room");
             }
             checkInRecord.setAccount(account);
             checkInRecord.setCustomer(customer);
+            checkInRecord.setName(customer.getName());
             checkInRecord.setType(Constants.Type.CHECK_IN_RECORD_RESERVE);
             checkInRecord.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION);
         }

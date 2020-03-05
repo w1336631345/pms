@@ -211,9 +211,16 @@ public class ReceptionServiceImpl implements ReceptionService {
 	public DtoResponse<String> checkInM(String id) {
 		DtoResponse<String> rep = new DtoResponse<>();
 		CheckInRecord cir = checkInRecordService.findById(id);
-//		LocalDate businessDate = businessSeqService.getBuinessDate(cir.getHotelCode());
-//		DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-
+		LocalDate businessDate = businessSeqService.getBuinessDate(cir.getHotelCode());
+		DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+		LocalDateTime arriveTime = cir.getArriveTime();
+		String bDate = businessDate.format(fmt);
+		String aDate = arriveTime.format(fmt);
+		if(!bDate.equals(aDate)){
+			rep.setStatus(Constants.BusinessCode.CODE_PARAMETER_INVALID);
+			rep.setMessage("请核对营业日期与入住日期是否相同");
+			return  rep;
+		}
 		cir.setActualTimeOfArrive(LocalDateTime.now());
 		if (cir != null) {
 			// 预留单不能入住
