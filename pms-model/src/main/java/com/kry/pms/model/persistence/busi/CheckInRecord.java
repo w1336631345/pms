@@ -105,6 +105,8 @@ public class CheckInRecord extends PersistenceModel {
 	@Column
 	private String groupType;// Y : 真是团队，N 散客
 	@Column
+	private String groupName;//团队名称
+	@Column
 	private String fitType;//散客类别 T：散客团， P 散客
 	@ManyToOne
 	private Group group;// 团队信息
@@ -153,6 +155,8 @@ public class CheckInRecord extends PersistenceModel {
 	@Transient
 	private String isGOrU;//预订来至团队（G）还是多人（U）
 
+	public String getGroupName() { return groupName; }
+	public void setGroupName(String groupName) { this.groupName = groupName; }
 	public Double getOriginalPrice() { return originalPrice; }
 	public void setOriginalPrice(Double originalPrice) { this.originalPrice = originalPrice; }
 	public String getFitType() { return fitType; }

@@ -88,10 +88,10 @@ public class CustomerServiceImpl implements CustomerService {
 
 	@Override
 	public PageResponse<Customer> listPage(PageRequest<Customer> prq) {
-//		ExampleMatcher matcher = ExampleMatcher.matching()
-//				.withMatcher("name" ,ExampleMatcher.GenericPropertyMatchers.contains())
-//				.withMatcher("address" ,ExampleMatcher.GenericPropertyMatchers.contains());
-		Example<Customer> ex = Example.of(prq.getExb());
+		ExampleMatcher matcher = ExampleMatcher.matching()
+				.withMatcher("name" ,ExampleMatcher.GenericPropertyMatchers.contains())
+				.withMatcher("address" ,ExampleMatcher.GenericPropertyMatchers.contains());
+		Example<Customer> ex = Example.of(prq.getExb(),matcher);
 		org.springframework.data.domain.PageRequest req;
 		if (prq.getOrderBy() != null) {
 			Sort sort = new Sort(prq.isAsc() ? Direction.ASC : Direction.DESC, prq.getOrderBy());

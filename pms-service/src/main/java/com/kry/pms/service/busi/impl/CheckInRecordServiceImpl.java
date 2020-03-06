@@ -386,6 +386,10 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
             ncir.setGroupType(cir.getGroupType());// 设置分组类型（团队/散客）
 //			ncir.setReserveId(cir.getId());// 添加预留记录id
             ncir.setMainRecord(cir.getMainRecord());
+            //如果有主单，添加主单团名
+            if(cir.getMainRecord() != null){
+                ncir.setGroupName(cir.getMainRecord().getGroupName());
+            }
             ncir.setArrangements(arrangements);
             ncir = add(ncir);
             data.add(ncir);
@@ -403,6 +407,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
         String orderNum = businessSeqService.fetchNextSeqNum(checkInRecord.getHotelCode(),
                 Constants.Key.BUSINESS_ORDER_NUM_SEQ_KEY);
         checkInRecord.setOrderNum(orderNum);
+        checkInRecord.setGroupName(checkInRecord.getName());
         if (checkInRecord.getSubRecords() != null && !checkInRecord.getSubRecords().isEmpty()) {
 //			if (checkInRecord.getGroupType() != null
 //					&& checkInRecord.getGroupType().equals(Constants.Type.CHECK_IN_RECORD_GROUP_TYPE_YES)) {
@@ -501,11 +506,19 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
         checkInRecord.setGuestRoom(gr);
         checkInRecord.setHotelCode(gr.getHotelCode());
         String tempName = gr.getRoomNum();
-        Customer customer = customerService.createTempCustomer(gr.getHotelCode(), tempName + "#" + 1);
+        Customer customer = null;
+        if(checkInRecord.getCustomer() == null){
+            customer = customerService.createTempCustomer(gr.getHotelCode(), tempName + "#" + 1);
+        }else {
+            customer = checkInRecord.getCustomer();
+        }
         checkInRecord.setCustomer(customer);
         checkInRecord.setName(customer.getName());
-        Account account = accountService.createAccount(customer, null);
+        Account account = accountService.createAccount(customer, tempName);
         checkInRecord.setAccount(account);
+        if(Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN.equals(checkInRecord.getStatus())){
+            checkInRecord.setActualTimeOfArrive(LocalDateTime.now());
+        }
         CheckInRecord cir = add(checkInRecord);
         roomStatisticsService.reserve(new CheckInRecordWrapper(cir));
         if ((Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN).equals(checkInRecord.getStatus())) {

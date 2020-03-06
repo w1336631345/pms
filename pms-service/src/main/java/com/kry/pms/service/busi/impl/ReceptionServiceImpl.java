@@ -327,10 +327,23 @@ public class ReceptionServiceImpl implements ReceptionService {
 	}
 
 	@Override
+	@Transactional
 	public DtoResponse<String> checkInAll(String[] ids) {
 		DtoResponse<String> rep = new DtoResponse<>();
 		for (int i = 0; i < ids.length; i++) {
 			CheckInRecord cir = checkInRecordService.findById(ids[i]);
+			//判断是否是营业日期
+			LocalDate businessDate = businessSeqService.getBuinessDate(cir.getHotelCode());
+			DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+			LocalDateTime arriveTime = cir.getArriveTime();
+			String bDate = businessDate.format(fmt);
+			String aDate = arriveTime.format(fmt);
+			if(!bDate.equals(aDate)){
+				rep.setStatus(Constants.BusinessCode.CODE_PARAMETER_INVALID);
+				rep.setMessage("请核对营业日期与入住日期是否相同");
+				return  rep;
+			}
+			//
 			// 预留单不能入住R
 			if ((Constants.Type.CHECK_IN_RECORD_RESERVE).equals(cir.getType())) {
 				rep.setStatus(Constants.BusinessCode.CODE_PARAMETER_INVALID);
