@@ -491,7 +491,7 @@ public class RoomTypeQuantityServiceImpl implements RoomTypeQuantityService {
 	}
 
 	@Override
-	public List<Map<String, Object>> getByTimeAndRoomType2(String hotelCode, String times, String[] buildIds,
+	public List<Map<String, Object>> getByTimeAndRoomType2(String hotelCode, String startTimes, String endTime, String[] buildIds,
 			String[] roomTypeIds) {
 		List<String> bIds = null;
 		if (buildIds != null) {
@@ -522,7 +522,7 @@ public class RoomTypeQuantityServiceImpl implements RoomTypeQuantityService {
 					String room_type_id = MapUtils.getString(schmes.get(j), "room_type_id");
 					newMap.put("price_" + typeCode, price);
 					newMap.put("typeName_" + typeCode, roomTypeName);
-					Map<String, Object> tMap = roomTypeQuantityDao.mapByTimeAndRoomType2(hotelCode, times, bIds,
+					Map<String, Object> tMap = roomTypeQuantityDao.mapByTimeAndRoomType2(hotelCode, startTimes, endTime, bIds,
 							room_type_id);
 					if (tMap == null || tMap.isEmpty()) {
 						newMap.put("total_" + typeCode, 0);

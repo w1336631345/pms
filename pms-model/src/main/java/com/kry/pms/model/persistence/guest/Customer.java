@@ -64,8 +64,10 @@ public class Customer extends PersistenceModel {
 	private SalesMen salesMen;
 	@Column
 	private String numCode;//编号
-	@ManyToOne
-	private CustomerType customerType;//类型
+//	@ManyToOne
+//	private CustomerType customerType;//类型
+	@Column
+	private String customerType;//类型
 	@Column
 	private String education;//学历
 	@Column

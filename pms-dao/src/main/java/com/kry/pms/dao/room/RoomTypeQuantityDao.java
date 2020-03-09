@@ -54,15 +54,15 @@ public interface RoomTypeQuantityDao extends BaseDao<RoomTypeQuantity> {
 			" (select DISTINCT guest_room_id, usage_status " +
 			" from t_room_usage tru " +
 			" where 1=1" +
-			" and if(:times is not null && :times != '', DATE_FORMAT(start_date_time, '%Y-%m-%d %T') <=:times, 1=1 ) " +
-			" and if(:times is not null && :times != '', DATE_FORMAT(end_date_time, '%Y-%m-%d %T') >=:times, 1=1 ) " +
+			" and if(:times is not null && :times != '', DATE_FORMAT(start_date_time, '%Y-%m-%d %T') <=:startTime, 1=1 ) " +
+			" and if(:times is not null && :times != '', DATE_FORMAT(end_date_time, '%Y-%m-%d %T') >=:endTime, 1=1 ) " +
 			" and usage_status = 'F') t " +
 			" where tgr.id = t.guest_room_id and tgr.room_type_id = trt.id and tgr.building_id = tb.id " +
 			" and if(:hotelCode is not null && :hotelCode != '', tgr.hotel_code=:hotelCode, 1=1 ) " +
 			" and if(coalesce(:buildIds, null) is not null, tb.id in (:buildIds), 1=1 ) " +
 			" and if(:roomTypeId is not null && :roomTypeId != '', trt.id =:roomTypeId, 1=1 ) " +
 			" group by trt.id, trt.`name` " )
-	Map<String, Object> mapByTimeAndRoomType2(@Param("hotelCode")String hotelCode, @Param("times")String times,
+	Map<String, Object> mapByTimeAndRoomType2(@Param("hotelCode")String hotelCode, @Param("startTime")String startTime, @Param("endTime") String endTime,
 											  @Param("buildIds")List<String> buildIds, @Param("roomTypeId")String roomTypeId);
 
 	@Transactional
