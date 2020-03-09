@@ -2,11 +2,7 @@ package com.kry.pms.model.persistence.sys;
 
 import java.time.LocalDate;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
-import javax.persistence.Transient;
+import javax.persistence.*;
 
 import com.kry.pms.model.persistence.PersistenceModel;
 import com.kry.pms.model.persistence.busi.Group;
@@ -55,7 +51,7 @@ public class Account extends PersistenceModel {
 	private Employee operationEmployee;
 	@Column(columnDefinition = "varchar(255) COMMENT '操作员备注'")
 	private String operationRemark;
-	@OneToOne
+	@ManyToOne
 	private Customer customer;
 	@OneToOne
 	private Group group;
