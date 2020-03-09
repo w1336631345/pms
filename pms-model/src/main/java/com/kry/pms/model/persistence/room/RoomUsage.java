@@ -7,6 +7,9 @@ import java.util.Set;
 
 import javax.persistence.*;
 
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.GenericGenerator;
 
 import lombok.Getter;
@@ -43,6 +46,7 @@ public class RoomUsage implements Serializable {
 	@Column
 	private Long duration;
 	@ElementCollection
+	@Cascade(org.hibernate.annotations.CascadeType.REMOVE)
 	private Set<String> uniqueIds;
 
 	@Override
