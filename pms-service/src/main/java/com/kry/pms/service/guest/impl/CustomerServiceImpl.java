@@ -1,15 +1,16 @@
 package com.kry.pms.service.guest.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import com.kry.pms.model.persistence.busi.CheckInRecord;
 import com.kry.pms.model.persistence.marketing.RoomPriceScheme;
 import com.kry.pms.service.sys.BusinessSeqService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.ExampleMatcher;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import com.kry.pms.base.Constants;
@@ -22,6 +23,8 @@ import com.kry.pms.model.persistence.guest.Customer;
 import com.kry.pms.model.persistence.guest.GuestInfo;
 import com.kry.pms.service.guest.CustomerService;
 import com.kry.pms.service.guest.GuestInfoService;
+
+import javax.persistence.criteria.*;
 
 @Service
 public class CustomerServiceImpl implements CustomerService {
@@ -100,6 +103,28 @@ public class CustomerServiceImpl implements CustomerService {
 			req = org.springframework.data.domain.PageRequest.of(prq.getPageNum(), prq.getPageSize());
 		}
 		return convent(customerDao.findAll(ex, req));
+	}
+	@Override
+	public PageResponse<Customer> listPageQuery(PageRequest<Customer> prq) {
+		Pageable page = org.springframework.data.domain.PageRequest.of(prq.getPageNum(), prq.getPageSize());
+		Page<Customer> p = null;
+		if(("Y").equals(prq.getExb().getIsLike())){
+			p = customerDao.queryLike(page, prq.getExb().getName());
+		}else {
+			ExampleMatcher matcher = ExampleMatcher.matching()
+					.withMatcher("name" ,ExampleMatcher.GenericPropertyMatchers.contains())
+					.withMatcher("address" ,ExampleMatcher.GenericPropertyMatchers.contains());
+			Example<Customer> ex = Example.of(prq.getExb(),matcher);
+			org.springframework.data.domain.PageRequest req;
+			if (prq.getOrderBy() != null) {
+				Sort sort = new Sort(prq.isAsc() ? Direction.ASC : Direction.DESC, prq.getOrderBy());
+				req = org.springframework.data.domain.PageRequest.of(prq.getPageNum(), prq.getPageSize(), sort);
+			} else {
+				req = org.springframework.data.domain.PageRequest.of(prq.getPageNum(), prq.getPageSize());
+			}
+			p = customerDao.findAll(ex, req);
+		}
+		return convent(p);
 	}
 
 	@Override

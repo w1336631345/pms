@@ -53,6 +53,21 @@ public class CustomerController extends BaseController<Customer> {
 		return rep.addData(customerService.listPage(req));
 	}
 
+	/**
+	 * 功能描述: <br>客户档案的模糊查询
+	 * 〈〉
+	 * @Param: [request]
+	 * @Return: com.kry.pms.base.HttpResponse<com.kry.pms.base.PageResponse<com.kry.pms.model.persistence.guest.Customer>>
+	 * @Author: huanghaibin
+	 * @Date: 2020/3/9 17:31
+	 */
+	@GetMapping(path = "/queryLike")
+	public HttpResponse<PageResponse<Customer>> queryLike(HttpServletRequest request) throws InstantiationException, IllegalAccessException{
+		HttpResponse<PageResponse<Customer>> rep = new HttpResponse<PageResponse<Customer>>();
+		PageRequest<Customer> req = parse2PageRequest(request);
+		return rep.addData(customerService.listPageQuery(req));
+	}
+
 	@GetMapping(path = "/getNum")
 	public HttpResponse<String> getNum(){
 		HttpResponse<String> rep = new HttpResponse<String>();
