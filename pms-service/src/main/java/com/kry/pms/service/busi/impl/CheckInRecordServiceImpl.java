@@ -520,7 +520,8 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
             checkInRecord.setActualTimeOfArrive(LocalDateTime.now());
         }
         CheckInRecord cir = add(checkInRecord);
-        roomStatisticsService.reserve(new CheckInRecordWrapper(cir));
+        roomStatisticsService.reserve(new CheckInRecordWrapper(cir));//预订
+        roomStatisticsService.assignRoom(new CheckInRecordWrapper(cir));//排房
         if ((Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN).equals(checkInRecord.getStatus())) {
             roomStatisticsService.checkIn(new CheckInRecordWrapper(checkInRecord));
         }
