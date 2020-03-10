@@ -1,5 +1,7 @@
 package com.kry.pms.service.sys.impl;
 
+import com.kry.pms.base.PageRequest;
+import com.kry.pms.base.PageResponse;
 import com.kry.pms.service.sys.CommonQueryService;
 import com.kry.pms.service.sys.SqlTemplateService;
 import freemarker.template.TemplateException;
@@ -18,5 +20,10 @@ public class CommonQueryServiceImpl implements CommonQueryService {
     @Override
     public List<Map<String, Object>> commonQuery(String hotelCode, String code, Map<String, Object> parameterMap) throws IOException, TemplateException {
         return sqlTemplateService.processByCode(hotelCode, code, parameterMap);
+    }
+
+    @Override
+    public PageResponse<Map<String, Object>> commonPageQuery(String hotelCode, String code, PageRequest pageRequest) throws IOException, TemplateException {
+        return sqlTemplateService.queryForPage(hotelCode, code, pageRequest);
     }
 }

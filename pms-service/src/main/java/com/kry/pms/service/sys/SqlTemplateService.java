@@ -1,5 +1,7 @@
 package com.kry.pms.service.sys;
 
+import com.kry.pms.base.PageRequest;
+import com.kry.pms.base.PageResponse;
 import com.kry.pms.model.persistence.sys.SqlTemplate;
 import com.kry.pms.service.BaseService;
 import freemarker.template.TemplateException;
@@ -22,4 +24,6 @@ public interface SqlTemplateService extends BaseService<SqlTemplate> {
     List<Map<String, Object>> processTemplateQuery(String templateName, String templateValue, Map<String, String[]> parmrs) throws IOException, TemplateException;
 
     List<Map<String, Object>> processByCode(String hotelCode, String code, Map<String, Object> parmrs) throws IOException, TemplateException;
+
+    PageResponse<Map<String, Object>> queryForPage(String hotelCode, String code, PageRequest<Map<String, Object>> pageRequest) throws IOException, TemplateException;
 }

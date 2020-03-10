@@ -2,6 +2,7 @@ package com.kry.pms.api.sys;
 
 import com.kry.pms.api.BaseController;
 import com.kry.pms.base.HttpResponse;
+import com.kry.pms.base.PageResponse;
 import com.kry.pms.model.http.response.report.CommomReportTableData;
 import com.kry.pms.service.report.CommomReportService;
 import com.kry.pms.service.sys.CommonQueryService;
@@ -27,6 +28,12 @@ public class CommonQueryController extends BaseController {
     public HttpResponse<List<Map<String,Object>>> fetchData(@PathVariable("code") String id, HttpServletRequest request) throws IOException, TemplateException {
         HttpResponse<List<Map<String,Object>>> rep = new HttpResponse<>();
         rep.setData(commonQueryService.commonQuery(getCurrentHotleCode(),id, parse2Map(request)));
+        return rep;
+    }
+    @GetMapping("/page/{code}")
+    public HttpResponse<PageResponse<Map<String,Object>>> fetchPageData(@PathVariable("code") String id, HttpServletRequest request) throws IOException, TemplateException {
+        HttpResponse<PageResponse<Map<String,Object>>> rep = new HttpResponse<>();
+        rep.setData(commonQueryService.commonPageQuery(getCurrentHotleCode(),id, parse2CommonPageRequest(request)));
         return rep;
     }
 

@@ -23,6 +23,7 @@ import com.kry.pms.model.persistence.sys.User;
 import com.kry.pms.service.org.EmployeeService;
 import com.kry.pms.util.StringUtil;
 import com.kry.pms.utils.ShiroUtils;
+import org.springframework.http.HttpRequest;
 
 
 public class BaseController<T> {
@@ -223,5 +224,24 @@ public class BaseController<T> {
             }
         }
         return data;
+    }
+
+    public PageRequest<Map<String, Object>> parse2CommonPageRequest(HttpServletRequest request) {
+        PageRequest<Map<String, Object>> pr = new PageRequest<>();
+        Map<String, String[]> params = request.getParameterMap();
+        if (params.containsKey(Constants.KEY_PAGE_SIZE)) {
+            pr.setPageSize(Integer.valueOf(params.get(Constants.KEY_PAGE_SIZE)[0]));
+        }
+        if (params.containsKey(Constants.KEY_PAGE_NUM)) {
+            pr.setPageNum(Integer.valueOf(params.get(Constants.KEY_PAGE_NUM)[0]) - 1);
+        }
+        if (params.containsKey(Constants.KEY_ORDER)) {
+            pr.setOrderBy(Arrays.asList(params.get(Constants.KEY_ORDER)));
+        }
+        if (params.containsKey(Constants.KEY_SHORT_ASC)) {
+            pr.setAsc(Boolean.valueOf(params.get(Constants.KEY_SHORT_ASC)[0]));
+        }
+        pr.setExb((parse2Map(request)));
+        return pr;
     }
 }

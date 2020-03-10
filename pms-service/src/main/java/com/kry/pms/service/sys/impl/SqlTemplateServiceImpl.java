@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.kry.pms.util.SqlUtil;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
@@ -162,5 +163,32 @@ public class SqlTemplateServiceImpl implements SqlTemplateService {
             return query.getResultList();
         }
         return null;
+    }
+
+    @Override
+    public PageResponse<Map<String, Object>> queryForPage(String hotelCode, String code, PageRequest<Map<String, Object>> pageRequest) throws IOException, TemplateException {
+        SqlTemplate st = sqlTemplateDao.findByHotelCodeAndCode(hotelCode, code);
+        PageResponse<Map<String, Object>> rep = new PageResponse<>();
+        if (st != null) {
+            String templateValue = st.getSql();
+            StringWriter stringWriter = new StringWriter();
+            Template template = new Template(hotelCode, templateValue, configuration);
+            template.process(pageRequest.getExb(), stringWriter);
+            String data = stringWriter.toString();
+            String countSql = SqlUtil.getCountSQL(data);
+            Query countQuery = entityManager.createNativeQuery(countSql);
+            int count = Integer.parseInt(countQuery.getSingleResult().toString());
+            Query query = entityManager.createNativeQuery(data);
+            query.unwrap(NativeQueryImpl.class)
+                    .setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
+            rep.setTotal(count);
+            rep.setPageCount(count/pageRequest.getPageSize()+1);
+            rep.setCurrentPage(pageRequest.getPageNum()+1);
+            rep.setPageSize(pageRequest.getPageSize());
+            query.setFirstResult(pageRequest.getPageNum() * pageRequest.getPageSize());
+            query.setMaxResults(pageRequest.getPageSize());
+            rep.setContent(query.getResultList());
+        }
+        return rep;
     }
 }
