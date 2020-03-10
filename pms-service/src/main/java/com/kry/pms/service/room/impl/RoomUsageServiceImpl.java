@@ -443,12 +443,13 @@ public class RoomUsageServiceImpl implements RoomUsageService {
                 } else {
                     if (!ru.getUniqueIds().contains(info.uniqueId())) {
                         ru.getUniqueIds().add(info.uniqueId());
+                        modify(ru);
                     }
                 }
-                modify(ru);
             }
+            return true;
         }
-        return true;
+        return false;
     }
 
     @Override
