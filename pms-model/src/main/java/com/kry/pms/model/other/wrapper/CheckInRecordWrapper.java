@@ -9,6 +9,7 @@ import com.kry.pms.model.persistence.room.RoomType;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 public class CheckInRecordWrapper implements UseInfoAble {
 
@@ -68,19 +69,24 @@ public class CheckInRecordWrapper implements UseInfoAble {
 
     @Override
     public LocalDateTime getStartTime() {
+        LocalDate localDate = null;
         if (this.checkInRecord.getActualTimeOfArrive() != null) {
-            return this.checkInRecord.getActualTimeOfArrive();
+            localDate =  this.checkInRecord.getActualTimeOfArrive().toLocalDate();
         } else {
-            return this.checkInRecord.getArriveTime();
+            localDate =  this.checkInRecord.getArriveTime().toLocalDate();
         }
+        return LocalDateTime.of(localDate,LocalTime.NOON);
     }
 
     @Override
     public LocalDateTime getEndTime() {
-        if(this.checkInRecord.getActualTimeOfLeave()!=null){
-            return this.checkInRecord.getActualTimeOfLeave();
+        LocalDate localDate = null;
+        if (this.checkInRecord.getActualTimeOfLeave() != null) {
+            localDate = this.checkInRecord.getActualTimeOfLeave().toLocalDate();
+        }else{
+            localDate = this.checkInRecord.getLeaveTime().toLocalDate();
         }
-        return this.checkInRecord.getLeaveTime();
+        return LocalDateTime.of(localDate, LocalTime.NOON);
     }
 
     @JsonIgnore
