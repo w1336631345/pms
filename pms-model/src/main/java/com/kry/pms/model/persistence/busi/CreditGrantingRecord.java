@@ -33,6 +33,8 @@ public class CreditGrantingRecord extends PersistenceModel{
 	@Column
 	private LocalDate periodOfValidity;
 	@Column
+	private String payWay;
+	@Column
 	private Double grantingLimit;
 	@Column
 	private String cardNum;
