@@ -54,8 +54,8 @@ public interface RoomTypeQuantityDao extends BaseDao<RoomTypeQuantity> {
 			" (select DISTINCT guest_room_id, usage_status " +
 			" from t_room_usage tru " +
 			" where 1=1" +
-			" and if(:times is not null && :times != '', DATE_FORMAT(start_date_time, '%Y-%m-%d %T') <=:startTime, 1=1 ) " +
-			" and if(:times is not null && :times != '', DATE_FORMAT(end_date_time, '%Y-%m-%d %T') >=:endTime, 1=1 ) " +
+			" and if(:startTime is not null && :startTime != '', DATE_FORMAT(start_date_time, '%Y-%m-%d %T') <=:startTime, 1=1 ) " +
+			" and if(:endTime is not null && :endTime != '', DATE_FORMAT(end_date_time, '%Y-%m-%d %T') >=:endTime, 1=1 ) " +
 			" and usage_status = 'F') t " +
 			" where tgr.id = t.guest_room_id and tgr.room_type_id = trt.id and tgr.building_id = tb.id " +
 			" and if(:hotelCode is not null && :hotelCode != '', tgr.hotel_code=:hotelCode, 1=1 ) " +

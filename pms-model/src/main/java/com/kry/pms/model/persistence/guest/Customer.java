@@ -10,6 +10,7 @@ import com.kry.pms.model.persistence.busi.CheckInRecord;
 import com.kry.pms.model.persistence.marketing.ProtocolCorpation;
 import com.kry.pms.model.persistence.marketing.RoomPriceScheme;
 import com.kry.pms.model.persistence.marketing.SalesMen;
+import com.kry.pms.model.persistence.sys.Account;
 import com.kry.pms.model.persistence.sys.User;
 
 import lombok.Getter;
@@ -99,5 +100,11 @@ public class Customer extends PersistenceModel {
 
 	@ManyToMany
 	private List<RoomPriceScheme> roomPriceSchemes;//客户类型是团队才有的销售策略（房价方案）
+
+	@Transient
+	private String isLike;//是否是模糊查询(不映射数据库)'Y','N'
+	@OneToMany
+	@PrimaryKeyJoinColumn
+	private List<Account> account;//账户
 
 }
