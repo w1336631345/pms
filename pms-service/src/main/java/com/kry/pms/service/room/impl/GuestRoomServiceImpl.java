@@ -174,16 +174,8 @@ public class GuestRoomServiceImpl implements GuestRoomService {
 	@Transactional
 	public void addRoomRelated(GuestRoom gr) {
 		guestRoomStatusService.initNewGuestRoomStatus(gr);
-		// 上级处理
-//		RoomType rt = roomTypeService.findById(gr.getRoomType().getId());
-//		rt.setRoomCount(rt.getRoomCount()+1);
-//		roomTypeService.modify(rt);
-//		LocalDate date = LocalDate.now();
-//		DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-//		String dateStr = date.format(fmt);
-//		int i = roomTypeQuantityDao.updateAddTotal(gr.getRoomType().getId(), dateStr);
 		RoomUsage ru = new RoomUsage();
-		ru.setStartDateTime(LocalDateTime.now());
+		ru.setStartDateTime(LocalDateTime.of(LocalDate.now(),LocalTime.NOON));
 		ru.setEndDateTime(LocalDateTime.of(businessSeqService.getPlanDate(gr.getHotelCode()), LocalTime.MAX));
 		ru.setUsageStatus(Constants.Status.ROOM_USAGE_FREE);
 		long d = Duration.between(ru.getStartDateTime(), ru.getEndDateTime()).get(ChronoUnit.SECONDS);
