@@ -12,11 +12,13 @@ import com.kry.pms.model.http.response.busi.CheckInRecordListVo;
 import com.kry.pms.model.persistence.busi.CheckInRecord;
 import com.kry.pms.model.persistence.sys.User;
 import com.kry.pms.service.busi.CheckInRecordService;
+import freemarker.template.TemplateException;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -127,16 +129,37 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
 		rep.addData(checkInRecordService.findByOrderNum(orderNum));
 		return rep;
 	}
+	/**
+	 * 功能描述: <br>只查询宾客的数据（不查询主单和预订单）jpa关联查询，效率低，弃用
+	 * 〈〉
+	 * @Param: [orderNum]
+	 * @Return: com.kry.pms.base.HttpResponse<java.util.List<com.kry.pms.model.persistence.busi.CheckInRecord>>
+	 * @Author: huanghaibin
+	 * @Date: 2020/3/9 18:42
+	 */
 	@GetMapping(path="/orderNumC/{orderNum}")
 	public HttpResponse<List<CheckInRecord>> findDetailByOrderNumC(@PathVariable("orderNum") String orderNum){
 		HttpResponse<List<CheckInRecord>> rep = new HttpResponse<List<CheckInRecord>>();
 		rep.addData(checkInRecordService.findByOrderNumC(orderNum));
 		return rep;
 	}
+	/**
+	 * 功能描述: <br>只查询宾客的数据（不查询主单和预订单） 在用
+	 * 〈〉
+	 * @Param: [orderNum]
+	 * @Return: com.kry.pms.base.HttpResponse<java.util.List<java.util.Map<java.lang.String,java.lang.Object>>>
+	 * @Author: huanghaibin
+	 * @Date: 2020/3/10 10:25
+	 */
+	@GetMapping(path="/orderNumC2/{orderNum}")
+	public HttpResponse<List<Map<String, Object>>> findDetailByOrderNumCSQL(@PathVariable("orderNum") String orderNum) throws IOException, TemplateException {
+		HttpResponse<List<Map<String, Object>>> rep = new HttpResponse<List<Map<String, Object>>>();
+		rep.addData(checkInRecordService.findByOrderNumC2(getCurrentHotleCode(),orderNum));
+		return rep;
+	}
 	@GetMapping(path="/orderNum2/{orderNum}")
 	public HttpResponse<List<Map<String, Object>>> findDetailByOrderNumSQL(@PathVariable("orderNum") String orderNum){
 		HttpResponse<List<Map<String, Object>>> rep = new HttpResponse<List<Map<String, Object>>>();
-
 		rep.addData(checkInRecordService.findByOrderNum2(getCurrentHotleCode(),orderNum));
 		return rep;
 	}
@@ -442,6 +465,35 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
 		CheckInRecord cir = checkInRecordService.updateReserve(checkInRecord);
 		hr.addData(cir);
 		return hr.ok();
+	}
+
+	/**
+	 * 功能描述: <br>单独查询房间布置（防止一次查询效率低问题）
+	 * 〈〉
+	 * @Param: [checkInId]
+	 * @Return: com.kry.pms.base.HttpResponse<java.util.List<java.lang.String>>
+	 * @Author: huanghaibin
+	 * @Date: 2020/3/10 15:46
+	 */
+	@GetMapping(path="/getRoomLayout")
+	public HttpResponse<List<String>> getRoomLayout(String checkInId){
+		HttpResponse<List<String>> rep = new HttpResponse<List<String>>();
+		rep.addData(checkInRecordService.getRoomLayout(checkInId));
+		return rep;
+	}
+	/**
+	 * 功能描述: <br>单独查询房间要求（防止一次查询效率低问题）
+	 * 〈〉
+	 * @Param: [checkInId]
+	 * @Return: com.kry.pms.base.HttpResponse<java.util.List<java.lang.String>>
+	 * @Author: huanghaibin
+	 * @Date: 2020/3/10 15:47
+	 */
+	@GetMapping(path="/getRoomRequirement")
+	public HttpResponse<List<String>> getRoomRequirement(String checkInId){
+		HttpResponse<List<String>> rep = new HttpResponse<List<String>>();
+		rep.addData(checkInRecordService.getRoomRequirement(checkInId));
+		return rep;
 	}
 
 }

@@ -190,6 +190,10 @@ public class ReceptionServiceImpl implements ReceptionService {
 					if (cir.getRoomCount() == 0) {
 						cir.setDeleted(Constants.DELETED_TRUE);
 					}
+					if(cir.getSingleRoomCount() != null){
+						int hCount = roomAssignBo.getRoomId().length * cir.getSingleRoomCount();
+						cir.setHumanCount(cir.getHumanCount() - hCount);
+					}
 					checkInRecordService.modify(cir);
 				} else {
 					TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();

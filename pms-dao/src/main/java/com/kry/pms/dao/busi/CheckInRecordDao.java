@@ -214,5 +214,11 @@ public interface CheckInRecordDao extends BaseDao<CheckInRecord> {
 	Page<Map<String, Object>> resverList(Pageable page, @Param("hotelCode") String hotelCode, @Param("tType") String type, @Param("fitType") String fitType,
 										 @Param("status") String status, @Param("groupType") String groupType);
 
+	@Query(nativeQuery = true, value = " select room_layout from t_room_layout t where t.check_in_record_id = ?1 ")
+	List<String> getRoomLayout(String checkInId);
+
+	@Query(nativeQuery = true, value = " select t.room_requirement from t_room_requirement t where t.check_in_record_id = ?1 ")
+	List<String> getRoomRequirement(String checkInId);
+
 
 }

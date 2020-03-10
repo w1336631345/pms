@@ -14,8 +14,10 @@ import com.kry.pms.model.persistence.busi.CheckInRecord;
 import com.kry.pms.model.persistence.room.GuestRoom;
 import com.kry.pms.model.persistence.sys.User;
 import com.kry.pms.service.BaseService;
+import freemarker.template.TemplateException;
 
 import javax.transaction.Transactional;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -78,7 +80,9 @@ public interface CheckInRecordService extends BaseService<CheckInRecord> {
 
     public List<CheckInRecord> findByOrderNum(String orderNum);
 
-	List<Map<String, Object>> findByOrderNum2(String hotelCode,String orderNum);
+    List<Map<String, Object>> findByOrderNumC2(String hotelCode, String orderNum) throws IOException, TemplateException;
+
+    List<Map<String, Object>> findByOrderNum2(String hotelCode, String orderNum);
 
 	List<Map<String, Object>> sqlOrderNum(String orderNum);
 
@@ -152,4 +156,8 @@ public interface CheckInRecordService extends BaseService<CheckInRecord> {
 	CheckInRecord updateReserve(CheckInRecord cir);
 
     List<CheckInRecord> getRoomLinkListTo(String id, String orderNum);
+
+    List<String> getRoomLayout(String checkInId);
+
+	List<String> getRoomRequirement(String checkInId);
 }

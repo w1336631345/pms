@@ -68,8 +68,6 @@ public class CheckInRecord extends PersistenceModel {
 	private Integer childCount;//小孩数量
 	@Column
 	private Integer roomCount;// 房间数
-	@ManyToMany(cascade = CascadeType.PERSIST)
-	private List<RoomTag> demands;// 房间标签
 	@Column
 	private Integer chrildrenCount;// 子单数
 	@Column
@@ -147,14 +145,26 @@ public class CheckInRecord extends PersistenceModel {
 	private String togetherCode;
 	@Transient
 	private Boolean isUpdateTime = false;// 用作判断主单是否修改了到店离店时间
-	@ManyToMany
-	private List<Arrangement> arrangements;//房间布置
+//	@ManyToMany
+//	private List<Arrangement> arrangements;//房间布置（特殊要求）
+//	@ManyToMany(cascade = CascadeType.PERSIST)
+//	private List<RoomTag> demands;// 房间标签(房间布置)
+	@ElementCollection
+	@CollectionTable(name="t_room_layout")
+	private List<String> roomLayout;//客房布置
+	@ElementCollection
+	@CollectionTable(name="t_room_requirement")
+	private List<String> roomRequirement;//客房要求
 	@Column
 	private Boolean isSecrecy;//房价是否保密
 
 	@Transient
 	private String isGOrU;//预订来至团队（G）还是多人（U）
 
+	public List<String> getRoomRequirement() { return roomRequirement; }
+	public void setRoomRequirement(List<String> roomRequirement) { this.roomRequirement = roomRequirement; }
+	public List<String> getRoomLayout() { return roomLayout; }
+	public void setRoomLayout(List<String> roomLayout) { this.roomLayout = roomLayout; }
 	public String getGroupName() { return groupName; }
 	public void setGroupName(String groupName) { this.groupName = groupName; }
 	public Double getOriginalPrice() { return originalPrice; }
@@ -169,8 +179,6 @@ public class CheckInRecord extends PersistenceModel {
 	public void setActualTimeOfArrive(LocalDateTime actualTimeOfArrive) { this.actualTimeOfArrive = actualTimeOfArrive; }
 	public LocalDateTime getActualTimeOfLeave() { return actualTimeOfLeave; }
 	public void setActualTimeOfLeave(LocalDateTime actualTimeOfLeave) { this.actualTimeOfLeave = actualTimeOfLeave; }
-	public List<Arrangement> getArrangements() { return arrangements; }
-	public void setArrangements(List<Arrangement> arrangements) { this.arrangements = arrangements; }
 	public Integer getAdultCount() { return adultCount; }
 	public void setAdultCount(Integer adultCount) { this.adultCount = adultCount; }
 	public Integer getChildCount() { return childCount; }
@@ -303,15 +311,6 @@ public class CheckInRecord extends PersistenceModel {
 	public void setDistributionChannel(DistributionChannel distributionChannel) {
 		this.distributionChannel = distributionChannel;
 	}
-
-//	public Employee getMarketEmployee() {
-//		return marketEmployee;
-//	}
-//
-//	public void setMarketEmployee(Employee marketEmployee) {
-//		this.marketEmployee = marketEmployee;
-//	}
-
 	public RoomPriceScheme getRoomPriceScheme() {
 		return roomPriceScheme;
 	}
@@ -527,14 +526,6 @@ public class CheckInRecord extends PersistenceModel {
 
 	public void setHoldTime(String holdTime) {
 		this.holdTime = holdTime;
-	}
-
-	public List<RoomTag> getDemands() {
-		return demands;
-	}
-
-	public void setDemands(List<RoomTag> demands) {
-		this.demands = demands;
 	}
 
 	public String getTogetherCode() {
