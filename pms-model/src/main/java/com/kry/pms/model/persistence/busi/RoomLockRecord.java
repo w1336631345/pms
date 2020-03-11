@@ -24,8 +24,8 @@ import lombok.Setter;
 public class RoomLockRecord extends PersistenceModel implements UseInfoAble{
 	@OneToOne
 	private GuestRoom guestRoom;
-	@OneToOne
-	private RoomLockReason reason;
+	@Column
+	private String reason;
 	@Column
 	private LocalDateTime startTime;
 	@Column

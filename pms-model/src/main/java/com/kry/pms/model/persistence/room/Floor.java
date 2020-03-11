@@ -1,9 +1,6 @@
 package com.kry.pms.model.persistence.room;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 
 import com.kry.pms.model.persistence.PersistenceModel;
@@ -16,8 +13,8 @@ import lombok.Setter;
 @Setter
 @Table(name = "t_floor")
 public class Floor extends PersistenceModel {
-	@OneToOne
-	private Building Building;
+	@ManyToOne
+	private Building building;
 	@Column(columnDefinition = "varchar(40) default NUll COMMENT '名称'")
 	@NotBlank
 	private String name;
