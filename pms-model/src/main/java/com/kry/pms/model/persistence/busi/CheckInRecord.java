@@ -45,7 +45,7 @@ public class CheckInRecord extends PersistenceModel {
 	@JoinColumn(name = "main_record_id")
 	private CheckInRecord mainRecord;// 主单id
 //	@OneToMany(cascade = CascadeType.DETACH)
-//	@JoinColumn(name="main_record_id")
+////	@JoinColumn(name="main_record_id")
 	@Transient
 	private List<CheckInRecord> subRecords;// 子单
 	@ManyToOne

@@ -40,6 +40,7 @@ D:\workspace\idea_pms\pms-service\src\main\java\com\kry\pms\service\marketing\im
 D:\workspace\idea_pms\pms-service\src\main\java\com\kry\pms\service\room\RoomTypeQuantityService.java
 D:\workspace\idea_pms\pms-service\src\main\java\com\kry\pms\service\marketing\impl\RoomPriceSchemeItemServiceImpl.java
 D:\workspace\idea_pms\pms-service\src\main\java\com\kry\pms\service\busi\impl\CreditGrantingRecordServiceImpl.java
+D:\workspace\idea_pms\pms-service\src\main\java\com\kry\pms\service\report\ReportBaseValueService.java
 D:\workspace\idea_pms\pms-service\src\main\java\com\kry\pms\service\guest\impl\MemberRoomTypeServiceImpl.java
 D:\workspace\idea_pms\pms-service\src\main\java\com\kry\pms\service\report\impl\GenerateReportsLogServiceImpl.java
 D:\workspace\idea_pms\pms-service\src\main\java\com\kry\pms\service\busi\impl\ChangeRoomRecordServiceImpl.java
@@ -60,6 +61,7 @@ D:\workspace\idea_pms\pms-service\src\main\java\com\kry\pms\service\guest\Custom
 D:\workspace\idea_pms\pms-service\src\main\java\com\kry\pms\service\guest\VipTypeService.java
 D:\workspace\idea_pms\pms-service\src\main\java\com\kry\pms\service\guest\impl\VipRoomTypeServiceImpl.java
 D:\workspace\idea_pms\pms-service\src\main\java\com\kry\pms\service\busi\CreditGrantingRecordService.java
+D:\workspace\idea_pms\pms-service\src\main\java\com\kry\pms\service\report\impl\ReportBaseValueDefinitionServiceImpl.java
 D:\workspace\idea_pms\pms-service\src\main\java\com\kry\pms\service\sys\BusinessSeqService.java
 D:\workspace\idea_pms\pms-service\src\main\java\com\kry\pms\service\sys\impl\SystemConfigServiceImpl.java
 D:\workspace\idea_pms\pms-service\src\main\java\com\kry\pms\service\dict\AreaService.java
@@ -78,6 +80,7 @@ D:\workspace\idea_pms\pms-service\src\main\java\com\kry\pms\service\room\impl\Ro
 D:\workspace\idea_pms\pms-service\src\main\java\com\kry\pms\service\dict\impl\CountryOrRegionServiceImpl.java
 D:\workspace\idea_pms\pms-service\src\main\java\com\kry\pms\service\report\impl\RoomReportServiceImpl.java
 D:\workspace\idea_pms\pms-service\src\main\java\com\kry\pms\service\busi\BillItemService.java
+D:\workspace\idea_pms\pms-service\src\main\java\com\kry\pms\service\report\impl\ReportBaseValueServiceImpl.java
 D:\workspace\idea_pms\pms-service\src\main\java\com\kry\pms\service\guest\impl\CustomerPointsRecordServiceImpl.java
 D:\workspace\idea_pms\pms-service\src\main\java\com\kry\pms\service\goods\impl\SetMealServiceImpl.java
 D:\workspace\idea_pms\pms-service\src\main\java\com\kry\pms\service\busi\impl\BillTransferRecordServiceImpl.java
@@ -116,6 +119,7 @@ D:\workspace\idea_pms\pms-service\src\main\java\com\kry\pms\service\report\impl\
 D:\workspace\idea_pms\pms-service\src\main\java\com\kry\pms\service\room\impl\RoomTagServiceImpl.java
 D:\workspace\idea_pms\pms-service\src\main\java\com\kry\pms\service\busi\RoomRecordService.java
 D:\workspace\idea_pms\pms-service\src\main\java\com\kry\pms\service\busi\impl\BillServiceImpl.java
+D:\workspace\idea_pms\pms-service\src\main\java\com\kry\pms\service\report\ReportTableDefinitionService.java
 D:\workspace\idea_pms\pms-service\src\main\java\com\kry\pms\service\guest\MemberTypeService.java
 D:\workspace\idea_pms\pms-service\src\main\java\com\kry\pms\service\room\impl\GuestRoomStatusServiceImpl.java
 D:\workspace\idea_pms\pms-service\src\main\java\com\kry\pms\service\report\impl\FrontEntryReportServiceImpl.java
@@ -137,6 +141,7 @@ D:\workspace\idea_pms\pms-service\src\main\java\com\kry\pms\service\dict\impl\Di
 D:\workspace\idea_pms\pms-service\src\main\java\com\kry\pms\service\report\BusinessReportService.java
 D:\workspace\idea_pms\pms-service\src\main\java\com\kry\pms\service\report\impl\AuditReportServiceImpl.java
 D:\workspace\idea_pms\pms-service\src\main\java\com\kry\pms\service\marketing\SalesMenService.java
+D:\workspace\idea_pms\pms-service\src\main\java\com\kry\pms\service\report\ReportBaseValueDefinitionService.java
 D:\workspace\idea_pms\pms-service\src\main\java\com\kry\pms\service\busi\DailyVerifyService.java
 D:\workspace\idea_pms\pms-service\src\main\java\com\kry\pms\service\goods\ProductCategoryService.java
 D:\workspace\idea_pms\pms-service\src\main\java\com\kry\pms\service\busi\SettleAccountRecordService.java
@@ -165,6 +170,7 @@ D:\workspace\idea_pms\pms-service\src\main\java\com\kry\pms\service\guest\Custom
 D:\workspace\idea_pms\pms-service\src\main\java\com\kry\pms\service\goods\ProductTypeService.java
 D:\workspace\idea_pms\pms-service\src\main\java\com\kry\pms\service\audit\impl\NightAuditServiceImpl.java
 D:\workspace\idea_pms\pms-service\src\main\java\com\kry\pms\service\marketing\ProtocolCorpationService.java
+D:\workspace\idea_pms\pms-service\src\main\java\com\kry\pms\service\report\impl\ReportTableDefinitionServiceImpl.java
 D:\workspace\idea_pms\pms-service\src\main\java\com\kry\pms\service\marketing\DiscountTypeService.java
 D:\workspace\idea_pms\pms-service\src\main\java\com\kry\pms\service\dict\impl\RoomRepairReasonServiceImpl.java
 D:\workspace\idea_pms\pms-service\src\main\java\com\kry\pms\service\sys\impl\ShiftServiceImpl.java
