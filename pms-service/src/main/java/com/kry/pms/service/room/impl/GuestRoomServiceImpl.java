@@ -47,11 +47,7 @@ public class GuestRoomServiceImpl implements GuestRoomService {
 	@Autowired
 	RoomLockRecordService roomLockRecordService;
 	@Autowired
-	RoomRepairReasonService roomRepairReasonService;
-	@Autowired
 	RoomRepairRecordService roomRepairRecordService;
-	@Autowired
-	RoomLockReasonService roomLockReasonService;
 	@Autowired
 	RoomUsageService roomUsageService;
 	@Autowired
