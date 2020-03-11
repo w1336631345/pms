@@ -98,7 +98,7 @@ public class BaseController<T> {
         Method m = null;
         Method g = null;
         for (String key : params.keySet()) {
-            if (key.startsWith("page")) {
+            if (key.startsWith("page")||key.equals("order")||key.equals("asc")||key.equals("desc")) {
                 continue;
             }
             if (key.contains("_")) {

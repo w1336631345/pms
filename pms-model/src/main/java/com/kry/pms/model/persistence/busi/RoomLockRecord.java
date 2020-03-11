@@ -10,7 +10,6 @@ import javax.persistence.Table;
 import com.kry.pms.base.Constants;
 import com.kry.pms.model.func.UseInfoAble;
 import com.kry.pms.model.persistence.PersistenceModel;
-import com.kry.pms.model.persistence.dict.RoomLockReason;
 import com.kry.pms.model.persistence.room.GuestRoom;
 import com.kry.pms.model.persistence.room.RoomType;
 

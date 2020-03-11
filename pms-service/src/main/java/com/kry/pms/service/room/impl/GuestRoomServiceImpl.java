@@ -30,14 +30,9 @@ import com.kry.pms.dao.room.GuestRoomDao;
 import com.kry.pms.model.http.request.busi.GuestRoomOperation;
 import com.kry.pms.model.persistence.busi.RoomLockRecord;
 import com.kry.pms.model.persistence.busi.RoomRepairRecord;
-import com.kry.pms.model.persistence.dict.RoomLockReason;
-import com.kry.pms.model.persistence.dict.RoomRepairReason;
 import com.kry.pms.service.busi.RoomLockRecordService;
 import com.kry.pms.service.busi.RoomRecordService;
 import com.kry.pms.service.busi.RoomRepairRecordService;
-import com.kry.pms.service.dict.RoomLockReasonService;
-import com.kry.pms.service.dict.RoomRepairReasonService;
-import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 @Service
 public class GuestRoomServiceImpl implements GuestRoomService {

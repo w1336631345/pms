@@ -14,7 +14,6 @@ import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
 import com.kry.pms.dao.busi.RoomRepairRecordDao;
 import com.kry.pms.model.persistence.busi.RoomRepairRecord;
-import com.kry.pms.model.persistence.dict.RoomRepairReason;
 import com.kry.pms.model.persistence.room.GuestRoom;
 import com.kry.pms.service.busi.RoomRepairRecordService;
 

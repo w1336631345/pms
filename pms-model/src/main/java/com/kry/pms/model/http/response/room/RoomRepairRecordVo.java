@@ -7,7 +7,6 @@ import java.util.List;
 import org.springframework.beans.BeanUtils;
 
 import com.kry.pms.model.persistence.busi.RoomRepairRecord;
-import com.kry.pms.model.persistence.dict.RoomRepairReason;
 
 import lombok.Data;
 
@@ -15,7 +14,7 @@ import lombok.Data;
 public class RoomRepairRecordVo {
 	private String roomNum;
 	private String roomId;
-	private RoomRepairReason reason;
+	private String reason;
 	private LocalDateTime startTime;
 	private LocalDateTime endTime;
 	private String remark;

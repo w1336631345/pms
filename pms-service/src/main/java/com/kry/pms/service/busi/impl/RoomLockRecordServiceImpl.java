@@ -14,12 +14,8 @@ import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
 import com.kry.pms.dao.busi.RoomLockRecordDao;
 import com.kry.pms.model.persistence.busi.RoomLockRecord;
-import com.kry.pms.model.persistence.busi.RoomRepairRecord;
-import com.kry.pms.model.persistence.dict.RoomLockReason;
 import com.kry.pms.model.persistence.room.GuestRoom;
-import com.kry.pms.model.persistence.room.GuestRoomStatus;
 import com.kry.pms.service.busi.RoomLockRecordService;
-import com.kry.pms.service.dict.RoomLockReasonService;
 
 @Service
 public class RoomLockRecordServiceImpl implements RoomLockRecordService {

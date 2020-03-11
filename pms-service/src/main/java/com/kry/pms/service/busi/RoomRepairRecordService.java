@@ -4,7 +4,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import com.kry.pms.model.persistence.busi.RoomRepairRecord;
-import com.kry.pms.model.persistence.dict.RoomRepairReason;
 import com.kry.pms.model.persistence.room.GuestRoom;
 import com.kry.pms.service.BaseService;
 
