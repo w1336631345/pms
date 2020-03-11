@@ -68,7 +68,7 @@ public class RoomRepairRecordServiceImpl implements RoomRepairRecordService {
 
 	@Override
 	public RoomRepairRecord createRecord(GuestRoom gr, LocalDateTime startTime, LocalDateTime endTime,
-			RoomRepairReason rpr, String endToStatus) {
+			String rpr, String endToStatus) {
 		RoomRepairRecord rlr = new RoomRepairRecord();
 		rlr.setGuestRoom(gr);
 		rlr.setStartTime(startTime);

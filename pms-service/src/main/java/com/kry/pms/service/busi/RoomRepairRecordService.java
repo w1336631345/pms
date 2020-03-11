@@ -10,7 +10,7 @@ import com.kry.pms.service.BaseService;
 
 public interface RoomRepairRecordService extends BaseService<RoomRepairRecord> {
 
-	RoomRepairRecord createRecord(GuestRoom gr, LocalDateTime startTime, LocalDateTime endTime, RoomRepairReason rpr,
+	RoomRepairRecord createRecord(GuestRoom gr, LocalDateTime startTime, LocalDateTime endTime, String rpr,
 			String endToStatus);
 
 	RoomRepairRecord openRepair(String id, String operationEmployeeId);

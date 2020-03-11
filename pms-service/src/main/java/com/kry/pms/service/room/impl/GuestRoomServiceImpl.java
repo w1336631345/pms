@@ -334,12 +334,11 @@ public class GuestRoomServiceImpl implements GuestRoomService {
 				switch (op.getOp()) {
 				case Constants.Status.ROOM_STATUS_OUT_OF_ORDER:
 					if (op.getReasonId() != null && op.getEndToStatus() != null) {
-						RoomRepairReason rpr = roomRepairReasonService.findById(op.getReasonId());
 						DtoResponse<RoomUsage> r = roomUsageService.use(gr, Constants.Status.ROOM_USAGE_REPARIE,
 								op.getStartTime(), op.getEndTime(), null, null);
 						if (r.getStatus() == 0) {
 							RoomRepairRecord record = roomRepairRecordService.add(roomRepairRecordService
-									.createRecord(gr, op.getStartTime(), op.getEndTime(), rpr, op.getEndToStatus()));
+									.createRecord(gr, op.getStartTime(), op.getEndTime(), op.getReasonId(), op.getEndToStatus()));
 							r.getData().setBusinesskey(record.getId());
 							roomUsageService.modify(r.getData());
 							if (op.getStartTime().toLocalDate().isEqual(LocalDate.now())) {
@@ -358,12 +357,11 @@ public class GuestRoomServiceImpl implements GuestRoomService {
 					break;
 				case Constants.Status.ROOM_STATUS_OUT_OF_SERVCIE:
 					if (op.getReasonId() != null && op.getEndToStatus() != null) {
-						RoomLockReason rlr = roomLockReasonService.findById(op.getReasonId());
 						DtoResponse<RoomUsage> r = roomUsageService.use(gr, Constants.Status.ROOM_USAGE_LOCKED,
 								op.getStartTime(), op.getEndTime(), null, null);
 						if (r.getStatus() == 0) {
 							RoomLockRecord record = roomLockRecordService.add(roomLockRecordService.createRecord(gr,
-									op.getStartTime(), op.getEndTime(), rlr, op.getEndToStatus()));
+									op.getStartTime(), op.getEndTime(), op.getReasonId(), op.getEndToStatus()));
 							r.getData().setBusinesskey(record.getId());
 							roomUsageService.modify(r.getData());
 							if (op.getStartTime().toLocalDate().isEqual(LocalDate.now())) {

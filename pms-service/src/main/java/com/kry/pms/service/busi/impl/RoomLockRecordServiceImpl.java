@@ -25,8 +25,7 @@ import com.kry.pms.service.dict.RoomLockReasonService;
 public class RoomLockRecordServiceImpl implements RoomLockRecordService {
 	@Autowired
 	RoomLockRecordDao roomLockRecordDao;
-	@Autowired
-	RoomLockReasonService roomLockReasonService;
+
 
 	@Override
 	public RoomLockRecord add(RoomLockRecord roomLockRecord) {
@@ -73,7 +72,7 @@ public class RoomLockRecordServiceImpl implements RoomLockRecordService {
 
 	@Override
 	public RoomLockRecord createRecord(GuestRoom gr, LocalDateTime startTime, LocalDateTime endTime,
-			RoomLockReason reason, String endToStatus) {
+			String reason, String endToStatus) {
 		RoomLockRecord rlr = new RoomLockRecord();
 		rlr.setGuestRoom(gr);
 		rlr.setStartTime(startTime);

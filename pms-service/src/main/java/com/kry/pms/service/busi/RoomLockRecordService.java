@@ -10,7 +10,7 @@ import com.kry.pms.service.BaseService;
 
 public interface RoomLockRecordService extends BaseService<RoomLockRecord>{
 
-	RoomLockRecord createRecord(GuestRoom gr, LocalDateTime startTime, LocalDateTime endTime, RoomLockReason reason,
+	RoomLockRecord createRecord(GuestRoom gr, LocalDateTime startTime, LocalDateTime endTime, String reason,
 			String endToStatus);
 
 	RoomLockRecord openLock(String id, String operationEmployeeId);
