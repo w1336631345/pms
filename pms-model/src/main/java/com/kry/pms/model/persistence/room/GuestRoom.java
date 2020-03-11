@@ -18,9 +18,7 @@ public class GuestRoom extends PersistenceModel {
 	private RoomType roomType;
 	@ManyToMany
 	private List<RoomTag> tags;
-	@OneToOne(fetch = FetchType.LAZY)
-	private Building building;
-	@OneToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.LAZY)
 	private Floor floor;
 	@Column(columnDefinition = "varchar(40) default NUll COMMENT '房间号'")
 	private String roomNum;

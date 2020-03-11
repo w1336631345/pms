@@ -2,12 +2,7 @@ package com.kry.pms.model.persistence.room;
 
 import java.util.List;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 import com.kry.pms.model.persistence.PersistenceModel;
 import com.kry.pms.model.persistence.sys.StaticResource;
@@ -28,6 +23,8 @@ public class RoomType extends PersistenceModel {
 	private String code;
 	@Column(columnDefinition = "varchar(400) default NULL COMMENT '描述'")
 	private String description;
+	@ManyToOne
+	private Building building;
 	@Column(columnDefinition = "int(8) COMMENT '排序'")
 	private Integer sortCode;
 	@Column(columnDefinition = "int(8) COMMENT '超预留数'")
