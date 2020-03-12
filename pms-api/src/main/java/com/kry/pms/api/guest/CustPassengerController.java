@@ -21,7 +21,6 @@ public class CustPassengerController extends BaseController<CustPassenger> {
 	CustPassengerService custPassengerService;
 	@PostMapping
 	public HttpResponse<CustPassenger> add(@RequestBody CustPassenger custPassenger) {
-		custPassenger.setHotelCode(getCurrentHotleCode());
 		return getDefaultResponse().addData(custPassengerService.add(custPassenger));
 	}
 
@@ -44,10 +43,17 @@ public class CustPassengerController extends BaseController<CustPassenger> {
 		return rep.addData(custPassengerService.listPage(req));
 	}
 
-	@GetMapping(path = "/list")
+	@GetMapping(path = "/hotel")
 	public HttpResponse<List<CustPassenger>> getByHotelCode(HttpServletRequest request){
 		HttpResponse<List<CustPassenger>> rep = new HttpResponse<List<CustPassenger>>();
 		List<CustPassenger> list = custPassengerService.getAllByHotelCode(getCurrentHotleCode());
+		return rep.addData(list);
+	}
+
+	@GetMapping(path = "/list")
+	public HttpResponse<List<CustPassenger>> getByCustomerId(String customerId){
+			HttpResponse<List<CustPassenger>> rep = new HttpResponse<List<CustPassenger>>();
+		List<CustPassenger> list = custPassengerService.getByCustomerId(customerId);
 		return rep.addData(list);
 	}
 

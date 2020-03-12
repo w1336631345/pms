@@ -43,7 +43,7 @@ public class CustPassengerServiceImpl implements CustPassengerService {
 
 	@Override
 	public List<CustPassenger> getAllByHotelCode(String code) {
-		return custPassengerDao.findByHotelCode(code);
+		return null;
 	}
 
 	@Override
@@ -57,5 +57,10 @@ public class CustPassengerServiceImpl implements CustPassengerService {
 			req = org.springframework.data.domain.PageRequest.of(prq.getPageNum(), prq.getPageSize());
 		}
 		return convent(custPassengerDao.findAll(ex, req));
+	}
+
+	@Override
+	public List<CustPassenger> getByCustomerId(String customerId) {
+		return custPassengerDao.findByCustomerId(customerId);
 	}
 }

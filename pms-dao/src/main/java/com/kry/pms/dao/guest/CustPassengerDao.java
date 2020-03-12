@@ -7,8 +7,7 @@ import java.util.List;
 
 public interface CustPassengerDao extends BaseDao<CustPassenger>{
 
-	List<CustPassenger> findByHotelCode(String hotelCode);
-
+	List<CustPassenger> findByCustomerId(String customerId);
 
 
 }

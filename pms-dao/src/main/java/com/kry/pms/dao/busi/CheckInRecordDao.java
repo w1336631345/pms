@@ -168,6 +168,10 @@ public interface CheckInRecordDao extends BaseDao<CheckInRecord> {
 			" tc.`name` custName, \n" +
 			" tcr.group_name groupName, \n" +
 			" ta.`code` accountCode, \n" +
+			" ta.total, \n" +
+			" ta.credit_limit creditLimit, \n" +
+			" ta.cost, \n" +
+			" ta.pay, \n" +
 			" tcr.status, \n" +
 			" tcr.order_num orderNum, \n" +
 			" tcr.order_type orderType, \n" +
