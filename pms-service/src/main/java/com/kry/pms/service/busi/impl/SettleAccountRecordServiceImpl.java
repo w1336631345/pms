@@ -167,9 +167,15 @@ public class SettleAccountRecordServiceImpl implements SettleAccountRecordServic
 
 	private DtoResponse<String> cancleTransfer(SettleAccountRecord sar, String shiftCode, Employee operationEmployee) {
 		DtoResponse<String> rep = new DtoResponse<String>();
-		DtoResponse<List<Bill>> crep = accountService.transferBill(sar.getFlatBills(), sar.getTotal(), sar.getAccount(),
+		DtoResponse<List<Bill>> crep = accountService.cancleTransfer(sar.getFlatBills(), sar.getTotal(), sar.getAccount(),
 				sar.getTargetAccount(), shiftCode, operationEmployee, sar.getCancleNum());
-		BeanUtils.copyProperties(crep, rep);
+		for(Bill bill:sar.getBills()){
+			bill.setStatus(Constants.Status.BILL_NEED_SETTLED);
+			bill.setTranferRemark(null);
+			bill.setCurrentSettleAccountRecordNum(null);
+			billService.modify(bill);
+		}
+//		BeanUtils.copyProperties(crep, rep);
 		return rep;
 	}
 

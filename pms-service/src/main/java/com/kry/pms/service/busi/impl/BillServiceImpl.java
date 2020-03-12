@@ -403,6 +403,7 @@ public class BillServiceImpl implements BillService {
         offsetBill.setCurrentSettleAccountRecordNum(recordNum);
         offsetBill.setTranferRemark("To " + targetAccount.getCode());
         offsetBill.setStatus(Constants.Status.BILL_SETTLED);
+        bill.setTranferRemark(offsetBill.getTranferRemark());
         bill.setStatus(Constants.Status.BILL_SETTLED);
         bill.setCurrentSettleAccountRecordNum(recordNum);
         modify(bill);

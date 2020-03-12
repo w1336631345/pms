@@ -129,6 +129,7 @@ public class AccountServiceImpl implements AccountService {
 	@Override
 	public Account billEntry(Bill bill) {
 		Account account = findById(bill.getAccount().getId());
+		System.out.println(bill.getAccount().getId());
 		if (account != null) {
 			if (bill.getCost() != null) {
 				account.setCost(BigDecimalUtil.add(account.getCost(), bill.getCost()));
@@ -198,6 +199,22 @@ public class AccountServiceImpl implements AccountService {
 		}
 
 		return rep;
+	}
+
+	@Override
+	public DtoResponse<List<Bill>> cancleTransfer(List<Bill> flatBills, Double total, Account account, Account targetAccount, String shiftCode, Employee operationEmployee, String cancleNum) {
+		for(Bill bill:flatBills){
+			if(bill.getAccount().getId().equals(targetAccount.getId())){
+				List<Bill> bills = billService.transfer(bill,account,shiftCode,operationEmployee,cancleNum).getData();
+				for(Bill b:bills){
+					b.setStatus(Constants.Status.BILL_INVALID);
+					billService.modify(b);
+				}
+			}
+			bill.setStatus(Constants.Status.BILL_INVALID);
+			billService.modify(bill);
+		}
+		return null;
 	}
 
 	private DtoResponse<Account> transferBill(BillCheckBo billCheckBo) {
