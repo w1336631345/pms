@@ -159,7 +159,7 @@ public interface CheckInRecordDao extends BaseDao<CheckInRecord> {
 	@Query(value = "select new com.kry.pms.model.http.response.busi.AccountSummaryVo(b.orderNum, a.id, d.name,a.total, c.roomNum," +
 			"a.type, a.pay, a.cost, a.creditLimit, a.availableCreditLimit," +
 			"b.status, a.code, b.arriveTime, b.leaveTime,c.id) from Account a,CheckInRecord b,GuestRoom c,Customer d" +
-			" where b.account=a and b.guestRoom = c and a.customer = d and b.orderNum = ?1 and b.deleted=?3 and b.type=?2")
+			" where b.account=a and b.guestRoom = c and b.customer = d and b.orderNum = ?1 and b.deleted=?3 and b.type=?2")
 	List<AccountSummaryVo> querySummeryByOrderNumAndTypeAndDeleted(String orderNum,String type, int deletedFalse);
 
 	@Query(nativeQuery = true, value = " select \n" +

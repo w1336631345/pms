@@ -273,8 +273,9 @@ public class ReceptionServiceImpl implements ReceptionService {
 		CheckInRecord cir = checkInRecordService.findById(id);
 		AccountSummaryVo asv = null;
 		if (cir != null && cir.getGroupType() != null) {
-			switch (cir.getType()) {
-			case Constants.Type.CHECK_IN_RECORD_GROUP:
+			switch (cir.getGroupType()) {
+			case Constants.Type.CHECK_IN_RECORD_GROUP_TYPE_YES:
+				cir = cir.getMainRecord();
 				asv = new AccountSummaryVo();
 				asv.setName("团队所有账务");
 				asv.setType("temp");
@@ -288,7 +289,7 @@ public class ReceptionServiceImpl implements ReceptionService {
 				asv.getChildren().addAll((checkInRecordService.getAccountSummaryByOrderNum2(cir.getOrderNum(),
 						Constants.Type.CHECK_IN_RECORD_CUSTOMER)));
 				break;
-			case Constants.Type.CHECK_IN_RECORD_CUSTOMER:
+			case Constants.Type.CHECK_IN_RECORD_GROUP_TYPE_NO:
 				if (cir.getRoomLinkId() == null) {// 散客
 					Collection<AccountSummaryVo> data = checkInRecordService
 							.getAccountSummaryByOrderNum2(cir.getOrderNum(), Constants.Type.CHECK_IN_RECORD_CUSTOMER);

@@ -2,6 +2,7 @@ package com.kry.pms.model.persistence.busi;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kry.pms.model.annotation.Log;
 import com.kry.pms.model.persistence.PersistenceModel;
 import com.kry.pms.model.persistence.goods.SetMeal;
 import com.kry.pms.model.persistence.guest.Customer;
@@ -35,7 +36,6 @@ public class CheckInRecord extends PersistenceModel {
 	private String name;// 姓名
 	@OneToOne
 	@JsonIgnoreProperties(value={"hibernateLazyInitializer","handler","fieldHandler"})
-//	@JsonIgnore
 	private RoomPriceScheme roomPriceScheme;// 房价方案
 	@OneToOne
 	private RoomType roomType;// 房间类型
@@ -44,8 +44,6 @@ public class CheckInRecord extends PersistenceModel {
 	@ManyToOne
 	@JoinColumn(name = "main_record_id")
 	private CheckInRecord mainRecord;// 主单id
-//	@OneToMany(cascade = CascadeType.DETACH)
-////	@JoinColumn(name="main_record_id")
 	@Transient
 	private List<CheckInRecord> subRecords;// 子单
 	@ManyToOne
@@ -73,6 +71,7 @@ public class CheckInRecord extends PersistenceModel {
 	@Column
 	private LocalDateTime arriveTime;// 到达时间
 	@Column
+	@Log(operationName = "actual_time_of_arrive")
 	private LocalDateTime actualTimeOfArrive;//实际到达时间
 	@Column
 	private LocalDateTime actualTimeOfLeave;//实际离开时间
