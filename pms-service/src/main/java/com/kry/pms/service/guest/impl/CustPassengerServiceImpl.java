@@ -24,7 +24,7 @@ public class CustPassengerServiceImpl implements CustPassengerService {
 
 	@Override
 	public CustPassenger add(CustPassenger entity) {
-		if(entity.getCustomerId() == null && entity.getPassengerId() != null){
+		if(entity.getCustomerId() != null && entity.getPassengerId() != null){
 			List<CustPassenger> list = custPassengerDao.findByCustomerIdAndPassengerId(entity.getCustomerId(), entity.getPassengerId());
 			if(list != null && !list.isEmpty()){
 				return null;
