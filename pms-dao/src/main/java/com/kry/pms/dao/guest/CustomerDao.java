@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Map;
 
 public interface CustomerDao extends BaseDao<Customer>{
 	
@@ -35,5 +36,19 @@ public interface CustomerDao extends BaseDao<Customer>{
 					" left join t_account ta on tc.id = ta.customer_id  \n" +
 					" where if(:name is not null && :name != '', (tc.name like CONCAT('%',:name,'%') or ta.`code` like CONCAT('%',:name,'%') or tgr.room_num like CONCAT('%',:name,'%')), 1=1 ) ")
 	Page<Customer> queryLike(Pageable page, @Param("name") String name);
+
+	@Query(nativeQuery = true, value = " select \n" +
+			" tcr.hotel_code hotelCode, tcr.arrive_time arriveTime, tcr.leave_time leaveTime, \n" +
+			" tcr.days, trt.`name` roomType, tgr.room_num roomNum, tcr.personal_price personalPrice, \n" +
+			" tc.`name` customerName, tcr.room_count roomCount, tcr.human_count humanCount, ta.cost, ta.total, tcr.`status`, \n" +
+			" ta.`code` accountNum, tcr.order_num orderNum, tcr.remark, tcr.create_user createUser, \n" +
+			" tcr.create_date createDate, tcr.customer_id customerId, \n" +
+			" if(tc.customer_type = 'B', tc.`name`, null) corpName \n" +
+			" from t_checkin_record tcr left join t_customer tc on tcr.customer_id = tc.id \n" +
+			" left join t_account ta on tcr.account_id = ta.id \n" +
+			"  left join t_room_type trt on tcr.room_type_id = trt.id \n" +
+			"   left join t_guest_room tgr on tcr.guest_room_id = tgr.id \n" +
+			" where tcr.customer_id = ?1 ")
+	List<Map<String, Object>> getResverInfo(String customerId);
 
 }

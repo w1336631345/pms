@@ -2,6 +2,7 @@ package com.kry.pms.service.guest.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import com.kry.pms.model.persistence.busi.CheckInRecord;
 import com.kry.pms.model.persistence.marketing.RoomPriceScheme;
@@ -191,6 +192,11 @@ public class CustomerServiceImpl implements CustomerService {
 			}
 		}
 		return customer;
+	}
+
+	@Override
+	public List<Map<String, Object>> getResverInfo(String customerId) {
+		return customerDao.getResverInfo(customerId);
 	}
 
 }

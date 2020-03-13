@@ -164,6 +164,7 @@ public interface CheckInRecordDao extends BaseDao<CheckInRecord> {
 
 	@Query(nativeQuery = true, value = " select \n" +
 			" tcr.id, \n" +
+			" ta.id accountId, \n" +
 			" tcr.name_ name, \n" +
 			" tc.`name` custName, \n" +
 			" tcr.group_name groupName, \n" +

@@ -6,6 +6,9 @@ import com.kry.pms.model.http.request.busi.GuestInfoBo;
 import com.kry.pms.model.persistence.guest.Customer;
 import com.kry.pms.service.BaseService;
 
+import java.util.List;
+import java.util.Map;
+
 public interface CustomerService extends BaseService<Customer>{
 
     String getNum(String hotelCode);
@@ -20,4 +23,5 @@ public interface CustomerService extends BaseService<Customer>{
 
 	public Customer createOrGetCustomer(String hotelCode,String name, String idCardNum, String mobile);
 
+    List<Map<String, Object>> getResverInfo(String customerId);
 }

@@ -117,6 +117,15 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
         if (dbCir != null) {
             checkInRecord.setMainRecord(dbCir.getMainRecord());
             updateCustomer(dbCir, checkInRecord);
+            if(checkInRecord.getCustomer() != null){
+                Customer c = customerService.findById(checkInRecord.getCustomer().getId());
+                if(c != null){
+                    if(!dbCir.getName().equals(c.getName())){
+                        checkInRecord.setName(c.getName());
+                    }
+                }
+            }
+
             // 如果是主单操作，判断是不是修改的时间
             if (("G").equals(dbCir.getType())) {
                 // 查询主单下的成员记录

@@ -14,6 +14,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class CustPassengerServiceImpl implements CustPassengerService {
@@ -23,7 +24,15 @@ public class CustPassengerServiceImpl implements CustPassengerService {
 
 	@Override
 	public CustPassenger add(CustPassenger entity) {
-		return custPassengerDao.saveAndFlush(entity);
+		if(entity.getCustomerId() == null && entity.getPassengerId() != null){
+			List<CustPassenger> list = custPassengerDao.findByCustomerIdAndPassengerId(entity.getCustomerId(), entity.getPassengerId());
+			if(list != null && !list.isEmpty()){
+				return null;
+			}
+			return custPassengerDao.saveAndFlush(entity);
+		}else{
+			return null;
+		}
 	}
 
 	@Override
@@ -62,5 +71,10 @@ public class CustPassengerServiceImpl implements CustPassengerService {
 	@Override
 	public List<CustPassenger> getByCustomerId(String customerId) {
 		return custPassengerDao.findByCustomerId(customerId);
+	}
+
+	@Override
+	public List<Map<String, Object>> getPassengerList(String customerId) {
+		return custPassengerDao.getPassengerList(customerId);
 	}
 }

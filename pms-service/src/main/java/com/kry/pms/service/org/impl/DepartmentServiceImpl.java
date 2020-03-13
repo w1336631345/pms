@@ -46,8 +46,8 @@ public class  DepartmentServiceImpl implements  DepartmentService{
 
 	@Override
 	public List<Department> getAllByHotelCode(String code) {
-		return null;//默认不实现
-		//return departmentDao.findByHotelCode(code);
+//		return null;//默认不实现
+		return departmentDao.findByHotelCode(code);
 	}
 
 	@Override

@@ -106,5 +106,19 @@ public class Customer extends PersistenceModel {
 	@OneToMany
 	@PrimaryKeyJoinColumn
 	private List<Account> account;//账户
+	@Column
+	private String isPassenger;//是否是联系人
+	@Column
+	private String isAuto;//是否签单人
+	@Column
+	private String englishFrist;//英文名
+	@Column
+	private String englishLast;//英文姓
+	@Column
+	private String passengerType;//联系人类型
+	@Column
+	private String autograph;//签名图
+	@Column
+	private String photo;//照片
 
 }

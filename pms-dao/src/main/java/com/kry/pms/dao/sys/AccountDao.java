@@ -3,6 +3,7 @@ package com.kry.pms.dao.sys;
 import java.util.Collection;
 import java.util.List;
 
+import com.kry.pms.model.persistence.guest.Customer;
 import org.springframework.data.jpa.repository.Query;
 
 import com.kry.pms.dao.BaseDao;
@@ -18,5 +19,7 @@ public interface AccountDao extends BaseDao<Account> {
 			String status);
 
 	List<Account> findByHotelCodeAndType(String hotelCode, String type);
+
+	List<Account> findByCustomerAndType(Customer customer, String type);
 
 }

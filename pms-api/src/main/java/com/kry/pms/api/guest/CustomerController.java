@@ -18,6 +18,9 @@ import com.kry.pms.base.PageResponse;
 import com.kry.pms.model.persistence.guest.Customer;
 import com.kry.pms.service.guest.CustomerService;
 
+import java.util.List;
+import java.util.Map;
+
 @RestController
 @RequestMapping(path = "/api/v1/guest/customer")
 public class CustomerController extends BaseController<Customer> {
@@ -73,6 +76,21 @@ public class CustomerController extends BaseController<Customer> {
 		HttpResponse<String> rep = new HttpResponse<String>();
 		String num = customerService.getNum(getCurrentHotleCode());
 		return rep.addData(num);
+	}
+
+	/**
+	 * 功能描述: <br>客户档案-预订信息查询
+	 * 〈〉
+	 * @Param: [customerId]
+	 * @Return: com.kry.pms.base.HttpResponse<java.util.List<java.util.Map<java.lang.String,java.lang.Object>>>
+	 * @Author: huanghaibin
+	 * @Date: 2020/3/13 14:41
+	 */
+	@GetMapping(path = "/getResverInfo")
+	public HttpResponse<List<Map<String, Object>>> getResverInfo(String customerId){
+		HttpResponse<List<Map<String, Object>>> rep = new HttpResponse<List<Map<String, Object>>>();
+		List<Map<String, Object>> list = customerService.getResverInfo(customerId);
+		return rep.addData(list);
 	}
 
 }

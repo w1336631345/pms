@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping(path = "/api/v1/guest/custPassenger")
@@ -54,6 +55,13 @@ public class CustPassengerController extends BaseController<CustPassenger> {
 	public HttpResponse<List<CustPassenger>> getByCustomerId(String customerId){
 			HttpResponse<List<CustPassenger>> rep = new HttpResponse<List<CustPassenger>>();
 		List<CustPassenger> list = custPassengerService.getByCustomerId(customerId);
+		return rep.addData(list);
+	}
+
+	@GetMapping(path = "/getPassengerList")
+	public HttpResponse<List<Map<String, Object>>> getPassengerList(String customerId){
+		HttpResponse<List<Map<String, Object>>> rep = new HttpResponse<List<Map<String, Object>>>();
+		List<Map<String, Object>> list = custPassengerService.getPassengerList(customerId);
 		return rep.addData(list);
 	}
 

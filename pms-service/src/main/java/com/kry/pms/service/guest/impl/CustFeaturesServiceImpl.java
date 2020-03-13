@@ -6,8 +6,10 @@ import com.kry.pms.dao.guest.CustFeaturesDao;
 import com.kry.pms.dao.guest.CustVehicleDao;
 import com.kry.pms.model.persistence.guest.CustFeatures;
 import com.kry.pms.model.persistence.guest.CustVehicle;
+import com.kry.pms.model.persistence.guest.Customer;
 import com.kry.pms.service.guest.CustFeaturesService;
 import com.kry.pms.service.guest.CustVehicleService;
+import com.kry.pms.service.guest.CustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Sort;
@@ -19,10 +21,18 @@ import java.util.List;
 public class CustFeaturesServiceImpl implements CustFeaturesService {
 	@Autowired
 	CustFeaturesDao custFeaturesDao;
+	@Autowired
+	CustomerService customerService;
 
 
 	@Override
 	public CustFeatures add(CustFeatures entity) {
+		if(entity.getAutograph() != null || entity.getPhoto() != null){
+			Customer customer = customerService.findById(entity.getCustomerId());
+			customer.setAutograph(entity.getAutograph());
+			customer.setPhoto(entity.getPhoto());
+			customerService.modify(customer);
+		}
 		return custFeaturesDao.saveAndFlush(entity);
 	}
 
@@ -33,6 +43,12 @@ public class CustFeaturesServiceImpl implements CustFeaturesService {
 
 	@Override
 	public CustFeatures modify(CustFeatures custFeatures) {
+		if(custFeatures.getAutograph() != null || custFeatures.getPhoto() != null){
+			Customer customer = customerService.findById(custFeatures.getCustomerId());
+			customer.setAutograph(custFeatures.getAutograph());
+			customer.setPhoto(custFeatures.getPhoto());
+			customerService.modify(customer);
+		}
 		return custFeaturesDao.saveAndFlush(custFeatures);
 	}
 

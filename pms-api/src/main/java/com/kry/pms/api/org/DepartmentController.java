@@ -18,6 +18,8 @@ import com.kry.pms.base.PageResponse;
 import com.kry.pms.model.persistence.org.Department;
 import com.kry.pms.service.org.DepartmentService;
 
+import java.util.List;
+
 @RestController
 @RequestMapping(path = "/api/v1/org/department")
 public class DepartmentController extends BaseController<Department> {
@@ -45,6 +47,13 @@ public class DepartmentController extends BaseController<Department> {
 		HttpResponse<PageResponse<Department>> rep = new HttpResponse<PageResponse<Department>>();
 		PageRequest<Department> req = parse2PageRequest(request);
 		return rep.addData(departmentService.listPage(req));
+	}
+
+	@GetMapping(path = "/list")
+	public HttpResponse<List<Department>> getByCustomerId(){
+		HttpResponse<List<Department>> rep = new HttpResponse<List<Department>>();
+		List<Department> list = departmentService.getAllByHotelCode(getCurrentHotleCode());
+		return rep.addData(list);
 	}
 
 }
