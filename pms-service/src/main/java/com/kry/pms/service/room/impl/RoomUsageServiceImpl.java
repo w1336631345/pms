@@ -584,8 +584,6 @@ public class RoomUsageServiceImpl implements RoomUsageService {
         RoomUsage ru = roomUsageDao.queryGuestRoomUsable(info.guestRoom().getId(), info.getStartTime(), info.getEndTime());
         LocalDateTime startTime = info.getStartTime();
         LocalDateTime endTime = info.getEndTime();
-        Duration d = Duration.between(startTime, endTime);
-        long duration = d.get(ChronoUnit.SECONDS) / 3600;
         String businessInfo = info.getSummaryInfo();
         String businesskey = info.getBusinessKey();
         RoomUsage data = null;
@@ -612,6 +610,7 @@ public class RoomUsageServiceImpl implements RoomUsageService {
                     updateDuration(npur);
                     add(npur);
                     ru.setPostRoomUsage(npur);
+                    updateDuration(ru);
                     data = modify(ru);
                 }
             } else {
@@ -620,14 +619,15 @@ public class RoomUsageServiceImpl implements RoomUsageService {
                     BeanUtils.copyProperties(ru, npur);
                     npur.setUniqueIds(null);
                     ru.setEndDateTime(startTime);
+                    ru.setUsageStatus(status);
+                    ru.setBusinessInfo(businessInfo);
                     updateDuration(ru);
                     npur.setStartDateTime(endTime);
-                    npur.setUsageStatus(status);
-                    npur.setBusinessInfo(businessInfo);
                     npur.setId(null);
                     npur.setBusinesskey(businesskey);
                     ru = modify(ru);
                     npur.setPreRoomUsage(ru);
+                    updateDuration(npur);
                     data = add(npur);
                     ru.setPostRoomUsage(npur);
                     modify(ru);
@@ -643,7 +643,7 @@ public class RoomUsageServiceImpl implements RoomUsageService {
                     cru.setEndDateTime(endTime);
                     cru.setBusinessInfo(businessInfo);
                     cru.setBusinesskey(businesskey);
-                    cru.setDuration(duration);
+                    updateDuration(cru);
                     cru.setUsageStatus(status);
                     ru = modify(ru);
                     cru.setPreRoomUsage(ru);
