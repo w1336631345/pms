@@ -275,7 +275,9 @@ public class ReceptionServiceImpl implements ReceptionService {
 		if (cir != null && cir.getGroupType() != null) {
 			switch (cir.getGroupType()) {
 			case Constants.Type.CHECK_IN_RECORD_GROUP_TYPE_YES:
-				cir = cir.getMainRecord();
+				if(cir.getMainRecord()!=null){
+					cir = cir.getMainRecord();
+				}
 				asv = new AccountSummaryVo();
 				asv.setName("团队所有账务");
 				asv.setType("temp");
