@@ -6,6 +6,7 @@ import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+
 @Getter
 @Setter
 @Entity
@@ -22,4 +23,7 @@ public class OperationLog {
     private String newValue;
     private LocalDateTime opDate;
     private String opUser;
+    private String businessKey;
+    private String businessId;
+    private String hotelCode;
 }
