@@ -357,12 +357,13 @@ public class BillServiceImpl implements BillService {
                 bill.setCost(val1);
                 bill.setTotal(val1);
                 newBill1.setCost(val2);
+                newBill1.setTotal(val2);
             }else if(bill.getPay()!=null){
                 bill.setPay(val1);
                 bill.setTotal(val1);
-                newBill1.setCost(val2);
+                newBill1.setPay(val2);
+                newBill1.setTotal(val2);
             }
-            newBill1.setTotal(val2);
             add(newBill1);
             modify(bill);
         }
