@@ -118,10 +118,12 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
             checkInRecord.setMainRecord(dbCir.getMainRecord());
             updateCustomer(dbCir, checkInRecord);
             if(checkInRecord.getCustomer() != null){
-                Customer c = customerService.findById(checkInRecord.getCustomer().getId());
-                if(c != null){
-                    if(!dbCir.getName().equals(c.getName())){
-                        checkInRecord.setName(c.getName());
+                if(checkInRecord.getCustomer().getId() != null){
+                    Customer c = customerService.findById(checkInRecord.getCustomer().getId());
+                    if(c != null){
+                        if(!dbCir.getName().equals(c.getName())){
+                            checkInRecord.setName(c.getName());
+                        }
                     }
                 }
             }
@@ -225,7 +227,8 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
         HttpResponse hr = new HttpResponse();
         for (int i = 0; i < ids.length; i++) {
             CheckInRecord cir = findById(ids[i]);
-            cir.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_ASSIGN);
+//            cir.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_ASSIGN);//取消入住，退回排房状态，但排房还是预定
+            cir.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION);
             checkInRecordDao.save(cir);
             roomStatisticsService.cancleCheckIn(new CheckInRecordWrapper(cir));
         }
@@ -388,7 +391,8 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 //            ncir.setPersonalPrice(cir.getPurchasePrice());
 //            ncir.setPersonalPercentage(1.0);
             ncir.setId(null);
-            ncir.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_ASSIGN);
+//            ncir.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_ASSIGN);//之前排房状态A
+            ncir.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION);//排放状态依旧是预定
             ncir.setCustomer(customer);
             ncir.setName(customer.getName());
             ncir.setType(Constants.Type.CHECK_IN_RECORD_CUSTOMER);
@@ -455,7 +459,8 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                     if (item.getRoomType() == null) {
                         item.setRoomType(roomTypeService.findById(item.getRoomTypeId()));
                     }
-                    item.setProtocolCorpation(checkInRecord.getProtocolCorpation());
+//                    item.setProtocolCorpation(checkInRecord.getProtocolCorpation());
+                    item.setCorp(checkInRecord.getCorp());
                     item = add(item);
                     roomStatisticsService.reserve(new CheckInRecordWrapper(item));
                 }
@@ -524,6 +529,8 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
         checkInRecord.setAccount(account);
         if(Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN.equals(checkInRecord.getStatus())){
             checkInRecord.setActualTimeOfArrive(LocalDateTime.now());
+        }else{
+            checkInRecord.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION);
         }
         CheckInRecord cir = add(checkInRecord);
         roomStatisticsService.reserve(new CheckInRecordWrapper(cir));//预订
@@ -552,7 +559,8 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
         }
         if(checkInRecord.getGuestRoom() != null){//如果选了房间，直接预订
             checkInRecord.setType(Constants.Type.CHECK_IN_RECORD_CUSTOMER);
-            checkInRecord.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_ASSIGN);
+//            checkInRecord.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_ASSIGN);//以前选了房间为排房A，但排房依旧是预定
+            checkInRecord.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION);//上句注释对比修改
             GuestRoom gr = guestRoomService.findById(checkInRecord.getGuestRoom().getId());
 
             checkInRecord.setCheckInCount(1);
@@ -684,7 +692,8 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                     if (item.getRoomType() == null) {
                         item.setRoomType(roomTypeService.findById(item.getRoomTypeId()));
                     }
-                    item.setProtocolCorpation(checkInRecord.getProtocolCorpation());
+//                    item.setProtocolCorpation(checkInRecord.getProtocolCorpation());
+                    item.setCorp(checkInRecord.getCorp());
 //					boolean bookResult = roomStatisticsService.booking(item.getRoomType(), item.getArriveTime(),
 //							item.getRoomCount(), item.getDays());
 //					if (!bookResult) {
@@ -1111,7 +1120,8 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
             if (("G").equals(cir.getType()) || ("R").equals(cir.getType())) {
                 return hr.error("主单/预留不能取消");
             }
-            if ((Constants.Status.CHECKIN_RECORD_STATUS_ASSIGN).equals(cir.getStatus())) {//排房
+//            if ((Constants.Status.CHECKIN_RECORD_STATUS_ASSIGN).equals(cir.getStatus())) {//排房
+            if ((Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION).equals(cir.getStatus())) {//预定，没入住就是排房状态
                 roomStatisticsService.cancleAssign(new CheckInRecordWrapper(cir));//取消排房
             }
             if ((Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN).equals(cir.getStatus())) {
@@ -1185,7 +1195,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
     // 查询可联房的数据
     @Override
     public PageResponse<CheckInRecord> getNRoomLink(int pageIndex, int pageSize, String name, String roomNum,
-                                                    String hotelCode, String groupType) {
+                                                    String hotelCode, String groupType, String corp, String status, String account) {
         Pageable page = org.springframework.data.domain.PageRequest.of(pageIndex - 1, pageSize);
         Page<CheckInRecord> pageList = checkInRecordDao.findAll(new Specification<CheckInRecord>() {
             @Override
@@ -1195,15 +1205,26 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                 if (hotelCode != null) {
                     list.add(criteriaBuilder.equal(root.get("hotelCode"), hotelCode));
                 }
-                if (groupType != null) {
+                if (groupType != null) {//主单：N宾客，Y团队
                     list.add(criteriaBuilder.equal(root.get("groupType"), groupType));
                 }
-                if (roomNum != null) {
-                    list.add(criteriaBuilder.equal(root.get("roomNum"), roomNum));
+                if (roomNum != null) {//房间号
+                    list.add(criteriaBuilder.equal(root.join("guestRoom").get("roomNum"), roomNum));
                 }
-                if (name != null) {
+                if (status != null) {//状态
+                    list.add(criteriaBuilder.equal(root.get("status"), status));
+                }
+                if (name != null) {//姓名
                     // 外键对象的属性，要用join再get
                     list.add(criteriaBuilder.like(root.join("customer").get("name"), "%" + name + "%"));
+                }
+                if (corp != null) {//单位
+                    // 外键对象的属性，要用join再get
+                    list.add(criteriaBuilder.like(root.join("corp").get("name"), "%" + corp + "%"));
+                }
+                if (account != null) {//账号
+                    // 外键对象的属性，要用join再get
+                    list.add(criteriaBuilder.equal(root.join("account").get("code"), account));
                 }
                 list.add(criteriaBuilder.isNull(root.get("roomLinkId")));
                 list.add(criteriaBuilder.equal(root.get("type"), Constants.Type.CHECK_IN_RECORD_CUSTOMER));

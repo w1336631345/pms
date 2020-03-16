@@ -199,4 +199,15 @@ public class CustomerServiceImpl implements CustomerService {
 		return customerDao.getResverInfo(customerId);
 	}
 
+	@Override
+	public List<Customer> findByHotelCodeAndNameAndCustomerType(String hotelCode, String name, String customerType) {
+		 List<Customer> list = customerDao.findByHotelCodeAndNameAndCustomerType(hotelCode, name, customerType);
+		 return list;
+	}
+
+	@Override
+	public List<Map<String, Object>> getTypeIsB(String hotelCode, String customerType, String name, String numCode) {
+		return customerDao.getTypeIsB(hotelCode, customerType, name, numCode);
+	}
+
 }

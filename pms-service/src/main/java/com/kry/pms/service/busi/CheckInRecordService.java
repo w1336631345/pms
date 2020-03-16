@@ -111,7 +111,7 @@ public interface CheckInRecordService extends BaseService<CheckInRecord> {
     HttpResponse updateCount(List<String> reserveIds, String mainRecordId);
 
 	PageResponse<CheckInRecord> getNRoomLink(int pageIndex, int pageSize, String name, String roomNum, String hotelCode,
-			String groupType);
+			String groupType, String corp, String status, String account);
 
 	List<CheckInRecord> getRoomLinkList(String roomLinkId);
 

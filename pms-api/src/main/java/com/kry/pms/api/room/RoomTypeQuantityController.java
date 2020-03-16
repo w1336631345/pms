@@ -115,9 +115,9 @@ public class RoomTypeQuantityController extends BaseController<RoomTypeQuantity>
 	}
 
 	@GetMapping(path="/roomPriceByShecme2")
-	public HttpResponse<List<Map<String, Object>>> roomPriceByShecme2(String startTimes, String endTime, String[] buildIds, String[] roomTypeIds){
+	public HttpResponse<List<Map<String, Object>>> roomPriceByShecme2(String startTimes, String[] buildIds, String[] roomTypeIds){
 		HttpResponse<List<Map<String, Object>>> rep = new HttpResponse<>();
-		List<Map<String, Object>> data = roomTypeQuantityService.getByTimeAndRoomType2(getCurrentHotleCode(),startTimes, endTime,buildIds, roomTypeIds);
+		List<Map<String, Object>> data = roomTypeQuantityService.getByTimeAndRoomType2(getCurrentHotleCode(),startTimes, buildIds, roomTypeIds);
 		return rep.addData(data);
 	}
 

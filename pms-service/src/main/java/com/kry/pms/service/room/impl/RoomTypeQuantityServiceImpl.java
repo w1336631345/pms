@@ -483,6 +483,8 @@ public class RoomTypeQuantityServiceImpl implements RoomTypeQuantityService {
                     String name = MapUtils.getString(schmes.get(j), "name");
                     String price = MapUtils.getString(schmes.get(j), "price");
                     String room_type_id = MapUtils.getString(schmes.get(j), "room_type_id");
+                    String over_reservation = MapUtils.getString(schmes.get(j), "over_reservation");
+                    newMap.put("over_" + typeCode, over_reservation);
                     newMap.put("price_" + typeCode, price);
                     newMap.put("typeName_" + typeCode, roomTypeName);
                     Map<String, Object> tMap = roomTypeQuantityDao.mapByTimeAndRoomType(hotelCode, times, room_type_id);
@@ -495,7 +497,7 @@ public class RoomTypeQuantityServiceImpl implements RoomTypeQuantityService {
     }
 
     @Override
-    public List<Map<String, Object>> getByTimeAndRoomType2(String hotelCode, String startTimes, String endTime, String[] buildIds,
+    public List<Map<String, Object>> getByTimeAndRoomType2(String hotelCode, String startTimes, String[] buildIds,
                                                            String[] roomTypeIds) {
         List<String> bIds = null;
         if (buildIds != null) {
@@ -518,20 +520,24 @@ public class RoomTypeQuantityServiceImpl implements RoomTypeQuantityService {
             for (int j = 0; j < schmes.size(); j++) {
                 String id = MapUtils.getString(schmes.get(j), "id");
                 if (fId.equals(id)) {
-                    String code = MapUtils.getString(schmes.get(j), "code");
+//                    String code = MapUtils.getString(schmes.get(j), "code");
                     String typeCode = MapUtils.getString(schmes.get(j), "typeCode");
                     String roomTypeName = MapUtils.getString(schmes.get(j), "roomTypeName");
-                    String name = MapUtils.getString(schmes.get(j), "name");
+//                    String name = MapUtils.getString(schmes.get(j), "name");
                     String price = MapUtils.getString(schmes.get(j), "price");
                     String room_type_id = MapUtils.getString(schmes.get(j), "room_type_id");
+                    String over_reservation = MapUtils.getString(schmes.get(j), "over_reservation");
+                    newMap.put("over_" + typeCode, over_reservation);
                     newMap.put("price_" + typeCode, price);
                     newMap.put("typeName_" + typeCode, roomTypeName);
-                    Map<String, Object> tMap = roomTypeQuantityDao.mapByTimeAndRoomType2(hotelCode, startTimes, endTime, bIds,
-                            room_type_id);
+                    Map<String, Object> tMap = roomTypeQuantityDao.mapByTimeAndRoomType(hotelCode, startTimes, room_type_id);
+//                    Map<String, Object> tMap = roomTypeQuantityDao.mapByTimeAndRoomType2(hotelCode, startTimes, endTime, bIds,
+//                            room_type_id);
                     if (tMap == null || tMap.isEmpty()) {
                         newMap.put("total_" + typeCode, 0);
                     } else {
-                        newMap.put("total_" + typeCode, MapUtils.getString(tMap, "total"));
+//                        newMap.put("total_" + typeCode, MapUtils.getString(tMap, "total"));
+                        newMap.put("total_" + typeCode, MapUtils.getString(tMap, "predictable_total"));
                     }
                 }
             }

@@ -4,8 +4,10 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import com.kry.pms.model.persistence.busi.CheckInRecord;
+import com.kry.pms.model.persistence.guest.Customer;
 import com.kry.pms.model.persistence.marketing.ProtocolCorpation;
 
+import com.kry.pms.model.persistence.org.Corporation;
 import lombok.Data;
 @Data
 public class CheckInRecordListVo {
@@ -26,7 +28,8 @@ public class CheckInRecordListVo {
 	private String contactMobile;
 	private String type;
 	private String contactName;
-	private ProtocolCorpation protocolCorpation;
+//	private ProtocolCorpation protocolCorpation;
+	private Customer corp;
 	private String remark;
 	private String groupType;
 	private String roomLinkId;
@@ -49,7 +52,8 @@ public class CheckInRecordListVo {
 		this.type = cir.getType();
 		this.contactName = cir.getContactName();
 		this.contactMobile = cir.getContactMobile();
-		this.protocolCorpation = cir.getProtocolCorpation();
+//		this.protocolCorpation = cir.getProtocolCorpation();
+		this.corp = cir.getCorp();
 		this.remark = cir.getRemark();
 		this.groupType = cir.getGroupType();
 		this.roomLinkId = cir.getRoomLinkId();

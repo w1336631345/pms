@@ -117,8 +117,10 @@ public class CheckInRecord extends PersistenceModel {
 	private String contactMobile;// 预订人电话
 	@OneToOne
 	private MarketingSources marketingSources;// 市场来源
-	@OneToOne
-	private ProtocolCorpation protocolCorpation;// 协议单位
+//	@OneToOne
+//	private ProtocolCorpation protocolCorpation;// 协议单位
+	@ManyToOne
+	private Customer corp;//协议单位
 	@OneToOne
 	private Employee operationEmployee;// 操作人
 	@OneToOne
@@ -160,6 +162,8 @@ public class CheckInRecord extends PersistenceModel {
 	@Transient
 	private String isGOrU;//预订来至团队（G）还是多人（U）
 
+	public Customer getCorp() { return corp; }
+	public void setCorp(Customer corp) { this.corp = corp; }
 	public List<String> getRoomRequirement() { return roomRequirement; }
 	public void setRoomRequirement(List<String> roomRequirement) { this.roomRequirement = roomRequirement; }
 	public List<String> getRoomLayout() { return roomLayout; }
@@ -285,14 +289,6 @@ public class CheckInRecord extends PersistenceModel {
 
 	public void setMarketingSources(MarketingSources marketingSources) {
 		this.marketingSources = marketingSources;
-	}
-
-	public ProtocolCorpation getProtocolCorpation() {
-		return protocolCorpation;
-	}
-
-	public void setProtocolCorpation(ProtocolCorpation protocolCorpation) {
-		this.protocolCorpation = protocolCorpation;
 	}
 
 	public Employee getOperationEmployee() {

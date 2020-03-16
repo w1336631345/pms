@@ -56,11 +56,11 @@ public class RoomLinkController extends BaseController<RoomLink> {
      */
     @GetMapping(value = "/hRoomLink")
     public HttpResponse<PageResponse<CheckInRecord>> getHRoomLink(@RequestParam(value = "pageNum", defaultValue = "1")Integer pageNum,
-                                                                  @RequestParam(value = "pageSize", defaultValue = "10")Integer pageSize,
-                                                                  String name, String roomNum){
+                                                                  @RequestParam(value = "pageSize", defaultValue = "20")Integer pageSize,
+                                                                  String name, String roomNum, String groupTyp, String corp, String status, String account){
         HttpResponse<PageResponse<CheckInRecord>> rep = new HttpResponse<>();
         User user = getUser();
-        PageResponse<CheckInRecord> page = checkInRecordService.getNRoomLink(pageNum, pageSize,name, roomNum, user.getHotelCode(), Constants.Type.CHECK_IN_RECORD_GROUP_TYPE_NO);
+        PageResponse<CheckInRecord> page = checkInRecordService.getNRoomLink(pageNum, pageSize,name, roomNum, user.getHotelCode(), groupTyp, corp, status, account);
         rep.addData(page);
         return rep;
 

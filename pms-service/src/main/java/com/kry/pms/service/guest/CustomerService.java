@@ -24,4 +24,8 @@ public interface CustomerService extends BaseService<Customer>{
 	public Customer createOrGetCustomer(String hotelCode,String name, String idCardNum, String mobile);
 
     List<Map<String, Object>> getResverInfo(String customerId);
+
+    List<Customer> findByHotelCodeAndNameAndCustomerType(String hotelCode, String name, String customerType);
+
+    List<Map<String, Object>> getTypeIsB(String hotelCode, String customerType, String name, String numCode);
 }

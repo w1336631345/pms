@@ -19,6 +19,15 @@ import javax.servlet.http.HttpServletRequest;
 public class RoomChangeRecordController extends BaseController<RoomChangeRecord> {
 	@Autowired
 	RoomChangeRecordService roomChangeRecordService;
+
+	/**
+	 * 功能描述: <br>换房
+	 * 〈〉
+	 * @Param: [roomChangeRecord]
+	 * @Return: com.kry.pms.base.HttpResponse<com.kry.pms.model.persistence.busi.RoomChangeRecord>
+	 * @Author: huanghaibin
+	 * @Date: 2020/3/16 15:48
+	 */
 	@PostMapping
 	public HttpResponse<RoomChangeRecord> add(@RequestBody  RoomChangeRecord roomChangeRecord) {
 		HttpResponse hr = new HttpResponse();

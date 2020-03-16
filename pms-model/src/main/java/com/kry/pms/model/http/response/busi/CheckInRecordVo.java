@@ -38,9 +38,13 @@ public class CheckInRecordVo {
 		if (cir.getCustomer() != null) {
 			cirv.setCustomer(CustomerVo.convert(cir.getCustomer()));
 		}
-		if (cir.getProtocolCorpation() != null) {
-			cirv.setProtocolCorpationId(cir.getProtocolCorpation().getId());
-			cirv.setProtocolCorpationName(cir.getProtocolCorpation().getName());
+//		if (cir.getProtocolCorpation() != null) {
+//			cirv.setProtocolCorpationId(cir.getProtocolCorpation().getId());
+//			cirv.setProtocolCorpationName(cir.getProtocolCorpation().getName());
+//		}
+		if (cir.getCorp() != null) {
+			cirv.setProtocolCorpationId(cir.getCorp().getId());
+			cirv.setProtocolCorpationName(cir.getCorp().getName());
 		}
 		if(cir.getActualTimeOfLeave()!=null){
 			cirv.setLeaveTime(cir.getActualTimeOfLeave());

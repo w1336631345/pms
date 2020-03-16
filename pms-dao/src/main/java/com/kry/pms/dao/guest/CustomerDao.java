@@ -51,4 +51,21 @@ public interface CustomerDao extends BaseDao<Customer>{
 			" where tcr.customer_id = ?1 ")
 	List<Map<String, Object>> getResverInfo(String customerId);
 
+	List<Customer> findByHotelCodeAndNameAndCustomerType(String hotelCode, String name, String customerType);
+
+	@Query(nativeQuery = true, value = " select \n" +
+			" tc.id, tc.`name`, tc.num_code numCode, tcm.agreement_type agreementType, \n" +
+			" tc.deleted, tc.effective_date effectiveDate, ta.total, \n" +
+			" ta.credit_limit creditLimit, ta.`code` arCode, ta.id accountId \n" +
+			" from t_customer tc left join t_cust_market tcm on tc.id = tcm.customer_id \n" +
+			" left join (select ta.id, ta.total, ta.`code`, ta.customer_id, ta.credit_limit \n" +
+			"  from t_account ta where ta.type_='AR' limit 1) ta on tc.id = ta.customer_id \n" +
+			" where 1=1 \n" +
+			" and if(:hotelCode is not null && :hotelCode != '', tc.hotel_code=:hotelCode, 1=1 )  \n" +
+			" and if(:customerType is not null && :customerType != '', tc.customer_type=:customerType, 1=1 )  \n" +
+			" and if(:name is not null && :name != '', tc.`name` like CONCAT('%',:name,'%'), 1=1 ) \n" +
+			" and if(:numCode is not null && :numCode != '', tc.num_code=:numCode, 1=1 ) ")
+	List<Map<String, Object>> getTypeIsB(@Param("hotelCode") String hotelCode, @Param("customerType")String customerType,
+										 @Param("name") String name, @Param("numCode") String numCode);
+
 }

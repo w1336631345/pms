@@ -70,7 +70,8 @@ public class RoomChangeRecordServiceImpl implements RoomChangeRecordService {
 				}
 				checkInRecordService.update(cirs);
 				roomStatisticsService.reserve(new CheckInRecordWrapper(cirs));
-				if(Constants.Status.CHECKIN_RECORD_STATUS_ASSIGN.equals(cirs.getStatus())){
+//				if(Constants.Status.CHECKIN_RECORD_STATUS_ASSIGN.equals(cirs.getStatus())){
+				if(Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION.equals(cirs.getStatus())){
 					roomStatisticsService.assignRoom(new CheckInRecordWrapper(cirs));
 				}
 				if(Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN.equals(cirs.getStatus())){
@@ -94,7 +95,8 @@ public class RoomChangeRecordServiceImpl implements RoomChangeRecordService {
 			roomRecordService.createRoomRecord(cir);
 			//房间新预订，占用资源
 			roomStatisticsService.reserve(new CheckInRecordWrapper(cir));
-			if(Constants.Status.CHECKIN_RECORD_STATUS_ASSIGN.equals(cir.getStatus())){
+//			if(Constants.Status.CHECKIN_RECORD_STATUS_ASSIGN.equals(cir.getStatus())){
+			if(Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION.equals(cir.getStatus())){
 				roomStatisticsService.assignRoom(new CheckInRecordWrapper(cir));
 			}
 			if(Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN.equals(cir.getStatus())){

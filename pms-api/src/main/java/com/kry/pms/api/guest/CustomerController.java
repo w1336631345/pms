@@ -93,4 +93,33 @@ public class CustomerController extends BaseController<Customer> {
 		return rep.addData(list);
 	}
 
+	/**
+	 * 功能描述: <br>查询单位
+	 * 〈〉
+	 * @Param: [name, customerType]
+	 * @Return: com.kry.pms.base.HttpResponse<java.util.List<com.kry.pms.model.persistence.guest.Customer>>
+	 * @Author: huanghaibin
+	 * @Date: 2020/3/16 17:10
+	 */
+	@GetMapping(path = "/getCorp")
+	public HttpResponse<List<Customer>> findByHotelCodeAndNameAndCustomerType(String name, String customerType){
+		HttpResponse<List<Customer>> rep = new HttpResponse<List<Customer>>();
+		List<Customer> list = customerService.findByHotelCodeAndNameAndCustomerType(getCurrentHotleCode(),name,customerType);
+		return rep.addData(list);
+	}
+	/**
+	 * 功能描述: <br>查询单位(在用)
+	 * 〈〉
+	 * @Param: [customerType, name, numCode]
+	 * @Return: com.kry.pms.base.HttpResponse<java.util.List<java.util.Map<java.lang.String,java.lang.Object>>>
+	 * @Author: huanghaibin
+	 * @Date: 2020/3/16 19:09
+	 */
+	@GetMapping(path = "/getCorpT")
+	public HttpResponse<List<Map<String, Object>>> getCorpT(String customerType, String name, String numCode){
+		HttpResponse<List<Map<String, Object>>> rep = new HttpResponse<List<Map<String, Object>>>();
+		List<Map<String, Object>> list = customerService.getTypeIsB(getCurrentHotleCode(), customerType, name, numCode);
+		return rep.addData(list);
+	}
+
 }

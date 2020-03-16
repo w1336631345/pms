@@ -36,5 +36,5 @@ public interface RoomTypeQuantityService extends BaseService<RoomTypeQuantity>{
     public void initNewType(RoomType roomType);
     public void addRoomQuantity(RoomType roomType, int quantity);
 
-    List<Map<String, Object>> getByTimeAndRoomType2(String hotelCode, String startTimes, String endTime, String[] buildIds, String[] roomTypeIds);
+    List<Map<String, Object>> getByTimeAndRoomType2(String hotelCode, String startTimes, String[] buildIds, String[] roomTypeIds);
 }
