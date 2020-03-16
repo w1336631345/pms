@@ -50,7 +50,7 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
 		HttpResponse hr = checkInRecordService.modifyInfo(checkInRecord);
 		return hr;
 	}
-	/**
+	/**hangUp
 	 * 功能描述: <br>保存-预订
 	 * 〈〉
 	 * @Param: [checkInRecord]
