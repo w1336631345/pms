@@ -52,6 +52,8 @@ public class CustMarket extends PersistenceModel {
     @Column
     private String agreementType;//协议类别
     @Column
+    private String agreementNum;//协议编号
+    @Column
     private String customerId;
 
 }
