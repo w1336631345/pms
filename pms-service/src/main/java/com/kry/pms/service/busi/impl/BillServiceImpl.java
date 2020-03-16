@@ -346,19 +346,25 @@ public class BillServiceImpl implements BillService {
     @Override
     public DtoResponse<Bill> split(String id, Double val1, Double val2) {
         DtoResponse<Bill> rep = new DtoResponse<Bill>();
-        rep = adjust(id, null, false, null);
+//        rep = adjust(id, null, false, null);
         if (rep.getStatus() == 0) {
             Bill bill = findById(id);
             Bill newBill1 = null;
-            Bill newBill2 = null;
             newBill1 = copyBill(bill);
-            newBill2 = copyBill(bill);
             newBill1.setStatus(Constants.Status.BILL_NEED_SETTLED);
-            newBill2.setStatus(Constants.Status.BILL_NEED_SETTLED);
-            newBill1.setTotal(val1);
-            newBill2.setTotal(val2);
+            bill.setStatus(Constants.Status.BILL_NEED_SETTLED);
+            if(bill.getCost()!=null){
+                bill.setCost(val1);
+                bill.setTotal(val1);
+                newBill1.setCost(val2);
+            }else if(bill.getPay()!=null){
+                bill.setPay(val1);
+                bill.setTotal(val1);
+                newBill1.setCost(val2);
+            }
+            newBill1.setTotal(val2);
             add(newBill1);
-            add(newBill2);
+            modify(bill);
         }
         return rep;
     }
