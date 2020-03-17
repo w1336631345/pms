@@ -417,8 +417,8 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
 	@GetMapping(value = "/inGroup")
 	public HttpResponse inGroup(String[] cir, String cirG, Boolean isFollowGroup){
 		HttpResponse hr = new HttpResponse();
-		checkInRecordService.inGroup(cir,cirG, isFollowGroup);
-		return hr.ok();
+		hr = checkInRecordService.inGroup(cir,cirG, isFollowGroup);
+		return hr;
 	}
 
 	/**
@@ -430,10 +430,10 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
 	 * @Date: 2020/1/9 17:50
 	 */
 	@GetMapping(value = "/outGroup")
-	public HttpResponse outGroup(String[] cir, String cirG, Boolean isFollowGroup){
+	public HttpResponse outGroup(String[] cir, String cirG, Boolean isFollowGroup, String roomPriceId){
 		HttpResponse hr = new HttpResponse();
-		checkInRecordService.outGroup(cir,cirG,isFollowGroup);
-		return hr.ok();
+		hr = checkInRecordService.outGroup(cir,cirG,isFollowGroup, roomPriceId);
+		return hr;
 	}
 
 	/**
@@ -447,8 +447,8 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
 	@GetMapping(value = "/updateGroup")
 	public HttpResponse updateGroup(String[] cir, String cirG, String cirU, Boolean isFollowGroup){
 		HttpResponse hr = new HttpResponse();
-		checkInRecordService.updateGroup(cir,cirG,cirU, isFollowGroup);
-		return hr.ok();
+		hr = checkInRecordService.updateGroup(cir,cirG,cirU, isFollowGroup);
+		return hr;
 	}
 
 	/**

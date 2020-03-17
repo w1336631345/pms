@@ -146,11 +146,11 @@ public interface CheckInRecordService extends BaseService<CheckInRecord> {
 	public List<CheckInRecord> findByLinkId(String id);
 
     List<Map<String, Object>> getGroup(String hotelCode, String arriveTime, String leaveTime, String name_, String code_);
-    void inGroup(String[] cId, String gId, Boolean isFollowGroup);
+	HttpResponse inGroup(String[] cId, String gId, Boolean isFollowGroup);
 
-    void outGroup(String[] cId, String gId, Boolean isFollowGroup);
+	HttpResponse outGroup(String[] cId, String gId, Boolean isFollowGroup, String roomPriceId);
 
-	void updateGroup(String[] cId, String gId, String uId, Boolean isFollowGroup);
+	HttpResponse updateGroup(String[] cId, String gId, String uId, Boolean isFollowGroup);
 
 	//修改预留
 	CheckInRecord updateReserve(CheckInRecord cir);

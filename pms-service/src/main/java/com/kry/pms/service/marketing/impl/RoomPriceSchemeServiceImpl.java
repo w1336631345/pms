@@ -147,5 +147,11 @@ public class  RoomPriceSchemeServiceImpl implements  RoomPriceSchemeService{
 		List<RoomPriceScheme> list = roomPriceSchemeDao.getByCustomerId(custId);
 		return list;
 	}
+
+	@Override
+	public Map<String, Object> roomTypeAndPriceScheme(String roomTypeId, String roomPriceSchemeId){
+	 	Map<String, Object> map = roomPriceSchemeDao.roomTypeAndPriceScheme(roomTypeId, roomPriceSchemeId);
+	 	return map;
+	}
 	 
 }

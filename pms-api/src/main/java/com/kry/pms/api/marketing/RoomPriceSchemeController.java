@@ -1,6 +1,7 @@
 package com.kry.pms.api.marketing;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -128,6 +129,22 @@ public class RoomPriceSchemeController extends BaseController<RoomPriceScheme> {
 		HttpResponse hr = new HttpResponse();
 		List<RoomPriceScheme> list = roomPriceSchemeService.getByCustomerId(id);
 		hr.setData(list);
+		return hr;
+	}
+
+	/**
+	 * 功能描述: <br>查询房型对应房价码的相关信息（价格）
+	 * 〈〉
+	 * @Param: [roomTypeId, roomPriceSchemeId]
+	 * @Return: com.kry.pms.base.HttpResponse<java.util.Map<java.lang.String,java.lang.Object>>
+	 * @Author: huanghaibin
+	 * @Date: 2020/3/17 20:21
+	 */
+	@GetMapping(path = "/schemePrice")
+	public HttpResponse<Map<String, Object>> roomTypeAndPriceScheme(String roomTypeId, String roomPriceSchemeId) {
+		HttpResponse hr = new HttpResponse();
+		Map<String, Object> map = roomPriceSchemeService.roomTypeAndPriceScheme(roomTypeId, roomPriceSchemeId);
+		hr.setData(map);
 		return hr;
 	}
 

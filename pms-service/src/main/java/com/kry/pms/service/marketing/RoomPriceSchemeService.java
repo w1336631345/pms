@@ -24,4 +24,6 @@ public interface RoomPriceSchemeService extends BaseService<RoomPriceScheme>{
     List<RoomPriceScheme> findByHotelCodeAndDeleted(String hotelCode);
 
     List<RoomPriceScheme> getByCustomerId(String custId);
+
+    Map<String, Object> roomTypeAndPriceScheme(String roomTypeId, String roomPriceSchemeId);
 }
