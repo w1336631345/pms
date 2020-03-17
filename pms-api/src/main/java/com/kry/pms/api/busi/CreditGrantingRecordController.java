@@ -45,6 +45,12 @@ public class CreditGrantingRecordController extends BaseController<CreditGrantin
 		creditGrantingRecordService.delete(id);
 		return rep;
 	}
+	@GetMapping(path="/cancle/{id}")
+	public HttpResponse<CreditGrantingRecord> cancle(@PathVariable("id") String id){
+		HttpResponse<CreditGrantingRecord> rep = new HttpResponse<CreditGrantingRecord>();
+		BeanUtils.copyProperties(creditGrantingRecordService.cancle(id), rep);
+		return rep;
+	}
 
 	@GetMapping
 	public HttpResponse<PageResponse<CreditGrantingRecord>> query(HttpServletRequest request) throws InstantiationException, IllegalAccessException{

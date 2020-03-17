@@ -147,4 +147,29 @@ public class CreditGrantingRecordServiceImpl implements CreditGrantingRecordServ
 		}
 	}
 
+	@Override
+	public DtoResponse<CreditGrantingRecord>  cancle(String id) {
+		DtoResponse<CreditGrantingRecord> rep = new DtoResponse<>();
+		CreditGrantingRecord creditGrantingRecord = creditGrantingRecordDao.findById(id).get();
+		switch (creditGrantingRecord.getType()) {
+			case TYPE_CARD:
+				return rep.addData(cancleCreditCardGranting(creditGrantingRecord));
+			default:
+				rep.setStatus(Constants.BusinessCode.CODE_PARAMETER_INVALID);
+				rep.setMessage("暂时不支持取消该类型授信");
+				return rep;
+		}
+	}
+
+	private CreditGrantingRecord cancleCreditCardGranting(CreditGrantingRecord creditGrantingRecord) {
+		Account account = accountService.findById(creditGrantingRecord.getAccount().getId());
+		account.setAvailableCreditLimit(
+				BigDecimalUtil.sub(account.getAvailableCreditLimit() == null ? 0 : account.getAvailableCreditLimit(),
+						creditGrantingRecord.getGrantingLimit()));
+		account.setCreditLimit(BigDecimalUtil.sub(account.getCreditLimit() == null ? 0 : account.getCreditLimit(),
+				creditGrantingRecord.getGrantingLimit()));
+		accountService.modify(account);
+		delete(creditGrantingRecord.getId());
+		return creditGrantingRecord;
+	}
 }

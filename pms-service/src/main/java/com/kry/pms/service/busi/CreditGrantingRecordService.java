@@ -15,4 +15,5 @@ public interface CreditGrantingRecordService extends BaseService<CreditGrantingR
 	DtoResponse<CreditGrantingRecord> createRecord(CreditGrantingRecord creditGrantingRecord);
 
 
+	DtoResponse<CreditGrantingRecord> cancle(String id);
 }
