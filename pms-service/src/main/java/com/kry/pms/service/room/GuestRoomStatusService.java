@@ -65,6 +65,7 @@ public interface GuestRoomStatusService extends BaseService<GuestRoomStatus> {
 	void changeStatus(UseInfoAble info);
 
 	public GuestRoomStatusVo detailGuestRoomNum(String num,String hotleCode);
-	
-	
+
+
+    void clearUseInfo(UseInfoAble info);
 }

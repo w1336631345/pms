@@ -93,5 +93,10 @@ public class RoomLockRecord extends PersistenceModel implements UseInfoAble{
 	public String getRoomStatus() {
 		return Constants.Status.ROOM_STATUS_OUT_OF_SERVCIE;
 	}
-	
+
+	@Override
+	public LocalDateTime getActualStartTime() {
+		return null;
+	}
+
 }

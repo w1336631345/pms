@@ -1,5 +1,6 @@
 package com.kry.pms.service.room.impl;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -416,7 +417,8 @@ public class GuestRoomStatusServiceImpl implements GuestRoomStatusService {
 	public void changeStatus(UseInfoAble info) {
 		GuestRoomStatus status = guestRoomStatusDao.findByGuestRoomId(info.guestRoom().getId());
 		if (status != null) {
-			if (!info.getStartTime().isAfter(LocalDateTime.now())) {
+			Duration duration = Duration.between(info.getStartTime(),LocalDateTime.now());
+			if (duration.toMinutes()<1) {
 				if (info.getRoomStatus() != null) {
 					if (Constants.Status.ROOM_STATUS_OCCUPY_CLEAN.equals(info.getRoomStatus())) {
 						status.setFree(info.isFree());
@@ -477,5 +479,19 @@ public class GuestRoomStatusServiceImpl implements GuestRoomStatusService {
 		inflatRecordInfo(status);
 		return GuestRoomStatusVo.covert(status);
 	}
+
+	@Override
+	public void clearUseInfo(UseInfoAble info) {
+		GuestRoomStatus status = findGuestRoomStatusByGuestRoom(info.guestRoom());
+		status.setFree(false);
+		status.setGroup(false);
+		status.setOta(false);
+		status.setHourRoom(false);
+		status.setOverdued(false);
+		status.setWillLeave(false);
+		status.setRoomStatus(Constants.Status.ROOM_STATUS_VACANT_DIRTY);
+		modify(status);
+	}
+
 
 }

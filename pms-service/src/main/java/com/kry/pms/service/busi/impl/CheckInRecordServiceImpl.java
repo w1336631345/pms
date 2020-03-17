@@ -1055,6 +1055,8 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
         CheckInRecord cir = checkInRecordDao.findByAccountId(id);
         DtoResponse<String> rep = new DtoResponse<String>();
         cir.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_OUT_UNSETTLED);
+        cir.setActualTimeOfLeave(LocalDateTime.now());
+        roomStatisticsService.checkOut(new CheckInRecordWrapper(cir));
         modify(cir);
         return rep;
     }

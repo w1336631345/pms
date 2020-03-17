@@ -237,7 +237,6 @@ public class BillServiceImpl implements BillService {
             bill.setOperationEmployee(employee);
             bill.setShiftCode(shiftCode);
             bill.setCurrentSettleAccountRecordNum(orderNum);
-
             bill = add(bill);
         }
         return list;

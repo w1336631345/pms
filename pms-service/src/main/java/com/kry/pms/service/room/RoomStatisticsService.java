@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 
 import com.kry.pms.model.func.UseInfoAble;
 import com.kry.pms.model.other.wrapper.CheckInRecordWrapper;
+import com.kry.pms.model.persistence.room.GuestRoom;
 
 public interface RoomStatisticsService {
 
@@ -118,4 +119,5 @@ public interface RoomStatisticsService {
 	 */
 	public boolean cancleLock(UseInfoAble info, LocalDateTime cancleDateTime);
 
+	public boolean checkOut(GuestRoom guestRoom);
 }

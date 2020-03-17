@@ -16,6 +16,8 @@ public interface UseInfoAble {
 	
 	public String getRoomStatus();
 
+	public LocalDateTime getActualStartTime();
+
 	/**
 	 * 获取房间类型
 	 * 
@@ -81,7 +83,7 @@ public interface UseInfoAble {
 	public boolean isArrears();
 
 	/**
-	 * 开始时间
+	 * 资源使用开始时间
 	 * 
 	 * @return
 	 */

@@ -2,6 +2,7 @@ package com.kry.pms.service.room.impl;
 
 import java.time.LocalDateTime;
 
+import com.kry.pms.model.persistence.room.GuestRoom;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -68,7 +69,6 @@ public class RoomStatisticsServiceImpl implements RoomStatisticsService {
 	public boolean checkIn(UseInfoAble info) {
 		if (info.guestRoom() != null) {
 			roomUsageService.checkIn(info);
-			guestRoomStatusService.changeStatus(info);
 		}
 		return true;
 	}
@@ -83,8 +83,12 @@ public class RoomStatisticsServiceImpl implements RoomStatisticsService {
 
 	@Override
 	public boolean checkOut(UseInfoAble info) {
-		roomUsageService.changeUseStatus(info.guestRoom(), info.getBusinessKey(),
-				Constants.Status.ROOM_USAGE_CHECK_OUT);
+		roomUsageService.checkOut(info);
+		return true;
+	}
+	@Override
+	public boolean checkOut(GuestRoom guestRoom) {
+
 		return true;
 	}
 

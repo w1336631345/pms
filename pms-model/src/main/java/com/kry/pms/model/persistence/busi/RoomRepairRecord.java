@@ -105,4 +105,9 @@ public class RoomRepairRecord extends PersistenceModel implements UseInfoAble {
 	public String getRoomStatus() {
 		return Constants.Status.ROOM_STATUS_OUT_OF_ORDER;
 	}
+
+	@Override
+	public LocalDateTime getActualStartTime() {
+		return null;
+	}
 }

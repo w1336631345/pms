@@ -71,7 +71,7 @@ public class CheckInRecordWrapper implements UseInfoAble {
     public LocalDateTime getStartTime() {
         LocalDate localDate = null;
         if (this.checkInRecord.getActualTimeOfArrive() != null) {
-            localDate =  this.checkInRecord.getActualTimeOfArrive().toLocalDate();
+            return this.checkInRecord.getActualTimeOfArrive();
         } else {
             localDate =  this.checkInRecord.getArriveTime().toLocalDate();
         }
@@ -82,7 +82,7 @@ public class CheckInRecordWrapper implements UseInfoAble {
     public LocalDateTime getEndTime() {
         LocalDate localDate = null;
         if (this.checkInRecord.getActualTimeOfLeave() != null) {
-            localDate = this.checkInRecord.getActualTimeOfLeave().toLocalDate();
+            return this.checkInRecord.getActualTimeOfLeave();
         }else{
             localDate = this.checkInRecord.getLeaveTime().toLocalDate();
         }
@@ -145,5 +145,10 @@ public class CheckInRecordWrapper implements UseInfoAble {
             }
         }
         return null;
+    }
+
+    @Override
+    public LocalDateTime getActualStartTime() {
+        return this.checkInRecord.getActualTimeOfArrive();
     }
 }

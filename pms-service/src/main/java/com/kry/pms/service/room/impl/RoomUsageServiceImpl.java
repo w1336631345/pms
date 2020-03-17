@@ -59,8 +59,8 @@ public class RoomUsageServiceImpl implements RoomUsageService {
 
     @Autowired
     RoomRepairRecordService roomRepairRecordService;
-//	@Autowired
-//	GuestRoomStatusService guestRoomStatusService;
+	@Autowired
+	GuestRoomStatusService guestRoomStatusService;
 
     @Override
     public RoomUsage add(RoomUsage roomUsage) {
@@ -363,6 +363,7 @@ public class RoomUsageServiceImpl implements RoomUsageService {
             if (ru == null) { // 该状态为没有预留直接入住
                 // 使用房间资源
                 use(info, Constants.Status.ROOM_USAGE_CHECK_IN);
+                guestRoomStatusService.changeStatus(info);
                 // 使用房类资源
                 roomTypeQuantityService.checkInRoomTypeWithoutBook(info.roomType(), info.getStartTime().toLocalDate(),
                         info.getEndTime().toLocalDate(), 1);
@@ -375,6 +376,7 @@ public class RoomUsageServiceImpl implements RoomUsageService {
                         ru.getUniqueIds().clear();
                     }
                     ru.getUniqueIds().add(info.uniqueId());
+                    guestRoomStatusService.changeStatus(info);
                     roomTypeQuantityService.changeRoomTypeQuantity(info.roomType(), info.getStartTime().toLocalDate(),
                             info.getEndTime().toLocalDate(), ru.getUsageStatus(), Constants.Status.ROOM_USAGE_CHECK_IN, 1);
                     ru.setUsageStatus(Constants.Status.ROOM_USAGE_CHECK_IN);
@@ -420,7 +422,7 @@ public class RoomUsageServiceImpl implements RoomUsageService {
         if (info.guestRoom() != null) {// 如果没有房间的入住不占用任何资源，可能为主单入住
             RoomUsage ru = roomUsageDao.findByGuestRoomIdAndBusinesskey(info.guestRoom().getId(),
                     info.getBusinessKey());
-            if (ru == null) { // 该状态为没有预留直接入住
+            if (ru == null) {
                 // 使用房间资源
                 boolean result = use(info, Constants.Status.ROOM_USAGE_ASSIGN);
                 if (result) {
@@ -488,7 +490,7 @@ public class RoomUsageServiceImpl implements RoomUsageService {
             if (!ru.getStartDateTime().isBefore(endTime)) { // 开始时间前释放资源 相当于直接取消
                 RoomUsage pru = ru.getPreRoomUsage();//前一个
                 RoomUsage npru = ru.getPostRoomUsage();//后一个
-                if (pru.getUsageStatus().equals(Constants.Status.ROOM_USAGE_FREE)) {
+                if (pru!=null&&pru.getUsageStatus().equals(Constants.Status.ROOM_USAGE_FREE)) {
                     if (npru.getUsageStatus().equals(Constants.Status.ROOM_USAGE_FREE)) {
                         pru.setEndDateTime(npru.getEndDateTime());
                         updateDuration(pru);
@@ -516,8 +518,10 @@ public class RoomUsageServiceImpl implements RoomUsageService {
                         updateDuration(npru);
                         npru.setPreRoomUsage(pru);
                         modify(npru);
-                        pru.setPostRoomUsage(npru);
-                        modify(pru);
+                        if(pru!=null){
+                            pru.setPostRoomUsage(npru);
+                            modify(pru);
+                        }
                         ru.setPostRoomUsage(null);
                         ru.setPreRoomUsage(null);
                         modify(ru);
@@ -563,15 +567,30 @@ public class RoomUsageServiceImpl implements RoomUsageService {
         return true;
 
     }
-
-
-
-
-
-
-
     @Override
     public boolean checkOut(UseInfoAble info) {
+        if (info.guestRoom() != null) {
+            RoomUsage ru = roomUsageDao.findByGuestRoomIdAndBusinesskey(info.guestRoom().getId(),
+                    info.getBusinessKey());
+            if(ru.getUniqueIds().contains(info.uniqueId())){
+                ru.getUniqueIds().remove(info.uniqueId());
+                if(ru.getUniqueIds().isEmpty()){
+                    if(info.getEndTime().equals(ru.getEndDateTime())){
+                        ru.setUsageStatus(Constants.Status.ROOM_USAGE_CHECK_OUT);
+                    }else{
+                        if(info.getEndTime().isBefore(ru.getEndDateTime())){
+                            //提前退房
+                            unUse(ru,info);
+                            //提前释放房类资源
+                            // TODO
+                            roomTypeQuantityService.changeRoomTypeQuantity(info.roomType(), info.getStartTime().toLocalDate(),
+                                    info.getEndTime().toLocalDate(), ru.getUsageStatus(), Constants.Status.ROOM_USAGE_FREE, 1);
+                        }
+                    }
+                    guestRoomStatusService.clearUseInfo(info);
+                }
+            }
+        }
         return false;
     }
 
@@ -605,6 +624,7 @@ public class RoomUsageServiceImpl implements RoomUsageService {
                     ru.setBusinesskey(businesskey);
                     ru.setUsageStatus(status);
                     ru = modify(ru);
+                    npur.setStartDateTime(endTime);
                     npur.setPreRoomUsage(ru);
                     npur.setId(null);
                     updateDuration(npur);

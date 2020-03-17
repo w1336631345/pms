@@ -1,21 +1,20 @@
 package com.kry.pms.component.aop;
 
-import com.kry.pms.dao.log.RoomSourceUseLogDao;
 import com.kry.pms.dao.sys.OperationLogDao;
 import com.kry.pms.model.annotation.Log;
-import com.kry.pms.model.func.UseInfoAble;
-import com.kry.pms.model.persistence.log.RoomSourceUseLog;
 import com.kry.pms.model.persistence.sys.OperationLog;
 import com.kry.pms.service.sys.OperationLogService;
 import lombok.extern.slf4j.Slf4j;
+import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.Signature;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -23,9 +22,9 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
-//@Slf4j
-//@Aspect
-//@Component
+@Slf4j
+@Aspect
+@Component
 public class OperationLogAop {
     private static final String NAME_METHOD_FIND_BY_ID = "findById";
     private static final String NAME_METHOD_GET_ID = "getId";
@@ -35,20 +34,15 @@ public class OperationLogAop {
     @Autowired
     OperationLogDao operationLogDao;
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     @Around("execution(* com.kry.pms.service.busi.impl.CheckInRecordServiceImpl.modify(..))")
-    public Object addLog(ProceedingJoinPoint joinpoint) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+    public void addLog(JoinPoint joinpoint) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
         Object object = joinpoint.getArgs()[0];
         Signature s = joinpoint.getSignature();
         MethodSignature ms = (MethodSignature) s;
         Method m = ms.getMethod();
         List<OperationLog> logs = createLogs(object, findOldData(joinpoint.getTarget(), object));
         operationLogDao.saveAll(logs);
-        try {
-            return joinpoint.proceed();
-        } catch (Throwable throwable) {
-            throwable.printStackTrace();
-        }
-        return null;
     }
 
     private Object findOldData(Object target, Object object) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
@@ -62,8 +56,8 @@ public class OperationLogAop {
         List<OperationLog> logs = new ArrayList<>();
         Field[] fs = newData.getClass().getDeclaredFields();
         for (Field f : fs) {
-            Log l =  f.getAnnotation(Log.class);
-            if (l!=null) {
+            Log l = f.getAnnotation(Log.class);
+            if (l != null) {
                 f.setAccessible(true);
                 logs.add(createLog(oldData, newData, f, l));
                 f.setAccessible(false);
