@@ -141,6 +141,9 @@ public class CheckInRecord extends PersistenceModel {
 	// 联房id
 	@Column(columnDefinition = "varchar(64) COMMENT '联房id'")
 	private String roomLinkId;
+	// 联房主要房间，如果是主要房间记录M，主要是用于删除联房时，不能删除散客团原来的成员
+	@Column(columnDefinition = "varchar(64) COMMENT '联房主要房间：M'")
+	private String roomLinkIdM;
 	// 同住
 	@Column(columnDefinition = "varchar(64) COMMENT '同住编号'")
 	private String togetherCode;
@@ -162,6 +165,8 @@ public class CheckInRecord extends PersistenceModel {
 	@Transient
 	private String isGOrU;//预订来至团队（G）还是多人（U）
 
+	public String getRoomLinkIdM() { return roomLinkIdM; }
+	public void setRoomLinkIdM(String roomLinkIdM) { this.roomLinkIdM = roomLinkIdM; }
 	public Customer getCorp() { return corp; }
 	public void setCorp(Customer corp) { this.corp = corp; }
 	public List<String> getRoomRequirement() { return roomRequirement; }

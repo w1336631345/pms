@@ -12,6 +12,7 @@ import com.kry.pms.model.persistence.busi.RoomLink;
 import com.kry.pms.model.persistence.room.GuestRoom;
 import com.kry.pms.service.busi.CheckInRecordService;
 import com.kry.pms.service.busi.RoomLinkService;
+import com.kry.pms.service.sys.BusinessSeqService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -29,6 +30,8 @@ public class RoomLinkServiceImpl implements RoomLinkService {
     CheckInRecordService checkInRecordService;
     @Autowired
     CheckInRecordDao checkInRecordDao;
+    @Autowired
+    BusinessSeqService businessSeqService;
 
     @Override
     public RoomLink add(RoomLink entity) {
@@ -73,16 +76,6 @@ public class RoomLinkServiceImpl implements RoomLinkService {
             String ids[] = roomLinkBo.getIds();
             for(int i=0; i<ids.length; i++){
                 CheckInRecord cir = checkInRecordService.findById(ids[i]);
-//                if(cir.getGuestRoom() != null){
-//                    String roomNum = cir.getGuestRoom().getRoomNum();
-//                    String hotelCode = cir.getHotelCode();
-//                    List<CheckInRecord> list = checkInRecordService.getByRoomNum(roomNum, hotelCode, Constants.Type.CHECK_IN_RECORD_GROUP_TYPE_NO);
-//                    for(int m=0; m<list.size(); m++){
-//                        CheckInRecord cirRoomNum = list.get(m);
-//                        cirRoomNum.setRoomLinkId(roomLinkBo.getRoomLinkId());
-//                        checkInRecordService.update(cirRoomNum);
-//                    }
-//                }
                     if(cir.getGuestRoom() != null){
                         GuestRoom gr = cir.getGuestRoom();
                         String orderNum = cir.getOrderNum();
@@ -90,10 +83,12 @@ public class RoomLinkServiceImpl implements RoomLinkService {
                         for(int m=0; m<list.size(); m++){
                             CheckInRecord cirRoomNum = list.get(m);
                             cirRoomNum.setRoomLinkId(roomLinkBo.getRoomLinkId());
+                            cirRoomNum.setOrderNum(roomLinkBo.getOrderNum());
                             checkInRecordService.update(cirRoomNum);
                         }
                     }
                 cir.setRoomLinkId(roomLinkBo.getRoomLinkId());
+                cir.setOrderNum(roomLinkBo.getOrderNum());
                 checkInRecordService.update(cir);
             }
         }else {
@@ -109,16 +104,19 @@ public class RoomLinkServiceImpl implements RoomLinkService {
                     for(int m=0; m<list.size(); m++){
                         CheckInRecord cirRoomNum = list.get(m);
                         cirRoomNum.setRoomLinkId(rl.getId());
+                        cirRoomNum.setOrderNum(roomLinkBo.getOrderNum());
                         checkInRecordService.update(cirRoomNum);
                     }
                 }
                 cir.setRoomLinkId(rl.getId());
+                cir.setOrderNum(roomLinkBo.getOrderNum());
                 checkInRecordService.update(cir);
             }
             String[] id = roomLinkBo.getId();
             for(int j=0; j<id.length; j++){
                 CheckInRecord cir = checkInRecordService.findById(id[j]);
                 cir.setRoomLinkId(rl.getId());
+                cir.setRoomLinkIdM("M");
                 checkInRecordService.update(cir);
             }
         }
@@ -135,45 +133,47 @@ public class RoomLinkServiceImpl implements RoomLinkService {
             if(roomLinkId == null){
                 roomLinkId = cir.getRoomLinkId();
             }
-//            String roomNum = cir.getGuestRoom().getRoomNum();
-//            String hotelCode = cir.getHotelCode();
-//            List<CheckInRecord> list = checkInRecordService.getByRoomNum(roomNum, hotelCode, Constants.Type.CHECK_IN_RECORD_GROUP_TYPE_NO);
+            String orderNum = businessSeqService.fetchNextSeqNum(cir.getHotelCode(),
+                    Constants.Key.BUSINESS_ORDER_NUM_SEQ_KEY);
             List<CheckInRecord> list = checkInRecordService.findByOrderNumAndGuestRoomAndDeleted(cir.getOrderNum(), cir.getGuestRoom(), Constants.DELETED_FALSE);
             for(int m=0; m<list.size(); m++){
                 CheckInRecord cirRoomNum = list.get(m);
-                cirRoomNum.setRoomLinkId(null);
-                checkInRecordService.update(cirRoomNum);
-            }
-            cir.setRoomLinkId(null);
-            checkInRecordService.update(cir);
-        }
-        List<CheckInRecord> list = checkInRecordService.getRoomLinkList(roomLinkId);
-        String roomNum = null;
-        boolean isOne = true;
-        for(int j=0; j<list.size(); j++){
-            CheckInRecord cir = list.get(j);
-            if(cir.getGuestRoom() != null){
-                if(j==0){
-                    roomNum = cir.getGuestRoom().getRoomNum();
-                }
-                if(roomNum != null){
-                    String eNum = cir.getGuestRoom().getRoomNum();
-                    if(!roomNum.equals(eNum)){
-                        isOne = false;
-                    }
+                if(!"M".equals(cirRoomNum.getRoomLinkIdM())){
+                    cirRoomNum.setRoomLinkId(null);
+                    cirRoomNum.setOrderNum(orderNum);
+                    checkInRecordService.update(cirRoomNum);
                 }
             }
+//            cir.setRoomLinkId(null);
+//            checkInRecordService.update(cir);
         }
-        if(isOne){
-            for(int i=0; i<list.size(); i++){
-                CheckInRecord cir = list.get(i);
-                cir.setRoomLinkId(null);
-                checkInRecordService.update(cir);
-            }
-            if(roomLinkId != null){
-                delete(roomLinkId);
-            }
-        }
+//        List<CheckInRecord> list = checkInRecordService.getRoomLinkList(roomLinkId);
+//        String roomNum = null;
+//        boolean isOne = true;
+//        for(int j=0; j<list.size(); j++){
+//            CheckInRecord cir = list.get(j);
+//            if(cir.getGuestRoom() != null){
+//                if(j==0){
+//                    roomNum = cir.getGuestRoom().getRoomNum();
+//                }
+//                if(roomNum != null){
+//                    String eNum = cir.getGuestRoom().getRoomNum();
+//                    if(!roomNum.equals(eNum)){
+//                        isOne = false;
+//                    }
+//                }
+//            }
+//        }
+//        if(isOne){
+//            for(int i=0; i<list.size(); i++){
+//                CheckInRecord cir = list.get(i);
+//                cir.setRoomLinkId(null);
+//                checkInRecordService.update(cir);
+//            }
+//            if(roomLinkId != null){
+//                delete(roomLinkId);
+//            }
+//        }
         return hr.ok();
     }
 
