@@ -273,8 +273,7 @@ public class ReceptionServiceImpl implements ReceptionService {
 		CheckInRecord cir = checkInRecordService.findById(id);
 		AccountSummaryVo asv = null;
 		if (cir != null && cir.getGroupType() != null) {
-			switch (cir.getGroupType()) {
-			case Constants.Type.CHECK_IN_RECORD_GROUP_TYPE_YES:
+			if(Constants.Type.CHECK_IN_RECORD_GROUP_TYPE_YES.equals(cir.getGroupType())||"T".equals(cir.getFitType())){
 				if(cir.getMainRecord()!=null){
 					cir = cir.getMainRecord();
 				}
@@ -290,26 +289,20 @@ public class ReceptionServiceImpl implements ReceptionService {
 				asv.getChildren().add(group);
 				asv.getChildren().addAll((checkInRecordService.getAccountSummaryByOrderNum2(cir.getOrderNum(),
 						Constants.Type.CHECK_IN_RECORD_CUSTOMER)));
-				break;
-			case Constants.Type.CHECK_IN_RECORD_GROUP_TYPE_NO:
-				if (cir.getRoomLinkId() == null) {// 散客
-					Collection<AccountSummaryVo> data = checkInRecordService
-							.getAccountSummaryByOrderNum2(cir.getOrderNum(), Constants.Type.CHECK_IN_RECORD_CUSTOMER);
-					if (data != null && !data.isEmpty()) {
-						asv = (AccountSummaryVo) data.toArray()[0];
-					}
-				} else {// 联房
-					Collection<AccountSummaryVo> data = checkInRecordService
-							.getAccountSummaryByLinkNum(cir.getRoomLinkId(), Constants.Type.CHECK_IN_RECORD_CUSTOMER);
-					asv = new AccountSummaryVo();
-					asv.setName("联房账务");
-					asv.setType("link");
-					asv.setSettleType(Constants.Type.SETTLE_TYPE_LINK);
-					asv.setChildren(data);
+			}else if(cir.getRoomLinkId() != null){
+				Collection<AccountSummaryVo> data = checkInRecordService
+						.getAccountSummaryByLinkNum(cir.getRoomLinkId(), Constants.Type.CHECK_IN_RECORD_CUSTOMER);
+				asv = new AccountSummaryVo();
+				asv.setName("联房账务");
+				asv.setType("link");
+				asv.setSettleType(Constants.Type.SETTLE_TYPE_LINK);
+				asv.setChildren(data);
+			}else{
+				Collection<AccountSummaryVo> data = checkInRecordService
+						.getAccountSummaryByOrderNum2(cir.getOrderNum(), Constants.Type.CHECK_IN_RECORD_CUSTOMER);
+				if (data != null && !data.isEmpty()) {
+					asv = (AccountSummaryVo) data.toArray()[0];
 				}
-				break;
-			default:
-				break;
 			}
 		} else {
 			// 散客

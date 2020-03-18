@@ -12,10 +12,11 @@ import lombok.Data;
 @Data
 public class BillCheckBo {
 	private String shiftCode;
-	private String checkType;//ALL 为全部结账，PART 为部分结账    ROOM 房间结账     GROUP 团队结账   IG 散客团队结账 LINK 联房
+	private String checkType;//ACCOUNT 账户结账，PART 为部分结账    ROOM 房间结账     GROUP 团队结账   IG 散客团队结账 LINK 联房
 	private String checkWay;//S 结账，T 转账
 	@NotBlank
 	private String accountId;//AccountId,RoomId,主单id,联房id
+	private String mainAccountId;//结帐主账户id
 	private String targetAccountId;
 	private String roomNum;
 	private String orderNum;

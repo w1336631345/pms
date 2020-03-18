@@ -102,8 +102,8 @@ public class Constants {
 		public static final String CONFIG_OPERATION = "O";
 		public static final String CONFIG_SYSTEM = "S";
 
-		public static final String BILL_CHECK_TYPE_ALL = "ALL";
-		public static final String BILL_CHECK_TYPE_PART = "PART";
+//		public static final String BILL_CHECK_TYPE_ALL = "ALL";
+//		public static final String BILL_CHECK_TYPE_PART = "PART";
 
 		public static final String BUSINESS_SEQ_PDS = "PDS";
 		public static final String BUSINESS_SEQ_PS = "PS";

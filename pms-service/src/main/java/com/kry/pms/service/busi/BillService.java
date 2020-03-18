@@ -30,6 +30,7 @@ public interface BillService extends BaseService<Bill> {
 	public boolean checkAndPayBill(BillSettleBo bsb);
 
 	public List<Bill> findByAccountId(String id);
+	public List<Bill> findByAccountAndStatus(Account account,String status);
 	
 	public List<Bill> findByIds(List<String> ids);
 

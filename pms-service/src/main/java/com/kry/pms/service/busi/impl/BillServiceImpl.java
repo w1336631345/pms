@@ -185,6 +185,11 @@ public class BillServiceImpl implements BillService {
     }
 
     @Override
+    public List<Bill> findByAccountAndStatus(Account account, String status) {
+        return billDao.findByAccountAndStatus(account,status);
+    }
+
+    @Override
     public List<Bill> checkBillIds(List<String> billIds, double total, DtoResponse<Account> rep, String recordNum) {
         List<Bill> bills = billDao.findAllById(billIds);
         return checkBills(bills, total, rep, recordNum);
