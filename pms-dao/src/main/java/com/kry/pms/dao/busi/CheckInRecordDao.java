@@ -69,9 +69,9 @@ public interface CheckInRecordDao extends BaseDao<CheckInRecord> {
 	List<CheckInRecord> findByMainRecordAndDeleted(CheckInRecord mainRecord, int deleted);
 
 	@Query(nativeQuery = true, value = " select  "
-			+ " tcr.id, ta.`code`, DATE_FORMAT(tcr.arrive_time,'%Y-%m-%d %T') arrive_time, DATE_FORMAT(tcr.leave_time, '%Y-%m-%d %T') leave_time, "
+			+ " tcr.id, tcr.order_num, ta.`code`, DATE_FORMAT(tcr.arrive_time,'%Y-%m-%d %T') arrive_time, DATE_FORMAT(tcr.leave_time, '%Y-%m-%d %T') leave_time, "
 			+ " tcr.name_, tcr.room_count, tcr.human_count, tcr.`status` "
-			+ " from t_checkin_record tcr left join t_account ta " + " on tcr.account_id = ta.id "
+			+ " from t_checkin_record tcr left join t_account ta on tcr.account_id = ta.id "
 			+ " where tcr.deleted =0 and tcr.group_type='Y' and tcr.type_='G' "
 			+ " and if(:hotelCode is not null && :hotelCode != '', tcr.hotel_code=:hotelCode, 1=1 ) "
 			+ " and if(:arriveTime is not null && :arriveTime != '', DATE_FORMAT(tcr.arrive_time, '%Y-%m-%d')<=:arriveTime, 1=1 ) "

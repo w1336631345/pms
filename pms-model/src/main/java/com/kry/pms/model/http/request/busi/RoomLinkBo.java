@@ -8,4 +8,5 @@ public class RoomLinkBo {
     private String[] ids;
     private String[] id;
     private String roomLinkId;
+    private String orderNum;
 }
