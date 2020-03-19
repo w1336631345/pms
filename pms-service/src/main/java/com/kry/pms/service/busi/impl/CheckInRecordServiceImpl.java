@@ -51,6 +51,7 @@ import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Service
@@ -942,6 +943,11 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
     }
 
     @Override
+    public PageResponse<Map<String, Object>> querySummaryListToBySql(String hotelCode, PageRequest pageRequest) throws IOException, TemplateException {
+        return sqlTemplateService.queryForPage(hotelCode, "resverList", pageRequest);
+    }
+
+    @Override
     public List<CheckInRecord> findByOrderNum(String orderNum) {
 
 
@@ -1005,6 +1011,14 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
         String mainId = null;
         int humanCount = 0;
         for (CheckInRecord cir : checkInRecords) {
+            cir.setPersonalPrice(cir.getPurchasePrice());
+            //如果新增房价，没有设置房价码价格，默认定价（成交价）和个人承担价是原价
+            if(cir.getPurchasePrice() == null || "".equals(cir.getPurchasePrice())){
+                cir.setPurchasePrice(cir.getOriginalPrice());
+            }
+            if(cir.getPersonalPrice() == null || "".equals(cir.getPersonalPrice())){
+                cir.setPersonalPrice(cir.getOriginalPrice());
+            }
             cir = addReserve(cir);
             //新增预留占用资源
             roomStatisticsService.reserve(new CheckInRecordWrapper(cir));
@@ -1437,12 +1451,15 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
     // 独单房价
     @Override
     @org.springframework.transaction.annotation.Transactional(rollbackFor = Exception.class)
-    public void roomPriceAllocation(String hotelCode, String orderNum, String customerId, String guestRoomId) {
+    public void roomPriceAllocation(String hotelCode, String orderNum, String checkInRecordId, String guestRoomId) {
+        LocalDate date = LocalDate.now();
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        String recordDate = date.format(fmt);
         List<CheckInRecord> list = checkInTogether(hotelCode, orderNum, guestRoomId);
         for (int i = 0; i < list.size(); i++) {
             CheckInRecord cir = list.get(i);
-            String custId = cir.getCustomer().getId();
-            if (!customerId.equals(custId)) {
+//            String custId = cir.getCustomer().getId();
+            if (!checkInRecordId.equals(cir.getId())) {
                 cir.setOriginalPrice(0.0);
                 cir.setPersonalPrice(0.0);
                 cir.setPersonalPercentage(0.0);
@@ -1452,6 +1469,13 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                 cir.setPersonalPercentage(1.0);// 因为是独单房价，占比1
             }
             update(cir);
+            List<RoomRecord> roomRecords = roomRecordService.getByTimeAndCheckId(recordDate, cir.getId());
+            for(int j=0; j<roomRecords.size(); j++){
+                RoomRecord rr = roomRecords.get(j);
+                rr.setCost(cir.getPersonalPrice());
+                rr.setCostRatio(cir.getPersonalPercentage());
+                roomRecordService.modify(rr);
+            }
 
         }
     }
@@ -1460,6 +1484,9 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
     @Override
     @org.springframework.transaction.annotation.Transactional(rollbackFor = Exception.class)
     public void roomPriceAvg(String hotelCode, String orderNum, String guestRoomId) {
+        LocalDate date = LocalDate.now();
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        String recordDate = date.format(fmt);
         List<CheckInRecord> list = checkInTogether(hotelCode, orderNum, guestRoomId);
         if (list != null && !list.isEmpty()) {
             Double peopleCount = Double.valueOf(list.size());
@@ -1476,6 +1503,13 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                 cir.setPersonalPercentage(personalPercentage);
                 cir.setOriginalPrice(originalPrice);
                 update(cir);
+                List<RoomRecord> roomRecords = roomRecordService.getByTimeAndCheckId(recordDate, cir.getId());
+                for(int j=0; j<roomRecords.size(); j++){
+                    RoomRecord rr = roomRecords.get(j);
+                    rr.setCostRatio(cir.getPersonalPercentage());
+                    rr.setCost(cir.getPersonalPrice());
+                    roomRecordService.modify(rr);
+                }
             }
         }
     }

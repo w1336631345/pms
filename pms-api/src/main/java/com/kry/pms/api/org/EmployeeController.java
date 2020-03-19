@@ -1,6 +1,7 @@
 package com.kry.pms.api.org;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -91,6 +92,26 @@ public class EmployeeController extends BaseController<Employee> {
 			return rep.loginError();
 		}
 		List<Employee> list = employeeService.getByHotelCodeAndDelete(user.getHotelCode());
+		rep.setData(list);
+		return rep;
+	}
+
+	/**
+	 * 功能描述: <br>操作员的下拉框列表
+	 * 〈〉
+	 * @Param: []
+	 * @Return: com.kry.pms.base.HttpResponse
+	 * @Author: huanghaibin
+	 * @Date: 2020/3/19 20:21
+	 */
+	@GetMapping(path="/getListMap")
+	public HttpResponse getListMap(){
+		HttpResponse<List<Map<String, Object>>> rep = new HttpResponse<List<Map<String, Object>>>();
+		User user = getUser();
+		if(user == null){
+			return rep.loginError();
+		}
+		List<Map<String, Object>> list = employeeService.getListMap(user.getHotelCode());
 		rep.setData(list);
 		return rep;
 	}

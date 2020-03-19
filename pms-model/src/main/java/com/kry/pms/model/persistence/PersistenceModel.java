@@ -11,7 +11,9 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -34,11 +36,13 @@ public class PersistenceModel implements Serializable,Cloneable {
 	@CreatedDate
 	@Column(updatable = false, columnDefinition = "datetime NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间'")
 	protected LocalDateTime createDate;
+	@CreatedBy
 	@Column(columnDefinition = "varchar(255) COMMENT '创建人'")
 	protected String createUser;
 	@LastModifiedDate
 	@Column(columnDefinition = "datetime NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间'")
 	protected LocalDateTime updateDate;
+	@LastModifiedBy
 	@Column(columnDefinition = "varchar(255) COMMENT '修改人'")
 	protected String updateUser;
 	@Column(columnDefinition = "tinyint(1) default '0' COMMENT '删除状态'")

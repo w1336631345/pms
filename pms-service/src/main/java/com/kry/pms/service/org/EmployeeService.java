@@ -1,6 +1,7 @@
 package com.kry.pms.service.org;
 
 import java.util.List;
+import java.util.Map;
 
 import com.kry.pms.base.DtoResponse;
 import com.kry.pms.model.persistence.org.Employee;
@@ -17,4 +18,5 @@ public interface EmployeeService extends BaseService<Employee> {
 
 	List<Employee> findEmployeeByDeptCode(String deptMarketingDefaultCode, String currentHotleCode);
 
+    List<Map<String, Object>> getListMap(String hotelCode);
 }

@@ -28,4 +28,6 @@ public interface RoomRecordService extends BaseService<RoomRecord> {
     List<RoomRecord> findByHotelCodeAndCheckInRecord(String hotelCode, String checkInRecordId);
 
     Map<String, Object> recordDateAndRoomPrice(String recordDate, String checkInRecordId);
+
+    List<RoomRecord> getByTimeAndCheckId(String recordDate, String checkInRecordId);
 }

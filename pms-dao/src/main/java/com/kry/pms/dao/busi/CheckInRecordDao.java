@@ -202,7 +202,7 @@ public interface CheckInRecordDao extends BaseDao<CheckInRecord> {
 			" where tcr.deleted = 0 \n" +
 			" and if(:hotelCode is not null && :hotelCode != '', tcr.hotel_code=:hotelCode, 1=1 )  \n" +
 			" and (if(:tType is not null && :tType != '', tcr.type_=:tType, 1=2 ) OR if(:fitType is not null && :fitType != '', tcr.fit_type=:fitType, 1=2 ))  \n" +
-			" and if(:status is not null && :status != '', if(:status = 'A', tcr.status in (:status,'R'), tcr.status=:status ), 1=1 ) \n" +
+			" and if(:status is not null && :status != '', tcr.status=:status, 1=1 ) \n" +
 			" and if(:groupType is not null && :groupType != '',  tcr.group_type=:groupType, 1=1 ) ",
 			countQuery = " select \n" +
 					" count(tcr.id) \n" +
@@ -214,7 +214,7 @@ public interface CheckInRecordDao extends BaseDao<CheckInRecord> {
 					" where tcr.deleted = 0 \n" +
 					" and if(:hotelCode is not null && :hotelCode != '', tcr.hotel_code=:hotelCode, 1=1 )  \n" +
 					" and (if(:tType is not null && :tType != '', tcr.type_=:tType, 1=2 ) OR if(:fitType is not null && :fitType != '', tcr.fit_type=:fitType, 1=2 ))  \n" +
-					" and if(:status is not null && :status != '', if(:status = 'A', tcr.status in (:status,'R'), tcr.status=:status ), 1=1 ) \n" +
+					" and if(:status is not null && :status != '', tcr.status=:status, 1=1 ) \n" +
 					" and if(:groupType is not null && :groupType != '',  tcr.group_type=:groupType, 1=1 ) ")
 	Page<Map<String, Object>> resverList(Pageable page, @Param("hotelCode") String hotelCode, @Param("tType") String type, @Param("fitType") String fitType,
 										 @Param("status") String status, @Param("groupType") String groupType);

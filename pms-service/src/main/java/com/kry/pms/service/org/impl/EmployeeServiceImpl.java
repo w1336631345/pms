@@ -1,6 +1,7 @@
 package com.kry.pms.service.org.impl;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
@@ -115,6 +116,11 @@ public class EmployeeServiceImpl implements EmployeeService {
 	@Override
 	public List<Employee> findEmployeeByDeptCode(String deptMarketingDefaultCode, String currentHotleCode) {
 		return employeeDao.findByDepartmentCodeAndHotelCode(deptMarketingDefaultCode, currentHotleCode);
+	}
+
+	@Override
+	public List<Map<String, Object>> getListMap(String hotelCode) {
+		return employeeDao.getListMap(hotelCode);
 	}
 
 }

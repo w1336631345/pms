@@ -20,6 +20,7 @@ import com.kry.pms.base.PageResponse;
 import com.kry.pms.model.persistence.busi.RoomRecord;
 import com.kry.pms.service.busi.RoomRecordService;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -86,4 +87,19 @@ public class RoomRecordController extends BaseController<RoomRecord> {
 		return rep.addData(map);
 	}
 
+	/**
+	 * 功能描述: <br>查询对应记录(checkInRecord)某一天之后的所有记录
+	 * 〈〉
+	 * @Param: [recorDate, checkInRecordId]
+	 * @Return: com.kry.pms.base.HttpResponse<java.util.List<com.kry.pms.model.persistence.busi.RoomRecord>>
+	 * @Author: huanghaibin
+	 * @Date: 2020/3/19 10:11
+	 */
+	@GetMapping(path = "/getByTimeAndCheckId")
+	public HttpResponse<List<RoomRecord>> getByTimeAndCheckId(String recordDate, String checkInRecordId) throws InstantiationException, IllegalAccessException{
+		HttpResponse<List<RoomRecord>> rep = new HttpResponse<List<RoomRecord>>();
+		List<RoomRecord> list = roomRecordService.getByTimeAndCheckId(recordDate, checkInRecordId);
+		rep.setData(list);
+		return rep;
+	}
 }

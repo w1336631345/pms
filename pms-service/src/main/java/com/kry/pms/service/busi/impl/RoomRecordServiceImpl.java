@@ -113,6 +113,8 @@ public class RoomRecordServiceImpl implements RoomRecordService {
 			rr.setCheckInRecord(cir);
 			rr.setCustomer(cir.getCustomer());
 			rr.setGuestRoom(cir.getGuestRoom());
+			rr.setCost(cir.getPersonalPrice());
+			rr.setCostRatio(cir.getPersonalPercentage());
 			rr.setRecordDate(cir.getStartDate().plusDays(i));
 			add(rr);
 		}
@@ -211,6 +213,32 @@ public class RoomRecordServiceImpl implements RoomRecordService {
 	public Map<String, Object> recordDateAndRoomPrice(String recordDate, String checkInRecordId){
 		Map<String, Object> map = roomRecordDao.recordDateAndRoomPrice(recordDate, checkInRecordId);
 		return map;
+	}
+
+	@Override
+	public List<RoomRecord> getByTimeAndCheckId(String recordDate, String checkInRecordId) {
+		Specification<RoomRecord> querySpecifi = new Specification<RoomRecord>() {
+			@Override
+			public Predicate toPredicate(Root<RoomRecord> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder cb) {
+				List<Predicate> predicates = new ArrayList<>();
+//				predicates.add(cb.equal(root.get("recordDate").as(LocalDate.class), LocalDate.now()));
+//				//大于或等于传入时间
+//				predicates.add(cb.greaterThanOrEqualTo(root.get("recordDate").as(Date.class), startTime));
+//				//小于或等于传入时间
+//				predicates.add(cb.lessThanOrEqualTo(root.get("recordDate").as(Date.class), endTime));
+				if (recordDate != null) {
+					predicates.add(cb.greaterThanOrEqualTo(root.get("recordDate").as(LocalDate.class), LocalDate.parse(recordDate)));
+				}
+				if (StringUtils.isNotBlank(checkInRecordId)) {
+					predicates.add(cb.equal(root.join("checkInRecord").get("id").as(String.class), checkInRecordId));
+				}
+				predicates.add(cb.equal(root.get("isAccountEntry").as(String.class), "NO"));
+				// and到一起的话所有条件就是且关系，or就是或关系
+				return cb.and(predicates.toArray(new Predicate[predicates.size()]));
+			}
+		};
+		List<RoomRecord> list = roomRecordDao.findAll(querySpecifi);
+		return list;
 	}
 
 }

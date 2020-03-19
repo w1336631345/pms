@@ -300,11 +300,16 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
 	 * @Author: huanghaibin
 	 * @Date: 2020/2/29 14:55
 	 */
+//	@GetMapping(path = "/summaryTo")
+//	public HttpResponse<PageResponse<Map<String, Object>>> querySummaryListTo(HttpServletRequest request) throws InstantiationException, IllegalAccessException{
+//		HttpResponse<PageResponse<Map<String, Object>>> rep = new HttpResponse<PageResponse<Map<String, Object>>>();
+//		PageRequest<CheckInRecord> req = parse2PageRequest(request);
+//		return rep.addData(checkInRecordService.querySummaryListTo(req));
+//	}
 	@GetMapping(path = "/summaryTo")
-	public HttpResponse<PageResponse<Map<String, Object>>> querySummaryListTo(HttpServletRequest request) throws InstantiationException, IllegalAccessException{
+	public HttpResponse<PageResponse<Map<String, Object>>> querySummaryListTo(HttpServletRequest request) throws IOException, TemplateException, IllegalAccessException, InstantiationException {
 		HttpResponse<PageResponse<Map<String, Object>>> rep = new HttpResponse<PageResponse<Map<String, Object>>>();
-		PageRequest<CheckInRecord> req = parse2PageRequest(request);
-		return rep.addData(checkInRecordService.querySummaryListTo(req));
+		return rep.addData(checkInRecordService.querySummaryListToBySql(getCurrentHotleCode(), parse2CommonPageRequest(request)));
 	}
 
 	/**
@@ -366,10 +371,10 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
 	 * @Date: 2019/12/24 17:40
 	 */
 	@GetMapping(value = "/roomPriceAllocation")
-	public HttpResponse roomPriceAllocation(String orderNum, String customerId, String guestRoomId){
+	public HttpResponse roomPriceAllocation(String orderNum, String checkInRecordId, String guestRoomId){
 		HttpResponse hr = new HttpResponse();
 		User user = getUser();
-		checkInRecordService.roomPriceAllocation(user.getHotelCode(), orderNum, customerId, guestRoomId);
+		checkInRecordService.roomPriceAllocation(user.getHotelCode(), orderNum, checkInRecordId, guestRoomId);
 		return hr.ok();
 	}
 

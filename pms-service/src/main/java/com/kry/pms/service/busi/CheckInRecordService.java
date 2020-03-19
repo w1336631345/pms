@@ -78,6 +78,8 @@ public interface CheckInRecordService extends BaseService<CheckInRecord> {
 
     PageResponse<Map<String, Object>> querySummaryListTo(PageRequest<CheckInRecord> prq);
 
+    PageResponse<Map<String, Object>> querySummaryListToBySql(String hotelCode, PageRequest pageRequest) throws IOException, TemplateException;
+
     public List<CheckInRecord> findByOrderNum(String orderNum);
 
     List<Map<String, Object>> findByOrderNumC2(String hotelCode, String orderNum) throws IOException, TemplateException;
@@ -127,7 +129,7 @@ public interface CheckInRecordService extends BaseService<CheckInRecord> {
 
 	// 独单房价
 	@org.springframework.transaction.annotation.Transactional(rollbackFor = Exception.class)
-	void roomPriceAllocation(String hotelCode, String orderNum, String customerId, String guestRoomId);
+	void roomPriceAllocation(String hotelCode, String orderNum, String checkInRecordId, String guestRoomId);
 
 	// 平均房价
 	@org.springframework.transaction.annotation.Transactional(rollbackFor = Exception.class)
