@@ -2,6 +2,7 @@ package com.kry.pms.api.sys;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.kry.pms.base.*;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -14,10 +15,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.kry.pms.api.BaseController;
-import com.kry.pms.base.DtoResponse;
-import com.kry.pms.base.HttpResponse;
-import com.kry.pms.base.PageRequest;
-import com.kry.pms.base.PageResponse;
 import com.kry.pms.model.http.response.busi.SettleInfoVo;
 import com.kry.pms.model.persistence.sys.Account;
 import com.kry.pms.service.org.EmployeeService;
@@ -59,9 +56,13 @@ public class AccountController extends BaseController<Account> {
 	}
 
 	@GetMapping("/settleInfo/{type}/{id}")
-	public HttpResponse<SettleInfoVo> getSettleInfo(@PathVariable String type,@PathVariable String id) {
+	public HttpResponse<SettleInfoVo> getSettleInfo(@PathVariable String type,@PathVariable String id,String extFee) {
 		 HttpResponse<SettleInfoVo> response = new HttpResponse<SettleInfoVo>();
-		 SettleInfoVo settleInfoVo = accountService.getSettleInfo(type,id);
+		 SettleInfoVo settleInfoVo = accountService.getSettleInfo(type,id,extFee,getCurrentHotleCode());
+		 if(settleInfoVo==null){
+		 	response.setCode(Constants.BusinessCode.CODE_ILLEGAL_OPERATION);
+		 	response.setMessage("无法生成结帐信息");
+		 }
 		 return response.addData(settleInfoVo);
 	}
 

@@ -228,10 +228,10 @@ public class BillServiceImpl implements BillService {
                 break;
             }
         }
-        if (total != 0) {
-            rep.setStatus(Constants.BusinessCode.CODE_ILLEGAL_OPERATION);
-            rep.setMessage("账务不平，无法结账");
-        }
+//        if (total != 0) {
+//            rep.setStatus(Constants.BusinessCode.CODE_ILLEGAL_OPERATION);
+//            rep.setMessage("账务不平，无法结账");
+//        }
         return bills;
     }
 

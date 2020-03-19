@@ -7,4 +7,5 @@ public interface ProductDao extends BaseDao<Product>{
 
     Product getById(String id);
 
+    Product findByHotelCodeAndCode(String hotelCode, String code);
 }

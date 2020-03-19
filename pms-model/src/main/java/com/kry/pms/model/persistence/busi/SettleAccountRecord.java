@@ -58,4 +58,6 @@ public class SettleAccountRecord extends PersistenceModel {
 	private List<Bill> bills;
 	@ManyToMany
 	private List<Bill> flatBills;
+	@ManyToMany
+	private List<Bill> extBills;
 }

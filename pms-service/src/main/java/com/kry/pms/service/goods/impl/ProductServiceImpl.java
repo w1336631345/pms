@@ -49,6 +49,16 @@ public class  ProductServiceImpl implements  ProductService{
 	}
 
 	@Override
+	public Product findHalfRoomFee(String hotelCode) {
+		return productDao.findByHotelCodeAndCode(hotelCode,Constants.Code.HALF_DAY_ROOM_FEE);
+	}
+
+	@Override
+	public Product findFullRoomFee(String hotelCode) {
+		return productDao.findByHotelCodeAndCode(hotelCode,Constants.Code.FULL_DAY_ROOM_FEE);
+	}
+
+	@Override
 	public List<Product> getAllByHotelCode(String code) {
 		return null;//默认不实现
 		//return productDao.findByHotelCode(code);

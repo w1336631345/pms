@@ -6,4 +6,8 @@ import com.kry.pms.service.BaseService;
 public interface ProductService extends BaseService<Product>{
 
     Product getById(String id);
+
+    Product findHalfRoomFee(String hotelCode);
+
+    Product findFullRoomFee(String hotelCode);
 }

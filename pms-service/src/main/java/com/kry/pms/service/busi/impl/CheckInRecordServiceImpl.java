@@ -871,6 +871,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
         Map<String, AccountSummaryVo> asvm = new HashMap<>();
         AccountSummaryVo asv = null;
         for (AccountSummaryVo item : list) {
+            item.setSettleType(Constants.Type.SETTLE_TYPE_ACCOUNT);
             if (!asvm.containsKey(item.getRoomNum())) {
                 asv = new AccountSummaryVo();
                 asv.setType("room");
@@ -949,8 +950,6 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 
     @Override
     public List<CheckInRecord> findByOrderNum(String orderNum) {
-
-
         return checkInRecordDao.findByOrderNumAndDeleted(orderNum, Constants.DELETED_FALSE);
     }
 

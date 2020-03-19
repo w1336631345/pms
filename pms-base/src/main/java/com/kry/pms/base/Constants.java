@@ -164,6 +164,10 @@ public class Constants {
 		
 		public static final String CREDIT_GRANT_EMPLOYEE="E";
 
+		public static final String EXT_FEE_NONE = "N";
+		public static final String EXT_FEE_FULL = "F";
+		public static final String EXT_FEE_HALF = "H";
+
 	}
 
 	public static final int DELETED_TRUE = 1;
@@ -241,5 +245,10 @@ public class Constants {
 	public interface auditNightMode {
 		public static final String NIGHT_AUDIT_AUTO = "AUTO";// 夜审入账方式-自动入账
 		public static final String NIGHT_AUDIT_MANUAL = "MANUAL";// 夜审入账方式-手动入账
+	}
+
+	public interface Code {
+		public static final String  HALF_DAY_ROOM_FEE = "1050";
+		public static final String  FULL_DAY_ROOM_FEE = "1051";
 	}
 }

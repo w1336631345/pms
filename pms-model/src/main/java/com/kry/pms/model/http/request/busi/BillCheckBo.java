@@ -23,6 +23,7 @@ public class BillCheckBo {
 	private double total;
 	private List<String> billIds;
 	private List<Bill> bills;
+	private List<Bill> extBills;
 	private Employee operationEmployee;
 	private String hotelCode;
 }

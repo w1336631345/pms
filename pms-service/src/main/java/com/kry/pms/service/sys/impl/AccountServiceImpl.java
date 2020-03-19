@@ -11,7 +11,10 @@ import java.util.Map;
 import javax.transaction.Transactional;
 
 import com.kry.pms.dao.busi.RoomRecordDao;
+import com.kry.pms.model.persistence.goods.Product;
+import com.kry.pms.model.persistence.room.GuestRoom;
 import com.kry.pms.service.busi.*;
+import com.kry.pms.service.goods.ProductService;
 import org.apache.commons.collections4.MapUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,6 +59,8 @@ public class AccountServiceImpl implements AccountService {
     BusinessSeqService businessSeqService;
     @Autowired
     RoomRecordDao roomRecordDao;
+    @Autowired
+    ProductService productService;
 
     @Override
     public Account add(Account account) {
@@ -129,7 +134,6 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public Account billEntry(Bill bill) {
         Account account = findById(bill.getAccount().getId());
-        System.out.println(bill.getAccount().getId());
         if (account != null) {
             if (bill.getCost() != null) {
                 account.setCost(BigDecimalUtil.add(account.getCost(), bill.getCost()));
@@ -273,6 +277,8 @@ public class AccountServiceImpl implements AccountService {
                 return checkLinkBill(billCheckBo);
             case Constants.Type.SETTLE_TYPE_IGROUP:
                 return checkIGroupBill(billCheckBo);
+            case Constants.Type.SETTLE_TYPE_ROOM:
+                return checkRoomBill(billCheckBo);
         }
         DtoResponse<Account> rep = new DtoResponse<Account>();
         return rep;
@@ -284,6 +290,7 @@ public class AccountServiceImpl implements AccountService {
         Account account = findById(billCheckBo.getAccountId());
         List<Bill> bills = null;
         if (account != null) {
+            List<Bill> extBills = addExtBills(billCheckBo);
             SettleAccountRecord settleAccountRecord = settleAccountRecordService.create(billCheckBo, account);
             List<Bill> flatBills = billService.addFlatBills(billCheckBo.getBills(), billCheckBo.getOperationEmployee(),
                     billCheckBo.getShiftCode(), settleAccountRecord.getRecordNum());
@@ -305,6 +312,7 @@ public class AccountServiceImpl implements AccountService {
             if (rep.getStatus() == 0) {
                 settleAccountRecord.setBills(bills);
                 settleAccountRecord.setFlatBills(flatBills);
+                settleAccountRecord.setExtBills(extBills);
                 settleAccountRecordService.modify(settleAccountRecord);
 
             }
@@ -319,9 +327,56 @@ public class AccountServiceImpl implements AccountService {
         return rep;
     }
 
+    private List<Bill> addExtBills(BillCheckBo billCheckBo) {
+        List<Bill> bills =null;
+        if (billCheckBo.getExtBills() != null && !billCheckBo.getExtBills().isEmpty()) {
+            bills = new ArrayList<>();
+            for (Bill eb : billCheckBo.getExtBills()) {
+                bills.add(billService.add(eb));
+            }
+        }
+        return bills;
+    }
+
     private DtoResponse<Account> checkRoomBill(BillCheckBo billCheckBo) {
         DtoResponse<Account> rep = new DtoResponse<Account>();
+        List<CheckInRecord> cirs = checkInRecordService.findByGuestRoomAndStatusAndDeleted(billCheckBo.getAccountId(), Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN, Constants.DELETED_FALSE);
+        if (!cirs.isEmpty() && cirs.size() == 0) {
+            billCheckBo.setCheckType(Constants.Type.SETTLE_TYPE_ACCOUNT);
+            billCheckBo.setAccountId(cirs.get(0).getAccount().getId());
+            return checkAccountBill(billCheckBo);
+        } else {
+            Account mainAccount = findMainAccount(cirs, billCheckBo.getMainAccountId());
+            if (mainAccount != null) {
+                transferBill(cirs, mainAccount, billCheckBo);
+                billCheckBo.setCheckType(Constants.Type.SETTLE_TYPE_ACCOUNT);
+                billCheckBo.setAccountId(mainAccount.getId());
+                return checkAccountBill(billCheckBo);
+            } else {
+                rep.setStatus(Constants.BusinessCode.CODE_PARAMETER_INVALID);
+                rep.setMessage("无法找到结帐主账户");
+            }
+        }
         return rep;
+    }
+
+    private Account findMainAccount(List<CheckInRecord> list, String mainAccountId) {
+        Account mainAccount = null;
+        if (mainAccountId != null) {
+            for (CheckInRecord cir : list) {
+                if (cir.getAccount() != null && cir.getAccount().getId().equals(mainAccountId)) {
+                    mainAccount = cir.getAccount();
+                }
+            }
+        } else {
+            int cseq = 0;
+            for (CheckInRecord cir : list) {
+                if (cir.getAccount() != null && cir.getAccount().getCurrentBillSeq() > cseq) {
+                    mainAccount = cir.getAccount();
+                }
+            }
+        }
+        return mainAccount;
     }
 
     private DtoResponse<Account> checkIGroupBill(BillCheckBo billCheckBo) {
@@ -351,6 +406,7 @@ public class AccountServiceImpl implements AccountService {
         List<CheckInRecord> cirs = checkInRecordService.findByOrderNum(cir.getOrderNum());
         Account targetAccount = cir.getAccount();
         boolean result = true;
+        addExtBills(billCheckBo);
         for (CheckInRecord item : cirs) {
             if (Constants.Type.CHECK_IN_RECORD_CUSTOMER.equals(item.getType())) {
                 Account account = item.getAccount();
@@ -402,13 +458,15 @@ public class AccountServiceImpl implements AccountService {
     private DtoResponse<Account> checkLinkBill(BillCheckBo billCheckBo) {
         DtoResponse<Account> rep = new DtoResponse<Account>();
         String id = billCheckBo.getAccountId();
-        CheckInRecord cir = checkInRecordService.queryByAccountId(id);
-        List<CheckInRecord> cirs = checkInRecordService.findByLinkId(cir.getRoomLinkId());
-        boolean result = transferBill(cirs, cir.getAccount(), billCheckBo);
-        if(result){
+        List<CheckInRecord> cirs = checkInRecordService.findByLinkId(id);
+        addExtBills(billCheckBo);
+        Account account = findMainAccount(cirs,billCheckBo.getMainAccountId());
+        boolean result = transferBill(cirs, account, billCheckBo);
+        if (result) {
             billCheckBo.setCheckType(Constants.Type.SETTLE_TYPE_ACCOUNT);
+            billCheckBo.setAccountId(account.getId());
             return checkAccountBill(billCheckBo);
-        }else{
+        } else {
             rep.setCode(Constants.BusinessCode.CODE_ILLEGAL_OPERATION);
             rep.setMessage("部分帐务无法转到主账户");
             return rep;
@@ -464,50 +522,88 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public SettleInfoVo getSettleInfo(String type, String id) {
+    public SettleInfoVo getSettleInfo(String type, String id, String extFee, String hotelCode) {
         SettleInfoVo siv = null;
         switch (type) {
             case Constants.Type.SETTLE_TYPE_ACCOUNT:
-                siv = getSingleAccountSettleInfo(id);
+                siv = getSingleAccountSettleInfo(id, extFee);
                 break;
             case Constants.Type.SETTLE_TYPE_PART:
 
                 break;
             case Constants.Type.SETTLE_TYPE_GROUP:
-                siv = getSingleAccountSettleInfo(id);
+                siv = getGroupAccountSettleInfo(id, extFee, hotelCode);
                 break;
             case Constants.Type.SETTLE_TYPE_IGROUP:
-
+                siv = getGroupAccountSettleInfo(id, extFee, hotelCode);
                 break;
             case Constants.Type.SETTLE_TYPE_ROOM:
-                siv = getRoomSettleInfo(id);
+                siv = getRoomSettleInfo(id, extFee, hotelCode);
                 break;
             case Constants.Type.SETTLE_TYPE_LINK:
-                siv = getLinkSettleInfo(id);
+                siv = getLinkSettleInfo(id, extFee, hotelCode);
                 break;
 
             default:
                 break;
         }
+        if (siv != null) {
+            countExtBillToInfo(siv);
+        }
         return siv;
     }
 
-    private SettleInfoVo getRoomSettleInfo(String id) {
-        List<CheckInRecord> cirs = checkInRecordService.findByGuestRoomAndStatusAndDeleted(id,
-                Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN, Constants.DELETED_FALSE);
-        SettleInfoVo info = new SettleInfoVo();
-        for (CheckInRecord cir : cirs) {
-            if (cir.getAccount() != null) {
-                countSettleInfo(info, cir.getAccount());
+    private void countExtBillToInfo(SettleInfoVo siv) {
+        if (!siv.getBills().isEmpty()) {
+            for (Bill bill : siv.getBills()) {
+                siv.setCost(BigDecimalUtil.add(siv.getCost(), bill.getCost()));
+                siv.setTotal(BigDecimalUtil.add(siv.getTotal(), bill.getCost()));
             }
         }
-        return info;
     }
 
-    private SettleInfoVo getSingleAccountSettleInfo(String id) {
+    private SettleInfoVo getRoomSettleInfo(String id, String extFee, String hotelCode) {
+        List<CheckInRecord> cirs = checkInRecordService.findByGuestRoomAndStatusAndDeleted(id,
+                Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN, Constants.DELETED_FALSE);
+        return createSettleInfo(cirs, extFee, hotelCode);
+    }
+
+    private Bill createExtFee(CheckInRecord cir, Product product, Double cost) {
+        Bill bill = new Bill();
+        bill.setCost(cost);
+        bill.setProduct(product);
+        bill.setQuantity(1);
+        GuestRoom guestRoom = new GuestRoom();
+        guestRoom.setId(cir.getGuestRoom().getId());
+        guestRoom.setRoomNum(cir.getGuestRoom().getRoomNum());
+        Account account = new Account();
+        account.setId(cir.getAccount().getId());
+        account.setName(cir.getAccount().getName());
+        account.setRoomNum(cir.getAccount().getRoomNum());
+        bill.setAccount(account);
+        bill.setGuestRoom(guestRoom);
+        bill.setStatus(Constants.Status.BILL_NEED_SETTLED);
+        return bill;
+    }
+
+    private SettleInfoVo getGroupAccountSettleInfo(String id, String extFee, String hotelCode) {
+        CheckInRecord cir = checkInRecordService.queryByAccountId(id);
+        if (cir != null) {
+            List<CheckInRecord> cirs = checkInRecordService.findByOrderNumC(cir.getOrderNum());
+            return createSettleInfo(cirs, extFee, hotelCode);
+        } else {
+            return null;
+        }
+    }
+
+
+    private SettleInfoVo getSingleAccountSettleInfo(String id, String extFee) {
         SettleInfoVo info = new SettleInfoVo();
         Account account = findById(id);
-        BeanUtils.copyProperties(account, info);
+        CheckInRecord cir = checkInRecordService.queryByAccountId(id);
+        if (cir != null) {
+            return createSettleInfo(cir, extFee, cir.getHotelCode());
+        }
         return info;
     }
 
@@ -529,16 +625,82 @@ public class AccountServiceImpl implements AccountService {
             info.setTotal(BigDecimalUtil.add(info.getTotal(), account.getTotal()));
         }
         if (account.getCurrentBillSeq() != null) {
-            info.setTotalSeq(info.getTotalSeq() + account.getCurrentBillSeq());
+            info.setTotalSeq(info.getTotalSeq() == null ? 0 : info.getTotalSeq() + account.getCurrentBillSeq());
         }
     }
 
-    private SettleInfoVo getLinkSettleInfo(String id) {
+    private SettleInfoVo getLinkSettleInfo(String id, String extFee, String hotelCode) {
         List<CheckInRecord> cirs = checkInRecordService.findByLinkId(id);
+        return createSettleInfo(cirs, extFee, hotelCode);
+
+    }
+
+    private SettleInfoVo createSettleInfo(CheckInRecord cir, String extFee, String hotelCode) {
         SettleInfoVo info = new SettleInfoVo();
-        for (CheckInRecord cir : cirs) {
-            if (cir.getAccount() != null) {
-                countSettleInfo(info, cir.getAccount());
+        Product product = null;
+        if (extFee != null) {
+            switch (extFee) {
+                case Constants.Type.EXT_FEE_NONE:
+                    countSettleInfo(info, cir.getAccount());
+                    break;
+                case Constants.Type.EXT_FEE_HALF:
+                    product = productService.findHalfRoomFee(hotelCode);
+                    if (cir.getAccount() != null) {
+                        countSettleInfo(info, cir.getAccount());
+                        if (cir.getPersonalPrice() != null && cir.getPersonalPrice() != 0.0) {
+                            info.getBills().add(createExtFee(cir, product, cir.getPersonalPrice() / 2));
+                        }
+                    }
+
+                    break;
+                case Constants.Type.EXT_FEE_FULL:
+                    product = productService.findFullRoomFee(hotelCode);
+                    if (cir.getAccount() != null) {
+                        countSettleInfo(info, cir.getAccount());
+                        if (cir.getPersonalPrice() != null && cir.getPersonalPrice() != 0.0) {
+                            info.getBills().add(createExtFee(cir, product, cir.getPersonalPrice()));
+                        }
+                    }
+                    break;
+            }
+        }
+        return info;
+    }
+
+    private SettleInfoVo createSettleInfo(List<CheckInRecord> cirs, String extFee, String hotelCode) {
+        SettleInfoVo info = new SettleInfoVo();
+        Product product = null;
+        if (extFee != null) {
+            switch (extFee) {
+                case Constants.Type.EXT_FEE_NONE:
+                    for (CheckInRecord cir : cirs) {
+                        if (cir.getAccount() != null) {
+                            countSettleInfo(info, cir.getAccount());
+                        }
+                    }
+                    break;
+                case Constants.Type.EXT_FEE_HALF:
+                    product = productService.findHalfRoomFee(hotelCode);
+                    for (CheckInRecord cir : cirs) {
+                        if (cir.getAccount() != null) {
+                            countSettleInfo(info, cir.getAccount());
+                            if (cir.getPersonalPrice() != null && cir.getPersonalPrice() > 0.0) {
+                                info.getBills().add(createExtFee(cir, product, cir.getPersonalPrice() / 2));
+                            }
+                        }
+                    }
+                    break;
+                case Constants.Type.EXT_FEE_FULL:
+                    product = productService.findFullRoomFee(hotelCode);
+                    for (CheckInRecord cir : cirs) {
+                        if (cir.getAccount() != null) {
+                            countSettleInfo(info, cir.getAccount());
+                            if (cir.getPersonalPrice() != null && cir.getPersonalPrice() > 0.0) {
+                                info.getBills().add(createExtFee(cir, product, cir.getPersonalPrice()));
+                            }
+                        }
+                    }
+                    break;
             }
         }
         return info;
