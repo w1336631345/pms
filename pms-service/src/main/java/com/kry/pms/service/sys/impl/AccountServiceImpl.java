@@ -573,7 +573,7 @@ public class AccountServiceImpl implements AccountService {
 
     private SettleInfoVo getRoomSettleInfo(String id, String extFee, String hotelCode) {
         List<CheckInRecord> cirs = checkInRecordService.findByGuestRoomAndStatusAndDeleted(id,
-                Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN, Constants.DELETED_FALSE);
+                null, Constants.DELETED_FALSE);
         return createSettleInfo(cirs, extFee, hotelCode);
     }
 

@@ -226,4 +226,5 @@ public interface CheckInRecordDao extends BaseDao<CheckInRecord> {
 	List<String> getRoomRequirement(String checkInId);
 
 
+    List<CheckInRecord> findByGuestRoomIdAndDeleted(String guestRoomId, int deleted);
 }

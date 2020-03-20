@@ -1531,7 +1531,13 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 
     @Override
     public List<CheckInRecord> findByGuestRoomAndStatusAndDeleted(String guestRoomId, String status, int deleted) {
+        if(status==null){
+            return findByGuestRoomIdAndStatus(guestRoomId,deleted);
+        }
         return checkInRecordDao.findByGuestRoomIdAndStatusAndDeleted(guestRoomId, status, deleted);
+    }
+    private List<CheckInRecord> findByGuestRoomIdAndStatus(String guestRoomId,int deleted){
+        return checkInRecordDao.findByGuestRoomIdAndDeleted(guestRoomId, deleted);
     }
 
     @Override
