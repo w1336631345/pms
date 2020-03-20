@@ -145,6 +145,7 @@ public class AccountServiceImpl implements AccountService {
             account.setTotal(BigDecimalUtil.sub(account.getCost(), account.getPay()));
         }
         account.setCurrentBillSeq(account.getCurrentBillSeq() + 1);
+        account.setStatus(Constants.Status.ACCOUNT_IN);
         if (Constants.Status.BILL_NEED_SETTLED.equals(bill.getStatus())) {
 
         }
@@ -267,6 +268,10 @@ public class AccountServiceImpl implements AccountService {
     }
 
     private DtoResponse<Account> checkBill(BillCheckBo billCheckBo) {
+        String recordNum = businessSeqService.fetchNextSeqNum(billCheckBo.getHotelCode(),
+                Constants.Key.BUSINESS_BUSINESS_SETTLE_SEQ_KEY);
+        billCheckBo.setMainSettleRecordNum(recordNum);
+        billCheckBo.setExtBills(addExtBills(billCheckBo));
         switch (billCheckBo.getCheckType()) {
             case Constants.Type.SETTLE_TYPE_ACCOUNT:
                 return checkAccountBill(billCheckBo);
@@ -312,7 +317,7 @@ public class AccountServiceImpl implements AccountService {
             if (rep.getStatus() == 0) {
                 settleAccountRecord.setBills(bills);
                 settleAccountRecord.setFlatBills(flatBills);
-//                settleAccountRecord.setExtBills(extBills);
+                settleAccountRecord.setExtBills(billCheckBo.getExtBills());
                 settleAccountRecordService.modify(settleAccountRecord);
 
             }
@@ -328,7 +333,7 @@ public class AccountServiceImpl implements AccountService {
     }
 
     private List<Bill> addExtBills(BillCheckBo billCheckBo) {
-        List<Bill> bills =null;
+        List<Bill> bills = null;
         if (billCheckBo.getExtBills() != null && !billCheckBo.getExtBills().isEmpty()) {
             bills = new ArrayList<>();
             for (Bill eb : billCheckBo.getExtBills()) {
@@ -350,11 +355,11 @@ public class AccountServiceImpl implements AccountService {
             Account mainAccount = findMainAccount(cirs, billCheckBo.getMainAccountId());
             if (mainAccount != null) {
                 boolean result = transferBill(cirs, mainAccount, billCheckBo);
-                if(result){
+                if (result) {
                     billCheckBo.setCheckType(Constants.Type.SETTLE_TYPE_ACCOUNT);
                     billCheckBo.setAccountId(mainAccount.getId());
                     return checkAccountBill(billCheckBo);
-                }else{
+                } else {
                     TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                     rep.setStatus(Constants.BusinessCode.CODE_PARAMETER_INVALID);
                     rep.setMessage("结帐过程中转账失败");
@@ -388,23 +393,21 @@ public class AccountServiceImpl implements AccountService {
     }
 
     private DtoResponse<Account> checkIGroupBill(BillCheckBo billCheckBo) {
+        DtoResponse<Account> rep = new DtoResponse<Account>();
         String id = billCheckBo.getAccountId();
         CheckInRecord cir = checkInRecordService.queryByAccountId(id);
-        List<CheckInRecord> cirs = checkInRecordService.findByOrderNum(cir.getOrderNum());
+        List<CheckInRecord> cirs = checkInRecordService.findByOrderNumC(cir.getOrderNum());
         Account targetAccount = cir.getAccount();
-        for (CheckInRecord item : cirs) {
-            if (Constants.Type.CHECK_IN_RECORD_CUSTOMER.equals(item.getType())) {
-                Account account = item.getAccount();
-                if (Constants.Status.ACCOUNT_IN.equals(account.getStatus()) && account.getTotal() != 0.0) {
-                    boolean result = transferBill(account, targetAccount, billCheckBo);
-                    if (!result) {
-                        // TODO 失败
-                    }
-                }
-            }
+        boolean result = transferBill(cirs, targetAccount, billCheckBo);
+        if (result) {
+            billCheckBo.setCheckType(Constants.Type.SETTLE_TYPE_ACCOUNT);
+            billCheckBo.setAccountId(targetAccount.getId());
+            return checkAccountBill(billCheckBo);
+        } else {
+            rep.setCode(Constants.BusinessCode.CODE_ILLEGAL_OPERATION);
+            rep.setMessage("部分帐务无法转到主账户");
+            return rep;
         }
-        billCheckBo.setCheckType(Constants.Type.SETTLE_TYPE_ACCOUNT);
-        return checkAccountBill(billCheckBo);
     }
 
     private DtoResponse<Account> checkGroupBill(BillCheckBo billCheckBo) {
@@ -414,13 +417,12 @@ public class AccountServiceImpl implements AccountService {
         List<CheckInRecord> cirs = checkInRecordService.findByOrderNum(cir.getOrderNum());
         Account targetAccount = cir.getAccount();
         boolean result = true;
-        addExtBills(billCheckBo);
         for (CheckInRecord item : cirs) {
             if (Constants.Type.CHECK_IN_RECORD_CUSTOMER.equals(item.getType())) {
                 Account account = item.getAccount();
-                if (account.getTotal() != 0.0) {
+                if (Constants.Status.ACCOUNT_NEW.equals(account.getStatus())||Constants.Status.ACCOUNT_SETTLE.equals(account.getStatus())) {
+                }else{
                     result = false;
-                    break;
                 }
             }
         }
@@ -438,7 +440,7 @@ public class AccountServiceImpl implements AccountService {
         for (CheckInRecord item : cirs) {
             if (Constants.Type.CHECK_IN_RECORD_CUSTOMER.equals(item.getType())) {
                 Account account = item.getAccount();
-                if (!account.getId().equals(targetAccount.getId()) &&  account.getTotal() != 0.0) {
+                if (!account.getId().equals(targetAccount.getId()) && account.getTotal() != 0.0) {
                     boolean result = transferBill(account, targetAccount, billCheckBo);
                     if (!result) {
                         // TODO 失败
@@ -467,8 +469,7 @@ public class AccountServiceImpl implements AccountService {
         DtoResponse<Account> rep = new DtoResponse<Account>();
         String id = billCheckBo.getAccountId();
         List<CheckInRecord> cirs = checkInRecordService.findByLinkId(id);
-        addExtBills(billCheckBo);
-        Account account = findMainAccount(cirs,billCheckBo.getMainAccountId());
+        Account account = findMainAccount(cirs, billCheckBo.getMainAccountId());
         boolean result = transferBill(cirs, account, billCheckBo);
         if (result) {
             billCheckBo.setCheckType(Constants.Type.SETTLE_TYPE_ACCOUNT);
@@ -599,22 +600,24 @@ public class AccountServiceImpl implements AccountService {
         SettleInfoVo settleInfoVo = new SettleInfoVo();
         if (cir != null) {
             List<CheckInRecord> cirs = checkInRecordService.findByOrderNumC(cir.getOrderNum());
-            settleInfoVo =  createSettleInfo(cirs, extFee, hotelCode);
+            settleInfoVo = createSettleInfo(cirs, extFee, hotelCode);
         } else {
             return null;
         }
         return settleInfoVo;
     }
 
-    private boolean accountCheck(List<CheckInRecord> cirs){
-        for(CheckInRecord cir:cirs){
+    private boolean accountCheck(List<CheckInRecord> cirs) {
+        for (CheckInRecord cir : cirs) {
 
         }
         return false;
     }
-    private int queryAccountCount(String orderNum,String status){
-        return accountDao.queryAccounCountByOrderNumAndStatus(orderNum,status);
+
+    private int queryAccountCount(String orderNum, String status) {
+        return accountDao.queryAccounCountByOrderNumAndStatus(orderNum, status);
     }
+
     private SettleInfoVo getSingleAccountSettleInfo(String id, String extFee) {
         SettleInfoVo info = new SettleInfoVo();
         Account account = findById(id);

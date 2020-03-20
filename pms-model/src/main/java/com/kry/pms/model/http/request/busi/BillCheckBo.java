@@ -26,4 +26,5 @@ public class BillCheckBo {
 	private List<Bill> extBills;
 	private Employee operationEmployee;
 	private String hotelCode;
+	private String mainSettleRecordNum;
 }
