@@ -28,4 +28,8 @@ public interface CustomerService extends BaseService<Customer>{
     List<Customer> findByHotelCodeAndNameAndCustomerType(String hotelCode, String name, String customerType);
 
     List<Map<String, Object>> getTypeIsB(String hotelCode, String customerType, String name, String numCode);
+
+    int updateIsUsed(String isUsed, String id);
+
+    int updateDeleted(String deleted, String id);
 }

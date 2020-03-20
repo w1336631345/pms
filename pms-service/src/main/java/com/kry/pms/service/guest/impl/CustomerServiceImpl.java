@@ -24,6 +24,7 @@ import com.kry.pms.model.persistence.guest.Customer;
 import com.kry.pms.model.persistence.guest.GuestInfo;
 import com.kry.pms.service.guest.CustomerService;
 import com.kry.pms.service.guest.GuestInfoService;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.criteria.*;
 
@@ -208,6 +209,17 @@ public class CustomerServiceImpl implements CustomerService {
 	@Override
 	public List<Map<String, Object>> getTypeIsB(String hotelCode, String customerType, String name, String numCode) {
 		return customerDao.getTypeIsB(hotelCode, customerType, name, numCode);
+	}
+
+	@Override
+	@Transactional
+	public int updateIsUsed(String isUsed, String id){
+		return customerDao.updateIsUsed(isUsed, id);
+	}
+	@Override
+	@Transactional
+	public int updateDeleted(String deleted, String id){
+		return customerDao.updateDeleted(deleted, id);
 	}
 
 }

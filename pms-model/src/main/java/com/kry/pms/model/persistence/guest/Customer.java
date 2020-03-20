@@ -120,5 +120,7 @@ public class Customer extends PersistenceModel {
 	private String autograph;//签名图
 	@Column
 	private String photo;//照片
+	@Column
+	private String isUsed;//是否启用
 
 }

@@ -501,4 +501,21 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
 		return rep;
 	}
 
+	/**
+	 * 功能描述: <br>资源统计
+	 * 〈〉
+	 * @Param: [orderNum, arriveTime, leaveTime]
+	 * @Return: com.kry.pms.base.HttpResponse
+	 * @Author: huanghaibin
+	 * @Date: 2020/3/20 17:40
+	 */
+	@GetMapping(value = "/resourceStatistics")
+	public HttpResponse resourceStatistics(String orderNum, String arriveTime, String leaveTime){
+		HttpResponse hr = new HttpResponse();
+		User user = getUser();
+		List<Map<String, Object>> list = checkInRecordService.resourceStatistics(orderNum, arriveTime, leaveTime);
+		hr.addData(list);
+		return hr.ok();
+	}
+
 }

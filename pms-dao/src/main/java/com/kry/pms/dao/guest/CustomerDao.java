@@ -68,4 +68,12 @@ public interface CustomerDao extends BaseDao<Customer>{
 	List<Map<String, Object>> getTypeIsB(@Param("hotelCode") String hotelCode, @Param("customerType")String customerType,
 										 @Param("name") String name, @Param("numCode") String numCode);
 
+	@Modifying
+	@Query(value = " update t_customer set is_used = ?1 where id = ?2 ",nativeQuery = true)
+	int updateIsUsed(String isUsed, String id);
+	@Modifying
+	@Query(value = " update t_customer set deleted = ?1 where id = ?2 ",nativeQuery = true)
+	int updateDeleted(String deleted, String id);
+
+
 }

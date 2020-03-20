@@ -122,4 +122,33 @@ public class CustomerController extends BaseController<Customer> {
 		return rep.addData(list);
 	}
 
+	/**
+	 * 功能描述: <br>启用，停用
+	 * 〈〉
+	 * @Param: [isUsed, id]
+	 * @Return: com.kry.pms.base.HttpResponse
+	 * @Author: huanghaibin
+	 * @Date: 2020/3/20 11:01
+	 */
+	@GetMapping(path = "/updateIsUsed")
+	public HttpResponse updateIsUsed(String isUsed, String id){
+		HttpResponse rep = new HttpResponse();
+		int i = customerService.updateIsUsed(isUsed, id);
+		return rep.addData(i);
+	}
+	/**
+	 * 功能描述: <br>删除
+	 * 〈〉
+	 * @Param: [deleted, id]
+	 * @Return: com.kry.pms.base.HttpResponse
+	 * @Author: huanghaibin
+	 * @Date: 2020/3/20 11:02
+	 */
+	@GetMapping(path = "/updateDeleted")
+	public HttpResponse updateDeleted(String deleted, String id){
+		HttpResponse rep = new HttpResponse();
+		int i = customerService.updateDeleted(deleted, id);
+		return rep.addData(i);
+	}
+
 }

@@ -162,4 +162,6 @@ public interface CheckInRecordService extends BaseService<CheckInRecord> {
     List<String> getRoomLayout(String checkInId);
 
 	List<String> getRoomRequirement(String checkInId);
+
+    List<Map<String, Object>> resourceStatistics(String orderNum, String arriveTime, String leaveTime);
 }
