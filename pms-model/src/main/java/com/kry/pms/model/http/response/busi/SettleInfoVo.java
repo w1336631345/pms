@@ -8,6 +8,8 @@ import java.util.List;
 
 @Data
 public class SettleInfoVo {
+	private boolean settlEnable =true;
+	private String message;
 	private String name;
 	private String settleType;
 	private Double total = 0.0;
