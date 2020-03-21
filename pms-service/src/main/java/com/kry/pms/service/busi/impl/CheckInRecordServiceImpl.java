@@ -640,24 +640,24 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 //            CheckInRecord cir = add(checkInRecord);
             return rcir;
         }else {//没有选择房间，生成纯预留
-            Customer customer = null;
-            Account account = null;
-            if (checkInRecord.getCustomer() == null) {
-                if(checkInRecord.getContactName() != null){
-                    customer = customerService.createTempCustomer(checkInRecord.getHotelCode(),  checkInRecord.getContactName());
-                    account = accountService.createAccount(customer, checkInRecord.getContactName());
-                }else {
-                    customer = customerService.createTempCustomer(checkInRecord.getHotelCode(),  "No Room");
-                    account = accountService.createAccount(customer, "No Room");
-                }
-            }else{
-                customer = customerService.findById(checkInRecord.getCustomer().getId());
-                account = accountService.createAccount(customer, "No Room");
-            }
+//            Customer customer = null;
+//            Account account = null;
+//            if (checkInRecord.getCustomer() == null) {
+//                if(checkInRecord.getContactName() != null){
+//                    customer = customerService.createTempCustomer(checkInRecord.getHotelCode(),  checkInRecord.getContactName());
+//                    account = accountService.createAccount(customer, checkInRecord.getContactName());
+//                }else {
+//                    customer = customerService.createTempCustomer(checkInRecord.getHotelCode(),  "No Room");
+//                    account = accountService.createAccount(customer, "No Room");
+//                }
+//            }else{
+//                customer = customerService.findById(checkInRecord.getCustomer().getId());
+//                account = accountService.createAccount(customer, "No Room");
+//            }
             checkInRecord.setCheckInCount(0);
-            checkInRecord.setAccount(account);
-            checkInRecord.setCustomer(customer);
-            checkInRecord.setName(customer.getName());
+//            checkInRecord.setAccount(account);
+//            checkInRecord.setCustomer(customer);
+//            checkInRecord.setName(customer.getName());
             checkInRecord.setType(Constants.Type.CHECK_IN_RECORD_RESERVE);
             checkInRecord.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION);
 
@@ -1778,6 +1778,12 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
     @Override
     public List<String> getRoomRequirement(String checkInId){
         return checkInRecordDao.getRoomRequirement(checkInId);
+    }
+
+    @Override
+    public List<Map<String, Object>> resourceStatistics(String orderNum, String arriveTime, String leaveTime) {
+        List<Map<String, Object>> list = checkInRecordDao.resourceStatistics(orderNum, arriveTime, leaveTime);
+        return list;
     }
 
 }

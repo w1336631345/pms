@@ -23,4 +23,8 @@ public interface RoomRecordDao extends BaseDao<RoomRecord>{
 			" and if(:recordId is not null && :recordId != '', tr.check_in_record_id=:recordId, 1=1 ) ")
 	Map<String, Object> recordDateAndRoomPrice(@Param("recordDate") String recordDate, @Param("recordId") String recordId);
 
+	@Query(nativeQuery = true, value = " select * from t_room_record \n" +
+			" where record_date >= :recordDate and check_in_record_id = :checkInRecordId ")
+	List<RoomRecord> recordDateAndCheckInRecord(@Param("recordDate") LocalDate recordDate, @Param("checkInRecordId") String checkInRecordId);
+
 }

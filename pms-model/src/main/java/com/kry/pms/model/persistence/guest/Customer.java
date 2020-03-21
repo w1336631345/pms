@@ -62,7 +62,7 @@ public class Customer extends PersistenceModel {
 	@Column
 	private LocalDate effectiveDate;//有效日期
 	@OneToOne
-	private SalesMen salesMen;
+	private SalesMen salesMen; //销售员
 	@Column
 	private String numCode;//编号
 //	@ManyToOne
@@ -120,5 +120,7 @@ public class Customer extends PersistenceModel {
 	private String autograph;//签名图
 	@Column
 	private String photo;//照片
+	@Column
+	private String isUsed="I";//是否启用(I:启用，O禁用)
 
 }

@@ -38,6 +38,9 @@ public interface RoomUsageService extends BaseService<RoomUsage> {
 	 */
 	boolean unUse(GuestRoom gr, String businessKey, LocalDateTime endTime);
 
+	List<RoomUsageListVo> queryUsableGuestRoomsTo(String roomTypeId, LocalDateTime startTime,
+												  LocalDateTime endDateTime);
+
 	/**
 	 * 使用资源
 	 * 

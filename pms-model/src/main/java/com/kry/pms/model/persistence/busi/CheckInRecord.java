@@ -161,10 +161,14 @@ public class CheckInRecord extends PersistenceModel {
 	private List<String> roomRequirement;//客房要求
 	@Column
 	private Boolean isSecrecy;//房价是否保密
+	@Column
+	private String externalOrder;//外部订单号
 
 	@Transient
 	private String isGOrU;//预订来至团队（G）还是多人（U）
 
+	public String getExternalOrder() { return externalOrder; }
+	public void setExternalOrder(String externalOrder) { this.externalOrder = externalOrder; }
 	public String getRoomLinkIdM() { return roomLinkIdM; }
 	public void setRoomLinkIdM(String roomLinkIdM) { this.roomLinkIdM = roomLinkIdM; }
 	public Customer getCorp() { return corp; }

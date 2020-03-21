@@ -2,6 +2,7 @@ package com.kry.pms.api.guest;
 
 import javax.servlet.http.HttpServletRequest;
 
+import freemarker.template.TemplateException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,6 +19,7 @@ import com.kry.pms.base.PageResponse;
 import com.kry.pms.model.persistence.guest.Customer;
 import com.kry.pms.service.guest.CustomerService;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -55,6 +57,21 @@ public class CustomerController extends BaseController<Customer> {
 		PageRequest<Customer> req = parse2PageRequest(request);
 		return rep.addData(customerService.listPage(req));
 	}
+
+	/**
+	 * 功能描述: <br>客户档案列表-多条件查询
+	 * 〈〉
+	 * @Param: [request]
+	 * @Return: com.kry.pms.base.HttpResponse<com.kry.pms.base.PageResponse<com.kry.pms.model.persistence.guest.Customer>>
+	 * @Author: huanghaibin
+	 * @Date: 2020/3/21 11:07
+	 */
+	@GetMapping(path = "/queryLikeSQL")
+	public HttpResponse<PageResponse<Map<String, Object>>> queryLikeSQL(HttpServletRequest request) throws IOException, TemplateException {
+		HttpResponse<PageResponse<Map<String, Object>>> rep = new HttpResponse<PageResponse<Map<String, Object>>>();
+		return rep.addData(customerService.listPageBySQL(getCurrentHotleCode(), parse2CommonPageRequest(request)));
+	}
+
 
 	/**
 	 * 功能描述: <br>客户档案的模糊查询
@@ -120,6 +137,35 @@ public class CustomerController extends BaseController<Customer> {
 		HttpResponse<List<Map<String, Object>>> rep = new HttpResponse<List<Map<String, Object>>>();
 		List<Map<String, Object>> list = customerService.getTypeIsB(getCurrentHotleCode(), customerType, name, numCode);
 		return rep.addData(list);
+	}
+
+	/**
+	 * 功能描述: <br>启用，停用
+	 * 〈〉
+	 * @Param: [isUsed, id]
+	 * @Return: com.kry.pms.base.HttpResponse
+	 * @Author: huanghaibin
+	 * @Date: 2020/3/20 11:01
+	 */
+	@GetMapping(path = "/updateIsUsed")
+	public HttpResponse updateIsUsed(String isUsed, String id){
+		HttpResponse rep = new HttpResponse();
+		int i = customerService.updateIsUsed(isUsed, id);
+		return rep.addData(i);
+	}
+	/**
+	 * 功能描述: <br>删除
+	 * 〈〉
+	 * @Param: [deleted, id]
+	 * @Return: com.kry.pms.base.HttpResponse
+	 * @Author: huanghaibin
+	 * @Date: 2020/3/20 11:02
+	 */
+	@GetMapping(path = "/updateDeleted")
+	public HttpResponse updateDeleted(String deleted, String id){
+		HttpResponse rep = new HttpResponse();
+		int i = customerService.updateDeleted(deleted, id);
+		return rep.addData(i);
 	}
 
 }

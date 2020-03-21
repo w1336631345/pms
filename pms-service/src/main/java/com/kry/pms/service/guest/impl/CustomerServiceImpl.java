@@ -1,12 +1,16 @@
 package com.kry.pms.service.guest.impl;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import com.kry.pms.model.persistence.busi.CheckInRecord;
 import com.kry.pms.model.persistence.marketing.RoomPriceScheme;
+import com.kry.pms.model.persistence.sys.SqlTemplate;
 import com.kry.pms.service.sys.BusinessSeqService;
+import com.kry.pms.service.sys.SqlTemplateService;
+import freemarker.template.TemplateException;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
@@ -24,6 +28,7 @@ import com.kry.pms.model.persistence.guest.Customer;
 import com.kry.pms.model.persistence.guest.GuestInfo;
 import com.kry.pms.service.guest.CustomerService;
 import com.kry.pms.service.guest.GuestInfoService;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.criteria.*;
 
@@ -35,6 +40,8 @@ public class CustomerServiceImpl implements CustomerService {
 	GuestInfoService guestInfoService;
 	@Autowired
 	BusinessSeqService businessSeqService;
+	@Autowired
+	SqlTemplateService sqlTemplateService;
 
 	@Override
 	public Customer add(Customer customer) {
@@ -104,6 +111,10 @@ public class CustomerServiceImpl implements CustomerService {
 			req = org.springframework.data.domain.PageRequest.of(prq.getPageNum(), prq.getPageSize());
 		}
 		return convent(customerDao.findAll(ex, req));
+	}
+	@Override
+	public PageResponse<Map<String, Object>> listPageBySQL(String hotelCode, PageRequest pageRequest) throws IOException, TemplateException {
+		return sqlTemplateService.queryForPage(hotelCode, "paramsCustomerList", pageRequest);
 	}
 	@Override
 	public PageResponse<Customer> listPageQuery(PageRequest<Customer> prq) {
@@ -208,6 +219,17 @@ public class CustomerServiceImpl implements CustomerService {
 	@Override
 	public List<Map<String, Object>> getTypeIsB(String hotelCode, String customerType, String name, String numCode) {
 		return customerDao.getTypeIsB(hotelCode, customerType, name, numCode);
+	}
+
+	@Override
+	@Transactional
+	public int updateIsUsed(String isUsed, String id){
+		return customerDao.updateIsUsed(isUsed, id);
+	}
+	@Override
+	@Transactional
+	public int updateDeleted(String deleted, String id){
+		return customerDao.updateDeleted(deleted, id);
 	}
 
 }
