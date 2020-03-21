@@ -41,7 +41,7 @@ public class CheckInRecordWrapper implements UseInfoAble {
     @Override
     public boolean isOTA() {
         if (this.checkInRecord.getMarketingSources() != null) {
-            return this.checkInRecord.getMarketingSources().getName().equals("OTA");
+            return "OTA".equals(this.checkInRecord.getMarketingSources().getName());
         }
         return false;
     }

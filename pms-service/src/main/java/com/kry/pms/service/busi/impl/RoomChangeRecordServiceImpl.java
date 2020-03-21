@@ -1,10 +1,12 @@
 package com.kry.pms.service.busi.impl;
 
 import com.kry.pms.base.Constants;
+import com.kry.pms.base.HttpResponse;
 import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
 import com.kry.pms.dao.busi.CheckInRecordDao;
 import com.kry.pms.dao.busi.RoomChangeRecordDao;
+import com.kry.pms.dao.busi.RoomRecordDao;
 import com.kry.pms.model.other.wrapper.CheckInRecordWrapper;
 import com.kry.pms.model.persistence.busi.CheckInRecord;
 import com.kry.pms.model.persistence.busi.RoomChangeRecord;
@@ -15,8 +17,12 @@ import com.kry.pms.service.busi.RoomRecordService;
 import com.kry.pms.service.room.RoomStatisticsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import javax.transaction.Transactional;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 
@@ -33,6 +39,8 @@ public class RoomChangeRecordServiceImpl implements RoomChangeRecordService {
 	RoomRecordService roomRecordService;
 	@Autowired
 	CheckInRecordDao checkInRecordDao;
+	@Autowired
+	RoomRecordDao roomRecordDao;
 
 	@Override
 	public RoomChangeRecord add(RoomChangeRecord entity) {
@@ -41,7 +49,8 @@ public class RoomChangeRecordServiceImpl implements RoomChangeRecordService {
 
 	@Override
 	@Transactional
-	public RoomChangeRecord save(String hotelCode, RoomChangeRecord entity) {
+	public HttpResponse save(String hotelCode, RoomChangeRecord entity) {
+		HttpResponse hr = new HttpResponse();
 		entity.setHotelCode(hotelCode);
 		Double roomPrice = 0.0;
 		//补差价
@@ -56,17 +65,51 @@ public class RoomChangeRecordServiceImpl implements RoomChangeRecordService {
 		List<CheckInRecord> list = checkInRecordDao.findByOrderNumAndGuestRoomAndDeleted(cir.getOrderNum(), cir.getGuestRoom(), Constants.DELETED_FALSE);
 		for(int i=0; i<list.size(); i++){
 			CheckInRecord cirs = list.get(i);
-			if(Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN.equals(cirs.getStatus())){//入住状态
-				roomStatisticsService.cancleCheckIn(new CheckInRecordWrapper(cirs));
+
+			LocalDateTime arriveTime = cirs.getArriveTime();
+			LocalDateTime leaveTime = cirs.getLeaveTime();
+			LocalDateTime now = LocalDateTime.now();
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+			if(now.isBefore(leaveTime)){//当前时间在离店时间之前
+				if(Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN.equals(cirs.getStatus())){//入住状态
+					roomStatisticsService.checkOut(new CheckInRecordWrapper(cirs));
+				}else {
+					roomStatisticsService.cancleAssign(new CheckInRecordWrapper(cirs));
+					roomStatisticsService.cancleReserve(new CheckInRecordWrapper(cirs));
+					List<RoomRecord> roomRecords = roomRecordDao.recordDateAndCheckInRecord(LocalDate.now(), cirs.getId());
+					for(int r=0; r<roomRecords.size(); r++){
+						RoomRecord rr = roomRecords.get(r);
+						rr.setGuestRoom(entity.getNewGuestRoom());
+						if(cirs.getPersonalPercentage() != null){
+							rr.setCost(entity.getNewPrice()*cirs.getPersonalPercentage());
+						}else {
+							rr.setCost(entity.getNewPrice());//承担全部房费
+						}
+//						rr.setCost(entity.getNewPrice());
+						rr.setCostRatio(null);
+						roomRecordService.modify(rr);
+					}
+				}
 			}
-			roomStatisticsService.cancleAssign(new CheckInRecordWrapper(cirs));
-			roomStatisticsService.cancleReserve(new CheckInRecordWrapper(cirs));
+			if(now.isAfter(leaveTime)){
+				TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+				return hr.error("已经过了离店时间，禁止换房操作");
+			}
+
+//			if(Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN.equals(cirs.getStatus())){//入住状态
+//				roomStatisticsService.cancleCheckIn(new CheckInRecordWrapper(cirs));
+//			}
+//			roomStatisticsService.cancleAssign(new CheckInRecordWrapper(cirs));
+//			roomStatisticsService.cancleReserve(new CheckInRecordWrapper(cirs));
 			//需要删除roomRecord的记录
-			List<RoomRecord> roomRecords = roomRecordService.findByHotelCodeAndCheckInRecord(cirs.getHotelCode(), cirs.getId());
-			for(int r=0; r<roomRecords.size(); r++){
-				roomRecordService.deleteTrue(roomRecords.get(r).getId());
-			}
-			//删除完毕
+//			List<RoomRecord> roomRecords = roomRecordService.findByHotelCodeAndCheckInRecord(cirs.getHotelCode(), cirs.getId());
+//			for(int r=0; r<roomRecords.size(); r++){
+//				roomRecordService.deleteTrue(roomRecords.get(r).getId());
+//			}
+
+
+
+			//修改roomRecord完毕
 			cirs.setGuestRoom(entity.getNewGuestRoom());//修改所有同住人员房间号为新房间
 			cirs.setPurchasePrice(entity.getNewPrice());
 			//同住 承担房费占比*房价=承担房费
@@ -75,19 +118,45 @@ public class RoomChangeRecordServiceImpl implements RoomChangeRecordService {
 			}else {
 				cirs.setPersonalPrice(roomPrice);//承担全部房费
 			}
-			checkInRecordService.update(cirs);
-			roomStatisticsService.reserve(new CheckInRecordWrapper(cirs));
-//				if(Constants.Status.CHECKIN_RECORD_STATUS_ASSIGN.equals(cirs.getStatus())){
-			if(Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION.equals(cirs.getStatus())){
-				roomStatisticsService.assignRoom(new CheckInRecordWrapper(cirs));
+
+			cirs = checkInRecordService.update(cirs);
+			//对新房间进行资源占用
+			if(now.isBefore(leaveTime) && now.isAfter(arriveTime)){//当前时间在到店时间和离店时间之间
+				cirs.setArriveTime(now);
+				cirs = checkInRecordService.update(cirs);
+				roomStatisticsService.reserve(new CheckInRecordWrapper(cirs));//占用房类资源应该是当前时间-离店时间
+				if(Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION.equals(cirs.getStatus())){
+					roomStatisticsService.assignRoom(new CheckInRecordWrapper(cirs));
+				}
+				if(Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN.equals(cirs.getStatus())){
+					roomStatisticsService.checkIn(new CheckInRecordWrapper(cirs));
+				}
+				cirs.setArriveTime(arriveTime);
+				cirs = checkInRecordService.update(cirs);
 			}
-			if(Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN.equals(cirs.getStatus())){
-				roomStatisticsService.checkIn(new CheckInRecordWrapper(cirs));
+			if(now.isBefore(arriveTime)){//当前时间在到店时间之前
+				//占用房类资源应该是到店时间-离店时间
+				roomStatisticsService.reserve(new CheckInRecordWrapper(cirs));
+				if(Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION.equals(cirs.getStatus())){
+					roomStatisticsService.assignRoom(new CheckInRecordWrapper(cirs));
+				}
+				if(Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN.equals(cirs.getStatus())){
+					roomStatisticsService.checkIn(new CheckInRecordWrapper(cirs));
+				}
 			}
-			roomRecordService.createRoomRecord(cirs);
+
+//			roomStatisticsService.reserve(new CheckInRecordWrapper(cirs));
+//			if(Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION.equals(cirs.getStatus())){
+//				roomStatisticsService.assignRoom(new CheckInRecordWrapper(cirs));
+//			}
+//			if(Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN.equals(cirs.getStatus())){
+//				roomStatisticsService.checkIn(new CheckInRecordWrapper(cirs));
+//			}
+//			roomRecordService.createRoomRecord(cirs);
 
 		}
-		return roomChangeRecordDao.save(entity);
+		hr.setData(roomChangeRecordDao.save(entity));
+		return hr;
 	}
 
 	@Override

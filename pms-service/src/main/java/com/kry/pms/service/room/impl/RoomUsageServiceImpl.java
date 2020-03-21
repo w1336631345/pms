@@ -89,11 +89,18 @@ public class RoomUsageServiceImpl implements RoomUsageService {
         return null;// 默认不实现
         // return roomUsageDao.findByHotelCode(code);
     }
-
+    //与下面的方法差别是：查询到店时间到离店时间的空闲房间
     @Override
     public List<RoomUsageListVo> queryUsableGuestRooms(String roomTypeId, LocalDateTime startTime,
                                                        LocalDateTime endDateTime) {
         List<RoomUsageListVo> list = roomUsageDao.queryUsableRoomTypeGuestRooms(roomTypeId, startTime, endDateTime);
+        return list;
+    }
+    //与上面的方法差别是：查询当前时间到离店时间的空闲房间
+    @Override
+    public List<RoomUsageListVo> queryUsableGuestRoomsTo(String roomTypeId, LocalDateTime startTime,
+                                                         LocalDateTime endDateTime) {
+        List<RoomUsageListVo> list = roomUsageDao.queryUsableRoomTypeGuestRooms(roomTypeId, LocalDateTime.now(), endDateTime);
         return list;
     }
 

@@ -53,6 +53,21 @@ public class RoomUsageController extends BaseController<RoomUsage> {
 				DateTimeUtil.parse(endTime)));
 		return rep;
 	}
+	/**
+	 * 功能描述: <br>换房：房间空闲查询-与上述方法比较（当前时间-离店时间）
+	 * 〈〉
+	 * @Param: [roomTypeId, startTime, endTime]
+	 * @Return: com.kry.pms.base.HttpResponse<java.util.List<com.kry.pms.model.http.response.room.RoomUsageListVo>>
+	 * @Author: huanghaibin
+	 * @Date: 2020/3/21 15:07
+	 */
+	@GetMapping(path="/roomTypeTo/{id}")
+	public HttpResponse<List<RoomUsageListVo>> queryUsableGuestRoomsTo(@PathVariable("id")String roomTypeId, String startTime, String endTime) {
+		HttpResponse<List<RoomUsageListVo>> rep = new HttpResponse<List<RoomUsageListVo>>();
+		rep.addData(roomUsageService.queryUsableGuestRoomsTo(roomTypeId, DateTimeUtil.parse(startTime),
+				DateTimeUtil.parse(endTime)));
+		return rep;
+	}
 	@GetMapping(path = "/bookItem/{id}")
 	public HttpResponse<List<RoomUsageListVo>> queryUsableGuestRoomsByBookItemId(@PathVariable("id")String bookItemId) {
 		HttpResponse<List<RoomUsageListVo>> rep = new HttpResponse<List<RoomUsageListVo>>();

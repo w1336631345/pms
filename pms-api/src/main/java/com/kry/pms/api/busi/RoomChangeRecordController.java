@@ -35,7 +35,8 @@ public class RoomChangeRecordController extends BaseController<RoomChangeRecord>
 		if(user == null){
 			return hr.loginError();
 		}
-		return hr.addData(roomChangeRecordService.save(user.getHotelCode(), roomChangeRecord));
+		hr = roomChangeRecordService.save(user.getHotelCode(), roomChangeRecord);
+		return hr;
 	}
 
 }
