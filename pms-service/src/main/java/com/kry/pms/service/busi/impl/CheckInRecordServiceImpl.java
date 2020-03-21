@@ -1562,7 +1562,6 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
             if (!roomNums.contains(cir.getGuestRoom().getRoomNum())) {
                 roomNums.add(cir.getGuestRoom().getRoomNum());
             }
-
             Map<String, Object> map = roomPriceSchemeDao.roomTypeAndPriceScheme(cir.getRoomType().getId(), cirG.getRoomPriceScheme().getId());
             Double price = MapUtils.getDouble(map, "price");
             //查询同房间同住的人，一起入团

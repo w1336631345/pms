@@ -120,4 +120,5 @@ public interface RoomStatisticsService {
 	public boolean cancleLock(UseInfoAble info, LocalDateTime cancleDateTime);
 
 	public boolean checkOut(GuestRoom guestRoom);
+
 }

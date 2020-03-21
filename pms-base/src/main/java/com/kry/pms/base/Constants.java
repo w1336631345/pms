@@ -169,6 +169,8 @@ public class Constants {
 		public static final String EXT_FEE_FULL = "F";
 		public static final String EXT_FEE_HALF = "H";
 
+		public static final String BILL_FLAG_EXT_ROOM_FEE = "EXT_ROOM_FEE";
+
 	}
 
 	public static final int DELETED_TRUE = 1;

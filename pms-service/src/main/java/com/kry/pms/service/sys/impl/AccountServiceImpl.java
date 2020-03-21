@@ -128,7 +128,6 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public Account billEntry(RoomRecord rr) {
-
         return null;
     }
 
@@ -289,8 +288,6 @@ public class AccountServiceImpl implements AccountService {
         DtoResponse<Account> rep = new DtoResponse<Account>();
         return rep;
     }
-
-
     private DtoResponse<Account> checkAccountBill(BillCheckBo billCheckBo) {
         DtoResponse<Account> rep = new DtoResponse<Account>();
         Account account = findById(billCheckBo.getAccountId());
@@ -338,6 +335,7 @@ public class AccountServiceImpl implements AccountService {
             bills = new ArrayList<>();
             for (Bill eb : billCheckBo.getExtBills()) {
                 eb.setHotelCode(billCheckBo.getHotelCode());
+                eb.setFeeFlag(Constants.Type.BILL_FLAG_EXT_ROOM_FEE);
                 bills.add(billService.add(eb));
             }
         }
@@ -572,14 +570,14 @@ public class AccountServiceImpl implements AccountService {
     }
 
     private SettleInfoVo getRoomSettleInfo(String id, String extFee, String hotelCode) {
-        List<CheckInRecord> cirs = checkInRecordService.findByGuestRoomAndStatusAndDeleted(id,
-                null, Constants.DELETED_FALSE);
+        List<CheckInRecord> cirs = checkInRecordService.findByGuestRoomAndStatusAndDeleted(id,Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN, Constants.DELETED_FALSE);
         return createSettleInfo(cirs, extFee, hotelCode);
     }
 
     private Bill createExtFee(CheckInRecord cir, Product product, Double cost) {
         Bill bill = new Bill();
         bill.setCost(cost);
+        bill.setTotal(cost);
         bill.setProduct(product);
         bill.setQuantity(1);
         GuestRoom guestRoom = new GuestRoom();
@@ -666,17 +664,16 @@ public class AccountServiceImpl implements AccountService {
                     break;
                 case Constants.Type.EXT_FEE_HALF:
                     product = productService.findHalfRoomFee(hotelCode);
-                    if (cir.getAccount() != null) {
+                    if (cir.getAccount() != null&&Constants.Type.CHECK_IN_RECORD_CUSTOMER.equals(cir.getType())) {
                         countSettleInfo(info, cir.getAccount());
                         if (cir.getPersonalPrice() != null && cir.getPersonalPrice() != 0.0) {
                             info.getBills().add(createExtFee(cir, product, cir.getPersonalPrice() / 2));
                         }
                     }
-
                     break;
                 case Constants.Type.EXT_FEE_FULL:
                     product = productService.findFullRoomFee(hotelCode);
-                    if (cir.getAccount() != null) {
+                    if (cir.getAccount() != null&&Constants.Type.CHECK_IN_RECORD_CUSTOMER.equals(cir.getType())) {
                         countSettleInfo(info, cir.getAccount());
                         if (cir.getPersonalPrice() != null && cir.getPersonalPrice() != 0.0) {
                             info.getBills().add(createExtFee(cir, product, cir.getPersonalPrice()));
@@ -703,7 +700,7 @@ public class AccountServiceImpl implements AccountService {
                 case Constants.Type.EXT_FEE_HALF:
                     product = productService.findHalfRoomFee(hotelCode);
                     for (CheckInRecord cir : cirs) {
-                        if (cir.getAccount() != null) {
+                        if (cir.getAccount() != null&&Constants.Type.CHECK_IN_RECORD_CUSTOMER.equals(cir.getType())) {
                             countSettleInfo(info, cir.getAccount());
                             if (cir.getPersonalPrice() != null && cir.getPersonalPrice() > 0.0) {
                                 info.getBills().add(createExtFee(cir, product, cir.getPersonalPrice() / 2));
@@ -714,7 +711,7 @@ public class AccountServiceImpl implements AccountService {
                 case Constants.Type.EXT_FEE_FULL:
                     product = productService.findFullRoomFee(hotelCode);
                     for (CheckInRecord cir : cirs) {
-                        if (cir.getAccount() != null) {
+                        if (cir.getAccount() != null&&Constants.Type.CHECK_IN_RECORD_CUSTOMER.equals(cir.getType())) {
                             countSettleInfo(info, cir.getAccount());
                             if (cir.getPersonalPrice() != null && cir.getPersonalPrice() > 0.0) {
                                 info.getBills().add(createExtFee(cir, product, cir.getPersonalPrice()));

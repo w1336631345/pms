@@ -59,6 +59,8 @@ public class Account extends PersistenceModel {
 	private ProtocolCorpation protocolCorpation;
 	@Column
 	private Integer currentBillSeq;
+	@Column
+	private LocalDate extFeeDate;
 	
 	public Account() {
 		super();
