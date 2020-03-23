@@ -226,13 +226,14 @@ public interface CheckInRecordDao extends BaseDao<CheckInRecord> {
 	List<String> getRoomRequirement(String checkInId);
 
 	@Query(nativeQuery = true, value = " select DATE_FORMAT(date.date,'%Y-%m-%d') date, t.room_type_id roomTypeId, t.`code`, t.`name` roomType, \n" +
-			" sum(t.human_count) humanCount, sum(t.room_count) roomCount, sum(t.cost) cost\n" +
-			" from\n" +
+			" sum(t.human_count) humanCount, sum(t.room_count) roomCount, sum(t.cost) cost \n" +
+			" from \n" +
 			" (select date from t_date) date left join \n" +
-			" (select  trr.record_date,tcr.room_type_id, trt.`code`, tcr.human_count, tcr.room_count,  trt.`name`, \n" +
+			" (select  trr.record_date,tgr.room_type_id, trt.`code`, tcr.human_count, tcr.room_count,  trt.`name`, \n" +
 			" trt.price, tcr.personal_price, IFNULL(trr.cost,tcr.personal_price) cost \n" +
 			" from t_checkin_record tcr left join t_room_record trr on tcr.id = trr.check_in_record_id \n" +
-			" left join t_room_type trt on tcr.room_type_id = trt.id \n" +
+			" left join t_guest_room tgr on trr.guest_room_id = tgr.id \n" +
+			" left join t_room_type trt on tgr.room_type_id = trt.id \n" +
 			" where tcr.order_num = :orderNum \n" +
 			" ) t on date.date = t.record_date \n" +
 			" where date.date >= :arriveTime and date.date < :leaveTime \n" +

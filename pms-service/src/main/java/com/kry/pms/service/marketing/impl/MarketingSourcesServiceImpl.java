@@ -28,6 +28,9 @@ public class  MarketingSourcesServiceImpl implements  MarketingSourcesService{
 	@Override
 	public void delete(String id) {
 		MarketingSources marketingSources = marketingSourcesDao.findById(id).get();
+		if(("M").equals(marketingSources.getRoleStatus())){
+			return;//M是不可删除状态
+		}
 		if (marketingSources != null) {
 			marketingSources.setDeleted(Constants.DELETED_TRUE);
 		}

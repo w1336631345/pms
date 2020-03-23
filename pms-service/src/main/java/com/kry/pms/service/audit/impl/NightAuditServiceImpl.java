@@ -121,6 +121,7 @@ public class NightAuditServiceImpl implements NightAuditService {
     //报表导入各个统计-手动
     @Override
     public HttpResponse addReportAll(User loginUser) {
+        businessSeqService.plusBuinessDate(loginUser.getHotelCode());//营业日期+1(这里只是为了方便营业日期新增，开始做此功能时必须删除)
         HttpResponse hr = new HttpResponse();
         LocalDate businessDate = businessSeqService.getBuinessDate(loginUser.getHotelCode());
         DailyVerify dailyVerify = dailyVerifyService.findByHotelCodeAndBusinessDate(loginUser.getHotelCode(), businessDate);

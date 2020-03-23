@@ -140,8 +140,12 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                 if (!dbCir.getRoomPriceScheme().getId().equals(checkInRecord.getRoomPriceScheme().getId())) {
                     for (int i = 0; i < children.size(); i++) {
                         CheckInRecord cir = children.get(i);
+                        System.out.println(cir.getRoomType().getId()+"reeeeeee"+checkInRecord.getRoomPriceScheme().getId());
                         Map<String, Object> map = roomPriceSchemeDao.roomTypeAndPriceScheme(cir.getRoomType().getId(), checkInRecord.getRoomPriceScheme().getId());
                         Double price = MapUtils.getDouble(map, "price");
+                        if(price == null){
+                            price = cir.getRoomType().getPrice();
+                        }
                         //修改所有主单下数据的房价码
                         cir.setRoomPriceScheme(checkInRecord.getRoomPriceScheme());
                         cir.setPersonalPrice(price * cir.getPersonalPercentage());

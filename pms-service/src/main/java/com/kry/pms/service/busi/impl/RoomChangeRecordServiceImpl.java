@@ -7,10 +7,12 @@ import com.kry.pms.base.PageResponse;
 import com.kry.pms.dao.busi.CheckInRecordDao;
 import com.kry.pms.dao.busi.RoomChangeRecordDao;
 import com.kry.pms.dao.busi.RoomRecordDao;
+import com.kry.pms.dao.room.GuestRoomDao;
 import com.kry.pms.model.other.wrapper.CheckInRecordWrapper;
 import com.kry.pms.model.persistence.busi.CheckInRecord;
 import com.kry.pms.model.persistence.busi.RoomChangeRecord;
 import com.kry.pms.model.persistence.busi.RoomRecord;
+import com.kry.pms.model.persistence.room.GuestRoom;
 import com.kry.pms.service.busi.CheckInRecordService;
 import com.kry.pms.service.busi.RoomChangeRecordService;
 import com.kry.pms.service.busi.RoomRecordService;
@@ -41,6 +43,8 @@ public class RoomChangeRecordServiceImpl implements RoomChangeRecordService {
 	CheckInRecordDao checkInRecordDao;
 	@Autowired
 	RoomRecordDao roomRecordDao;
+	@Autowired
+	GuestRoomDao guestRoomDao;
 
 	@Override
 	public RoomChangeRecord add(RoomChangeRecord entity) {
@@ -110,7 +114,9 @@ public class RoomChangeRecordServiceImpl implements RoomChangeRecordService {
 
 
 			//修改roomRecord完毕
+			GuestRoom newgr = guestRoomDao.getOne(entity.getNewGuestRoom().getId());
 			cirs.setGuestRoom(entity.getNewGuestRoom());//修改所有同住人员房间号为新房间
+			cirs.setRoomType(newgr.getRoomType());//修改新房型
 			cirs.setPurchasePrice(entity.getNewPrice());
 			//同住 承担房费占比*房价=承担房费
 			if(cir.getPersonalPercentage() != null){
