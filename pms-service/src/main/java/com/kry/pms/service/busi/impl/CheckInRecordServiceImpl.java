@@ -383,7 +383,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
             rep.setStatus(Constants.BusinessCode.CODE_ILLEGAL_OPERATION);
             rep.setMessage("找不到订单");
         } else {
-            if (cir.getAccount() != null && Constants.Status.ACCOUNT_IN.equals(cir.getAccount().getStatus())) {
+            if (cir.getAccount() == null || Constants.Status.ACCOUNT_IN.equals(cir.getAccount().getStatus())) {
                 rep.setStatus(Constants.BusinessCode.CODE_ILLEGAL_OPERATION);
                 rep.setMessage(cir.getAccount().getCode() + ":未完成结帐！");
             } else {
