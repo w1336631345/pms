@@ -119,11 +119,11 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
         if (dbCir != null) {
             checkInRecord.setMainRecord(dbCir.getMainRecord());
             updateCustomer(dbCir, checkInRecord);
-            if(checkInRecord.getCustomer() != null){
-                if(checkInRecord.getCustomer().getId() != null){
+            if (checkInRecord.getCustomer() != null) {
+                if (checkInRecord.getCustomer().getId() != null) {
                     Customer c = customerService.findById(checkInRecord.getCustomer().getId());
-                    if(c != null){
-                        if(!dbCir.getName().equals(c.getName())){
+                    if (c != null) {
+                        if (!dbCir.getName().equals(c.getName())) {
                             checkInRecord.setName(c.getName());
                         }
                     }
@@ -137,21 +137,21 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                         Constants.DELETED_FALSE);
                 checkInRecord.setCustomer(null);
                 //主单修改了房价码
-                if(!dbCir.getRoomPriceScheme().getId().equals(checkInRecord.getRoomPriceScheme().getId())){
+                if (!dbCir.getRoomPriceScheme().getId().equals(checkInRecord.getRoomPriceScheme().getId())) {
                     for (int i = 0; i < children.size(); i++) {
                         CheckInRecord cir = children.get(i);
                         Map<String, Object> map = roomPriceSchemeDao.roomTypeAndPriceScheme(cir.getRoomType().getId(), checkInRecord.getRoomPriceScheme().getId());
                         Double price = MapUtils.getDouble(map, "price");
                         //修改所有主单下数据的房价码
                         cir.setRoomPriceScheme(checkInRecord.getRoomPriceScheme());
-                        cir.setPersonalPrice(price*cir.getPersonalPercentage());
+                        cir.setPersonalPrice(price * cir.getPersonalPercentage());
                         String setMealId = MapUtils.getString(map, "setMealId");
-                        if(setMealId != null){
+                        if (setMealId != null) {
                             SetMeal sm = new SetMeal();
                             sm.setId(setMealId);
                             //修改所有主单下数据的包价
                             cir.setSetMeal(sm);
-                        }else {
+                        } else {
                             cir.setSetMeal(null);
                         }
                         checkInRecordDao.saveAndFlush(cir);
@@ -186,7 +186,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                     }
                 }
             }
-            if((Constants.Type.CHECK_IN_RECORD_RESERVE).equals(dbCir.getType())){
+            if ((Constants.Type.CHECK_IN_RECORD_RESERVE).equals(dbCir.getType())) {
                 return hr.error("预留信息请去“修改预留”界面");
             }
             hr.addData(checkInRecordDao.saveAndFlush(checkInRecord));
@@ -308,9 +308,93 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
     }
 
     @Override
-    public List<CheckInRecord> checkOut(String roomId) {
-        // TODO Auto-generated method stub
-        return null;
+    public DtoResponse<List<CheckInRecord>> checkOut(String type, String id) {
+        switch (type) {
+            case Constants.Type.SETTLE_TYPE_ACCOUNT:
+                return checkOutAccout(id);
+            case Constants.Type.SETTLE_TYPE_PART:
+                DtoResponse<List<CheckInRecord>> response = new DtoResponse<>();
+                response.setCode(Constants.BusinessCode.CODE_PARAMETER_INVALID);
+                response.setMessage("不支持的退房类型");
+                return response;
+            case Constants.Type.SETTLE_TYPE_GROUP:
+                return checkOutGroup(id);
+            case Constants.Type.SETTLE_TYPE_IGROUP:
+                return checkOutGroup(id);
+            case Constants.Type.SETTLE_TYPE_ROOM:
+                return checkOutRoom(id);
+            case Constants.Type.SETTLE_TYPE_LINK:
+                return checkOutLink(id);
+            default:
+                DtoResponse<List<CheckInRecord>> rep = new DtoResponse<>();
+                rep.setCode(Constants.BusinessCode.CODE_PARAMETER_INVALID);
+                rep.setMessage("不支持的退房类型");
+                return rep;
+
+        }
+    }
+
+    private DtoResponse<List<CheckInRecord>> checkOutLink(String id) {
+        List<CheckInRecord> cirs = findByLinkId(id);
+        return checkOut(cirs);
+    }
+
+    private DtoResponse<List<CheckInRecord>> checkOutRoom(String id) {
+        return checkOut(findByGuestRoomAndStatusAndDeleted(id, Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN, Constants.DELETED_FALSE));
+    }
+
+    private DtoResponse<List<CheckInRecord>> checkOutGroup(String id) {
+        CheckInRecord cir = findById(id);
+        return checkOut(findByOrderNumC(cir.getOrderNum()));
+    }
+
+    private DtoResponse<List<CheckInRecord>> checkOutAccout(String id) {
+        CheckInRecord cir = queryByAccountId(id);
+        DtoResponse<List<CheckInRecord>> response = new DtoResponse<>();
+        List<CheckInRecord> data = new ArrayList<>();
+        DtoResponse<CheckInRecord> rep = checkOut(cir);
+        if (rep.getStatus() != 0) {
+            BeanUtils.copyProperties(rep, response);
+        } else {
+            data.add(rep.getData());
+        }
+        return response.addData(data);
+    }
+
+    private DtoResponse<List<CheckInRecord>> checkOut(List<CheckInRecord> cirs) {
+        DtoResponse<List<CheckInRecord>> response = new DtoResponse<>();
+        List<CheckInRecord> data = new ArrayList<>();
+        for (CheckInRecord cir : cirs) {
+            DtoResponse<CheckInRecord> rep = checkOut(cir);
+            if (rep.getStatus() != 0) {
+                BeanUtils.copyProperties(rep, response);
+                break;
+            } else {
+                data.add(rep.getData());
+            }
+        }
+        response.setData(data);
+        return response;
+    }
+
+    private DtoResponse<CheckInRecord> checkOut(CheckInRecord cir) {
+        DtoResponse<CheckInRecord> rep = new DtoResponse<>();
+        if (cir == null) {
+            rep.setStatus(Constants.BusinessCode.CODE_ILLEGAL_OPERATION);
+            rep.setMessage("找不到订单");
+        } else {
+            if (cir.getAccount() != null && !Constants.Status.ACCOUNT_IN.equals(cir.getAccount().getStatus())) {
+                rep.setStatus(Constants.BusinessCode.CODE_ILLEGAL_OPERATION);
+                rep.setMessage(cir.getAccount().getCode() + ":未完成结帐！");
+            } else {
+                cir.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_OUT_UNSETTLED);
+                cir.setActualTimeOfLeave(LocalDateTime.now());
+                roomStatisticsService.checkOut(new CheckInRecordWrapper(cir));
+                modify(cir);
+            }
+        }
+        rep.setData(cir);
+        return rep;
     }
 
     @Override
@@ -366,16 +450,16 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
             }
             Customer customer = null;
             Account account = null;
-            if(cir.getCustomer() != null){//这个判断只针对散客单房预订，选择房型并没选择房间，生成账号的情况
+            if (cir.getCustomer() != null) {//这个判断只针对散客单房预订，选择房型并没选择房间，生成账号的情况
                 customer = customerService.findById(cir.getCustomer().getId());
-                if(("No Room").equals(customer.getName())){
+                if (("No Room").equals(customer.getName())) {
                     customer.setName(tempName + "#" + i);
                     customerService.modify(customer);
                 }
                 account = accountService.findById(cir.getAccount().getId());
                 account.setName(customer.getName());
                 accountService.modify(account);
-            }else {
+            } else {
                 customer = customerService.createTempCustomer(gr.getHotelCode(), tempName + "#" + i);
                 account = new Account(0, 0);
                 account.setRoomNum(gr.getRoomNum());
@@ -388,11 +472,11 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
             ncir.setHumanCount(1);
             ncir.setRoomLayout(layout);
             ncir.setRoomRequirement(requirement);
-            if(i == 1){//排房时，一房多人，默认第一个人承担房价，后面人承担0
+            if (i == 1) {//排房时，一房多人，默认第一个人承担房价，后面人承担0
                 ncir.setOriginalPrice(gr.getRoomType().getPrice());//原价
                 ncir.setPersonalPrice(cir.getPurchasePrice());
                 ncir.setPersonalPercentage(1.0);
-            }else {
+            } else {
                 ncir.setOriginalPrice(0.0);
                 ncir.setPersonalPrice(0.0);
                 ncir.setPersonalPercentage(0.0);
@@ -416,7 +500,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 //			ncir.setReserveId(cir.getId());// 添加预留记录id
             ncir.setMainRecord(cir.getMainRecord());
             //如果有主单，添加主单团名
-            if(cir.getMainRecord() != null){
+            if (cir.getMainRecord() != null) {
                 ncir.setGroupName(cir.getMainRecord().getGroupName());
             }
             ncir = add(ncir);
@@ -434,7 +518,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
     public CheckInRecord book(CheckInRecord checkInRecord) {
         String orderNum = businessSeqService.fetchNextSeqNum(checkInRecord.getHotelCode(),
                 Constants.Key.BUSINESS_ORDER_NUM_SEQ_KEY);
-        if(Constants.Type.CHECK_IN_RECORD_GROUP_TYPE_YES.equals(checkInRecord.getGroupType())){
+        if (Constants.Type.CHECK_IN_RECORD_GROUP_TYPE_YES.equals(checkInRecord.getGroupType())) {
             checkInRecord.setGroupName(checkInRecord.getName());
         }
         checkInRecord.setOrderNum(orderNum);
@@ -454,7 +538,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                     item.setDays(checkInRecord.getDays());
                     item.setContactName(checkInRecord.getContactName());
                     //如果新增房价，没有设置房价码价格，默认定价（成交价）和个人承担价是原价
-                    if(item.getPurchasePrice() == null || "".equals(item.getPurchasePrice())){
+                    if (item.getPurchasePrice() == null || "".equals(item.getPurchasePrice())) {
                         item.setPurchasePrice(item.getOriginalPrice());
                     }
                     item.setPersonalPrice(item.getPurchasePrice());
@@ -531,30 +615,30 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
         checkInRecord.setGuestRoom(gr);
         checkInRecord.setHotelCode(gr.getHotelCode());
         //如果新增房价，没有设置房价码价格，默认定价（成交价）和个人承担价是原价
-        if(checkInRecord.getPurchasePrice() == null || "".equals(checkInRecord.getPurchasePrice())){
-            if(checkInRecord.getRoomType() != null){
+        if (checkInRecord.getPurchasePrice() == null || "".equals(checkInRecord.getPurchasePrice())) {
+            if (checkInRecord.getRoomType() != null) {
                 RoomType rt = roomTypeService.findById(checkInRecord.getRoomType().getId());
                 checkInRecord.setPurchasePrice(rt.getPrice());
                 checkInRecord.setPersonalPrice(rt.getPrice());
-                if(checkInRecord.getOriginalPrice() == null || "".equals(checkInRecord.getOriginalPrice())){
+                if (checkInRecord.getOriginalPrice() == null || "".equals(checkInRecord.getOriginalPrice())) {
                     checkInRecord.setOriginalPrice(rt.getPrice());
                 }
             }
         }
         String tempName = gr.getRoomNum();
         Customer customer = null;
-        if(checkInRecord.getCustomer() == null){
+        if (checkInRecord.getCustomer() == null) {
             customer = customerService.createTempCustomer(gr.getHotelCode(), tempName + "#" + 1);
-        }else {
+        } else {
             customer = checkInRecord.getCustomer();
         }
         checkInRecord.setCustomer(customer);
         checkInRecord.setName(customer.getName());
         Account account = accountService.createAccount(customer, tempName);
         checkInRecord.setAccount(account);
-        if(Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN.equals(checkInRecord.getStatus())){
+        if (Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN.equals(checkInRecord.getStatus())) {
             checkInRecord.setActualTimeOfArrive(LocalDateTime.now());
-        }else{
+        } else {
             checkInRecord.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION);
         }
         CheckInRecord cir = add(checkInRecord);
@@ -576,18 +660,18 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
         checkInRecord.setOrderNum(orderNum);
         checkInRecord.setRoomCount(1);
         checkInRecord.setGroupType(Constants.Type.CHECK_IN_RECORD_GROUP_TYPE_NO);
-        if(checkInRecord.getHumanCount() != null ){
+        if (checkInRecord.getHumanCount() != null) {
             checkInRecord.setSingleRoomCount(checkInRecord.getHumanCount());
-        }else {
+        } else {
             checkInRecord.setHumanCount(1);
             checkInRecord.setSingleRoomCount(1);
         }
         //如果新增房价，没有设置房价码价格，默认定价（成交价）和个人承担价是原价
-        if(checkInRecord.getPurchasePrice() == null || "".equals(checkInRecord.getPurchasePrice())){
+        if (checkInRecord.getPurchasePrice() == null || "".equals(checkInRecord.getPurchasePrice())) {
             checkInRecord.setPurchasePrice(checkInRecord.getOriginalPrice());
             checkInRecord.setPersonalPrice(checkInRecord.getOriginalPrice());
         }
-        if(checkInRecord.getGuestRoom() != null){//如果选了房间，直接预订
+        if (checkInRecord.getGuestRoom() != null) {//如果选了房间，直接预订
             checkInRecord.setType(Constants.Type.CHECK_IN_RECORD_CUSTOMER);
 //            checkInRecord.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_ASSIGN);//以前选了房间为排房A，但排房依旧是预定
             checkInRecord.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION);//上句注释对比修改
@@ -596,17 +680,17 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
             checkInRecord.setCheckInCount(1);
 
             List<CheckInRecord> listc = new ArrayList<>();
-            for(int i=0; i<checkInRecord.getHumanCount(); i++){
+            for (int i = 0; i < checkInRecord.getHumanCount(); i++) {
                 CheckInRecord addCir = new CheckInRecord();
                 Customer customer = null;
                 if (checkInRecord.getHumanCount() == 1) {
-                    if(checkInRecord.getCustomer() == null){
-                        customer = customerService.createTempCustomer(checkInRecord.getHotelCode(), gr.getRoomNum() + "#"+(i+1));
-                    }else{
+                    if (checkInRecord.getCustomer() == null) {
+                        customer = customerService.createTempCustomer(checkInRecord.getHotelCode(), gr.getRoomNum() + "#" + (i + 1));
+                    } else {
                         customer = customerService.findById(checkInRecord.getCustomer().getId());
                     }
-                }else{
-                    customer = customerService.createTempCustomer(checkInRecord.getHotelCode(), gr.getRoomNum() + "#"+(i+1));
+                } else {
+                    customer = customerService.createTempCustomer(checkInRecord.getHotelCode(), gr.getRoomNum() + "#" + (i + 1));
                 }
                 Account account = accountService.createAccount(customer, gr.getRoomNum());
                 checkInRecord.setAccount(account);
@@ -616,15 +700,15 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                 listc.add(addCir);
             }
             CheckInRecord rcir = null;
-            for(int j=0; j<listc.size(); j++){
+            for (int j = 0; j < listc.size(); j++) {
                 CheckInRecord cir = listc.get(j);
                 cir.setHumanCount(1);
                 cir.setSingleRoomCount(1);
-                if(j==0){
+                if (j == 0) {
                     cir.setOriginalPrice(gr.getRoomType().getPrice());//原价
                     cir.setPersonalPrice(cir.getPurchasePrice());
                     cir.setPersonalPercentage(1.0);
-                }else {
+                } else {
                     cir.setOriginalPrice(0.0);
                     cir.setPersonalPrice(0.0);
                     cir.setPersonalPercentage(0.0);
@@ -632,14 +716,14 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                 CheckInRecord c = checkInRecordDao.saveAndFlush(cir);
                 roomStatisticsService.assignRoom(new CheckInRecordWrapper(c));
                 roomRecordService.createRoomRecord(c);
-                if(j==0){
+                if (j == 0) {
                     roomStatisticsService.reserve(new CheckInRecordWrapper(c));
                     rcir = c;
                 }
             }
 //            CheckInRecord cir = add(checkInRecord);
             return rcir;
-        }else {//没有选择房间，生成纯预留
+        } else {//没有选择房间，生成纯预留
 //            Customer customer = null;
 //            Account account = null;
 //            if (checkInRecord.getCustomer() == null) {
@@ -762,10 +846,10 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
         if (checkInRecord.getGroup() != null) {
             account.setGroup(checkInRecord.getGroup());
         }
-        if((Constants.Type.CHECK_IN_RECORD_GROUP).equals(checkInRecord.getIsGOrU())){
+        if ((Constants.Type.CHECK_IN_RECORD_GROUP).equals(checkInRecord.getIsGOrU())) {
             account.setCode(businessSeqService.fetchNextSeqNum(checkInRecord.getHotelCode(), Constants.Key.BUSINESS_BUSINESS_GROUP_ACCOUNT_SEQ_KEY));
             account.setType(Constants.Type.ACCOUNT_GROUP);
-        }else {
+        } else {
             account.setCode(businessSeqService.fetchNextSeqNum(checkInRecord.getHotelCode(), Constants.Key.BUSINESS_BUSINESS_GROUP_CUSTOMER_ACCOUNT_SEQ_KEY));
             account.setType(Constants.Type.ACCOUNT_GROUP_CUSTOMER);
         }
@@ -862,6 +946,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                 Constants.DELETED_FALSE);
         return checkInRecordToAccountSummaryVo(cirs);
     }
+
     public Collection<AccountSummaryVo> getAccountSummaryByOrderNum2(String orderNum, String type) {
         List<AccountSummaryVo> list = checkInRecordDao.querySummeryByOrderNumAndTypeAndDeleted(orderNum, type, Constants.DELETED_FALSE);
         return accountListToTree(list);
@@ -928,6 +1013,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
         rep.setContent(data);
         return rep;
     }
+
     @Override
     public PageResponse<Map<String, Object>> querySummaryListTo(PageRequest<CheckInRecord> prq) {
         Pageable page = org.springframework.data.domain.PageRequest.of(prq.getPageNum(), prq.getPageSize());
@@ -1012,10 +1098,10 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
         for (CheckInRecord cir : checkInRecords) {
             cir.setPersonalPrice(cir.getPurchasePrice());
             //如果新增房价，没有设置房价码价格，默认定价（成交价）和个人承担价是原价
-            if(cir.getPurchasePrice() == null || "".equals(cir.getPurchasePrice())){
+            if (cir.getPurchasePrice() == null || "".equals(cir.getPurchasePrice())) {
                 cir.setPurchasePrice(cir.getOriginalPrice());
             }
-            if(cir.getPersonalPrice() == null || "".equals(cir.getPersonalPrice())){
+            if (cir.getPersonalPrice() == null || "".equals(cir.getPersonalPrice())) {
                 cir.setPersonalPrice(cir.getOriginalPrice());
             }
             cir = addReserve(cir);
@@ -1044,7 +1130,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                 roomLayout.addAll(cir.getRoomLayout());
             }
             List<String> requirement = null;
-            if(cir.getRoomRequirement() != null && !cir.getRoomRequirement().isEmpty()){
+            if (cir.getRoomRequirement() != null && !cir.getRoomRequirement().isEmpty()) {
                 requirement = new ArrayList<>();
                 requirement.addAll(cir.getRoomRequirement());
             }
@@ -1173,13 +1259,13 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                 roomStatisticsService.cancleAssign(new CheckInRecordWrapper(cir));//再取消排房
             }
             int together = checkInRecordDao.countTogetherRoom(Constants.DELETED_FALSE, cir.getHotelCode(), cir.getGuestRoom().getId());
-                if (together == 1) {//表明房间没有人住，需要释放资源
+            if (together == 1) {//表明房间没有人住，需要释放资源
                 roomStatisticsService.cancleReserve(new CheckInRecordWrapper(cir));
             }
             roomCount = roomCount + 1;
             //需要删除roomRecord的记录
             List<RoomRecord> list = roomRecordService.findByHotelCodeAndCheckInRecord(cir.getHotelCode(), cir.getId());
-            for(int r=0; r<list.size(); r++){
+            for (int r = 0; r < list.size(); r++) {
                 roomRecordService.deleteTrue(list.get(r).getId());
             }
             cir.setDeleted(Constants.DELETED_TRUE);
@@ -1401,7 +1487,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
             roomLayout.addAll(cir.getRoomLayout());
         }
         List<String> requirement = null;
-        if(cir.getRoomRequirement() != null && !cir.getRoomRequirement().isEmpty()){
+        if (cir.getRoomRequirement() != null && !cir.getRoomRequirement().isEmpty()) {
             requirement = new ArrayList<>();
             requirement.addAll(cir.getRoomRequirement());
         }
@@ -1469,7 +1555,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
             }
             update(cir);
             List<RoomRecord> roomRecords = roomRecordService.getByTimeAndCheckId(recordDate, cir.getId());
-            for(int j=0; j<roomRecords.size(); j++){
+            for (int j = 0; j < roomRecords.size(); j++) {
                 RoomRecord rr = roomRecords.get(j);
                 rr.setCost(cir.getPersonalPrice());
                 rr.setCostRatio(cir.getPersonalPercentage());
@@ -1494,8 +1580,8 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
             DecimalFormat df = new DecimalFormat("####0.00");
             Double avg = roomPrice / peopleCount;
             Double personalPrice = Double.parseDouble(df.format(avg));
-            Double personalPercentage = Double.parseDouble(df.format(1.0/ peopleCount));
-            Double originalPrice = Double.parseDouble(df.format(oPrice/peopleCount));
+            Double personalPercentage = Double.parseDouble(df.format(1.0 / peopleCount));
+            Double originalPrice = Double.parseDouble(df.format(oPrice / peopleCount));
             for (int i = 0; i < list.size(); i++) {
                 CheckInRecord cir = list.get(i);
                 cir.setPersonalPrice(personalPrice);
@@ -1503,7 +1589,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                 cir.setOriginalPrice(originalPrice);
                 update(cir);
                 List<RoomRecord> roomRecords = roomRecordService.getByTimeAndCheckId(recordDate, cir.getId());
-                for(int j=0; j<roomRecords.size(); j++){
+                for (int j = 0; j < roomRecords.size(); j++) {
                     RoomRecord rr = roomRecords.get(j);
                     rr.setCostRatio(cir.getPersonalPercentage());
                     rr.setCost(cir.getPersonalPrice());
@@ -1531,12 +1617,13 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 
     @Override
     public List<CheckInRecord> findByGuestRoomAndStatusAndDeleted(String guestRoomId, String status, int deleted) {
-        if(status==null){
-            return findByGuestRoomIdAndStatus(guestRoomId,deleted);
+        if (status == null) {
+            return findByGuestRoomIdAndStatus(guestRoomId, deleted);
         }
         return checkInRecordDao.findByGuestRoomIdAndStatusAndDeleted(guestRoomId, status, deleted);
     }
-    private List<CheckInRecord> findByGuestRoomIdAndStatus(String guestRoomId,int deleted){
+
+    private List<CheckInRecord> findByGuestRoomIdAndStatus(String guestRoomId, int deleted) {
         return checkInRecordDao.findByGuestRoomIdAndDeleted(guestRoomId, deleted);
     }
 
@@ -1565,14 +1652,14 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
             Map<String, Object> map = roomPriceSchemeDao.roomTypeAndPriceScheme(cir.getRoomType().getId(), cirG.getRoomPriceScheme().getId());
             Double price = MapUtils.getDouble(map, "price");
             //查询同房间同住的人，一起入团
-            if(cir.getGuestRoom() != null){
+            if (cir.getGuestRoom() != null) {
                 GuestRoom gr = cir.getGuestRoom();
                 String orderNum = cir.getOrderNum();
 
                 List<CheckInRecord> list = checkInRecordDao.findByOrderNumAndGuestRoomAndDeleted(orderNum, gr, Constants.DELETED_FALSE);
                 List<String> ids = Arrays.asList(cId);
-                for(int m=0; m<list.size(); m++){
-                    if(!ids.contains(list.get(m).getId())){
+                for (int m = 0; m < list.size(); m++) {
+                    if (!ids.contains(list.get(m).getId())) {
                         hCount = hCount + 1;
                         CheckInRecord cirRoomNum = list.get(m);
                         cirRoomNum.setMainRecord(cirG);
@@ -1608,7 +1695,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
             checkInRecordDao.save(cir);
         }
         cirG.setRoomCount(cirG.getRoomCount() + roomNums.size());
-		cirG.setHumanCount(cirG.getHumanCount() + hCount);
+        cirG.setHumanCount(cirG.getHumanCount() + hCount);
         cirG.setCheckInCount(cirG.getCheckInCount() + checkInCount);
         checkInRecordDao.save(cirG);
         HttpResponse hr = new HttpResponse();
@@ -1638,8 +1725,8 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                     String orderNumOld = cir.getOrderNum();
                     List<CheckInRecord> list = checkInRecordDao.findByOrderNumAndGuestRoomAndDeleted(orderNumOld, gr, Constants.DELETED_FALSE);
                     List<String> ids = Arrays.asList(cId);
-                    for(int m=0; m<list.size(); m++){
-                        if(!ids.contains(list.get(m).getId())){
+                    for (int m = 0; m < list.size(); m++) {
+                        if (!ids.contains(list.get(m).getId())) {
                             hCount = hCount + 1;
                         }
                         CheckInRecord cirRoomNum = list.get(m);
@@ -1687,13 +1774,13 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
             Map<String, Object> map = roomPriceSchemeDao.roomTypeAndPriceScheme(cir.getRoomType().getId(), cirU.getRoomPriceScheme().getId());
             Double price = MapUtils.getDouble(map, "price");//新团队的房价方案：房价
             //把同住的人一起转团
-            if(cir.getGuestRoom() != null){
+            if (cir.getGuestRoom() != null) {
                 GuestRoom gr = cir.getGuestRoom();
                 String orderNum = cir.getOrderNum();
                 List<CheckInRecord> list = checkInRecordDao.findByOrderNumAndGuestRoomAndDeleted(orderNum, gr, Constants.DELETED_FALSE);
                 List<String> ids = Arrays.asList(cId);
-                for(int m=0; m<list.size(); m++){
-                    if(!ids.contains(list.get(m).getId())){
+                for (int m = 0; m < list.size(); m++) {
+                    if (!ids.contains(list.get(m).getId())) {
                         hCount = hCount + 1;
                         CheckInRecord cirRoomNum = list.get(m);
                         cirRoomNum.setMainRecord(cirG);
@@ -1772,11 +1859,12 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
     }
 
     @Override
-    public List<String> getRoomLayout(String checkInId){
+    public List<String> getRoomLayout(String checkInId) {
         return checkInRecordDao.getRoomLayout(checkInId);
     }
+
     @Override
-    public List<String> getRoomRequirement(String checkInId){
+    public List<String> getRoomRequirement(String checkInId) {
         return checkInRecordDao.getRoomRequirement(checkInId);
     }
 
