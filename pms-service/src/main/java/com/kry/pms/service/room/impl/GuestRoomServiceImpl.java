@@ -1,5 +1,31 @@
 package com.kry.pms.service.room.impl;
 
+import com.kry.pms.base.*;
+import com.kry.pms.dao.room.GuestRoomDao;
+import com.kry.pms.dao.room.GuestRoomStatusDao;
+import com.kry.pms.dao.room.RoomTypeQuantityDao;
+import com.kry.pms.dao.room.RoomUsageDao;
+import com.kry.pms.model.http.request.busi.GuestRoomOperation;
+import com.kry.pms.model.persistence.busi.RoomLockRecord;
+import com.kry.pms.model.persistence.room.Floor;
+import com.kry.pms.model.persistence.room.GuestRoom;
+import com.kry.pms.model.persistence.room.RoomType;
+import com.kry.pms.model.persistence.room.RoomUsage;
+import com.kry.pms.service.busi.RoomLockRecordService;
+import com.kry.pms.service.busi.RoomRecordService;
+import com.kry.pms.service.room.GuestRoomService;
+import com.kry.pms.service.room.GuestRoomStatusService;
+import com.kry.pms.service.room.RoomTypeService;
+import com.kry.pms.service.room.RoomUsageService;
+import com.kry.pms.service.sys.BusinessSeqService;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
+import org.springframework.stereotype.Service;
+
+import javax.transaction.Transactional;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -8,31 +34,6 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.transaction.Transactional;
-
-import com.kry.pms.base.*;
-import com.kry.pms.dao.room.GuestRoomStatusDao;
-import com.kry.pms.dao.room.RoomTypeQuantityDao;
-import com.kry.pms.dao.room.RoomUsageDao;
-import com.kry.pms.model.persistence.room.*;
-import com.kry.pms.service.room.*;
-import com.kry.pms.service.sys.BusinessSeqService;
-
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Direction;
-import org.springframework.stereotype.Service;
-
-import com.kry.pms.dao.room.GuestRoomDao;
-import com.kry.pms.model.http.request.busi.GuestRoomOperation;
-import com.kry.pms.model.persistence.busi.RoomLockRecord;
-import com.kry.pms.model.persistence.busi.RoomRepairRecord;
-import com.kry.pms.service.busi.RoomLockRecordService;
-import com.kry.pms.service.busi.RoomRecordService;
-import com.kry.pms.service.busi.RoomRepairRecordService;
 
 @Service
 public class GuestRoomServiceImpl implements GuestRoomService {
@@ -46,8 +47,6 @@ public class GuestRoomServiceImpl implements GuestRoomService {
 	RoomRecordService roomRecordService;
 	@Autowired
 	RoomLockRecordService roomLockRecordService;
-	@Autowired
-	RoomRepairRecordService roomRepairRecordService;
 	@Autowired
 	RoomUsageService roomUsageService;
 	@Autowired
@@ -282,11 +281,11 @@ public class GuestRoomServiceImpl implements GuestRoomService {
 					}
 					break;
 				case OP_OPEN_REPAIR:
-					RoomRepairRecord rrr = roomRepairRecordService.openRepair(id, op.getOperationEmployeeId());
-					if (rrr != null && rrr.getStatus().equals(Constants.Status.CLOSE)) {
-						roomUsageService.unUse(gr, rrr.getId(), currentDate);
-						if (rrr.getStartTime().isBefore(currentDate)) {
-							if (guestRoomStatusService.unRepairGuestRoom(id, rrr)) {
+					RoomLockRecord rlrp = roomLockRecordService.openLock(id, op.getOperationEmployeeId());
+					if (rlrp != null && rlrp.getStatus().equals(Constants.Status.CLOSE)) {
+						roomUsageService.unUse(gr, rlrp.getId(), currentDate);
+						if (rlrp.getStartTime().isBefore(currentDate)) {
+							if (guestRoomStatusService.unLockGuestRoom(id, rlrp)) {
 							} else {
 								errorCode = Constants.BusinessCode.CODE_ILLEGAL_OPERATION;
 							}
@@ -306,6 +305,46 @@ public class GuestRoomServiceImpl implements GuestRoomService {
 		}
 		return rep;
 	}
+	private boolean unLockRoom(GuestRoomOperation op,GuestRoom gr,int errorCode){
+		LocalDateTime currentDate = LocalDateTime.now();
+		RoomLockRecord rlrp = roomLockRecordService.openLock(gr.getId(), op.getOperationEmployeeId());
+		if (rlrp != null && rlrp.getStatus().equals(Constants.Status.CLOSE)) {
+			roomUsageService.unUse(gr, rlrp.getId(), currentDate);
+			if (rlrp.getStartTime().isBefore(currentDate)) {
+				if (guestRoomStatusService.unLockGuestRoom(gr.getId(), rlrp)) {
+				} else {
+					errorCode = Constants.BusinessCode.CODE_ILLEGAL_OPERATION;
+				}
+			}
+		}
+		return true;
+	}
+
+	private boolean lockRoom(GuestRoomOperation op,GuestRoom gr,DtoResponse<String> rep,String type,int errorCode,StringBuilder message){
+		if (op.getReasonId() != null && op.getEndToStatus() != null) {
+			DtoResponse<RoomUsage> r = roomUsageService.use(gr, Constants.Status.ROOM_USAGE_LOCKED,
+					op.getStartTime(), op.getEndTime(), null, null);
+			if (r.getStatus() == 0) {
+				RoomLockRecord record = roomLockRecordService.add(roomLockRecordService.createRecord(gr,
+						op.getStartTime(), op.getEndTime(), op.getReasonId(), op.getEndToStatus()));
+				r.getData().setBusinesskey(record.getId());
+				roomUsageService.modify(r.getData());
+				if (op.getStartTime().toLocalDate().isEqual(LocalDate.now())) {
+					guestRoomStatusService.lockGuestRoom(gr.getId(), record);
+				}
+			} else {
+				errorCode = Constants.BusinessCode.CODE_ILLEGAL_OPERATION;
+				message.append(gr.getRoomNum());
+				message.append(" 房间资源不足，请确认");
+				message.append("/n");
+			}
+		} else {
+			rep.setStatus(Constants.BusinessCode.CODE_PARAMETER_INVALID);
+			rep.setMessage("必要参数不足：原因或者结束状态未选");
+		}
+		return false;
+	}
+
 
 	@Transactional
 	@Override
@@ -324,52 +363,11 @@ public class GuestRoomServiceImpl implements GuestRoomService {
 			if (gr != null) {
 				switch (op.getOp()) {
 				case Constants.Status.ROOM_STATUS_OUT_OF_ORDER:
-					if (op.getReasonId() != null && op.getEndToStatus() != null) {
-						DtoResponse<RoomUsage> r = roomUsageService.use(gr, Constants.Status.ROOM_USAGE_REPARIE,
-								op.getStartTime(), op.getEndTime(), null, null);
-						if (r.getStatus() == 0) {
-							RoomRepairRecord record = roomRepairRecordService.add(roomRepairRecordService
-									.createRecord(gr, op.getStartTime(), op.getEndTime(), op.getReasonId(), op.getEndToStatus()));
-							r.getData().setBusinesskey(record.getId());
-							roomUsageService.modify(r.getData());
-							if (op.getStartTime().toLocalDate().isEqual(LocalDate.now())) {
-								guestRoomStatusService.repairGuestRoom(gr.getId(), record);
-							}
-						} else {
-							errorCode = Constants.BusinessCode.CODE_ILLEGAL_OPERATION;
-							message.append(gr.getRoomNum());
-							message.append(" 房间资源不足，请确认");
-							message.append("/n");
-						}
-					} else {
-						rep.setStatus(Constants.BusinessCode.CODE_PARAMETER_INVALID);
-						rep.setMessage("必要参数不足：原因或者结束状态未选");
-					}
+					lockRoom(op,gr,rep,Constants.Type.ROOM_LOCK_LOCK,errorCode,message);
 					break;
 				case Constants.Status.ROOM_STATUS_OUT_OF_SERVCIE:
-					if (op.getReasonId() != null && op.getEndToStatus() != null) {
-						DtoResponse<RoomUsage> r = roomUsageService.use(gr, Constants.Status.ROOM_USAGE_LOCKED,
-								op.getStartTime(), op.getEndTime(), null, null);
-						if (r.getStatus() == 0) {
-							RoomLockRecord record = roomLockRecordService.add(roomLockRecordService.createRecord(gr,
-									op.getStartTime(), op.getEndTime(), op.getReasonId(), op.getEndToStatus()));
-							r.getData().setBusinesskey(record.getId());
-							roomUsageService.modify(r.getData());
-							if (op.getStartTime().toLocalDate().isEqual(LocalDate.now())) {
-								guestRoomStatusService.lockGuestRoom(gr.getId(), record);
-							}
-						} else {
-							errorCode = Constants.BusinessCode.CODE_ILLEGAL_OPERATION;
-							message.append(gr.getRoomNum());
-							message.append(" 房间资源不足，请确认");
-							message.append("/n");
-						}
-					} else {
-						rep.setStatus(Constants.BusinessCode.CODE_PARAMETER_INVALID);
-						rep.setMessage("必要参数不足：原因或者结束状态未选");
-					}
-					break;
-				default:
+					lockRoom(op,gr,rep,Constants.Type.ROOM_LOCK_LOCK,errorCode,message);
+					default:
 					if (rep.getStatus() == 0) {
 						DtoResponse<String> r = guestRoomStatusService.changeRoomStatus(id, toStatus, 1, false);
 						if (r.getStatus() != 0) {

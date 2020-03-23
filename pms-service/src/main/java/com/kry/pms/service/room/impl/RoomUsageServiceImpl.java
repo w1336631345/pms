@@ -1,21 +1,5 @@
 package com.kry.pms.service.room.impl;
 
-import java.time.Duration;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalUnit;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Direction;
-import org.springframework.stereotype.Service;
-
 import com.kry.pms.base.Constants;
 import com.kry.pms.base.DtoResponse;
 import com.kry.pms.base.PageRequest;
@@ -24,23 +8,31 @@ import com.kry.pms.dao.room.RoomUsageDao;
 import com.kry.pms.model.func.UseInfoAble;
 import com.kry.pms.model.http.response.busi.CheckInRecordVo;
 import com.kry.pms.model.http.response.room.RoomLockRecordVo;
-import com.kry.pms.model.http.response.room.RoomRepairRecordVo;
 import com.kry.pms.model.http.response.room.RoomUsageListVo;
 import com.kry.pms.model.http.response.room.RoomUsageVo;
-import com.kry.pms.model.persistence.busi.BookingItem;
 import com.kry.pms.model.persistence.busi.BookingRecord;
 import com.kry.pms.model.persistence.busi.CheckInRecord;
-import com.kry.pms.model.persistence.busi.RoomRepairRecord;
 import com.kry.pms.model.persistence.room.GuestRoom;
 import com.kry.pms.model.persistence.room.RoomUsage;
-import com.kry.pms.service.busi.BookingItemService;
 import com.kry.pms.service.busi.BookingRecordService;
 import com.kry.pms.service.busi.CheckInRecordService;
 import com.kry.pms.service.busi.RoomLockRecordService;
-import com.kry.pms.service.busi.RoomRepairRecordService;
 import com.kry.pms.service.room.GuestRoomStatusService;
 import com.kry.pms.service.room.RoomTypeQuantityService;
 import com.kry.pms.service.room.RoomUsageService;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
+import org.springframework.stereotype.Service;
+
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 
 @Service
 public class RoomUsageServiceImpl implements RoomUsageService {
@@ -57,8 +49,6 @@ public class RoomUsageServiceImpl implements RoomUsageService {
     @Autowired
     RoomLockRecordService roomLockRecordService;
 
-    @Autowired
-    RoomRepairRecordService roomRepairRecordService;
 	@Autowired
 	GuestRoomStatusService guestRoomStatusService;
 
@@ -109,9 +99,6 @@ public class RoomUsageServiceImpl implements RoomUsageService {
             if (Constants.Status.ROOM_USAGE_LOCKED.equals(roomUsageVo.getUsageStatus())) {
                 roomUsageVo.setRoomLockRecordVo(
                         RoomLockRecordVo.convert(roomLockRecordService.findById(roomUsageVo.getBusinesskey())));
-            } else if (Constants.Status.ROOM_USAGE_REPARIE.equals(roomUsageVo.getUsageStatus())) {
-                roomUsageVo.setRoomRepairRecordVo(
-                        RoomRepairRecordVo.convert(roomRepairRecordService.findById(roomUsageVo.getBusinesskey())));
             } else {
                 roomUsageVo.setCheckInRecordVo(
                         CheckInRecordVo.convert(checkInRecordService.findByOrderNumAndGuestRoomAndDeleted(

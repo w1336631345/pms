@@ -1,25 +1,13 @@
 package com.kry.pms.model.persistence.room;
 
-import java.util.List;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
-import javax.persistence.Transient;
-
-import com.kry.pms.model.http.response.busi.CheckInRecordVo;
-import com.kry.pms.model.http.response.room.RoomLockRecordVo;
-import com.kry.pms.model.http.response.room.RoomRepairRecordVo;
 import com.kry.pms.model.persistence.PersistenceModel;
 import com.kry.pms.model.persistence.busi.CheckInRecord;
 import com.kry.pms.model.persistence.busi.RoomLockRecord;
-import com.kry.pms.model.persistence.busi.RoomRepairRecord;
-
 import lombok.Getter;
 import lombok.Setter;
+
+import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Getter
@@ -69,7 +57,6 @@ public class GuestRoomStatus extends PersistenceModel {
 	private List<CheckInRecord> willCheckInRecords;
 	@Transient
 	private List<RoomLockRecord> lockRecords;
-	@Transient
-	private List<RoomRepairRecord> repairRecords;
+
 
 }

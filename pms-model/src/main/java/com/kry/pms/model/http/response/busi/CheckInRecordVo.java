@@ -1,15 +1,13 @@
 package com.kry.pms.model.http.response.busi;
 
+import com.kry.pms.model.http.response.marketing.CustomerVo;
+import com.kry.pms.model.persistence.busi.CheckInRecord;
+import lombok.Data;
+import org.springframework.beans.BeanUtils;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.springframework.beans.BeanUtils;
-
-import com.kry.pms.model.http.response.marketing.CustomerVo;
-import com.kry.pms.model.persistence.busi.CheckInRecord;
-
-import lombok.Data;
 
 @Data
 public class CheckInRecordVo {

@@ -77,7 +77,7 @@ public class AccountServiceImpl implements AccountService {
         account.setTotal(0.0);
         account.setStatus(Constants.Status.ACCOUNT_NEW);
         if (account.getCode() == null) {
-            account.setCode(fetchAccountCode(account.getHotelCode(), account.getType()));
+            account.setStatus(fetchAccountCode(account.getHotelCode(), account.getType()));
         }
     }
 
@@ -402,7 +402,7 @@ public class AccountServiceImpl implements AccountService {
             billCheckBo.setAccountId(targetAccount.getId());
             return checkAccountBill(billCheckBo);
         } else {
-            rep.setCode(Constants.BusinessCode.CODE_ILLEGAL_OPERATION);
+            rep.setStatus(Constants.BusinessCode.CODE_ILLEGAL_OPERATION);
             rep.setMessage("部分帐务无法转到主账户");
             return rep;
         }
@@ -425,7 +425,7 @@ public class AccountServiceImpl implements AccountService {
             }
         }
         if (!result) {
-            rep.setCode(Constants.BusinessCode.CODE_ILLEGAL_OPERATION);
+            rep.setStatus(Constants.BusinessCode.CODE_ILLEGAL_OPERATION);
             rep.setMessage("存在未结帐的团员，请先结清团员帐务");
             return rep;
         } else {
@@ -474,7 +474,7 @@ public class AccountServiceImpl implements AccountService {
             billCheckBo.setAccountId(account.getId());
             return checkAccountBill(billCheckBo);
         } else {
-            rep.setCode(Constants.BusinessCode.CODE_ILLEGAL_OPERATION);
+            rep.setStatus(Constants.BusinessCode.CODE_ILLEGAL_OPERATION);
             rep.setMessage("部分帐务无法转到主账户");
             return rep;
         }
@@ -494,7 +494,7 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public Account createAccount(Customer customer, String roomNum) {
         Account account = new Account(0, 0);
-        account.setCode(businessSeqService.fetchNextSeqNum(customer.getHotelCode(),
+        account.setStatus(businessSeqService.fetchNextSeqNum(customer.getHotelCode(),
                 Constants.Key.BUSINESS_BUSINESS_CUSTOMER_ACCOUNT_SEQ_KEY));
         account.setCustomer(customer);
         account.setHotelCode(customer.getHotelCode());

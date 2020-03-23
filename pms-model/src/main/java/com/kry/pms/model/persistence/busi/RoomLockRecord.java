@@ -1,20 +1,18 @@
 package com.kry.pms.model.persistence.busi;
 
-import java.time.LocalDateTime;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
-
 import com.kry.pms.base.Constants;
 import com.kry.pms.model.func.UseInfoAble;
 import com.kry.pms.model.persistence.PersistenceModel;
 import com.kry.pms.model.persistence.room.GuestRoom;
 import com.kry.pms.model.persistence.room.RoomType;
-
 import lombok.Getter;
 import lombok.Setter;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -29,6 +27,8 @@ public class RoomLockRecord extends PersistenceModel implements UseInfoAble{
 	private LocalDateTime startTime;
 	@Column
 	private LocalDateTime endTime;
+	@Column(name = "type_")
+	private String type;
 	@Column
 	private String remark;
 	@Column

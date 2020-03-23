@@ -171,7 +171,9 @@ public class Constants {
 
 		public static final String BILL_FLAG_EXT_ROOM_FEE = "EXT_ROOM_FEE";
 
-	}
+		public static final String ROOM_LOCK_LOCK = "L";
+		public static final String ROOM_LOCK_REPAIR = "R";
+    }
 
 	public static final int DELETED_TRUE = 1;
 	public static final int DELETED_FALSE = 0;

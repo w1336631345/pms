@@ -1,13 +1,11 @@
 package com.kry.pms.dao.busi;
 
-import java.util.List;
-
-import org.springframework.data.jpa.repository.Query;
-
 import com.kry.pms.dao.BaseDao;
 import com.kry.pms.model.persistence.busi.RoomLockRecord;
-import com.kry.pms.model.persistence.busi.RoomRepairRecord;
 import com.kry.pms.model.persistence.room.GuestRoom;
+import org.springframework.data.jpa.repository.Query;
+
+import java.util.List;
 
 public interface RoomLockRecordDao extends BaseDao<RoomLockRecord> {
 

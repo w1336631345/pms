@@ -285,7 +285,11 @@ public class ReceptionServiceImpl implements ReceptionService {
 				Account account = cir.getAccount();
 				AccountSummaryVo group = new AccountSummaryVo(cir);
 				group.setRoomStatus(cir.getStatus());
-				group.setSettleType(Constants.Type.SETTLE_TYPE_GROUP);
+				if(Constants.Type.CHECK_IN_RECORD_GROUP_TYPE_YES.equals(cir.getGroupType())){
+					group.setSettleType(Constants.Type.SETTLE_TYPE_GROUP);
+				}else{
+					group.setSettleType(Constants.Type.SETTLE_TYPE_IGROUP);
+				}
 				asv.getChildren().add(group);
 				asv.getChildren().addAll((checkInRecordService.getAccountSummaryByOrderNum2(cir.getOrderNum(),
 						Constants.Type.CHECK_IN_RECORD_CUSTOMER)));
