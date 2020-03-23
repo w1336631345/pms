@@ -24,6 +24,7 @@ public class CheckInRecordVo {
 	private Double purchasePrice;
 	private Double personalPrice;
 	private CustomerVo customer;
+	private String accountId;
 
 	public CheckInRecordVo() {
 
@@ -35,6 +36,7 @@ public class CheckInRecordVo {
 		}
 		CheckInRecordVo cirv = new CheckInRecordVo();
 		BeanUtils.copyProperties(cir, cirv);
+		cirv.setAccountId(cir.getAccount().getId());
 		if (cir.getCustomer() != null) {
 			cirv.setCustomer(CustomerVo.convert(cir.getCustomer()));
 		}
