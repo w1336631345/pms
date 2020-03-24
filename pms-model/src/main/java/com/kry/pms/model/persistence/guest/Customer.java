@@ -76,6 +76,8 @@ public class Customer extends PersistenceModel {
 	@ManyToOne
 	private VipType vipType;
 	@Column
+	private String vipCode;//vip字符串
+	@Column
 	private String compNum;//单位编号
 	@Column
 	private String comp;//单位

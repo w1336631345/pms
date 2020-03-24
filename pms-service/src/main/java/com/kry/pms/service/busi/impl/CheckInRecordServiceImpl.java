@@ -117,6 +117,13 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
     public HttpResponse modifyInfo(CheckInRecord checkInRecord) {
         HttpResponse hr = new HttpResponse();
         CheckInRecord dbCir = checkInRecordDao.getOne(checkInRecord.getId());
+        if(checkInRecord.getLeaveTime().isAfter(dbCir.getLeaveTime())){
+            boolean b = roomStatisticsService.extendTime(new CheckInRecordWrapper(dbCir), checkInRecord.getLeaveTime().toLocalDate());
+            if(!b){
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                return hr.error("资源不足");
+            }
+        }
         if (dbCir != null) {
             checkInRecord.setMainRecord(dbCir.getMainRecord());
             updateCustomer(dbCir, checkInRecord);
@@ -162,34 +169,40 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                         checkInRecordDao.saveAndFlush(cir);
                     }
                 }
-                if (checkInRecord.getIsUpdateTime()) {
-                    // 修改的离店时间小于之前时间（改小）
-                    if (checkInRecord.getLeaveTime().isBefore(dbCir.getLeaveTime())) {
-                        TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-                        return hr.error("离店时间小于之前时间，不能修改");
-                        // 释放资源
-                        // ...释放资源代码
-                        // ...
-                    } else {// 改大
-                        for (int i = 0; i < children.size(); i++) {
-                            CheckInRecord cir = children.get(i);
-                            if (cir.getRoomType() != null) {
-                                // 查询房类资源是否满足
+
+                // 修改的离店时间小于之前时间（改小）
+                if (checkInRecord.getLeaveTime().isBefore(dbCir.getLeaveTime())) {
+                    TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                    return hr.error("离店时间小于之前时间，不能修改");
+                    // 释放资源
+                    // ...释放资源代码
+                    // ...
+                }
+                if(checkInRecord.getLeaveTime().isAfter(dbCir.getLeaveTime())) {// 改大
+                    for (int i = 0; i < children.size(); i++) {
+                        CheckInRecord cir = children.get(i);
+                        if (cir.getRoomType() != null) {
+                            boolean b = roomStatisticsService.extendTime(new CheckInRecordWrapper(cir), checkInRecord.getLeaveTime().toLocalDate());
+                            if(!b){
+                                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                                return hr.error("资源不足");
+                            }
+                            // 查询房类资源是否满足
 //								boolean isExit = roomStatisticsService.booking(cir.getRoomType(), cir.getArriveTime(),
 //										cir.getRoomCount(), cir.getDays());
 //								if (!isExit) {
 //									TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 //									return hr.error("房类资源不够");
 //								}
-                            }
-                            //修改所有主单下数据的房价码
-                            cir.setRoomPriceScheme(checkInRecord.getRoomPriceScheme());
-                            cir.setArriveTime(checkInRecord.getArriveTime());
-                            cir.setLeaveTime(checkInRecord.getLeaveTime());
-                            checkInRecordDao.saveAndFlush(cir);
                         }
+                        //修改所有主单下数据的房价码
+                        cir.setRoomPriceScheme(checkInRecord.getRoomPriceScheme());
+                        cir.setArriveTime(checkInRecord.getArriveTime());
+                        cir.setLeaveTime(checkInRecord.getLeaveTime());
+                        checkInRecordDao.saveAndFlush(cir);
                     }
                 }
+
             }
             if ((Constants.Type.CHECK_IN_RECORD_RESERVE).equals(dbCir.getType())) {
                 return hr.error("预留信息请去“修改预留”界面");
