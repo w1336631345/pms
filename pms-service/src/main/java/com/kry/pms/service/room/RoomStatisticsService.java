@@ -1,5 +1,6 @@
 package com.kry.pms.service.room;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import com.kry.pms.model.func.UseInfoAble;
@@ -104,5 +105,7 @@ public interface RoomStatisticsService {
 	public boolean cancleLock(UseInfoAble info, LocalDateTime cancleDateTime);
 
 	public boolean checkOut(GuestRoom guestRoom);
+
+	public boolean extendTime(UseInfoAble info, LocalDate extendDate);
 
 }

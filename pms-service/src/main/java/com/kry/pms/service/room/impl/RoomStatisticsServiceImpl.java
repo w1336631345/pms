@@ -1,5 +1,6 @@
 package com.kry.pms.service.room.impl;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import com.kry.pms.model.persistence.room.GuestRoom;
@@ -89,6 +90,11 @@ public class RoomStatisticsServiceImpl implements RoomStatisticsService {
 	@Override
 	public boolean checkOut(GuestRoom guestRoom) {
 
+		return true;
+	}
+
+	@Override
+	public boolean extendTime(UseInfoAble info, LocalDate extendDate) {
 		return true;
 	}
 
