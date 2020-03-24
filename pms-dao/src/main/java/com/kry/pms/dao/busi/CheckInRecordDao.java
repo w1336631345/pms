@@ -153,8 +153,8 @@ public interface CheckInRecordDao extends BaseDao<CheckInRecord> {
 
 	@Query(nativeQuery = true, value = " select count(1) " +
 			" from t_checkin_record tcr " +
-			" where tcr.deleted = ?1 and tcr.hotel_code = ?2  and tcr.guest_room_id = ?3 ")
-	int countTogetherRoom(int deletedFalse, String hotelCode, String roomId);
+			" where tcr.deleted = ?1 and tcr.order_num = ?2  and tcr.guest_room_id = ?3 ")
+	int countTogetherRoom(int deletedFalse, String orderNum, String roomId);
 
 	@Query(value = "select new com.kry.pms.model.http.response.busi.AccountSummaryVo(b.orderNum, a.id, d.name,a.total, c.roomNum," +
 			"a.type, a.pay, a.cost, a.creditLimit, a.availableCreditLimit," +
