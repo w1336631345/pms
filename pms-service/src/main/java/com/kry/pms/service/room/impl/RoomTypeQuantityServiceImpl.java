@@ -448,6 +448,20 @@ public class RoomTypeQuantityServiceImpl implements RoomTypeQuantityService {
     }
 
     @Override
+    public boolean useRoomType(UseInfoAble info, LocalDateTime extendTime) {
+        RoomTypeQuantity rtq = null;
+        LocalDate currentDate = info.getStartTime().toLocalDate();
+        while (currentDate.isBefore(extendTime.toLocalDate())) {
+            rtq = findByRoomTypeAndQuantityDateForUpdate(info.roomType(), currentDate);
+            rtq.setPredictableTotal(rtq.getPredictableTotal()-1);
+            rtq.setBookingTotal(rtq.getBookingTotal()+1);
+            currentDate = currentDate.plusDays(1);
+            modify(rtq);
+        }
+        return true;
+    }
+
+    @Override
     public List<RoomTypeQuantityVo> queryOneDay(String currentHotleCode, LocalDate date) {
         List<RoomTypeQuantityVo> data = new ArrayList<RoomTypeQuantityVo>();
         RoomTypeQuantityVo rv = null;

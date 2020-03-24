@@ -1,6 +1,7 @@
 package com.kry.pms.service.room;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +27,7 @@ public interface RoomTypeQuantityService extends BaseService<RoomTypeQuantity>{
 	public void useRoomType(RoomType roomType, LocalDate startDate, LocalDate endDate, String useType);
 	public void unUseRoomType(RoomType roomType, LocalDate startDate, LocalDate startDate2, String roomUsageBook);
 	public void useRoomType(UseInfoAble info, String userType);
+	public boolean useRoomType(UseInfoAble info, LocalDateTime extendTime);
 	public List<RoomTypeQuantityVo> queryOneDay(String currentHotleCode, LocalDate now);
 	public void checkInRoomTypeWithoutBook(RoomType roomType, LocalDate startDate, LocalDate endDate, int quantity);
 	void changeRoomTypeQuantity(RoomType roomType, LocalDate startDate, LocalDate endDate, String oldUsageStatus,

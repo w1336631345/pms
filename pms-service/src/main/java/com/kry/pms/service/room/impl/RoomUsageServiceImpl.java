@@ -28,7 +28,9 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -614,6 +616,34 @@ public class RoomUsageServiceImpl implements RoomUsageService {
             }
         }
         return false;
+    }
+
+    @Override
+    public boolean extendTime(UseInfoAble info, LocalDate extendDate) {
+        RoomUsage ru = roomUsageDao.queryGuestRoomUsable(info.guestRoom().getId(), info.getStartTime(), info.getEndTime());
+        LocalDateTime endTime = LocalDateTime.of(extendDate, LocalTime.NOON);
+        if(ru!=null){
+            RoomUsage postRu = ru.getPostRoomUsage();
+            if(postRu!=null&&Constants.Status.ROOM_STATUS_FREE.equals(postRu.getUsageStatus())){
+                if(endTime.isBefore(postRu.getEndDateTime())){
+                    ru.setEndDateTime(endTime);
+                    updateDuration(ru);
+                    postRu.setStartDateTime(endTime);
+                    updateDuration(postRu);
+                    modify(ru);
+                    modify(postRu);
+                    roomTypeQuantityService.useRoomType(info,endTime);
+                    return true;
+                }else{
+                    return false;
+                }
+            }else{
+              return false;
+            }
+        }else{
+            return false;
+        }
+
     }
 
     private boolean use(UseInfoAble info, String status) {

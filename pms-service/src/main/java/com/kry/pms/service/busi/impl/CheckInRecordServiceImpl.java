@@ -363,6 +363,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 
     private DtoResponse<List<CheckInRecord>> checkOutGroup(String id) {
         CheckInRecord cir = findById(id);
+        checkOut(cir);
         return checkOut(findByOrderNumC(cir.getOrderNum()));
     }
 
