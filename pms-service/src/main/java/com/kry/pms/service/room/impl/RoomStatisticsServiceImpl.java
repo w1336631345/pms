@@ -99,27 +99,13 @@ public class RoomStatisticsServiceImpl implements RoomStatisticsService {
 	}
 
 	@Override
-	public boolean repair(UseInfoAble info) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean cancelRepair(UseInfoAble info, LocalDateTime cancleDateTime) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
 	public boolean lock(UseInfoAble info) {
-		// TODO Auto-generated method stub
-		return false;
+		return roomUsageService.lock(info);
 	}
 
 	@Override
 	public boolean cancleLock(UseInfoAble info, LocalDateTime cancleDateTime) {
-		// TODO Auto-generated method stub
-		return false;
+		return roomUsageService.unLock(info,cancleDateTime);
 	}
 
 }

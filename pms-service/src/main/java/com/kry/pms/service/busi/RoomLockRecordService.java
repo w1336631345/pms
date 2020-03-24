@@ -16,4 +16,5 @@ public interface RoomLockRecordService extends BaseService<RoomLockRecord>{
 
 	List<RoomLockRecord> findByGuestRoomAndStatus(GuestRoom guestRoom, String status);
 
+	RoomLockRecord lockRoom(GuestRoom gr, LocalDateTime startTime, LocalDateTime endTime, String reasonId, String endToStatus);
 }

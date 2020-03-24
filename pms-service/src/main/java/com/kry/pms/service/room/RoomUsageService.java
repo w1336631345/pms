@@ -106,4 +106,7 @@ public interface RoomUsageService extends BaseService<RoomUsage> {
 
     public boolean cancleCheckOut(UseInfoAble info);
 
+    boolean lock(UseInfoAble info);
+
+	boolean unLock(UseInfoAble info, LocalDateTime cancleDateTime);
 }

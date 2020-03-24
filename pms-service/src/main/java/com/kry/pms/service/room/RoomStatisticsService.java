@@ -86,22 +86,6 @@ public interface RoomStatisticsService {
 	 */
 	public boolean cancelCheckOut(UseInfoAble info);
 
-	/**
-	 * 维修 调整客房类型统计表，房间状态表，房间状态统计表
-	 * 
-	 * @param guestRoom
-	 * @return
-	 */
-
-	public boolean repair(UseInfoAble info);
-
-	/**
-	 * 维修完成 调整客房类型统计表，房间状态表，房间状态统计表
-	 * 
-	 * @param guestRoom
-	 * @return
-	 */
-	public boolean cancelRepair(UseInfoAble info, LocalDateTime cancleDateTime);
 
 	/**
 	 * 锁定房间 调整客房类型统计表，房间状态表，房间状态统计表

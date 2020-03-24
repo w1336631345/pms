@@ -49,8 +49,8 @@ public class RoomUsageServiceImpl implements RoomUsageService {
     @Autowired
     RoomLockRecordService roomLockRecordService;
 
-	@Autowired
-	GuestRoomStatusService guestRoomStatusService;
+    @Autowired
+    GuestRoomStatusService guestRoomStatusService;
 
     @Override
     public RoomUsage add(RoomUsage roomUsage) {
@@ -79,6 +79,7 @@ public class RoomUsageServiceImpl implements RoomUsageService {
         return null;// 默认不实现
         // return roomUsageDao.findByHotelCode(code);
     }
+
     //与下面的方法差别是：查询到店时间到离店时间的空闲房间
     @Override
     public List<RoomUsageListVo> queryUsableGuestRooms(String roomTypeId, LocalDateTime startTime,
@@ -86,6 +87,7 @@ public class RoomUsageServiceImpl implements RoomUsageService {
         List<RoomUsageListVo> list = roomUsageDao.queryUsableRoomTypeGuestRooms(roomTypeId, startTime, endDateTime);
         return list;
     }
+
     //与上面的方法差别是：查询当前时间到离店时间的空闲房间
     @Override
     public List<RoomUsageListVo> queryUsableGuestRoomsTo(String roomTypeId, LocalDateTime startTime,
@@ -462,10 +464,8 @@ public class RoomUsageServiceImpl implements RoomUsageService {
                         ru.getUniqueIds().remove(info.uniqueId());
                     }
                     if (ru.getUniqueIds().isEmpty()) {
-                        roomTypeQuantityService.changeRoomTypeQuantity(info.roomType(), info.getStartTime().toLocalDate(),
-                                info.getEndTime().toLocalDate(), ru.getUsageStatus(), Constants.Status.ROOM_USAGE_RESERVATION, 1);
-                        unUse(ru,info);
-                    }else{
+                        unUse(ru, info);
+                    } else {
                         modify(ru);
                     }
                 }
@@ -473,7 +473,8 @@ public class RoomUsageServiceImpl implements RoomUsageService {
         }
         return true;
     }
-    private boolean unUse(RoomUsage ru,UseInfoAble info){
+
+    private boolean unUse(RoomUsage ru, UseInfoAble info) {
         if (ru != null) {
             LocalDateTime startTime = info.getStartTime();
             LocalDateTime endTime = info.getEndTime();
@@ -484,7 +485,7 @@ public class RoomUsageServiceImpl implements RoomUsageService {
             if (!ru.getStartDateTime().isBefore(endTime)) { // 开始时间前释放资源 相当于直接取消
                 RoomUsage pru = ru.getPreRoomUsage();//前一个
                 RoomUsage npru = ru.getPostRoomUsage();//后一个
-                if (pru!=null&&pru.getUsageStatus().equals(Constants.Status.ROOM_USAGE_FREE)) {
+                if (pru != null && pru.getUsageStatus().equals(Constants.Status.ROOM_USAGE_FREE)) {
                     if (npru.getUsageStatus().equals(Constants.Status.ROOM_USAGE_FREE)) {
                         pru.setEndDateTime(npru.getEndDateTime());
                         updateDuration(pru);
@@ -512,7 +513,7 @@ public class RoomUsageServiceImpl implements RoomUsageService {
                         updateDuration(npru);
                         npru.setPreRoomUsage(pru);
                         modify(npru);
-                        if(pru!=null){
+                        if (pru != null) {
                             pru.setPostRoomUsage(npru);
                             modify(pru);
                         }
@@ -558,27 +559,25 @@ public class RoomUsageServiceImpl implements RoomUsageService {
         } else {
             return false;
         }
+        roomTypeQuantityService.changeRoomTypeQuantity(info.roomType(), info.getStartTime().toLocalDate(),
+                info.getEndTime().toLocalDate(), ru.getUsageStatus(), Constants.Status.ROOM_USAGE_FREE, 1);
         return true;
 
     }
+
     @Override
     public boolean checkOut(UseInfoAble info) {
         if (info.guestRoom() != null) {
             RoomUsage ru = roomUsageDao.findByGuestRoomIdAndBusinesskey(info.guestRoom().getId(),
                     info.getBusinessKey());
-            if(ru.getUniqueIds().contains(info.uniqueId())){
+            if (ru.getUniqueIds().contains(info.uniqueId())) {
                 ru.getUniqueIds().remove(info.uniqueId());
-                if(ru.getUniqueIds().isEmpty()){
-                    if(info.getEndTime().equals(ru.getEndDateTime())){
+                if (ru.getUniqueIds().isEmpty()) {
+                    if (info.getEndTime().equals(ru.getEndDateTime())) {
                         ru.setUsageStatus(Constants.Status.ROOM_USAGE_CHECK_OUT);
-                    }else{
-                        if(info.getEndTime().isBefore(ru.getEndDateTime())){
-                            //提前退房
-                            unUse(ru,info);
-                            //提前释放房类资源
-                            // TODO
-                            roomTypeQuantityService.changeRoomTypeQuantity(info.roomType(), info.getStartTime().toLocalDate(),
-                                    info.getEndTime().toLocalDate(), ru.getUsageStatus(), Constants.Status.ROOM_USAGE_FREE, 1);
+                    } else {
+                        if (info.getEndTime().isBefore(ru.getEndDateTime())) {
+                            unUse(ru, info);
                         }
                     }
                     guestRoomStatusService.clearUseInfo(info);
@@ -590,6 +589,21 @@ public class RoomUsageServiceImpl implements RoomUsageService {
 
     @Override
     public boolean cancleCheckOut(UseInfoAble info) {
+        return false;
+    }
+
+    @Override
+    public boolean lock(UseInfoAble info) {
+        return use(info, info.getRoomStatus());
+    }
+
+    @Override
+    public boolean unLock(UseInfoAble info, LocalDateTime cancleDateTime) {
+        RoomUsage ru = roomUsageDao.findByGuestRoomIdAndBusinesskey(info.guestRoom().getId(),
+                info.getBusinessKey());
+        if (ru != null) {
+            return unUse(ru, info);
+        }
         return false;
     }
 
