@@ -50,6 +50,8 @@ public class GuestRoomStatus extends PersistenceModel {
 	private Boolean overdued;// 欠费
 	@Column(columnDefinition = "bit(1) default NULl COMMENT 'OTA'")
 	private Boolean ota;
+	@Column(columnDefinition = "bit(1) default NULl COMMENT 'VIP'")
+	private Boolean vip;
 	
 	@Transient
 	private List<CheckInRecord> currentCheckInRecords;

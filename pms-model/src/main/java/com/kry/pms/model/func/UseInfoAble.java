@@ -6,94 +6,100 @@ import com.kry.pms.model.persistence.room.GuestRoom;
 import com.kry.pms.model.persistence.room.RoomType;
 
 public interface UseInfoAble {
-	
-	public String uniqueId();
-	public Integer getRoomCount();
 
-	public boolean isTodayLeave();
+    public String uniqueId();
 
-	public boolean isTodayArrive();
-	
-	public String getRoomStatus();
+    public Integer getRoomCount();
 
-	public LocalDateTime getActualStartTime();
+    public boolean isTodayLeave();
 
-	/**
-	 * 获取房间类型
-	 * 
-	 * @return
-	 */
-	public RoomType roomType();
+    public boolean isTodayArrive();
 
-	/**
-	 * 获取房间
-	 * 
-	 * @return
-	 */
-	public GuestRoom guestRoom();
+    public String getRoomStatus();
 
-	/**
-	 * 获取摘要信息
-	 * 
-	 * @return
-	 */
-	public String getSummaryInfo();
+    public LocalDateTime getActualStartTime();
 
-	/**
-	 * 业务主键 同一房间唯一
-	 * 
-	 * @return
-	 */
-	public String getBusinessKey();
+    /**
+     * 获取房间类型
+     *
+     * @return
+     */
+    public RoomType roomType();
 
-	/**
-	 * 是团队
-	 * 
-	 * @return
-	 */
-	public boolean isGroup();
+    /**
+     * 获取房间
+     *
+     * @return
+     */
+    public GuestRoom guestRoom();
 
-	/**
-	 * 是OTA
-	 * 
-	 * @return
-	 */
-	public boolean isOTA();
+    /**
+     * 获取摘要信息
+     *
+     * @return
+     */
+    public String getSummaryInfo();
 
-	/**
-	 * 是免费
-	 * 
-	 * @return
-	 */
-	public boolean isFree();
+    /**
+     * 业务主键 同一房间唯一
+     *
+     * @return
+     */
+    public String getBusinessKey();
 
-	/**
-	 * 是钟点房
-	 * 
-	 * @return
-	 */
-	public boolean isHourRoom();
+    /**
+     * 是团队
+     *
+     * @return
+     */
+    public boolean isGroup();
 
-	/**
-	 * 是欠费
-	 * 
-	 * @return
-	 */
+    /**
+     * 是OTA
+     *
+     * @return
+     */
+    public boolean isOTA();
 
-	public boolean isArrears();
+    /**
+     * 是免费
+     *
+     * @return
+     */
+    public boolean isFree();
 
-	/**
-	 * 资源使用开始时间
-	 * 
-	 * @return
-	 */
-	public LocalDateTime getStartTime();
+    /**
+     * 是钟点房
+     *
+     * @return
+     */
+    public boolean isHourRoom();
 
-	/**
-	 * 结束时间
-	 * 
-	 * @return
-	 */
-	public LocalDateTime getEndTime();
+    /**
+     * 是欠费
+     *
+     * @return
+     */
 
+    public boolean isArrears();
+
+    public boolean isVIP();
+
+    /**
+     * 资源使用开始时间
+     *
+     * @return
+     */
+    public LocalDateTime getStartTime();
+
+    /**
+     * 结束时间
+     *
+     * @return
+     */
+    public LocalDateTime getEndTime();
+
+    public String nextStatus();
+
+    public String useType();
 }

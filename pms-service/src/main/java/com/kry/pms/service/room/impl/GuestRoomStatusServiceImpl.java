@@ -400,6 +400,7 @@ public class GuestRoomStatusServiceImpl implements GuestRoomStatusService {
                         status.setOta(info.isOTA());
                         status.setHourRoom(info.isHourRoom());
                         status.setOverdued(info.isArrears());
+                        status.setVip(info.isVIP());
                         status.setWillArrive(false);
                     } else {
                         status.setFree(false);
@@ -453,25 +454,43 @@ public class GuestRoomStatusServiceImpl implements GuestRoomStatusService {
         inflatRecordInfo(status);
         return GuestRoomStatusVo.covert(status);
     }
-
+    @Override
     public void clearLockInfo(UseInfoAble info){
+        GuestRoomStatus status = findGuestRoomStatusByGuestRoom(info.guestRoom());
         Duration duration = Duration.between(info.getStartTime(), LocalDateTime.now());
-        if (duration.toMinutes() < 1) {
-
+        LocalDateTime now = LocalDateTime.now();
+        if(now.isAfter(info.getStartTime())&&now.isBefore(info.getEndTime())){
+            status.setRoomStatus(info.nextStatus());
+            clearStatus(status);
+            modify(status);
+        }
+    }
+    @Override
+    public void lock(UseInfoAble info){
+        GuestRoomStatus status = findGuestRoomStatusByGuestRoom(info.guestRoom());
+        LocalDateTime now = LocalDateTime.now();
+        if(now.isAfter(info.getStartTime())&&now.isBefore(info.getEndTime())){
+            status.setRoomStatus(info.getRoomStatus());
+            clearStatus(status);
+            modify(status);
         }
     }
 
     @Override
     public void clearUseInfo(UseInfoAble info) {
         GuestRoomStatus status = findGuestRoomStatusByGuestRoom(info.guestRoom());
+       clearStatus(status);
+        status.setRoomStatus(Constants.Status.ROOM_STATUS_VACANT_DIRTY);
+        modify(status);
+    }
+    private void clearStatus(GuestRoomStatus status){
         status.setFree(false);
         status.setGroup(false);
         status.setOta(false);
         status.setHourRoom(false);
         status.setOverdued(false);
         status.setWillLeave(false);
-        status.setRoomStatus(Constants.Status.ROOM_STATUS_VACANT_DIRTY);
-        modify(status);
+        status.setVip(false);
     }
 
 

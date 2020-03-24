@@ -68,6 +68,15 @@ public class CheckInRecordWrapper implements UseInfoAble {
     }
 
     @Override
+    public boolean isVIP() {
+        if(this.checkInRecord.getVipCode()==null){
+            return false;
+        }else{
+            return true;
+        }
+    }
+
+    @Override
     public LocalDateTime getStartTime() {
         LocalDate localDate = null;
         if (this.checkInRecord.getActualTimeOfArrive() != null) {
@@ -87,6 +96,16 @@ public class CheckInRecordWrapper implements UseInfoAble {
             localDate = this.checkInRecord.getLeaveTime().toLocalDate();
         }
         return LocalDateTime.of(localDate, LocalTime.NOON);
+    }
+
+    @Override
+    public String nextStatus() {
+        return Constants.Status.ROOM_USAGE_FREE;
+    }
+
+    @Override
+    public String useType() {
+        return null;
     }
 
     @JsonIgnore

@@ -67,6 +67,22 @@ public class RoomLockRecord extends PersistenceModel implements UseInfoAble{
 	public boolean isArrears() {
 		return false;
 	}
+
+	@Override
+	public boolean isVIP() {
+		return false;
+	}
+
+	@Override
+	public String nextStatus() {
+		return getEndToStatus();
+	}
+
+	@Override
+	public String useType() {
+		return getType();
+	}
+
 	@Override
 	public boolean isTodayLeave() {
 		return false;
