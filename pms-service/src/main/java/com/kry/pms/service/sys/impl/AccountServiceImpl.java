@@ -419,9 +419,10 @@ public class AccountServiceImpl implements AccountService {
         for (CheckInRecord item : cirs) {
             if (Constants.Type.CHECK_IN_RECORD_CUSTOMER.equals(item.getType())) {
                 Account account = item.getAccount();
-                if (Constants.Status.ACCOUNT_NEW.equals(account.getStatus()) || Constants.Status.ACCOUNT_SETTLE.equals(account.getStatus())) {
+                if (accountCheck(account.getId())) {
                 } else {
                     result = false;
+                    break;
                 }
             }
         }
