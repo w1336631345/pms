@@ -1294,9 +1294,11 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
             cir.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_CANCLE_BOOK);
             modify(cir);
         }
-        main.setRoomCount(main.getRoomCount() - roomCount);
-        main.setHumanCount(main.getHumanCount() - humanCount);
-        checkInRecordDao.saveAndFlush(main);
+        if(main != null){
+            main.setRoomCount(main.getRoomCount() - roomCount);
+            main.setHumanCount(main.getHumanCount() - humanCount);
+            checkInRecordDao.saveAndFlush(main);
+        }
 //		updateCount(reserveIds, mainRecordId);
         return hr.ok();
     }
