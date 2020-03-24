@@ -270,7 +270,7 @@ public class GuestRoomServiceImpl implements GuestRoomService {
 	private boolean lockRoom(GuestRoomOperation op,GuestRoom gr,DtoResponse<String> rep,String type,int errorCode,StringBuilder message){
 		if (op.getReasonId() != null && op.getEndToStatus() != null) {
 			RoomLockRecord record = roomLockRecordService.lockRoom(gr,
-					op.getStartTime(), op.getEndTime(), op.getReasonId(), op.getEndToStatus());
+					op.getStartTime(), op.getEndTime(), op.getReasonId(), op.getEndToStatus(),type);
 			if (record == null) {
 				return false;
 			}

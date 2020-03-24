@@ -18,6 +18,7 @@ public class RoomLockRecordVo {
 	private LocalDateTime startTime;
 	private LocalDateTime endTime;
 	private String remark;
+	private String type;
 	private String endToStatus;
 	private Boolean autoReOpen;
 

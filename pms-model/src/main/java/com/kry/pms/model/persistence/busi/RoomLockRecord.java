@@ -91,7 +91,11 @@ public class RoomLockRecord extends PersistenceModel implements UseInfoAble{
 	}
 	@Override
 	public String getRoomStatus() {
-		return Constants.Status.ROOM_STATUS_OUT_OF_SERVCIE;
+		if(Constants.Type.ROOM_LOCK_LOCK.equals(this.getType())){
+			return Constants.Status.ROOM_STATUS_OUT_OF_SERVCIE;
+		}else{
+			return Constants.Status.ROOM_STATUS_OUT_OF_ORDER;
+		}
 	}
 
 	@Override

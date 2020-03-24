@@ -71,15 +71,17 @@ public class RoomLockRecordServiceImpl implements RoomLockRecordService {
         return convent(roomLockRecordDao.findAll(ex, req));
     }
 
-    @Override
-    public RoomLockRecord createRecord(GuestRoom gr, LocalDateTime startTime, LocalDateTime endTime,
-                                       String reason, String endToStatus) {
+    private RoomLockRecord createRecord(GuestRoom gr, LocalDateTime startTime, LocalDateTime endTime,
+                                       String reason, String endToStatus,String type) {
         RoomLockRecord rlr = new RoomLockRecord();
         rlr.setGuestRoom(gr);
+        rlr.setHotelCode(gr.getHotelCode());
+        rlr.setStatus(Constants.Status.NORMAL);
         rlr.setStartTime(startTime);
         rlr.setEndTime(endTime);
         rlr.setReason(reason);
         rlr.setEndToStatus(endToStatus);
+        rlr.setType(type);
         return rlr;
     }
 
@@ -100,8 +102,8 @@ public class RoomLockRecordServiceImpl implements RoomLockRecordService {
     }
 
     @Override
-    public RoomLockRecord lockRoom(GuestRoom gr, LocalDateTime startTime, LocalDateTime endTime, String reasonId, String endToStatus) {
-        RoomLockRecord rlr = createRecord(gr, startTime, endTime, reasonId, endToStatus);
+    public RoomLockRecord lockRoom(GuestRoom gr, LocalDateTime startTime, LocalDateTime endTime, String reasonId, String endToStatus,String type) {
+        RoomLockRecord rlr = createRecord(gr, startTime, endTime, reasonId, endToStatus,type);
         rlr = add(rlr);
         roomStatisticsService.lock(rlr);
         return rlr;

@@ -438,7 +438,7 @@ public class GuestRoomStatusServiceImpl implements GuestRoomStatusService {
             case Constants.Status.ROOM_USAGE_LOCKED:
                 return Constants.Status.ROOM_STATUS_OUT_OF_SERVCIE;
             case Constants.Status.ROOM_USAGE_REPARIE:
-                return Constants.Status.ROOM_STATUS_OUT_OF_SERVCIE;
+                return Constants.Status.ROOM_STATUS_OUT_OF_ORDER;
             default:
                 return null;
         }
