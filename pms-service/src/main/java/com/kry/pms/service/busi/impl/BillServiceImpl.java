@@ -454,4 +454,9 @@ public class BillServiceImpl implements BillService {
         org.springframework.data.domain.PageRequest req = org.springframework.data.domain.PageRequest.of(1, 10);
        return  sqlTemplateService.processTemplateQuery(query.getHotelCode(),BillService.class.getSimpleName(),"queryByBo",query);
     }
+
+    @Override
+    public int countUnSettleBill(String accountId) {
+        return billDao.countUnSellteBill(accountId);
+    }
 }

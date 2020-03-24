@@ -35,6 +35,13 @@ public interface AccountService extends BaseService<Account> {
 
     DtoResponse<Double> queryRoomPrice(String id);
 
+    /**
+     * 帐务是否为空
+     * @param id
+     * @return
+     */
+    boolean accountCheck(String id);
+
     List<Account> findByHotelCodeAndType(String hotelCode);
 
     DtoResponse<List<Bill>> transferBill(List<Bill> bills, Double total, Account account, Account targetAccount,

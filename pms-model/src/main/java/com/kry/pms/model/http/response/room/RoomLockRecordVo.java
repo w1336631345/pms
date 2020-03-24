@@ -12,6 +12,7 @@ import lombok.Data;
 
 @Data
 public class RoomLockRecordVo {
+	private String id;
 	private String roomNum;
 	private String roomId;
 	private String reason;

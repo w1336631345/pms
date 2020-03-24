@@ -13,11 +13,12 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface BillDao extends BaseDao<Bill> {
 
-	public List<Bill> findByHotelCode(String hotelCode);
+    public List<Bill> findByHotelCode(String hotelCode);
 
-	public List<Bill> findByAccountId(String id);
+    public List<Bill> findByAccountId(String id);
 
-	public List<Bill> findByAccountAndStatus(Account account, String status);
+    public List<Bill> findByAccountAndStatus(Account account, String status);
 
-
+    @Query(nativeQuery = true, value = "select count(id) from t_bill where account_id = ?1 and status = 'NEED_SETTLED'")
+    int countUnSellteBill(String accountId);
 }

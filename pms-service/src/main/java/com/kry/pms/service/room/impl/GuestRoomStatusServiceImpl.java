@@ -454,6 +454,13 @@ public class GuestRoomStatusServiceImpl implements GuestRoomStatusService {
         return GuestRoomStatusVo.covert(status);
     }
 
+    public void clearLockInfo(UseInfoAble info){
+        Duration duration = Duration.between(info.getStartTime(), LocalDateTime.now());
+        if (duration.toMinutes() < 1) {
+
+        }
+    }
+
     @Override
     public void clearUseInfo(UseInfoAble info) {
         GuestRoomStatus status = findGuestRoomStatusByGuestRoom(info.guestRoom());

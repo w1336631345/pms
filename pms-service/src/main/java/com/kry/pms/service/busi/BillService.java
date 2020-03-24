@@ -76,4 +76,5 @@ public interface BillService extends BaseService<Bill> {
 
 	public List queryByBo(BillQueryBo query);
 
+    int countUnSettleBill(String accountId);
 }
