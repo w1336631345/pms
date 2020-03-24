@@ -18,7 +18,9 @@ spring:
     time-zone: Asia/Shanghai
     default-property-inclusion: non-null
   datasource:
-    url: jdbc:mysql://127.0.0.1:3306/pms_temp?useUnicode=true&characterEncoding=utf8&serverTimezone=Hongkong
+#    url: jdbc:mysql://169.254.55.91:3306/pms_temp?useUnicode=true&characterEncoding=utf8&serverTimezone=Hongkong&tinyInt1isBit=false
+#    url: jdbc:mysql://169.254.203.37:3306/pms_temp?useUnicode=true&characterEncoding=utf8&serverTimezone=Hongkong&tinyInt1isBit=false
+    url: jdbc:mysql://169.254.55.91:3306/pms_test?useUnicode=true&characterEncoding=utf8&serverTimezone=Hongkong&tinyInt1isBit=false
     username: root
     password: admin
   jpa:
