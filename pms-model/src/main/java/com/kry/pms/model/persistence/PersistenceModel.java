@@ -45,7 +45,7 @@ public class PersistenceModel implements Serializable,Cloneable {
 	@LastModifiedBy
 	@Column(columnDefinition = "varchar(255) COMMENT '修改人'")
 	protected String updateUser;
-	@Column(columnDefinition = "tinyint(1) default '0' COMMENT '删除状态'")
+	@Column(columnDefinition = "int(1) default '0' COMMENT '删除状态'")
 	protected Integer deleted = 0;
 	@Column(columnDefinition = "varchar(32) default 'draft' COMMENT '状态'")
 	protected String status;
