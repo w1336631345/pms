@@ -594,7 +594,12 @@ public class RoomUsageServiceImpl implements RoomUsageService {
 
     @Override
     public boolean lock(UseInfoAble info) {
-        return use(info, info.getRoomStatus());
+        if(use(info,info.getRoomStatus())){
+            guestRoomStatusService.changeStatus(info);
+            return true;
+        }else{
+            return false;
+        }
     }
 
     @Override
@@ -602,7 +607,9 @@ public class RoomUsageServiceImpl implements RoomUsageService {
         RoomUsage ru = roomUsageDao.findByGuestRoomIdAndBusinesskey(info.guestRoom().getId(),
                 info.getBusinessKey());
         if (ru != null) {
-            return unUse(ru, info);
+            if( unUse(ru, info)){
+                guestRoomStatusService.changeStatus(info);
+            }
         }
         return false;
     }
