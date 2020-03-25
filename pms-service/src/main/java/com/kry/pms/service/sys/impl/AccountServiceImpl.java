@@ -77,7 +77,7 @@ public class AccountServiceImpl implements AccountService {
         account.setTotal(0.0);
         account.setStatus(Constants.Status.ACCOUNT_NEW);
         if (account.getCode() == null) {
-            account.setStatus(fetchAccountCode(account.getHotelCode(), account.getType()));
+            account.setCode(fetchAccountCode(account.getHotelCode(), account.getType()));
         }
     }
 

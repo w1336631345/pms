@@ -27,7 +27,6 @@ public class RoomReport {
     private String roomNum;
     @Column(columnDefinition = "varchar(100) COMMENT '是否删除'")
     private String deleted;
-
     @Column(columnDefinition = "varchar(100) COMMENT '酒店代码'")
     private String hotelCode;
     @Column(columnDefinition = "date COMMENT '记录的营业日期'")
