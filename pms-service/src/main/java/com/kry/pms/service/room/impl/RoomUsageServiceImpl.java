@@ -466,6 +466,8 @@ public class RoomUsageServiceImpl implements RoomUsageService {
                         ru.getUniqueIds().remove(info.uniqueId());
                     }
                     if (ru.getUniqueIds().isEmpty()) {
+                        roomTypeQuantityService.changeRoomTypeQuantity(info.roomType(), info.getEndTime().toLocalDate(),
+                                ru.getEndDateTime().toLocalDate(), ru.getUsageStatus(), Constants.Status.ROOM_USAGE_FREE, 1);
                         unUse(ru, info);
                     } else {
                         modify(ru);
@@ -561,8 +563,6 @@ public class RoomUsageServiceImpl implements RoomUsageService {
         } else {
             return false;
         }
-        roomTypeQuantityService.changeRoomTypeQuantity(info.roomType(), info.getStartTime().toLocalDate(),
-                info.getEndTime().toLocalDate(), ru.getUsageStatus(), Constants.Status.ROOM_USAGE_FREE, 1);
         return true;
 
     }
@@ -579,6 +579,8 @@ public class RoomUsageServiceImpl implements RoomUsageService {
                         ru.setUsageStatus(Constants.Status.ROOM_USAGE_CHECK_OUT);
                     } else {
                         if (info.getEndTime().isBefore(ru.getEndDateTime())) {
+                            roomTypeQuantityService.changeRoomTypeQuantity(info.roomType(), info.getEndTime().toLocalDate(),
+                                    ru.getEndDateTime().toLocalDate(), ru.getUsageStatus(), Constants.Status.ROOM_USAGE_PREDICTABLE, 1);
                             unUse(ru, info);
                         }
                     }
@@ -596,12 +598,12 @@ public class RoomUsageServiceImpl implements RoomUsageService {
 
     @Override
     public boolean lock(UseInfoAble info) {
-        if(use(info,info.useType())){
+        if (use(info, info.useType())) {
             roomTypeQuantityService.changeRoomTypeQuantity(info.roomType(), info.getStartTime().toLocalDate(),
-                    info.getEndTime().toLocalDate(), info.useType(), Constants.Status.ROOM_USAGE_CHECK_IN, 1);
+                    info.getEndTime().toLocalDate(), Constants.Status.ROOM_USAGE_FREE, info.useType(), 1);
             guestRoomStatusService.lock(info);
             return true;
-        }else{
+        } else {
             return false;
         }
     }
@@ -611,7 +613,14 @@ public class RoomUsageServiceImpl implements RoomUsageService {
         RoomUsage ru = roomUsageDao.findByGuestRoomIdAndBusinesskey(info.guestRoom().getId(),
                 info.getBusinessKey());
         if (ru != null) {
-            if( unUse(ru, info)){
+            if (unUse(ru, info)) {
+                if(cancleDateTime.isBefore(info.getStartTime())){
+                    roomTypeQuantityService.changeRoomTypeQuantity(info.roomType(), info.getStartTime().toLocalDate(),
+                            info.getEndTime().toLocalDate(), ru.getUsageStatus(), Constants.Status.ROOM_USAGE_FREE, 1);
+                }else if(cancleDateTime.isBefore(info.getEndTime())){
+                    roomTypeQuantityService.changeRoomTypeQuantity(info.roomType(), cancleDateTime.toLocalDate(),
+                            info.getEndTime().toLocalDate(), ru.getUsageStatus(), Constants.Status.ROOM_USAGE_FREE, 1);
+                }
                 guestRoomStatusService.clearLockInfo(info);
             }
         }
@@ -622,25 +631,25 @@ public class RoomUsageServiceImpl implements RoomUsageService {
     public boolean extendTime(UseInfoAble info, LocalDate extendDate) {
         RoomUsage ru = roomUsageDao.queryGuestRoomUsable(info.guestRoom().getId(), info.getStartTime(), info.getEndTime());
         LocalDateTime endTime = LocalDateTime.of(extendDate, LocalTime.NOON);
-        if(ru!=null){
+        if (ru != null) {
             RoomUsage postRu = ru.getPostRoomUsage();
-            if(postRu!=null&&Constants.Status.ROOM_STATUS_FREE.equals(postRu.getUsageStatus())){
-                if(endTime.isBefore(postRu.getEndDateTime())){
+            if (postRu != null && Constants.Status.ROOM_STATUS_FREE.equals(postRu.getUsageStatus())) {
+                if (endTime.isBefore(postRu.getEndDateTime())) {
                     ru.setEndDateTime(endTime);
                     updateDuration(ru);
                     postRu.setStartDateTime(endTime);
                     updateDuration(postRu);
                     modify(ru);
                     modify(postRu);
-                    roomTypeQuantityService.useRoomType(info,endTime);
+                    roomTypeQuantityService.useRoomType(info, endTime);
                     return true;
-                }else{
+                } else {
                     return false;
                 }
-            }else{
-              return false;
+            } else {
+                return false;
             }
-        }else{
+        } else {
             return false;
         }
 
