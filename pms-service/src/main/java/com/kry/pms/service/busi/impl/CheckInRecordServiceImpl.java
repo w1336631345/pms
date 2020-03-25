@@ -45,6 +45,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
+import javax.annotation.Resource;
 import javax.persistence.criteria.*;
 import javax.transaction.Transactional;
 import java.io.IOException;

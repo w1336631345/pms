@@ -5,9 +5,11 @@ import lombok.Data;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Table;
 
 @Entity
 @Data
+@Table(name = "t_verify_step")
 public class VerifyStep extends PersistenceModel {
     @Column
     private String name;
