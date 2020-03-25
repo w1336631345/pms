@@ -102,11 +102,10 @@ public class RoomLockRecordServiceImpl implements RoomLockRecordService {
     }
 
     @Override
-    public RoomLockRecord lockRoom(GuestRoom gr, LocalDateTime startTime, LocalDateTime endTime, String reasonId, String endToStatus,String type) {
+    public boolean lockRoom(GuestRoom gr, LocalDateTime startTime, LocalDateTime endTime, String reasonId, String endToStatus,String type) {
         RoomLockRecord rlr = createRecord(gr, startTime, endTime, reasonId, endToStatus,type);
         rlr = add(rlr);
-        roomStatisticsService.lock(rlr);
-        return rlr;
+        return roomStatisticsService.lock(rlr);
     }
 
 }

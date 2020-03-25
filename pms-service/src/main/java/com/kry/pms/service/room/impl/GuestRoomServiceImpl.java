@@ -269,11 +269,7 @@ public class GuestRoomServiceImpl implements GuestRoomService {
 
     private boolean lockRoom(GuestRoomOperation op, GuestRoom gr, DtoResponse<String> rep, String type, int errorCode, StringBuilder message) {
         if (op.getReasonId() != null && op.getEndToStatus() != null) {
-            RoomLockRecord record = roomLockRecordService.lockRoom(gr,op.getStartTime(), op.getEndTime(), op.getReasonId(), op.getEndToStatus(), type);
-            if (record == null) {
-                return false;
-            }
-            return true;
+            return roomLockRecordService.lockRoom(gr,op.getStartTime(), op.getEndTime(), op.getReasonId(), op.getEndToStatus(), type);
         }
         return false;
     }
@@ -290,16 +286,17 @@ public class GuestRoomServiceImpl implements GuestRoomService {
         String[] ids = op.getRoomIds();
         String toStatus = op.getOp();
         int errorCode = 0;
+        boolean result = true;
         StringBuilder message = new StringBuilder();
         for (String id : ids) {
             GuestRoom gr = findById(id);
             if (gr != null) {
                 switch (op.getOp()) {
                     case Constants.Status.ROOM_STATUS_OUT_OF_ORDER:
-                        lockRoom(op, gr, rep, Constants.Type.ROOM_LOCK_REPAIR, errorCode, message);
+                        result =lockRoom(op, gr, rep, Constants.Type.ROOM_LOCK_REPAIR, errorCode, message);
                         break;
                     case Constants.Status.ROOM_STATUS_OUT_OF_SERVCIE:
-                        lockRoom(op, gr, rep, Constants.Type.ROOM_LOCK_LOCK, errorCode, message);
+                        result =lockRoom(op, gr, rep, Constants.Type.ROOM_LOCK_LOCK, errorCode, message);
                         break;
                     default:
                         if (rep.getStatus() == 0) {
@@ -310,6 +307,11 @@ public class GuestRoomServiceImpl implements GuestRoomService {
                             }
                         }
                         break;
+                }
+                if(!result){
+                    rep.setStatus(Constants.BusinessCode.CODE_PARAMETER_INVALID);
+                    rep.setMessage("锁房失败！房号："+ gr.getRoomNum());
+                    break;
                 }
             } else {
                 // 如果房间找不到 错误请求 不在判断其他房间
