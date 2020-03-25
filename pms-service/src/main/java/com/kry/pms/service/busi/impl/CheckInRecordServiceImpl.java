@@ -1746,8 +1746,13 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
         for (int i = 0; i < cId.length; i++) {
             String id = cId[i];
             CheckInRecord cir = checkInRecordDao.getOne(id);
-            String orderNum = businessSeqService.fetchNextSeqNum(cir.getHotelCode(),
-                    Constants.Key.BUSINESS_ORDER_NUM_SEQ_KEY);
+            String orderNum = null;
+            if(cir.getOrderNumOld() != null){
+                orderNum = cir.getOrderNumOld();
+            }else {
+                orderNum = businessSeqService.fetchNextSeqNum(cir.getHotelCode(),
+                        Constants.Key.BUSINESS_ORDER_NUM_SEQ_KEY);
+            }
             Map<String, Object> map = roomPriceSchemeDao.roomTypeAndPriceScheme(cir.getRoomType().getId(), roomPriceId);
             String setMealId = MapUtils.getString(map, "setMealId");
             Double price = MapUtils.getDouble(map, "price");//新的房价方案：房价
