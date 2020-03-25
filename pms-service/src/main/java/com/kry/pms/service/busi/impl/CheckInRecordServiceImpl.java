@@ -1551,6 +1551,12 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
             checkInRecord.setTogetherCode(cir.getTogetherCode());
         }
         checkInRecordDao.save(checkInRecord);
+        List<CheckInRecord> main = checkInRecordDao.findByOrderNumAndTypeAndDeleted(orderNum, Constants.Type.CHECK_IN_RECORD_GROUP, Constants.DELETED_FALSE);
+        if(main != null && !main.isEmpty()){
+            CheckInRecord cm = main.get(0);
+            cm.setHumanCount(cm.getHumanCount() + 1);
+            update(cm);
+        }
     }
 
     @Override
@@ -1674,6 +1680,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
             if (!roomNums.contains(cir.getGuestRoom().getRoomNum())) {
                 roomNums.add(cir.getGuestRoom().getRoomNum());
             }
+            cir.setOrderNumOld(cir.getOrderNum());
             Map<String, Object> map = roomPriceSchemeDao.roomTypeAndPriceScheme(cir.getRoomType().getId(), cirG.getRoomPriceScheme().getId());
             Double price = MapUtils.getDouble(map, "price");
             //查询同房间同住的人，一起入团
@@ -1688,6 +1695,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                         hCount = hCount + 1;
                         CheckInRecord cirRoomNum = list.get(m);
                         cirRoomNum.setMainRecord(cirG);
+                        cirRoomNum.setOrderNumOld(cir.getOrderNum());
                         cirRoomNum.setOrderNum(cirG.getOrderNum());
                         cirRoomNum.setGroupType(Constants.Type.CHECK_IN_RECORD_GROUP_TYPE_YES);
                         if (isFollowGroup) {
