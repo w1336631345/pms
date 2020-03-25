@@ -70,55 +70,48 @@ public class RoomLinkServiceImpl implements RoomLinkService {
     @Transactional
     public HttpResponse addRoomLink(RoomLinkBo roomLinkBo){
         HttpResponse hr = new HttpResponse();
+        String ids[] = roomLinkBo.getIds();
         String roomLinkId = null;
-        if(roomLinkBo.getRoomLinkId() != null && roomLinkBo.getRoomLinkId() != ""){
+        int hCount = 0;
+        List<String> roomList = new ArrayList<>();
+        if(roomLinkBo.getRoomLinkId() != null && !"".equals(roomLinkBo.getRoomLinkId())){
             roomLinkId = roomLinkBo.getRoomLinkId();
-            String ids[] = roomLinkBo.getIds();
-            for(int i=0; i<ids.length; i++){
-                CheckInRecord cir = checkInRecordService.findById(ids[i]);
-                    if(cir.getGuestRoom() != null){
-                        GuestRoom gr = cir.getGuestRoom();
-                        String orderNum = cir.getOrderNum();
-                        List<CheckInRecord> list = checkInRecordDao.findByOrderNumAndGuestRoomAndDeleted(orderNum, gr, Constants.DELETED_FALSE);
-                        for(int m=0; m<list.size(); m++){
-                            CheckInRecord cirRoomNum = list.get(m);
-                            cirRoomNum.setRoomLinkId(roomLinkBo.getRoomLinkId());
-                            cirRoomNum.setOrderNum(roomLinkBo.getOrderNum());
-                            checkInRecordService.update(cirRoomNum);
-                        }
-                    }
-                cir.setRoomLinkId(roomLinkBo.getRoomLinkId());
-                cir.setOrderNum(roomLinkBo.getOrderNum());
-                checkInRecordService.update(cir);
-            }
         }else {
             RoomLink rl = new RoomLink();
             rl.setDeleted(Constants.DELETED_FALSE);
-            add(rl);
+            add(rl);//没有roomLinkId说明之前没有联过房
             roomLinkId = rl.getId();
-            String ids[] = roomLinkBo.getIds();
-            for(int i=0; i<ids.length; i++){
-                CheckInRecord cir = checkInRecordService.findById(ids[i]);
-                if(cir.getGuestRoom() != null){
-                    List<CheckInRecord> list = checkInRecordService.findByOrderNumAndGuestRoomAndDeleted(cir.getOrderNum(), cir.getGuestRoom(), Constants.DELETED_FALSE);
-                    for(int m=0; m<list.size(); m++){
-                        CheckInRecord cirRoomNum = list.get(m);
-                        cirRoomNum.setRoomLinkId(rl.getId());
-                        cirRoomNum.setOrderNum(roomLinkBo.getOrderNum());
-                        checkInRecordService.update(cirRoomNum);
-                    }
-                }
-                cir.setRoomLinkId(rl.getId());
-                cir.setOrderNum(roomLinkBo.getOrderNum());
-                checkInRecordService.update(cir);
-            }
             String[] id = roomLinkBo.getId();
             for(int j=0; j<id.length; j++){
                 CheckInRecord cir = checkInRecordService.findById(id[j]);
-                cir.setRoomLinkId(rl.getId());
-                cir.setRoomLinkIdM("M");
+                cir.setRoomLinkId(roomLinkId);
+                cir.setRoomLinkIdM("M");//因为初次联房，设置联房原数据是主数据
                 checkInRecordService.update(cir);
             }
+        }
+        for(int i=0; i<ids.length; i++){
+            CheckInRecord cir = checkInRecordService.findById(ids[i]);
+            if(cir.getGuestRoom() != null){
+                if(!roomList.contains(cir.getGuestRoom().getRoomNum())){
+                    roomList.add(cir.getGuestRoom().getRoomNum());
+                }
+                List<CheckInRecord> list = checkInRecordService.findByOrderNumAndGuestRoomAndDeleted(cir.getOrderNum(), cir.getGuestRoom(), Constants.DELETED_FALSE);
+                hCount = hCount + list.size();
+                for(int m=0; m<list.size(); m++){
+                    CheckInRecord cirRoomNum = list.get(m);
+                    cirRoomNum.setOrderNumOld(cirRoomNum.getOrderNum());
+                    cirRoomNum.setRoomLinkId(roomLinkId);
+                    cirRoomNum.setOrderNum(roomLinkBo.getOrderNum());
+                    checkInRecordService.update(cirRoomNum);
+                }
+            }
+        }
+        List<CheckInRecord> listMain = checkInRecordDao.findByOrderNumAndTypeAndDeleted(roomLinkBo.getOrderNum(), Constants.Type.CHECK_IN_RECORD_GROUP, Constants.DELETED_FALSE);
+        if(listMain != null && !listMain.isEmpty()){
+            CheckInRecord main = listMain.get(0);
+            main.setRoomCount(main.getRoomCount() + roomList.size());
+            main.setHumanCount(main.getHumanCount() + ids.length);
+            checkInRecordService.update(main);
         }
         hr.setData(roomLinkId);
         return hr;
@@ -127,53 +120,41 @@ public class RoomLinkServiceImpl implements RoomLinkService {
     @Override
     public HttpResponse deleteRoomLink(String[] ids) {
         HttpResponse hr = new HttpResponse();
-        String roomLinkId = null;
+        String orderNum = null;
+        List<String> roomList = new ArrayList<>();
+        int hCount = 0;
+        List<CheckInRecord> main = null;
         for(int i=0; i<ids.length; i++){
             CheckInRecord cir = checkInRecordService.findById(ids[i]);
-            if(roomLinkId == null){
-                roomLinkId = cir.getRoomLinkId();
+            if(main == null){
+                main = checkInRecordDao.findByOrderNumAndTypeAndDeleted(cir.getOrderNum(), Constants.Type.CHECK_IN_RECORD_GROUP, Constants.DELETED_FALSE);
             }
-            String orderNum = businessSeqService.fetchNextSeqNum(cir.getHotelCode(),
-                    Constants.Key.BUSINESS_ORDER_NUM_SEQ_KEY);
+            if(cir.getOrderNumOld() != null){
+                orderNum = cir.getOrderNumOld();
+            }else {
+                orderNum = businessSeqService.fetchNextSeqNum(cir.getHotelCode(),
+                        Constants.Key.BUSINESS_ORDER_NUM_SEQ_KEY);
+            }
             List<CheckInRecord> list = checkInRecordService.findByOrderNumAndGuestRoomAndDeleted(cir.getOrderNum(), cir.getGuestRoom(), Constants.DELETED_FALSE);
             for(int m=0; m<list.size(); m++){
                 CheckInRecord cirRoomNum = list.get(m);
                 if(!"M".equals(cirRoomNum.getRoomLinkIdM())){
+                    if(!roomList.contains(cirRoomNum.getGuestRoom().getRoomNum())){
+                        roomList.add(cirRoomNum.getGuestRoom().getRoomNum());
+                    }
+                    hCount = hCount + 1;
                     cirRoomNum.setRoomLinkId(null);
                     cirRoomNum.setOrderNum(orderNum);
                     checkInRecordService.update(cirRoomNum);
                 }
             }
-//            cir.setRoomLinkId(null);
-//            checkInRecordService.update(cir);
         }
-//        List<CheckInRecord> list = checkInRecordService.getRoomLinkList(roomLinkId);
-//        String roomNum = null;
-//        boolean isOne = true;
-//        for(int j=0; j<list.size(); j++){
-//            CheckInRecord cir = list.get(j);
-//            if(cir.getGuestRoom() != null){
-//                if(j==0){
-//                    roomNum = cir.getGuestRoom().getRoomNum();
-//                }
-//                if(roomNum != null){
-//                    String eNum = cir.getGuestRoom().getRoomNum();
-//                    if(!roomNum.equals(eNum)){
-//                        isOne = false;
-//                    }
-//                }
-//            }
-//        }
-//        if(isOne){
-//            for(int i=0; i<list.size(); i++){
-//                CheckInRecord cir = list.get(i);
-//                cir.setRoomLinkId(null);
-//                checkInRecordService.update(cir);
-//            }
-//            if(roomLinkId != null){
-//                delete(roomLinkId);
-//            }
-//        }
+        if(main != null && !main.isEmpty()){
+            CheckInRecord cm = main.get(0);
+            cm.setHumanCount(cm.getHumanCount() - hCount);
+            cm.setRoomCount(cm.getRoomCount() - roomList.size());
+            checkInRecordService.update(cm);
+        }
         return hr.ok();
     }
 

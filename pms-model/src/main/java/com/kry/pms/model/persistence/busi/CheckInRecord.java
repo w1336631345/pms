@@ -51,6 +51,8 @@ public class CheckInRecord extends PersistenceModel {
 	@Column
 	private String orderNum;// 订单编号
 	@Column
+	private String orderNumOld;//原订单号
+	@Column
 	private Boolean linked;
 	@Column
 	private String linkNum;
@@ -169,6 +171,8 @@ public class CheckInRecord extends PersistenceModel {
 	@Transient
 	private String isGOrU;//预订来至团队（G）还是多人（U）
 
+	public String getOrderNumOld() { return orderNumOld; }
+	public void setOrderNumOld(String orderNumOld) { this.orderNumOld = orderNumOld; }
 	public String getVipCode() { return vipCode; }
 	public void setVipCode(String vipCode) { this.vipCode = vipCode; }
 	public String getExternalOrder() { return externalOrder; }
