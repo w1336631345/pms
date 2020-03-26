@@ -411,7 +411,6 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                 cir.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_CHECK_OUT);
                 cir.setActualTimeOfLeave(LocalDateTime.now());
                 roomStatisticsService.checkOut(new CheckInRecordWrapper(cir));
-                cir.getAccount().setStatus(Constants.Status.ACCOUNT_SETTLE);
                 modify(cir);
             }
         } else {
@@ -1193,7 +1192,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
         Example<CheckInRecord> ex = Example.of(exCir);
         return checkInRecordDao.findAll(ex);
     }
-
+    @Transactional
     @Override
     public DtoResponse<String> hangUp(String id) {
         CheckInRecord cir = findById(id);
@@ -1203,7 +1202,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
         modify(cir);
         return rep;
     }
-
+    @Transactional
     @Override
     public DtoResponse<String> hangUpByAccountId(String id) {
         CheckInRecord cir = checkInRecordDao.findByAccountId(id);
