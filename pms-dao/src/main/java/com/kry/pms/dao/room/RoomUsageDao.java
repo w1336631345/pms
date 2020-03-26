@@ -29,7 +29,7 @@ public interface RoomUsageDao extends BaseDao<RoomUsage> {
 	int deleteByGuestRoom(GuestRoom gr);
 	@Query(value = "select new com.kry.pms.model.http.response.room.RoomUsageListVo(a.id, b.roomNum, a.startDateTime, a.endDateTime," + 
 			"d.name, a.usageStatus, a.businesskey, a.businessInfo, a.duration,b.id) from RoomUsage a ,GuestRoom b,RoomType d where a.guestRoom = b and b.roomType = d and a.usageStatus='F"
-			+ "' and d.id = ?1 and a.startDateTime<?2 and a.endDateTime>?3")
+			+ "' and d.id = ?1 and a.startDateTime<=?2 and a.endDateTime>=?3")
 	List<RoomUsageListVo> queryUsableRoomTypeGuestRooms(String roomTypeId, LocalDateTime startTime, LocalDateTime endDateTime);
 	
 }

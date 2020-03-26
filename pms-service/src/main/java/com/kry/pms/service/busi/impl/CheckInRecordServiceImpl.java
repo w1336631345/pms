@@ -23,10 +23,7 @@ import com.kry.pms.model.persistence.sys.User;
 import com.kry.pms.service.busi.CheckInRecordService;
 import com.kry.pms.service.busi.RoomRecordService;
 import com.kry.pms.service.guest.CustomerService;
-import com.kry.pms.service.room.GuestRoomService;
-import com.kry.pms.service.room.RoomStatisticsService;
-import com.kry.pms.service.room.RoomTypeService;
-import com.kry.pms.service.room.RoomUsageService;
+import com.kry.pms.service.room.*;
 import com.kry.pms.service.sys.AccountService;
 import com.kry.pms.service.sys.BusinessSeqService;
 import com.kry.pms.service.sys.SqlTemplateService;
@@ -84,6 +81,8 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
     SqlTemplateService sqlTemplateService;
     @Autowired
     RoomPriceSchemeDao roomPriceSchemeDao;
+    @Autowired
+    GuestRoomStatusService guestRoomStatusService;
 
     @Override
     public CheckInRecord add(CheckInRecord checkInRecord) {
@@ -127,13 +126,19 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
         }
         if (dbCir != null) {
             checkInRecord.setMainRecord(dbCir.getMainRecord());
-            updateCustomer(dbCir, checkInRecord);
+//            updateCustomer(dbCir, checkInRecord);
             if (checkInRecord.getCustomer() != null) {
                 if (checkInRecord.getCustomer().getId() != null) {
                     Customer c = customerService.findById(checkInRecord.getCustomer().getId());
                     if (c != null) {
                         if (!dbCir.getName().equals(c.getName())) {
                             checkInRecord.setName(c.getName());
+                            if(checkInRecord.getAccount() != null){
+                                Account account = accountService.findById(checkInRecord.getAccount().getId());//连同主单账号名称一起修改
+                                account.setCustomer(c);
+                                account.setName(c.getName());
+                                accountService.modify(account);
+                            }
                         }
                     }
                 }
@@ -145,11 +150,23 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                 List<CheckInRecord> children = checkInRecordDao.findByMainRecordAndDeleted(dbCir,
                         Constants.DELETED_FALSE);
                 checkInRecord.setCustomer(null);
+                boolean updateRoomPriceS = false;
+                boolean updateName = false;
                 //主单修改了房价码
                 if (!dbCir.getRoomPriceScheme().getId().equals(checkInRecord.getRoomPriceScheme().getId())) {
-                    for (int i = 0; i < children.size(); i++) {
-                        CheckInRecord cir = children.get(i);
-                        System.out.println(cir.getRoomType().getId() + "reeeeeee" + checkInRecord.getRoomPriceScheme().getId());
+                    updateRoomPriceS = true;
+                }
+                if(!dbCir.getName().equals(checkInRecord.getName())){//主单修改名称
+                    updateName = true;
+                    if(checkInRecord.getAccount() != null){
+                        Account account = accountService.findById(checkInRecord.getAccount().getId());//连同主单账号名称一起修改
+                        account.setName(checkInRecord.getName());
+                        accountService.modify(account);
+                    }
+                }
+                for (int i = 0; i < children.size(); i++) {
+                    CheckInRecord cir = children.get(i);
+                    if(updateRoomPriceS){//主单修改了房价码
                         Map<String, Object> map = roomPriceSchemeDao.roomTypeAndPriceScheme(cir.getRoomType().getId(), checkInRecord.getRoomPriceScheme().getId());
                         Double price = MapUtils.getDouble(map, "price");
                         if (price == null) {
@@ -167,8 +184,11 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                         } else {
                             cir.setSetMeal(null);
                         }
-                        checkInRecordDao.saveAndFlush(cir);
                     }
+                    if(updateName){//主单修改名称
+                        cir.setGroupName(checkInRecord.getName());
+                    }
+                    checkInRecordDao.saveAndFlush(cir);
                 }
 
                 // 修改的离店时间小于之前时间（改小）
@@ -183,18 +203,12 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                     for (int i = 0; i < children.size(); i++) {
                         CheckInRecord cir = children.get(i);
                         if (cir.getRoomType() != null) {
+                            // 查询房类资源是否满足
                             boolean b = roomStatisticsService.extendTime(new CheckInRecordWrapper(cir), checkInRecord.getLeaveTime().toLocalDate());
                             if (!b) {
                                 TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                                 return hr.error("资源不足");
                             }
-                            // 查询房类资源是否满足
-//								boolean isExit = roomStatisticsService.booking(cir.getRoomType(), cir.getArriveTime(),
-//										cir.getRoomCount(), cir.getDays());
-//								if (!isExit) {
-//									TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-//									return hr.error("房类资源不够");
-//								}
                         }
                         //修改所有主单下数据的房价码
                         cir.setRoomPriceScheme(checkInRecord.getRoomPriceScheme());
@@ -216,8 +230,8 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
     private void updateCustomer(CheckInRecord dbCir, CheckInRecord cir) {
         if (cir.getGuestRoom() != null && cir.getCustomer() != null) {
             if (dbCir.getCustomer() != null && dbCir.getCustomer().getId().equals(cir.getCustomer().getId())) {
-//				guestRoomStatausService.updateSummary(cir.getGuestRoom(), dbCir.getCustomer().getName(),
-//						cir.getCustomer().getName());
+                guestRoomStatusService.updateSummary(cir.getGuestRoom(), dbCir.getCustomer().getName(),
+						cir.getCustomer().getName());
             }
         }
     }
