@@ -118,9 +118,9 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
     public HttpResponse modifyInfo(CheckInRecord checkInRecord) {
         HttpResponse hr = new HttpResponse();
         CheckInRecord dbCir = checkInRecordDao.getOne(checkInRecord.getId());
-        if(checkInRecord.getLeaveTime().isAfter(dbCir.getLeaveTime())){
+        if (checkInRecord.getLeaveTime().isAfter(dbCir.getLeaveTime())) {
             boolean b = roomStatisticsService.extendTime(new CheckInRecordWrapper(dbCir), checkInRecord.getLeaveTime().toLocalDate());
-            if(!b){
+            if (!b) {
                 TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                 return hr.error("资源不足");
             }
@@ -149,10 +149,10 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                 if (!dbCir.getRoomPriceScheme().getId().equals(checkInRecord.getRoomPriceScheme().getId())) {
                     for (int i = 0; i < children.size(); i++) {
                         CheckInRecord cir = children.get(i);
-                        System.out.println(cir.getRoomType().getId()+"reeeeeee"+checkInRecord.getRoomPriceScheme().getId());
+                        System.out.println(cir.getRoomType().getId() + "reeeeeee" + checkInRecord.getRoomPriceScheme().getId());
                         Map<String, Object> map = roomPriceSchemeDao.roomTypeAndPriceScheme(cir.getRoomType().getId(), checkInRecord.getRoomPriceScheme().getId());
                         Double price = MapUtils.getDouble(map, "price");
-                        if(price == null){
+                        if (price == null) {
                             price = cir.getRoomType().getPrice();
                         }
                         //修改所有主单下数据的房价码
@@ -179,12 +179,12 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                     // ...释放资源代码
                     // ...
                 }
-                if(checkInRecord.getLeaveTime().isAfter(dbCir.getLeaveTime())) {// 改大
+                if (checkInRecord.getLeaveTime().isAfter(dbCir.getLeaveTime())) {// 改大
                     for (int i = 0; i < children.size(); i++) {
                         CheckInRecord cir = children.get(i);
                         if (cir.getRoomType() != null) {
                             boolean b = roomStatisticsService.extendTime(new CheckInRecordWrapper(cir), checkInRecord.getLeaveTime().toLocalDate());
-                            if(!b){
+                            if (!b) {
                                 TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                                 return hr.error("资源不足");
                             }
@@ -326,6 +326,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
         return list;
     }
 
+    @Transactional
     @Override
     public DtoResponse<List<CheckInRecord>> checkOut(String type, String id) {
         switch (type) {
@@ -402,16 +403,20 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
         if (cir == null) {
             rep.setStatus(Constants.BusinessCode.CODE_ILLEGAL_OPERATION);
             rep.setMessage("找不到订单");
-        } else {
-            if (cir.getAccount() == null || Constants.Status.ACCOUNT_IN.equals(cir.getAccount().getStatus())) {
+        } else if (cir.getAccount() != null) {
+            if (!accountService.accountCheck(cir.getAccount().getId())) {
                 rep.setStatus(Constants.BusinessCode.CODE_ILLEGAL_OPERATION);
                 rep.setMessage(cir.getAccount().getCode() + ":未完成结帐！");
             } else {
                 cir.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_CHECK_OUT);
                 cir.setActualTimeOfLeave(LocalDateTime.now());
                 roomStatisticsService.checkOut(new CheckInRecordWrapper(cir));
+                cir.getAccount().setStatus(Constants.Status.ACCOUNT_SETTLE);
                 modify(cir);
             }
+        } else {
+            rep.setStatus(Constants.BusinessCode.CODE_ILLEGAL_OPERATION);
+            rep.setMessage("帐务信息有误");
         }
         rep.setData(cir);
         return rep;
@@ -1271,8 +1276,8 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                 return hr.error("主单/预留不能取消");
             }
             boolean b = accountService.accountCheck(cir.getAccount().getId());
-            if(!b){
-                return hr.error(cir.getName()+"有账务未结清");
+            if (!b) {
+                return hr.error(cir.getName() + "有账务未结清");
             }
 //            if ((Constants.Status.CHECKIN_RECORD_STATUS_ASSIGN).equals(cir.getStatus())) {//排房
             if ((Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION).equals(cir.getStatus())) {//预定，没入住就是排房状态
@@ -1296,7 +1301,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
             cir.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_CANCLE_BOOK);
             modify(cir);
         }
-        if(main != null){
+        if (main != null) {
             main.setRoomCount(main.getRoomCount() - roomCount);
             main.setHumanCount(main.getHumanCount() - humanCount);
             checkInRecordDao.saveAndFlush(main);
@@ -1553,7 +1558,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
         }
         checkInRecordDao.save(checkInRecord);
         List<CheckInRecord> main = checkInRecordDao.findByOrderNumAndTypeAndDeleted(orderNum, Constants.Type.CHECK_IN_RECORD_GROUP, Constants.DELETED_FALSE);
-        if(main != null && !main.isEmpty()){
+        if (main != null && !main.isEmpty()) {
             CheckInRecord cm = main.get(0);
             cm.setHumanCount(cm.getHumanCount() + 1);
             update(cm);
@@ -1748,9 +1753,9 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
             String id = cId[i];
             CheckInRecord cir = checkInRecordDao.getOne(id);
             String orderNum = null;
-            if(cir.getOrderNumOld() != null){
+            if (cir.getOrderNumOld() != null) {
                 orderNum = cir.getOrderNumOld();
-            }else {
+            } else {
                 orderNum = businessSeqService.fetchNextSeqNum(cir.getHotelCode(),
                         Constants.Key.BUSINESS_ORDER_NUM_SEQ_KEY);
             }
@@ -1758,7 +1763,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
             String setMealId = MapUtils.getString(map, "setMealId");
             Double price = MapUtils.getDouble(map, "price");//新的房价方案：房价
             if (cir.getGuestRoom() != null) {
-                if(price == null){
+                if (price == null) {
                     price = cir.getRoomType().getPrice();
                 }
                 if (!roomNums.contains(cir.getGuestRoom().getRoomNum())) {
@@ -1781,21 +1786,21 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                             checkInCount += 1;
                         }
                         cirRoomNum.setMarketingSources(cirG.getMarketingSources());
-                        if(roomPriceId != null){
+                        if (roomPriceId != null) {
                             RoomPriceScheme rps = new RoomPriceScheme();
                             rps.setId(roomPriceId);
                             cirRoomNum.setRoomPriceScheme(rps);
-                        }else {
+                        } else {
                             cirRoomNum.setRoomPriceScheme(cirG.getRoomPriceScheme());
                         }
 //                            cirRoomNum.setRoomPriceScheme(cirG.getRoomPriceScheme());
                         cirRoomNum.setDistributionChannel(cirG.getDistributionChannel());
                         cirRoomNum.setGroupName(null);
-                        if(setMealId != null){
+                        if (setMealId != null) {
                             SetMeal sm = new SetMeal();
                             sm.setId(setMealId);
                             cirRoomNum.setSetMeal(sm);
-                        }else{
+                        } else {
                             cirRoomNum.setSetMeal(null);
                         }
                         cirRoomNum.setPersonalPrice(price * cirRoomNum.getPersonalPercentage());
