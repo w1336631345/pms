@@ -4,6 +4,7 @@ import com.kry.pms.base.Constants;
 import com.kry.pms.base.HttpResponse;
 import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
+import com.kry.pms.dao.busi.CheckInRecordDao;
 import com.kry.pms.model.persistence.busi.DailyVerify;
 import com.kry.pms.model.persistence.busi.RoomRecord;
 import com.kry.pms.model.persistence.org.Employee;
@@ -16,6 +17,7 @@ import com.kry.pms.service.busi.RoomRecordService;
 import com.kry.pms.service.org.EmployeeService;
 import com.kry.pms.service.report.*;
 import com.kry.pms.service.sys.BusinessSeqService;
+import org.apache.commons.collections4.MapUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +26,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+
 @Service
 public class NightAuditServiceImpl implements NightAuditService {
 
@@ -49,6 +53,8 @@ public class NightAuditServiceImpl implements NightAuditService {
     FrontEntryReportService frontEntryReportService;
     @Autowired
     FrontReceiveReportService frontReceiveReportService;
+    @Autowired
+    CheckInRecordDao checkInRecordDao;
 
     @Override
     public RoomRecord add(RoomRecord entity) {
@@ -93,6 +99,24 @@ public class NightAuditServiceImpl implements NightAuditService {
         HttpResponse hr = new HttpResponse();
         //入账只入当前营业日期的账
         LocalDate businessDate = businessSeqService.getBuinessDate(loginUser.getHotelCode());
+        List<Map<String, Object>> listCount = checkInRecordDao.getStatistics(loginUser.getHotelCode());
+        int s = 0, n = 0, i = 0, x = 0;
+        for(int l=0; l<listCount.size(); l++){
+            Map<String, Object> map = listCount.get(l);
+            String status = MapUtils.getString(map,"status");
+            if(Constants.Status.CHECKIN_RECORD_STATUS_OUT_UNSETTLED.equals(status)){
+                s = MapUtils.getInteger(map, "scount");
+            }else if(Constants.Status.CHECKIN_RECORD_STATUS_NO_SHOW.equals(status)){
+                n = MapUtils.getInteger(map, "scount");
+            }else if(Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN.equals(status)){
+                i = MapUtils.getInteger(map, "scount");
+            }else if(Constants.Status.CHECKIN_RECORD_STATUS_CANCLE_BOOK.equals(status)){
+                x= MapUtils.getInteger(map, "scount");
+            }
+        }
+        if(s+n+i+x>0){
+            return hr.error("还有未处理订单！");
+        }
         LocalDate now = LocalDate.now();
         if(businessDate.isAfter(now)){
             hr.error("今日入账完成，请明日再进行入账操作");
@@ -121,9 +145,9 @@ public class NightAuditServiceImpl implements NightAuditService {
     //报表导入各个统计-手动
     @Override
     public HttpResponse addReportAll(User loginUser) {
-        businessSeqService.plusBuinessDate(loginUser.getHotelCode());//营业日期+1(这里只是为了方便营业日期新增，开始做此功能时必须删除)
         HttpResponse hr = new HttpResponse();
         LocalDate businessDate = businessSeqService.getBuinessDate(loginUser.getHotelCode());
+
         DailyVerify dailyVerify = dailyVerifyService.findByHotelCodeAndBusinessDate(loginUser.getHotelCode(), businessDate);
         if(dailyVerify == null){
             return hr.error(99999, "请先夜审入账");
@@ -137,21 +161,23 @@ public class NightAuditServiceImpl implements NightAuditService {
         grl.setType(Constants.auditNightMode.NIGHT_AUDIT_MANUAL);
         //入账只入当前营业日期的账
         try {
-            hr = businessReportService.saveReport(loginUser.getHotelCode(), null, businessDate.toString());//保存到报表-房费
-            roomReportService.totalRoomStatusAll(loginUser.getHotelCode(), businessDate.toString());//保存到报表-a、客房总数
-            roomReportService.totalCheckInType(loginUser.getHotelCode(), businessDate.toString());//保存到报表-b、出租总数
-            roomReportService.availableTotal(loginUser.getHotelCode(), businessDate.toString());//保存到报表-c、售卖率
-            businessReportService.costByGroupType(loginUser.getHotelCode(), businessDate.toString());//保存到报表-d、房租收入
-            businessReportService.costByGroupTypeAvg(loginUser.getHotelCode(), businessDate.toString());//保存到报表-e、平均房价
-
-            receivablesReportService.totalByTypeName(loginUser.getHotelCode(), businessDate.toString());//收款汇总
-            frontEntryReportService.frontEntryList2(loginUser.getHotelCode(), businessDate.toString());//前台入账报表
-            frontReceiveReportService.receiveList(loginUser.getHotelCode(), businessDate.toString());//前台收款汇总
+//            hr = businessReportService.saveReport(loginUser.getHotelCode(), null, businessDate.toString());//保存到报表-房费
+//            roomReportService.totalRoomStatusAll(loginUser.getHotelCode(), businessDate.toString());//保存到报表-a、客房总数
+//            roomReportService.totalCheckInType(loginUser.getHotelCode(), businessDate.toString());//保存到报表-b、出租总数
+//            roomReportService.availableTotal(loginUser.getHotelCode(), businessDate.toString());//保存到报表-c、售卖率
+//            businessReportService.costByGroupType(loginUser.getHotelCode(), businessDate.toString());//保存到报表-d、房租收入
+//            businessReportService.costByGroupTypeAvg(loginUser.getHotelCode(), businessDate.toString());//保存到报表-e、平均房价
+//
+//            receivablesReportService.totalByTypeName(loginUser.getHotelCode(), businessDate.toString());//收款汇总
+//            frontEntryReportService.frontEntryList2(loginUser.getHotelCode(), businessDate.toString());//前台入账报表
+//            frontReceiveReportService.receiveList(loginUser.getHotelCode(), businessDate.toString());//前台收款汇总
             //后续继续添加添...
             //...
             grl.setAuditStatus("success");
             generateReportsLogService.add(grl);
-            businessSeqService.plusBuinessDate(loginUser.getHotelCode());//营业日期+1
+            if(businessDate.isBefore(LocalDate.now())){
+                businessSeqService.plusBuinessDate(loginUser.getHotelCode());//营业日期+1
+            }
         } catch (Exception e) {
             e.printStackTrace();
             grl.setAuditStatus("error");

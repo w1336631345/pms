@@ -225,7 +225,7 @@ public class ReceptionServiceImpl implements ReceptionService {
 			rep.setMessage("请核对营业日期与入住日期是否相同");
 			return  rep;
 		}
-		cir.setActualTimeOfArrive(LocalDateTime.now());
+//		cir.setActualTimeOfArrive(LocalDateTime.now());
 		if (cir != null) {
 			// 预留单不能入住
 			if ((Constants.Type.CHECK_IN_RECORD_RESERVE).equals(cir.getType())) {
@@ -240,9 +240,9 @@ public class ReceptionServiceImpl implements ReceptionService {
 					String mainRecordId = cir.getMainRecord().getId();
 					CheckInRecord cirMain = checkInRecordService.findById(mainRecordId);
 					if (!(Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN).equals(cirMain.getStatus())) {
-						if(cirMain.getActualTimeOfArrive() == null){
-							cirMain.setActualTimeOfArrive(LocalDateTime.now());
-						}
+//						if(cirMain.getActualTimeOfArrive() == null){
+//							cirMain.setActualTimeOfArrive(LocalDateTime.now());
+//						}
 						rep = checkIn(cirMain);
 					}
 				}
@@ -257,6 +257,7 @@ public class ReceptionServiceImpl implements ReceptionService {
 	@Override
 	public DtoResponse<String> checkIn(CheckInRecord cir) {
 		DtoResponse<String> rep = new DtoResponse<>();
+		cir.setActualTimeOfArrive(LocalDateTime.now());
 		cir.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN);
 		checkInRecordService.modify(cir);
 		List<CheckInRecord> togetherRecord = checkInRecordService.findRoomTogetherRecord(cir,
