@@ -1198,6 +1198,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
     public DtoResponse<String> hangUp(String id) {
         CheckInRecord cir = findById(id);
         DtoResponse<String> rep = new DtoResponse<String>();
+        cir.setActualTimeOfLeave(LocalDateTime.now());
         cir.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_OUT_UNSETTLED);
         modify(cir);
         return rep;
