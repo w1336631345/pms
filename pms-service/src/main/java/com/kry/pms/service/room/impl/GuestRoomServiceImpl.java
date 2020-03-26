@@ -307,10 +307,10 @@ public class GuestRoomServiceImpl implements GuestRoomService {
                             }
                         }
                         break;
-                }
+                    }
                 if(!result){
                     rep.setStatus(Constants.BusinessCode.CODE_PARAMETER_INVALID);
-                    rep.setMessage("锁房失败！房号："+ gr.getRoomNum());
+                    rep.setMessage("锁房操作失败！房号："+ gr.getRoomNum());
                     break;
                 }
             } else {

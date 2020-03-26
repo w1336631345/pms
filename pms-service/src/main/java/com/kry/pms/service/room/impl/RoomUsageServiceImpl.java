@@ -746,6 +746,8 @@ public class RoomUsageServiceImpl implements RoomUsageService {
             }
             data.getUniqueIds().add(info.uniqueId());
             modify(data);
+        }else{
+            return false;
         }
         return true;
     }

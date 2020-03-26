@@ -15,9 +15,11 @@ import com.kry.pms.dao.report.VerifyOperationDao;
 import com.kry.pms.model.persistence.report.VerifyOperation;
 import com.kry.pms.service.report.VerifyOperationService;
 
+import javax.annotation.Resource;
+
 @Service
 public class  VerifyOperationServiceImpl implements  VerifyOperationService{
-	@Autowired
+	@Resource
 	 VerifyOperationDao verifyOperationDao;
 	 
 	 @Override
