@@ -241,6 +241,7 @@ public class BillServiceImpl implements BillService {
             bill.setStatus(Constants.Status.BILL_SETTLED);
             bill.setOperationEmployee(employee);
             bill.setShiftCode(shiftCode);
+            bill.setHotelCode(employee.getHotelCode());
             bill.setCurrentSettleAccountRecordNum(orderNum);
             bill = add(bill);
         }

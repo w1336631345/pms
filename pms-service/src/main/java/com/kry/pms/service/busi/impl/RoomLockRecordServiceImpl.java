@@ -44,7 +44,10 @@ public class RoomLockRecordServiceImpl implements RoomLockRecordService {
 
     @Override
     public RoomLockRecord modify(RoomLockRecord roomLockRecord) {
-        return roomLockRecordDao.saveAndFlush(roomLockRecord);
+        RoomLockRecord  dbrlr =  findById(roomLockRecord.getId());
+        dbrlr.setReason(roomLockRecord.getReason());
+        dbrlr.setRemark(roomLockRecord.getRemark());
+        return roomLockRecordDao.saveAndFlush(dbrlr);
     }
 
     @Override
