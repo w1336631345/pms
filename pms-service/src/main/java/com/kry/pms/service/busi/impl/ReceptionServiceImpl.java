@@ -284,6 +284,7 @@ public class ReceptionServiceImpl implements ReceptionService {
 				asv.setChildren(new ArrayList<>());
 				Account account = cir.getAccount();
 				AccountSummaryVo group = new AccountSummaryVo(cir);
+				group.setName(cir.getName());
 				group.setRoomStatus(cir.getStatus());
 				if(Constants.Type.CHECK_IN_RECORD_GROUP_TYPE_YES.equals(cir.getGroupType())){
 					group.setSettleType(Constants.Type.SETTLE_TYPE_GROUP);
