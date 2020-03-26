@@ -24,6 +24,7 @@ import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import javax.transaction.Transactional;
 import java.time.Duration;
@@ -269,7 +270,7 @@ public class GuestRoomServiceImpl implements GuestRoomService {
 
     private boolean lockRoom(GuestRoomOperation op, GuestRoom gr, DtoResponse<String> rep, String type, int errorCode, StringBuilder message) {
         if (op.getReasonId() != null && op.getEndToStatus() != null) {
-            return roomLockRecordService.lockRoom(gr,op.getStartTime(), op.getEndTime(), op.getReasonId(), op.getEndToStatus(), type);
+            return roomLockRecordService.lockRoom(gr, op.getStartTime(), op.getEndTime(), op.getReasonId(), op.getEndToStatus(), type);
         }
         return false;
     }
@@ -293,10 +294,10 @@ public class GuestRoomServiceImpl implements GuestRoomService {
             if (gr != null) {
                 switch (op.getOp()) {
                     case Constants.Status.ROOM_STATUS_OUT_OF_ORDER:
-                        result =lockRoom(op, gr, rep, Constants.Type.ROOM_LOCK_REPAIR, errorCode, message);
+                        result = lockRoom(op, gr, rep, Constants.Type.ROOM_LOCK_REPAIR, errorCode, message);
                         break;
                     case Constants.Status.ROOM_STATUS_OUT_OF_SERVCIE:
-                        result =lockRoom(op, gr, rep, Constants.Type.ROOM_LOCK_LOCK, errorCode, message);
+                        result = lockRoom(op, gr, rep, Constants.Type.ROOM_LOCK_LOCK, errorCode, message);
                         break;
                     default:
                         if (rep.getStatus() == 0) {
@@ -307,14 +308,16 @@ public class GuestRoomServiceImpl implements GuestRoomService {
                             }
                         }
                         break;
-                    }
-                if(!result){
+                }
+                if (!result) {
+                    TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                     rep.setStatus(Constants.BusinessCode.CODE_PARAMETER_INVALID);
-                    rep.setMessage("锁房操作失败！房号："+ gr.getRoomNum());
+                    rep.setMessage("锁房操作失败！房号：" + gr.getRoomNum());
                     break;
                 }
             } else {
                 // 如果房间找不到 错误请求 不在判断其他房间
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                 rep.setStatus(Constants.BusinessCode.CODE_PARAMETER_INVALID);
                 rep.setMessage("必要参数错误：房间找不到");
                 break;
