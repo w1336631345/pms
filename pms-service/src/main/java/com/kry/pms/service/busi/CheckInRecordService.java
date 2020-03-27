@@ -62,11 +62,13 @@ public interface CheckInRecordService extends BaseService<CheckInRecord> {
 
     PageResponse<CheckInRecord> notYet(int pageCount, int pageSize, String status, User user);
 
-	PageResponse<CheckInRecord> accountEntryList(int pageIndex, int pageSize, User user);
+    PageResponse<Map<String, Object>> notYetMap(int pageIndex, int pageSize, String status, User user);
+
+    PageResponse<CheckInRecord> accountEntryList(int pageIndex, int pageSize, User user);
 
 	List<CheckInRecord> accountEntryListAll(String hotelCode);
 
-	PageResponse<Map<String, Object>> unreturnedGuests(int pageIndex, int pageSize, String status, User user);
+	PageResponse<Map<String, Object>> unreturnedGuests(int pageIndex, int pageSize,String mainNum, String status, User user);
 
 	List<Map<String, Object>> getStatistics(User user);
 
@@ -107,7 +109,11 @@ public interface CheckInRecordService extends BaseService<CheckInRecord> {
 	// 取消预订
 	HttpResponse callOffReserve(String[] ids);
 
-    @Transactional
+	//夜审的取消预订
+	@Transactional
+	HttpResponse callOffReserveAudit(String[] ids);
+
+	@Transactional
     HttpResponse offReserve(String id);
 
     HttpResponse updateCount(List<String> reserveIds, String mainRecordId);

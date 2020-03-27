@@ -11,6 +11,10 @@ import javax.persistence.EntityManager;
 import javax.persistence.Transient;
 import javax.transaction.Transactional;
 
+import com.kry.pms.dao.busi.CheckInRecordDao;
+import com.kry.pms.dao.goods.ProductDao;
+import com.kry.pms.dao.goods.SetMealDao;
+import com.kry.pms.model.persistence.goods.SetMeal;
 import com.kry.pms.service.sys.SqlTemplateService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
@@ -64,6 +68,12 @@ public class BillServiceImpl implements BillService {
     RoomRecordService roomRecordService;
     @Autowired
     AccountService accountService;
+    @Autowired
+    CheckInRecordDao checkInRecordDao;
+    @Autowired
+    SetMealDao setMealDao;
+    @Autowired
+    ProductDao productDao;
 
     @Transient
     @Override
@@ -263,26 +273,38 @@ public class BillServiceImpl implements BillService {
     @Override
     public void putAcount(List<RoomRecord> ids, LocalDate businessDate, Employee emp, String shiftCode) {
         for (int i = 0; i < ids.size(); i++) {
-            String id = ids.get(i).getId();
-            RoomRecord rr = roomRecordService.findById(id);
-            Product p = new Product();
-            p.setId("10000");
-            Bill bill = new Bill();
-            bill.setProduct(p);
-            bill.setTotal(rr.getCost());
-            bill.setCost(rr.getCost());
-            bill.setQuantity(1);
-            bill.setAccount(rr.getCheckInRecord().getAccount());
-            bill.setHotelCode(rr.getHotelCode());
-            bill.setOperationRemark("夜审手动入账");
-//            bill.setOperationEmployee(emp);
-            bill.setShiftCode(shiftCode);
-            bill.setRoomRecordId(rr.getId());
-            bill.setBusinessDate(businessDate);
-            add(bill);
+            RoomRecord rr = ids.get(i);
+            String checkInRecordId = rr.getId();
+            CheckInRecord cir = checkInRecordDao.getOne(checkInRecordId);
+            SetMeal sm = cir.getSetMeal();
+            Product p = productDao.findByHotelCodeAndCode(rr.getHotelCode(), "1000");
+            if(sm.getProduct() != null){//如果有包价，就一笔整的包价价格账，一笔负的价格账，正负得0
+                Product product = sm.getProduct();//入账项目
+                addAudit(product,sm.getTotal(), sm.getAccount(), cir.getHotelCode(), emp, shiftCode, null);
+                addAudit(product, -sm.getTotal(), sm.getAccount(), cir.getHotelCode(), emp, shiftCode, null);
+            }
+            addAudit(p, rr.getCost(), cir.getAccount(), cir.getHotelCode(), emp, shiftCode, rr.getId());
             rr.setIsAccountEntry("PAY");// 入账成功后roomRecord里面入账状态改为pay
             roomRecordService.modify(rr);
         }
+    }
+
+    public void addAudit(Product product, Double cost, Account account, String hotelCode, Employee emp, String shiftCode, String roomRecordId){
+        //入账只入当前营业日期的账
+        LocalDate businessDate = businessSeqService.getBuinessDate(hotelCode);
+        Bill bill = new Bill();
+        bill.setProduct(product);
+        bill.setTotal(cost);
+        bill.setCost(cost);
+        bill.setQuantity(1);
+        bill.setAccount(account);
+        bill.setHotelCode(hotelCode);
+        bill.setOperationRemark("夜审手动入账");
+        bill.setOperationEmployee(emp);
+        bill.setShiftCode(shiftCode);
+        bill.setRoomRecordId(roomRecordId);
+        bill.setBusinessDate(businessDate);
+        add(bill);
     }
 
     // 夜审自动入账

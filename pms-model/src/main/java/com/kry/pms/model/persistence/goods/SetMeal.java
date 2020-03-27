@@ -21,8 +21,10 @@ public class SetMeal extends PersistenceModel {
 	private String description;//描述
 	@Column
 	private String code;//
-	@OneToOne
-	private Product product;//
+	@ManyToOne
+	private Product product;//入账项目
+	@ManyToOne
+	private Product deductionProduct;//扣减项目
 	@OneToOne
 	private Goods goods;//对应商品（如：早餐、矿泉水、方便面等）
 	@Column
@@ -40,6 +42,6 @@ public class SetMeal extends PersistenceModel {
 	@Column(columnDefinition = "varchar(400) default NUll COMMENT '缩略图'")
 	private String thumbnail;
 	@ManyToOne
-	private Account account;
+	private Account account;//调整账户
 
 }

@@ -26,7 +26,7 @@ public class Account extends PersistenceModel {
 	@Transient
 	private String roomNum;
 	@Column
-	private Double total;
+	private Double total;//余额
 	@Column(name="type_")
 	private String type;
 	@Column
@@ -34,7 +34,7 @@ public class Account extends PersistenceModel {
 	@Column
 	private LocalDate endDate;//有效期止
 	@Column
-	private Double cost;//消费
+	private Double cost;//消费（总）
 	@Column
 	private String contactName;
 	@Column
@@ -42,7 +42,7 @@ public class Account extends PersistenceModel {
 	@Column
 	private Boolean holdArrow;//允许记账
 	@Column
-	private Double pay;//付款
+	private Double pay;//付款（总）
 	@Column
 	private Double creditLimit ; //信用额度
 	@Column

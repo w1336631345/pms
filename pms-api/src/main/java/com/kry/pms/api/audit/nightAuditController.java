@@ -44,7 +44,7 @@ public class nightAuditController extends BaseController {
     NightAuditService nightAuditService;
 
     /**
-     * 功能描述: <br>夜间稽核列表
+     * 功能描述: <br>夜间稽核列表(没用，用的unreturnedGuests)
      * 〈〉状态（R：预订，I：入住，O：退房，D：历史订单，N：未到，S：退房未结账，X：取消）
      * @Param: [pageNum, pageSize, status]
      * @Return: com.kry.pms.base.HttpResponse<com.kry.pms.base.PageResponse<com.kry.pms.model.persistence.busi.CheckInRecord>>
@@ -62,6 +62,24 @@ public class nightAuditController extends BaseController {
         return rep;
     }
     /**
+     * 功能描述: <br>夜间稽核列表(没用，用的unreturnedGuests)
+     * 〈〉
+     * @Param: [pageNum, pageSize, status]
+     * @Return: com.kry.pms.base.HttpResponse<com.kry.pms.base.PageResponse<java.util.Map<java.lang.String,java.lang.Object>>>
+     * @Author: huanghaibin
+     * @Date: 2020/3/27 10:37
+     */
+    @GetMapping("/notYetMap")
+    public HttpResponse<PageResponse<Map<String, Object>>> notYetMap(@RequestParam(value = "pageNum", defaultValue = "1")Integer pageNum,
+                                                                            @RequestParam(value = "pageSize", defaultValue = "10")Integer pageSize,
+                                                                            String status) {
+        HttpResponse<PageResponse<Map<String, Object>>> rep = new HttpResponse<>();
+        User user = getUser();
+        PageResponse<Map<String, Object>> page = checkInRecordService.notYetMap(pageNum, pageSize,status, user);
+        rep.addData(page);
+        return rep;
+    }
+    /**
      * 功能描述: <br>应退未退客人（时间过了依旧在住）
      * 〈〉
      * @Param: [pageNum, pageSize, status]
@@ -72,10 +90,10 @@ public class nightAuditController extends BaseController {
     @GetMapping("/unreturnedGuests")
     public HttpResponse<PageResponse<Map<String, Object>>> unreturnedGuests(@RequestParam(value = "pageNum", defaultValue = "1")Integer pageNum,
                                                                     @RequestParam(value = "pageSize", defaultValue = "10")Integer pageSize,
-                                                                    String status) {
+                                                                    String mainNum, String status) {
         HttpResponse<PageResponse<Map<String, Object>>> rep = new HttpResponse<>();
         User user = getUser();
-        PageResponse<Map<String, Object>> page = checkInRecordService.unreturnedGuests(pageNum, pageSize,status, user);
+        PageResponse<Map<String, Object>> page = checkInRecordService.unreturnedGuests(pageNum, pageSize,mainNum,status, user);
         rep.addData(page);
         return rep;
     }
@@ -156,7 +174,7 @@ public class nightAuditController extends BaseController {
         HttpResponse<String> rep = getDefaultResponse();
         User loginUser = getUser();
         if(loginUser == null){
-            return rep.error(403, "未登录");
+            return rep.loginError();
         }
         Collection<Session> sessions =  sessionDAO.getActiveSessions();
         for (Session session : sessions) {
@@ -169,7 +187,7 @@ public class nightAuditController extends BaseController {
                 user = (User) principalCollection.getPrimaryPrincipal();
                 if(user != null){
                     if(!user.getId().equals(loginUser.getId())){
-                        return rep.error(99999, "还有其他用户在线，不能入账");
+                        return rep.error("还有其他用户在线，不能入账");
                     }
                 }
             }

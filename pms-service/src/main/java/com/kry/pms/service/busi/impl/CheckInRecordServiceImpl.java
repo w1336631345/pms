@@ -925,6 +925,23 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
     }
 
     @Override
+    public PageResponse<Map<String, Object>> notYetMap(int pageIndex, int pageSize, String status, User user) {
+        Pageable page = org.springframework.data.domain.PageRequest.of(pageIndex - 1, pageSize);
+        String hotelCode = null;
+        if (user != null) {
+            hotelCode = user.getHotelCode();
+        }
+        Page<Map<String, Object>> p = checkInRecordDao.notYetMap(page, status, hotelCode);
+        PageResponse<Map<String, Object>> pr = new PageResponse<>();
+        pr.setPageSize(p.getNumberOfElements());
+        pr.setPageCount(p.getTotalPages());
+        pr.setTotal(p.getTotalElements());
+        pr.setCurrentPage(p.getNumber());
+        pr.setContent(p.getContent());
+        return pr;
+    }
+
+    @Override
     public PageResponse<CheckInRecord> accountEntryList(int pageIndex, int pageSize, User user) {
         Pageable page = org.springframework.data.domain.PageRequest.of(pageIndex - 1, pageSize);
         ParamSpecification<CheckInRecord> psf = new ParamSpecification<CheckInRecord>();
@@ -932,6 +949,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
         Map<String, Object> emap = new HashMap<>();
         emap.put("hotelCode", user.getHotelCode());
         emap.put("status", "I");
+        emap.put("type","C");
         map.put("equals", emap);
         Specification<CheckInRecord> specification = psf.createSpecification(map);
         Page<CheckInRecord> p = checkInRecordDao.findAll(specification, page);
@@ -952,13 +970,13 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
     }
 
     @Override
-    public PageResponse<Map<String, Object>> unreturnedGuests(int pageIndex, int pageSize, String status, User user) {
+    public PageResponse<Map<String, Object>> unreturnedGuests(int pageIndex, int pageSize,String mainNum, String status, User user) {
         Pageable page = org.springframework.data.domain.PageRequest.of(pageIndex - 1, pageSize);
         String hotelCode = null;
         if (user != null) {
             hotelCode = user.getHotelCode();
         }
-        Page<Map<String, Object>> p = checkInRecordDao.unreturnedGuests(page, status, hotelCode);
+        Page<Map<String, Object>> p = checkInRecordDao.unreturnedGuests(page,mainNum, status, hotelCode);
         PageResponse<Map<String, Object>> pr = new PageResponse<>();
         pr.setPageSize(p.getNumberOfElements());
         pr.setPageCount(p.getTotalPages());
@@ -1118,6 +1136,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
             checkInRecord.setType(Constants.Type.CHECK_IN_RECORD_RESERVE);
             checkInRecord.setHotelCode(mainCheckInRecord.getHotelCode());
             checkInRecord.setGroupType(mainCheckInRecord.getGroupType());
+            checkInRecord.setGroupName(mainCheckInRecord.getName());
             checkInRecord.setRoomType(roomTypeService.findById(checkInRecord.getRoomTypeId()));
             checkInRecord.setMainRecord(mainCheckInRecord);
             checkInRecord = add(checkInRecord);
@@ -1321,6 +1340,62 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
             checkInRecordDao.saveAndFlush(main);
         }
 //		updateCount(reserveIds, mainRecordId);
+        return hr.ok();
+    }
+
+    //夜审的取消预订
+    @Override
+    @Transactional
+    public HttpResponse callOffReserveAudit(String[] ids) {
+        HttpResponse hr = new HttpResponse();
+        for (int i = 0; i < ids.length; i++) {
+            CheckInRecord main = null;
+            int roomCount = 0;
+            int humanCount = 0;
+            CheckInRecord cir = checkInRecordDao.getOne(ids[i]);
+            if (cir.getMainRecord() != null) {
+                main = cir.getMainRecord();
+            }
+            // 如果是主单、主单包括其下的所有子单都取消
+            if (("G").equals(cir.getType())) {
+                return hr.error("此处不能取消主单");
+            }
+            boolean b = accountService.accountCheck(cir.getAccount().getId());
+            if (!b) {
+                return hr.error(cir.getName() + "有账务未结清");
+            }
+            if(("R").equals(cir.getType())){//如果取消的是预留单
+                humanCount = cir.getHumanCount();
+                roomCount = cir.getRoomCount();
+                cir.setDeleted(Constants.DELETED_TRUE);
+                cir.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_CANCLE_BOOK);
+                modify(cir);
+                roomStatisticsService.cancleReserve(new CheckInRecordWrapper(cir));//取消预
+            }else if(("C").equals(cir.getType())) {//宾客排房未入住订单的取消
+                humanCount = 1;
+                if ((Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION).equals(cir.getStatus())) {//预定，没入住就是排房状态
+                    roomStatisticsService.cancleAssign(new CheckInRecordWrapper(cir));//取消排房
+                }
+                int together = checkInRecordDao.countTogetherRoom(Constants.DELETED_FALSE, cir.getOrderNum(), cir.getGuestRoom().getId());
+                if (together == 1) {//表明房间没有人住，需要释放资源
+                    roomStatisticsService.cancleReserve(new CheckInRecordWrapper(cir));
+                    roomCount = roomCount + 1;
+                }
+                //需要删除roomRecord的记录
+                List<RoomRecord> list = roomRecordService.findByHotelCodeAndCheckInRecord(cir.getHotelCode(), cir.getId());
+                for (int r = 0; r < list.size(); r++) {
+                    roomRecordService.deleteTrue(list.get(r).getId());
+                }
+                cir.setDeleted(Constants.DELETED_TRUE);
+                cir.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_CANCLE_BOOK);
+                modify(cir);
+            }
+            if (main != null) {
+                main.setRoomCount(main.getRoomCount() - roomCount);
+                main.setHumanCount(main.getHumanCount() - humanCount);
+                checkInRecordDao.saveAndFlush(main);
+            }
+        }
         return hr.ok();
     }
 

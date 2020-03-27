@@ -101,13 +101,6 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
         return getDefaultResponse().addData(checkInRecordService.singleRoom(checkInRecord));
     }
 
-    @PostMapping(path = "/reserve")
-    public HttpResponse<List<CheckInRecord>> addReserve(@RequestBody List<CheckInRecord> checkInRecords) {
-        HttpResponse<List<CheckInRecord>> rep = new HttpResponse<List<CheckInRecord>>();
-        return rep.addData(checkInRecordService.addReserve(checkInRecords));
-
-    }
-
     @DeleteMapping
     public HttpResponse<String> delete(String id) {
         HttpResponse<String> rep = new HttpResponse<>();
@@ -256,6 +249,20 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
     public HttpResponse callOffReserve(@RequestBody String[] ids) {
         HttpResponse rep = new HttpResponse();
         rep = checkInRecordService.callOffReserve(ids);
+        return rep;
+    }
+    /**
+     * 功能描述: <br>夜审中的取消预订
+     * 〈〉
+     * @Param: [ids]
+     * @Return: com.kry.pms.base.HttpResponse
+     * @Author: huanghaibin
+     * @Date: 2020/3/27 15:43
+     */
+    @PostMapping(path = "/callOffReserveAudit")
+    public HttpResponse callOffReserveAudit(@RequestBody String[] ids) {
+        HttpResponse rep = new HttpResponse();
+        rep = checkInRecordService.callOffReserveAudit(ids);
         return rep;
     }
 
@@ -507,6 +514,20 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
         return hr;
     }
 
+    /**
+     * 功能描述: <br>新增预留
+     * 〈〉
+     * @Param: [checkInRecords]
+     * @Return: com.kry.pms.base.HttpResponse<java.util.List<com.kry.pms.model.persistence.busi.CheckInRecord>>
+     * @Author: huanghaibin
+     * @Date: 2020/3/27 20:34
+     */
+    @PostMapping(path = "/reserve")
+    public HttpResponse<List<CheckInRecord>> addReserve(@RequestBody List<CheckInRecord> checkInRecords) {
+        HttpResponse<List<CheckInRecord>> rep = new HttpResponse<List<CheckInRecord>>();
+        return rep.addData(checkInRecordService.addReserve(checkInRecords));
+
+    }
     /**
      * 功能描述: <br>修改预留
      * 〈〉
