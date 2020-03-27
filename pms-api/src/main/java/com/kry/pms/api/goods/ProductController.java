@@ -2,6 +2,7 @@ package com.kry.pms.api.goods;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.kry.pms.base.Constants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,7 +26,15 @@ public class ProductController extends BaseController<Product> {
 	ProductService productService;
 	@PostMapping
 	public HttpResponse<Product> add(@RequestBody Product product) {
-		return getDefaultResponse().addData(productService.add(product));
+		HttpResponse<Product> rep = getDefaultResponse();
+		product = productService.add(product);
+		if(product==null){
+			rep.setStatus(Constants.BusinessCode.CODE_PARAMETER_INVALID);
+			rep.setMessage("编码重复");
+		}else{
+			rep.setData(product);
+		}
+		return rep;
 	}
 
 	@PutMapping

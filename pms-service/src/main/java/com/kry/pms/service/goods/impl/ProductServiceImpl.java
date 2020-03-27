@@ -22,7 +22,11 @@ public class  ProductServiceImpl implements  ProductService{
 	 
 	 @Override
 	public Product add(Product product) {
-		return productDao.saveAndFlush(product);
+	 	Product exsitProduct = productDao.findByHotelCodeAndCode(product.getHotelCode(),product.getCode());
+	 	if(exsitProduct==null){
+			return productDao.saveAndFlush(product);
+		}
+	 	return null;
 	}
 
 	@Override
