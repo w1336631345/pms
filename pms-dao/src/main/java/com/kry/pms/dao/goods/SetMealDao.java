@@ -7,5 +7,5 @@ import java.util.List;
 
 public interface SetMealDao extends BaseDao<SetMeal>{
 
-    List<SetMeal> findByHotelCode(String hotelCode);
+    List<SetMeal> findByHotelCodeAndDeleted(String hotelCode, int deleted);
 }
