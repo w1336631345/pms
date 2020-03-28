@@ -61,4 +61,11 @@ public class Hotel extends PersistenceModel {
 	private String thumbnail;
 	@Column
 	private String businessStatus;
+	@ManyToMany
+	private List<StaticResource> promotionalPictures;
+	@ManyToMany
+	private List<StaticResource> EnvironmentPictures;
+	@Column
+	private String vrUrl;
+
 }
