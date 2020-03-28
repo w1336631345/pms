@@ -151,6 +151,9 @@ public class CheckInRecordWrapper implements UseInfoAble {
 
     @Override
     public String getRoomStatus() {
+        if(checkInRecord.getMarketingSources()!=null&&checkInRecord.getMarketingSources().getCode().equals("HU")){
+            return "HU";
+        }
         if (checkInRecord.getStatus() != null) {
             switch (checkInRecord.getStatus()) {
                 case Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN:
