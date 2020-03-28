@@ -188,6 +188,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                     if(updateName){//主单修改名称
                         cir.setGroupName(checkInRecord.getName());
                     }
+                    cir.setCorp(checkInRecord.getCorp());
                     checkInRecordDao.saveAndFlush(cir);
                 }
 
@@ -556,9 +557,9 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
     public CheckInRecord book(CheckInRecord checkInRecord) {
         String orderNum = businessSeqService.fetchNextSeqNum(checkInRecord.getHotelCode(),
                 Constants.Key.BUSINESS_ORDER_NUM_SEQ_KEY);
-        if (Constants.Type.CHECK_IN_RECORD_GROUP_TYPE_YES.equals(checkInRecord.getGroupType())) {
+//        if (Constants.Type.CHECK_IN_RECORD_GROUP_TYPE_YES.equals(checkInRecord.getGroupType())) {
             checkInRecord.setGroupName(checkInRecord.getName());
-        }
+//        }
         checkInRecord.setOrderNum(orderNum);
         checkInRecord.setCheckInCount(0);
         if (checkInRecord.getSubRecords() != null && !checkInRecord.getSubRecords().isEmpty()) {

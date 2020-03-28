@@ -5,12 +5,14 @@ import com.kry.pms.base.HttpResponse;
 import com.kry.pms.base.PageResponse;
 import com.kry.pms.model.persistence.busi.CheckInRecord;
 import com.kry.pms.model.persistence.busi.RoomRecord;
+import com.kry.pms.model.persistence.sys.SystemConfig;
 import com.kry.pms.model.persistence.sys.User;
 import com.kry.pms.service.audit.NightAuditService;
 import com.kry.pms.service.busi.BillService;
 import com.kry.pms.service.busi.CheckInRecordService;
 import com.kry.pms.service.busi.RoomRecordService;
 import com.kry.pms.service.sys.BusinessSeqService;
+import com.kry.pms.service.sys.SystemConfigService;
 import com.kry.pms.utils.ShiroUtils;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.session.UnknownSessionException;
@@ -24,6 +26,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.*;
 
 @RestController
@@ -42,6 +45,8 @@ public class nightAuditController extends BaseController {
     BusinessSeqService businessSeqService;
     @Autowired
     NightAuditService nightAuditService;
+    @Autowired
+    SystemConfigService systemConfigService;
 
     /**
      * 功能描述: <br>夜间稽核列表(没用，用的unreturnedGuests)
@@ -168,10 +173,19 @@ public class nightAuditController extends BaseController {
      */
     @PostMapping("/manualAdd")
     public HttpResponse<String> manualAdd(@RequestBody String[] ids) {
+        HttpResponse<String> rep = getDefaultResponse();
+        LocalTime lt = LocalTime.now();
+        SystemConfig systemConfig = systemConfigService.getByHotelCodeAndKey(getCurrentHotleCode(), "manualAddTime");
+        if(systemConfig != null && systemConfig.getValue() != null){
+            LocalTime localTime = LocalTime.parse(systemConfig.getValue());
+            if(lt.isBefore(localTime)){
+//            return rep.error("夜审时间未到");
+            }
+        }
         if(ids != null){
             System.out.println("传过来的id数："+ids.length);
         }
-        HttpResponse<String> rep = getDefaultResponse();
+
         User loginUser = getUser();
         if(loginUser == null){
             return rep.loginError();

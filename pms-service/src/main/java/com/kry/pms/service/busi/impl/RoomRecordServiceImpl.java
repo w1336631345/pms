@@ -111,6 +111,7 @@ public class RoomRecordServiceImpl implements RoomRecordService {
 		for (int i = 0; i < cir.getDays(); i++) {
 			rr = new RoomRecord();
 			rr.setCheckInRecord(cir);
+			rr.setHotelCode(cir.getHotelCode());
 			rr.setCustomer(cir.getCustomer());
 			rr.setGuestRoom(cir.getGuestRoom());
 			rr.setCost(cir.getPersonalPrice());

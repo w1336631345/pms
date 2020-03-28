@@ -115,7 +115,7 @@ public class NightAuditServiceImpl implements NightAuditService {
             }
         }
         if(s+n+i+x>0){
-//            return hr.error("还有未处理订单！");
+            return hr.error("还有未处理订单！");
         }
         LocalDate now = LocalDate.now();
         if(businessDate.isAfter(now)){

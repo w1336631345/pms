@@ -46,7 +46,7 @@ public class  SetMealServiceImpl implements  SetMealService{
 
 	@Override
 	public List<SetMeal> getAllByHotelCode(String code) {
-		return setMealDao.findByHotelCode(code);
+		return setMealDao.findByHotelCodeAndDeleted(code, Constants.DELETED_FALSE);
 	}
 
 	@Override

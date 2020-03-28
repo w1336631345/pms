@@ -274,14 +274,16 @@ public class BillServiceImpl implements BillService {
     public void putAcount(List<RoomRecord> ids, LocalDate businessDate, Employee emp, String shiftCode) {
         for (int i = 0; i < ids.size(); i++) {
             RoomRecord rr = ids.get(i);
-            String checkInRecordId = rr.getId();
+            String checkInRecordId = rr.getCheckInRecord().getId();
             CheckInRecord cir = checkInRecordDao.getOne(checkInRecordId);
             SetMeal sm = cir.getSetMeal();
-            Product p = productDao.findByHotelCodeAndCode(rr.getHotelCode(), "1000");
-            if(sm.getProduct() != null){//如果有包价，就一笔整的包价价格账，一笔负的价格账，正负得0
-                Product product = sm.getProduct();//入账项目
-                addAudit(product,sm.getTotal(), sm.getAccount(), cir.getHotelCode(), emp, shiftCode, null);
-                addAudit(product, -sm.getTotal(), sm.getAccount(), cir.getHotelCode(), emp, shiftCode, null);
+            Product p = productDao.findByHotelCodeAndCode(rr.getHotelCode(), "1000");//这里必须改修改，不能写死，要找到夜间稽核类型（在product中加）
+            if(sm != null){
+                if(sm.getProduct() != null){//如果有包价，就一笔整的包价价格账，一笔负的价格账，正负得0
+                    Product product = sm.getProduct();//入账项目
+                    addAudit(product,sm.getTotal(), sm.getAccount(), cir.getHotelCode(), emp, shiftCode, null);
+                    addAudit(product, -sm.getTotal(), sm.getAccount(), cir.getHotelCode(), emp, shiftCode, null);
+                }
             }
             addAudit(p, rr.getCost(), cir.getAccount(), cir.getHotelCode(), emp, shiftCode, rr.getId());
             rr.setIsAccountEntry("PAY");// 入账成功后roomRecord里面入账状态改为pay

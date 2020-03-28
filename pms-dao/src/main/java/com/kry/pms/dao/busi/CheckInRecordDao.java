@@ -67,7 +67,7 @@ public interface CheckInRecordDao extends BaseDao<CheckInRecord> {
 	@Query(value = "select status, count(id) scount from t_checkin_record "
 			+ " where type_ != 'G' "
 			+ " and id not in (select id from t_checkin_record where `status`='I' and leave_time > SYSDATE()) "
-			+ " and id not in (select id from t_checkin_record where `status`='R' and arrive_time < SYSDATE() and deleted = 1) "
+			+ " and id not in (select id from t_checkin_record where `status`='R' and arrive_time > SYSDATE() and deleted = 1) "
 			+ " and if(:hotelCode is not null && :hotelCode != '', hotel_code=:hotelCode, 1=1 ) "
 			+ " GROUP BY status ", nativeQuery = true)
 	List<Map<String, Object>> getStatistics(@Param("hotelCode") String hotelCode);
