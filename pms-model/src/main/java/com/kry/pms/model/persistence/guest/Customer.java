@@ -7,7 +7,6 @@ import javax.persistence.*;
 
 import com.kry.pms.model.persistence.PersistenceModel;
 import com.kry.pms.model.persistence.busi.CheckInRecord;
-import com.kry.pms.model.persistence.marketing.ProtocolCorpation;
 import com.kry.pms.model.persistence.marketing.RoomPriceScheme;
 import com.kry.pms.model.persistence.marketing.SalesMen;
 import com.kry.pms.model.persistence.sys.Account;
@@ -65,16 +64,12 @@ public class Customer extends PersistenceModel {
 	private SalesMen salesMen; //销售员
 	@Column
 	private String numCode;//编号
-//	@ManyToOne
-//	private CustomerType customerType;//类型
 	@Column
 	private String customerType;//类型
 	@Column
 	private String education;//学历
 	@Column
 	private String graduateSchool;//毕业学校
-//	@ManyToOne
-//	private VipType vipType;
 	@Column
 	private String vipCode;//vip字符串
 	@Column
@@ -97,9 +92,6 @@ public class Customer extends PersistenceModel {
 	private String zipCode;//邮编
 	@Column
 	private String others;//其他
-//	@ManyToOne
-//	private ProtocolCorpation protocolCorpation;//客户公司
-
 	@ManyToMany
 	private List<RoomPriceScheme> roomPriceSchemes;//客户类型是团队才有的销售策略（房价方案）
 

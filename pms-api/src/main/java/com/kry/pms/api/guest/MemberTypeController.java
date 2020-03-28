@@ -5,9 +5,7 @@ import com.kry.pms.base.HttpResponse;
 import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
 import com.kry.pms.model.persistence.guest.MemberType;
-import com.kry.pms.model.persistence.guest.VipType;
 import com.kry.pms.service.guest.MemberTypeService;
-import com.kry.pms.service.guest.VipTypeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

@@ -1,9 +1,0 @@
-package com.kry.pms.service.guest;
-
-import com.kry.pms.model.persistence.guest.VipRoomType;
-import com.kry.pms.service.BaseService;
-
-public interface VipRoomTypeService extends BaseService<VipRoomType>{
-
-
-}

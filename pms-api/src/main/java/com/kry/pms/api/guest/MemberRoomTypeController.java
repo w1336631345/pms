@@ -5,9 +5,7 @@ import com.kry.pms.base.HttpResponse;
 import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
 import com.kry.pms.model.persistence.guest.MemberRoomType;
-import com.kry.pms.model.persistence.guest.VipRoomType;
 import com.kry.pms.service.guest.MemberRoomTypeService;
-import com.kry.pms.service.guest.VipRoomTypeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
