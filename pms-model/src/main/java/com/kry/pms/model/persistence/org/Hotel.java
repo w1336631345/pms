@@ -2,11 +2,7 @@ package com.kry.pms.model.persistence.org;
 
 import java.util.List;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.ManyToMany;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 import com.kry.pms.model.persistence.PersistenceModel;
 import com.kry.pms.model.persistence.sys.StaticResource;
@@ -61,10 +57,10 @@ public class Hotel extends PersistenceModel {
 	private String thumbnail;
 	@Column
 	private String businessStatus;
-	@ManyToMany
+	@ManyToMany(cascade = CascadeType.ALL)
 	private List<StaticResource> promotionalPictures;
-	@ManyToMany
-	private List<StaticResource> EnvironmentPictures;
+	@ManyToMany(cascade = CascadeType.ALL)
+	private List<StaticResource> environmentPictures;
 	@Column
 	private String vrUrl;
 
