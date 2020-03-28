@@ -9,8 +9,13 @@ import com.kry.pms.model.persistence.marketing.MarketingSources;
 import com.kry.pms.model.persistence.room.RoomTag;
 import com.kry.pms.model.persistence.room.RoomType;
 
+import com.kry.pms.model.persistence.sys.StaticResource;
 import lombok.Getter;
 import lombok.Setter;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.ManyToMany;
 
 @Getter
 @Setter
@@ -26,4 +31,7 @@ public class HotelInfoVo {
 	private List<RoomTag> roomTags;
 	private Map<String,String> configs;
 	private Map<String,Map<String,String>> dict;
+	private List<StaticResource> promotionalPictures;
+	private List<StaticResource> environmentPictures;
+	private String vrUrl;
 }

@@ -96,6 +96,7 @@ public class HotelServiceImpl implements HotelService {
 	@Override
 	public HotelInfoVo getHotelInfo(String currentHotleCode) {
 		HotelInfoVo hv = new HotelInfoVo();
+		Hotel hotel = getByHotelCode(currentHotleCode);
 		hv.setRoomTypes(roomTypeService.getAllByHotelCode(currentHotleCode, Constants.DELETED_FALSE));
 		hv.setMarketingSources(marketingSourcesService.getAllByHotelCode(currentHotleCode,Constants.DELETED_FALSE));
 		hv.setDiscountSchemes(discountSchemeService.getAllByHotelCode(currentHotleCode,Constants.DELETED_FALSE));
@@ -103,6 +104,8 @@ public class HotelServiceImpl implements HotelService {
 		hv.setConfigs(systemConfigService.getWebConfig(currentHotleCode));
 		hv.setDistributionChannels(distributionChannelService.getAllByHotelCode(currentHotleCode,Constants.DELETED_FALSE));
 		hv.setDict(dictDataService.getWebDict(currentHotleCode));
+		hv.setEnvironmentPictures(hotel.getEnvironmentPictures());
+		hv.setPromotionalPictures(hotel.getPromotionalPictures());
 		return hv;
 	}
 	
