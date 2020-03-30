@@ -8,7 +8,6 @@ import com.kry.pms.model.http.request.busi.*;
 import com.kry.pms.model.http.response.busi.AccountSummaryVo;
 import com.kry.pms.model.http.response.busi.CheckInRecordListVo;
 import com.kry.pms.model.other.wrapper.CheckInRecordWrapper;
-import com.kry.pms.model.persistence.busi.Arrangement;
 import com.kry.pms.model.persistence.busi.CheckInRecord;
 import com.kry.pms.model.persistence.busi.RoomLink;
 import com.kry.pms.model.persistence.busi.RoomRecord;
@@ -16,7 +15,6 @@ import com.kry.pms.model.persistence.goods.SetMeal;
 import com.kry.pms.model.persistence.guest.Customer;
 import com.kry.pms.model.persistence.marketing.RoomPriceScheme;
 import com.kry.pms.model.persistence.room.GuestRoom;
-import com.kry.pms.model.persistence.room.RoomTag;
 import com.kry.pms.model.persistence.room.RoomType;
 import com.kry.pms.model.persistence.sys.Account;
 import com.kry.pms.model.persistence.sys.User;
@@ -42,7 +40,6 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
-import javax.annotation.Resource;
 import javax.persistence.criteria.*;
 import javax.transaction.Transactional;
 import java.io.IOException;
@@ -926,23 +923,6 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
     }
 
     @Override
-    public PageResponse<Map<String, Object>> notYetMap(int pageIndex, int pageSize, String status, User user) {
-        Pageable page = org.springframework.data.domain.PageRequest.of(pageIndex - 1, pageSize);
-        String hotelCode = null;
-        if (user != null) {
-            hotelCode = user.getHotelCode();
-        }
-        Page<Map<String, Object>> p = checkInRecordDao.notYetMap(page, status, hotelCode);
-        PageResponse<Map<String, Object>> pr = new PageResponse<>();
-        pr.setPageSize(p.getNumberOfElements());
-        pr.setPageCount(p.getTotalPages());
-        pr.setTotal(p.getTotalElements());
-        pr.setCurrentPage(p.getNumber());
-        pr.setContent(p.getContent());
-        return pr;
-    }
-
-    @Override
     public PageResponse<CheckInRecord> accountEntryList(int pageIndex, int pageSize, User user) {
         Pageable page = org.springframework.data.domain.PageRequest.of(pageIndex - 1, pageSize);
         ParamSpecification<CheckInRecord> psf = new ParamSpecification<CheckInRecord>();
@@ -968,6 +948,19 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
         Specification<CheckInRecord> specification = psf.createSpecification(map);
         List<CheckInRecord> list = checkInRecordDao.findAll(specification);
         return list;
+    }
+    @Override
+    public PageResponse<Map<String, Object>> accountEntryListMap(int pageIndex, int pageSize, User user) {
+        Pageable page = org.springframework.data.domain.PageRequest.of(pageIndex - 1, pageSize);
+        LocalDate businessDate = businessSeqService.getBuinessDate(user.getHotelCode());
+        Page<Map<String, Object>> p = checkInRecordDao.accountEntryListMap(page, user.getHotelCode(), businessDate);
+        PageResponse<Map<String, Object>> pr = new PageResponse<>();
+        pr.setPageSize(p.getNumberOfElements());
+        pr.setPageCount(p.getTotalPages());
+        pr.setTotal(p.getTotalElements());
+        pr.setCurrentPage(p.getNumber());
+        pr.setContent(p.getContent());
+        return pr;
     }
 
     @Override
@@ -1361,10 +1354,6 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
             if (("G").equals(cir.getType())) {
                 return hr.error("此处不能取消主单");
             }
-            boolean b = accountService.accountCheck(cir.getAccount().getId());
-            if (!b) {
-                return hr.error(cir.getName() + "有账务未结清");
-            }
             if(("R").equals(cir.getType())){//如果取消的是预留单
                 humanCount = cir.getHumanCount();
                 roomCount = cir.getRoomCount();
@@ -1373,6 +1362,10 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                 modify(cir);
                 roomStatisticsService.cancleReserve(new CheckInRecordWrapper(cir));//取消预
             }else if(("C").equals(cir.getType())) {//宾客排房未入住订单的取消
+                boolean b = accountService.accountCheck(cir.getAccount().getId());
+                if (!b) {
+                    return hr.error(cir.getName() + "有账务未结清");
+                }
                 humanCount = 1;
                 if ((Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION).equals(cir.getStatus())) {//预定，没入住就是排房状态
                     roomStatisticsService.cancleAssign(new CheckInRecordWrapper(cir));//取消排房
