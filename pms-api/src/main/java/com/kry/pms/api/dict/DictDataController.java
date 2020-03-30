@@ -2,6 +2,7 @@ package com.kry.pms.api.dict;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.kry.pms.base.Constants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,7 +26,13 @@ public class DictDataController extends BaseController<DictData> {
 	DictDataService dictDataService;
 	@PostMapping
 	public HttpResponse<DictData> add(@RequestBody DictData dictData) {
-		return getDefaultResponse().addData(dictDataService.add(dictData));
+		HttpResponse<DictData> rep = new HttpResponse<>();
+		dictData = dictDataService.add(dictData);
+		if(dictData == null){
+			rep.setStatus(Constants.BusinessCode.CODE_PARAMETER_INVALID);
+			rep.setMessage("代码重复");
+		}
+		return rep.addData(dictData);
 	}
 
 	@PutMapping
