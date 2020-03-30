@@ -66,24 +66,7 @@ public class nightAuditController extends BaseController {
         rep.addData(page);
         return rep;
     }
-    /**
-     * 功能描述: <br>夜间稽核列表(没用，用的unreturnedGuests)
-     * 〈〉
-     * @Param: [pageNum, pageSize, status]
-     * @Return: com.kry.pms.base.HttpResponse<com.kry.pms.base.PageResponse<java.util.Map<java.lang.String,java.lang.Object>>>
-     * @Author: huanghaibin
-     * @Date: 2020/3/27 10:37
-     */
-    @GetMapping("/notYetMap")
-    public HttpResponse<PageResponse<Map<String, Object>>> notYetMap(@RequestParam(value = "pageNum", defaultValue = "1")Integer pageNum,
-                                                                            @RequestParam(value = "pageSize", defaultValue = "10")Integer pageSize,
-                                                                            String status) {
-        HttpResponse<PageResponse<Map<String, Object>>> rep = new HttpResponse<>();
-        User user = getUser();
-        PageResponse<Map<String, Object>> page = checkInRecordService.notYetMap(pageNum, pageSize,status, user);
-        rep.addData(page);
-        return rep;
-    }
+
     /**
      * 功能描述: <br>应退未退客人（时间过了依旧在住）
      * 〈〉
@@ -104,7 +87,7 @@ public class nightAuditController extends BaseController {
     }
 
     /**
-     * 功能描述: <br>查询房租预审及入账列表（夜间稽核可入账的入住（I））
+     * 功能描述: <br>查询房租预审及入账列表（夜间稽核可入账的入住（I））（停用）
      * 〈〉
      * @Param: [pageNum, pageSize]
      * @Return: com.kry.pms.base.HttpResponse<com.kry.pms.base.PageResponse<com.kry.pms.model.persistence.busi.CheckInRecord>>
@@ -120,6 +103,26 @@ public class nightAuditController extends BaseController {
             return rep.error(403, "未登录");
         }
         PageResponse<CheckInRecord> page = checkInRecordService.accountEntryList(pageNum, pageSize, user);
+        rep.addData(page);
+        return rep;
+    }
+    /**
+     * 功能描述: <br>查询房租预审及入账列表（夜间稽核可入账的入住（I））(在用)
+     * 〈〉
+     * @Param: [pageNum, pageSize]
+     * @Return: com.kry.pms.base.HttpResponse<com.kry.pms.base.PageResponse<java.util.Map<java.lang.String,java.lang.Object>>>
+     * @Author: huanghaibin
+     * @Date: 2020/3/30 16:17
+     */
+    @GetMapping("/accountEntryListMap")
+    public HttpResponse<PageResponse<Map<String, Object>>> accountEntryListMap(@RequestParam(value = "pageNum", defaultValue = "1")Integer pageNum,
+                                                                      @RequestParam(value = "pageSize", defaultValue = "10")Integer pageSize) {
+        HttpResponse<PageResponse<Map<String, Object>>> rep = new HttpResponse<>();
+        User user = getUser();
+        if(user == null){
+            return rep.error(403, "未登录");
+        }
+        PageResponse<Map<String, Object>> page = checkInRecordService.accountEntryListMap(pageNum, pageSize, user);
         rep.addData(page);
         return rep;
     }

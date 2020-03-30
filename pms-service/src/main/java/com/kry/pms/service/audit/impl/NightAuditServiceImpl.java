@@ -100,7 +100,7 @@ public class NightAuditServiceImpl implements NightAuditService {
         //入账只入当前营业日期的账
         LocalDate businessDate = businessSeqService.getBuinessDate(loginUser.getHotelCode());
         List<Map<String, Object>> listCount = checkInRecordDao.getStatistics(loginUser.getHotelCode());
-        int s = 0, n = 0, i = 0, x = 0;
+        int s = 0, n = 0, i = 0, x = 0, r=0;
         for(int l=0; l<listCount.size(); l++){
             Map<String, Object> map = listCount.get(l);
             String status = MapUtils.getString(map,"status");
@@ -112,9 +112,11 @@ public class NightAuditServiceImpl implements NightAuditService {
                 i = MapUtils.getInteger(map, "scount");
             }else if(Constants.Status.CHECKIN_RECORD_STATUS_CANCLE_BOOK.equals(status)){
                 x= MapUtils.getInteger(map, "scount");
+            }else if(Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION.equals(status)){
+                r= MapUtils.getInteger(map, "scount");
             }
         }
-        if(s+n+i+x>0){
+        if(s+r+i>0){//已退房未平账 + 应到未到 + 应退未退
             return hr.error("还有未处理订单！");
         }
         LocalDate now = LocalDate.now();
