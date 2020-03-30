@@ -466,6 +466,8 @@ public class BillServiceImpl implements BillService {
         targetBill.setOperationEmployee(operationEmployee);
         targetBill.setAccount(targetAccount);
         targetBill.setTransferFlag(Constants.FLAG_YES);
+        targetBill.setTransferType(targetAccount.getType());
+        targetBill.setSourceBill(bill);
         targetBill.setTranferRemark("From:" + bill.getAccount().getCode());
         targetBill.setStatus(Constants.Status.BILL_NEED_SETTLED);
         targetBill.setCurrentSettleAccountRecordNum(recordNum);
