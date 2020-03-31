@@ -97,6 +97,7 @@ public class BillServiceImpl implements BillService {
             return null;
         }
         Account account = accountService.billEntry(bill);
+        bill.setRoomNum(account.getRoomNum());
         bill.setBillSeq(account.getCurrentBillSeq());
         bill.setAccount(account);
         return billDao.saveAndFlush(bill);
