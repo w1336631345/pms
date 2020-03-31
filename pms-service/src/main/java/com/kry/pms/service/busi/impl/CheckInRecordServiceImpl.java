@@ -1223,22 +1223,22 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
     @Override
     public DtoResponse<String> hangUp(String id) {
         CheckInRecord cir = findById(id);
+        return hangUp(cir);
+    }
+    private DtoResponse<String> hangUp(CheckInRecord cir){
         DtoResponse<String> rep = new DtoResponse<String>();
         cir.setActualTimeOfLeave(LocalDateTime.now());
         cir.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_OUT_UNSETTLED);
+        roomStatisticsService.checkOut(new CheckInRecordWrapper(cir));
         modify(cir);
         return rep;
     }
+
     @Transactional
     @Override
     public DtoResponse<String> hangUpByAccountId(String id) {
         CheckInRecord cir = checkInRecordDao.findByAccountId(id);
-        DtoResponse<String> rep = new DtoResponse<String>();
-        cir.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_OUT_UNSETTLED);
-        cir.setActualTimeOfLeave(LocalDateTime.now());
-        roomStatisticsService.checkOut(new CheckInRecordWrapper(cir));
-        modify(cir);
-        return rep;
+        return hangUp(cir);
     }
 
     @Override

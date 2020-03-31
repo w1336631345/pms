@@ -98,6 +98,11 @@ public interface CheckInRecordService extends BaseService<CheckInRecord> {
 
 	public List<CheckInRecord> findRoomTogetherRecord(CheckInRecord cir, String status);
 
+	/**
+	 *
+	 * @param id checkinrecord  的   id
+	 * @return
+	 */
 	public DtoResponse<String> hangUp(String id);
 
 	public DtoResponse<String> hangUpByAccountId(String id);

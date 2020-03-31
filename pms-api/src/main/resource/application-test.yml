@@ -14,8 +14,8 @@ spring:
     time-zone: Asia/Shanghai
     default-property-inclusion: non-null
   datasource:
-    password: admin
-    url: jdbc:mysql://169.254.55.91:3306/pms_test?useUnicode=true&characterEncoding=utf8&serverTimezone=Hongkong&tinyInt1isBit=false
+    password: Rooibook123!@#
+    url: jdbc:mysql://192.168.1.188:3306/pms_test?useUnicode=true&characterEncoding=utf8&serverTimezone=Hongkong&tinyInt1isBit=false
     username: root
   jpa:
     database: mysql
