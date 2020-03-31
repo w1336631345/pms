@@ -45,7 +45,7 @@ public class ScheduleQuartzJob implements Job {
             //入账到bill
             automaticNightTrial.accountEntryListAll(hotelCode);
             //自动生成报表
-            nightAuditService.addReportAllAuto(hotelCode);
+//            nightAuditService.addReportAllAuto(hotelCode);
         }
 
     }

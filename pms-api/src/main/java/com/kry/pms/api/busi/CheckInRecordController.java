@@ -201,7 +201,7 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
     }
 
     /**
-     * 功能描述: <br>取消入住
+     * 功能描述: <br>批量取消入住
      * 〈〉
      *
      * @Param: [ids]
@@ -263,6 +263,34 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
     public HttpResponse callOffReserveAudit(@RequestBody String[] ids) {
         HttpResponse rep = new HttpResponse();
         rep = checkInRecordService.callOffReserveAudit(ids);
+        return rep;
+    }
+    /**
+     * 功能描述: <br>主单的取消预订
+     * 〈〉
+     * @Param: [id]
+     * @Return: com.kry.pms.base.HttpResponse
+     * @Author: huanghaibin
+     * @Date: 2020/3/31 19:14
+     */
+    @PostMapping(path = "/callOffG")
+    public HttpResponse callOffG(@RequestBody String id) {
+        HttpResponse rep = new HttpResponse();
+        rep = checkInRecordService.callOffG(id);
+        return rep;
+    }
+    /**
+     * 功能描述: <br>主单恢复
+     * 〈〉
+     * @Param: [id]
+     * @Return: com.kry.pms.base.HttpResponse
+     * @Author: huanghaibin
+     * @Date: 2020/3/31 19:48
+     */
+    @PostMapping(path = "/recovery")
+    public HttpResponse recovery(@RequestBody String id) {
+        HttpResponse rep = new HttpResponse();
+        rep = checkInRecordService.recovery(id);
         return rep;
     }
 

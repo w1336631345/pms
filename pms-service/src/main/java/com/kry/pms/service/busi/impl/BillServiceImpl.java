@@ -282,17 +282,17 @@ public class BillServiceImpl implements BillService {
             if(sm != null){
                 if(sm.getProduct() != null){//如果有包价，就一笔整的包价价格账，一笔负的价格账，正负得0
                     Product product = sm.getProduct();//入账项目
-                    addAudit(product,sm.getTotal(), sm.getAccount(), cir.getHotelCode(), emp, shiftCode, null);
-                    addAudit(product, -sm.getTotal(), sm.getAccount(), cir.getHotelCode(), emp, shiftCode, null);
+                    addAudit(product,sm.getTotal(), sm.getAccount(), cir.getHotelCode(), emp, shiftCode, null, "M");
+                    addAudit(product, -sm.getTotal(), sm.getAccount(), cir.getHotelCode(), emp, shiftCode, null,"M");
                 }
             }
-            addAudit(p, rr.getCost(), cir.getAccount(), cir.getHotelCode(), emp, shiftCode, rr.getId());
+            addAudit(p, rr.getCost(), cir.getAccount(), cir.getHotelCode(), emp, shiftCode, rr.getId(),"M");
             rr.setIsAccountEntry("PAY");// 入账成功后roomRecord里面入账状态改为pay
             roomRecordService.modify(rr);
         }
     }
 
-    public void addAudit(Product product, Double cost, Account account, String hotelCode, Employee emp, String shiftCode, String roomRecordId){
+    public void addAudit(Product product, Double cost, Account account, String hotelCode, Employee emp, String shiftCode, String roomRecordId, String type){
         //入账只入当前营业日期的账
         LocalDate businessDate = businessSeqService.getBuinessDate(hotelCode);
         Bill bill = new Bill();
@@ -302,7 +302,12 @@ public class BillServiceImpl implements BillService {
         bill.setQuantity(1);
         bill.setAccount(account);
         bill.setHotelCode(hotelCode);
-        bill.setOperationRemark("夜审手动入账");
+        if("M".equals(type)){
+            bill.setOperationRemark("夜审手动入账");
+        }
+        if("A".equals(type)){
+            bill.setOperationRemark("自动夜审入账");
+        }
         bill.setOperationEmployee(emp);
         bill.setShiftCode(shiftCode);
         bill.setRoomRecordId(roomRecordId);
@@ -314,24 +319,41 @@ public class BillServiceImpl implements BillService {
     @Override
     public void putAcountAUTO(List<RoomRecord> ids, LocalDate businessDate) {
         for (int i = 0; i < ids.size(); i++) {
-            String id = ids.get(i).getId();
-            RoomRecord rr = roomRecordService.findById(id);
-            Product p = new Product();
-            p.setId("10000");
-            Bill bill = new Bill();
-            bill.setProduct(p);
-            bill.setTotal(rr.getCost());
-            bill.setCost(rr.getCost());
-            bill.setQuantity(1);
-            bill.setAccount(rr.getCheckInRecord().getAccount());
-            bill.setHotelCode(rr.getHotelCode());
-            bill.setOperationRemark("夜审自动入账");
-            bill.setRoomRecordId(rr.getId());
-            bill.setBusinessDate(businessDate);
-            add(bill);
+            RoomRecord rr = ids.get(i);
+            String checkInRecordId = rr.getCheckInRecord().getId();
+            CheckInRecord cir = checkInRecordDao.getOne(checkInRecordId);
+            SetMeal sm = cir.getSetMeal();
+            Product p = productDao.findByHotelCodeAndCode(rr.getHotelCode(), "1000");//这里必须改修改，不能写死，要找到夜间稽核类型（在product中加）
+            if(sm != null){
+                if(sm.getProduct() != null){//如果有包价，就一笔整的包价价格账，一笔负的价格账，正负得0
+                    Product product = sm.getProduct();//入账项目
+                    addAudit(product,sm.getTotal(), sm.getAccount(), cir.getHotelCode(), null, null, null, "A");
+                    addAudit(product, -sm.getTotal(), sm.getAccount(), cir.getHotelCode(), null, null, null, "A");
+                }
+            }
+            addAudit(p, rr.getCost(), cir.getAccount(), cir.getHotelCode(), null, null, rr.getId(), "A");
             rr.setIsAccountEntry("PAY");// 入账成功后roomRecord里面入账状态改为pay
             roomRecordService.modify(rr);
         }
+//        for (int i = 0; i < ids.size(); i++) {
+//            String id = ids.get(i).getId();
+//            RoomRecord rr = roomRecordService.findById(id);
+//            Product p = new Product();
+//            p.setId("10000");
+//            Bill bill = new Bill();
+//            bill.setProduct(p);
+//            bill.setTotal(rr.getCost());
+//            bill.setCost(rr.getCost());
+//            bill.setQuantity(1);
+//            bill.setAccount(rr.getCheckInRecord().getAccount());
+//            bill.setHotelCode(rr.getHotelCode());
+//            bill.setOperationRemark("夜审自动入账");
+//            bill.setRoomRecordId(rr.getId());
+//            bill.setBusinessDate(businessDate);
+//            add(bill);
+//            rr.setIsAccountEntry("PAY");// 入账成功后roomRecord里面入账状态改为pay
+//            roomRecordService.modify(rr);
+//        }
     }
 
     @Transactional

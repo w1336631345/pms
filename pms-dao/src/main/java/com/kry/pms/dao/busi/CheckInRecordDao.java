@@ -287,4 +287,8 @@ public interface CheckInRecordDao extends BaseDao<CheckInRecord> {
 									   @Param("leaveTime") String leaveTime);
 
     List<CheckInRecord> findByGuestRoomIdAndDeleted(String guestRoomId, int deleted);
+
+    @Query(nativeQuery = true, value = " select tcr.id  from t_checkin_record tcr \n" +
+			" where tcr.main_record_id = ?1 and tcr.type_ = ?2 and tcr.deleted = ?3 ")
+    List<String> listIdByType(String mainId, String type, int deleted);
 }

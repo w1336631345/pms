@@ -116,7 +116,7 @@ public class NightAuditServiceImpl implements NightAuditService {
                 r= MapUtils.getInteger(map, "scount");
             }
         }
-        if(s+r+i>0){//已退房未平账 + 应到未到 + 应退未退
+        if(r+i>0){// 应到未到 + 应退未退
             return hr.error("还有未处理订单！");
         }
         LocalDate now = LocalDate.now();

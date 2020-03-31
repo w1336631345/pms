@@ -115,10 +115,12 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
         HttpResponse hr = new HttpResponse();
         CheckInRecord dbCir = checkInRecordDao.getOne(checkInRecord.getId());
         if (checkInRecord.getLeaveTime().isAfter(dbCir.getLeaveTime())) {
-            boolean b = roomStatisticsService.extendTime(new CheckInRecordWrapper(dbCir), checkInRecord.getLeaveTime().toLocalDate());
-            if (!b) {
-                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-                return hr.error("资源不足");
+            if(dbCir.getGuestRoom() != null){
+                boolean b = roomStatisticsService.extendTime(new CheckInRecordWrapper(dbCir), checkInRecord.getLeaveTime().toLocalDate());
+                if (!b) {
+                    TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                    return hr.error("资源不足");
+                }
             }
         }
         if (dbCir != null) {
@@ -558,9 +560,10 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
     public CheckInRecord book(CheckInRecord checkInRecord) {
         String orderNum = businessSeqService.fetchNextSeqNum(checkInRecord.getHotelCode(),
                 Constants.Key.BUSINESS_ORDER_NUM_SEQ_KEY);
-//        if (Constants.Type.CHECK_IN_RECORD_GROUP_TYPE_YES.equals(checkInRecord.getGroupType())) {
-            checkInRecord.setGroupName(checkInRecord.getName());
-//        }
+        if (checkInRecord.getName() == null) {
+            checkInRecord.setName("同行主账户"+orderNum);
+        }
+        checkInRecord.setGroupName(checkInRecord.getName());
         checkInRecord.setOrderNum(orderNum);
         checkInRecord.setCheckInCount(0);
         if (checkInRecord.getSubRecords() != null && !checkInRecord.getSubRecords().isEmpty()) {
@@ -1395,6 +1398,52 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
             }
         }
         return hr.ok();
+    }
+    //主单的取消预订
+    @Override
+    public HttpResponse callOffG(String id){
+        HttpResponse hr = new HttpResponse();
+        CheckInRecord cir = checkInRecordDao.getOne(id);
+        if(Constants.Type.CHECK_IN_RECORD_GROUP.equals(cir.getType())){//如果是主单
+            List<String> list = checkInRecordDao.listIdByType(id, Constants.Type.CHECK_IN_RECORD_CUSTOMER, Constants.DELETED_FALSE);
+            if(list != null && !list.isEmpty()){
+                return hr.error("存在排房或入住，主单取消失败");
+            }else {//没有成员排房或入住，查出预留单，全部删除
+                List<String> rList = checkInRecordDao.listIdByType(id, Constants.Type.CHECK_IN_RECORD_RESERVE, Constants.DELETED_FALSE);
+                for(int i=0; i<rList.size(); i++){
+                    offReserve(rList.get(i));//删除预留单
+                }
+                //删除预留单后删除主单
+                cir.setDeleted(Constants.DELETED_TRUE);
+                update(cir);
+            }
+        }else if(Constants.Type.CHECK_IN_RECORD_RESERVE.equals(cir.getType())) {//如果是预留单
+            return hr.error("预留单，请选择修改预留");
+        }else {
+            if(Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION.equals(cir.getStatus())){
+
+            }else {
+                return hr.error("选数据状态错误");
+            }
+        }
+        return hr.ok();
+    }
+    //主单恢复
+    @Override
+    public HttpResponse recovery(String id){
+        HttpResponse hr = new HttpResponse();
+        CheckInRecord cir = checkInRecordDao.getOne(id);
+        if(Constants.Type.CHECK_IN_RECORD_GROUP.equals(cir.getType())){//如果是主单
+            if(cir.getDeleted() == 0){
+                return hr.error("正常主单无需恢复");
+            }else{
+                cir.setDeleted(Constants.DELETED_FALSE);
+                update(cir);
+            }
+        }else {
+            return hr.error("主单恢复失败");
+        }
+        return hr;
     }
 
     @Override
