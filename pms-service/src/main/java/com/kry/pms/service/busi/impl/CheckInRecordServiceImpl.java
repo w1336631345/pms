@@ -360,6 +360,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
             default:
                 DtoResponse<List<CheckInRecord>> rep = new DtoResponse<>();
                 rep.setCode(Constants.BusinessCode.CODE_PARAMETER_INVALID);
+
                 rep.setMessage("不支持的退房类型");
                 return rep;
 
@@ -376,7 +377,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
     }
 
     private DtoResponse<List<CheckInRecord>> checkOutGroup(String id) {
-        CheckInRecord cir = findById(id);
+        CheckInRecord cir = queryByAccountId(id);
         checkOut(cir);
         return checkOut(findByOrderNumC(cir.getOrderNum()));
     }
@@ -398,6 +399,9 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
         DtoResponse<List<CheckInRecord>> response = new DtoResponse<>();
         List<CheckInRecord> data = new ArrayList<>();
         for (CheckInRecord cir : cirs) {
+            if(Constants.Status.CHECKIN_RECORD_STATUS_CHECK_OUT.equals(cir.getStatus())){
+                continue;
+            }
             DtoResponse<CheckInRecord> rep = checkOut(cir);
             if (rep.getStatus() != 0) {
                 BeanUtils.copyProperties(rep, response);

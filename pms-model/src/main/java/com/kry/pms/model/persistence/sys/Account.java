@@ -44,6 +44,8 @@ public class Account extends PersistenceModel {
 	@Column
 	private Double pay;//付款（总）
 	@Column
+	private Boolean isNoLimit;
+	@Column
 	private Double creditLimit ; //信用额度
 	@Column
 	private Double availableCreditLimit;//可用信用额度
