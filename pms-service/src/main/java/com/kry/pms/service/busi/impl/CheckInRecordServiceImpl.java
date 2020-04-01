@@ -114,18 +114,69 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
     public HttpResponse modifyInfo(CheckInRecord checkInRecord) {
         HttpResponse hr = new HttpResponse();
         CheckInRecord dbCir = checkInRecordDao.getOne(checkInRecord.getId());
-        if (checkInRecord.getLeaveTime().isAfter(dbCir.getLeaveTime())) {
-            if(dbCir.getGuestRoom() != null){
-                boolean b = roomStatisticsService.extendTime(new CheckInRecordWrapper(dbCir), checkInRecord.getLeaveTime().toLocalDate());
-                if (!b) {
-                    TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-                    return hr.error("资源不足");
+        boolean updateRoomPriceS = false;
+        boolean updateName = false;
+        boolean updateTime = false;
+        if ((Constants.Type.CHECK_IN_RECORD_RESERVE).equals(dbCir.getType())) {
+            return hr.error("预留单请去“修改预留”界面");
+        }
+        if (!dbCir.getRoomPriceScheme().getId().equals(checkInRecord.getRoomPriceScheme().getId())) {
+            updateRoomPriceS = true;
+        }
+        if(!dbCir.getName().equals(checkInRecord.getName())){//主单修改名称
+            updateName = true;
+        }
+        if(!dbCir.getArriveTime().isEqual(checkInRecord.getArriveTime()) || !dbCir.getLeaveTime().isEqual(checkInRecord.getLeaveTime())){
+            updateTime = true;
+        }
+        // 如果是主单操作，判断是不是修改的时间
+        if (("G").equals(dbCir.getType())) {
+            // 查询主单下的成员记录
+            List<CheckInRecord> children = checkInRecordDao.findByMainRecordAndDeleted(dbCir, Constants.DELETED_FALSE);
+            checkInRecord.setCustomer(null);
+            if(updateName){//主单修改名称
+                if(checkInRecord.getAccount() != null){
+                    Account account = accountService.findById(checkInRecord.getAccount().getId());//连同主单账号名称一起修改
+                    account.setName(checkInRecord.getName());
+                    accountService.modify(account);
                 }
             }
-        }
-        if (dbCir != null) {
+
+            for (int i = 0; i < children.size(); i++) {
+                CheckInRecord cir = children.get(i);
+                if(updateRoomPriceS){//主单修改了房价码
+                    Map<String, Object> map = roomPriceSchemeDao.roomTypeAndPriceScheme(cir.getRoomType().getId(), checkInRecord.getRoomPriceScheme().getId());
+                    Double price = MapUtils.getDouble(map, "price");
+                    if (price == null) {
+                        price = cir.getRoomType().getPrice();
+                    }
+                    //修改所有主单下数据的房价码
+                    cir.setRoomPriceScheme(checkInRecord.getRoomPriceScheme());
+                    cir.setPersonalPrice(price * cir.getPersonalPercentage());
+                    String setMealId = MapUtils.getString(map, "setMealId");
+                    if (setMealId != null) {
+                        SetMeal sm = new SetMeal();
+                        sm.setId(setMealId);
+                        //修改所有主单下数据的包价
+                        cir.setSetMeal(sm);
+                    } else {
+                        cir.setSetMeal(null);
+                    }
+                }
+                if(updateName){//主单修改名称
+                    cir.setGroupName(checkInRecord.getName());
+                }
+                if(updateTime){
+                    if(checkInRecord.getArriveTime().isAfter(cir.getArriveTime()) || checkInRecord.getLeaveTime().isBefore(cir.getLeaveTime())){
+                        TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                        return hr.error("主单时间范围不能小于成员时间范围");
+                    }
+                }
+                cir.setCorp(checkInRecord.getCorp());
+                checkInRecordDao.saveAndFlush(cir);
+            }
+        }else {//不是主单，是宾客信息
             checkInRecord.setMainRecord(dbCir.getMainRecord());
-//            updateCustomer(dbCir, checkInRecord);
             if (checkInRecord.getCustomer() != null) {
                 if (checkInRecord.getCustomer().getId() != null) {
                     Customer c = customerService.findById(checkInRecord.getCustomer().getId());
@@ -142,88 +193,23 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                     }
                 }
             }
-
-            // 如果是主单操作，判断是不是修改的时间
-            if (("G").equals(dbCir.getType())) {
-                // 查询主单下的成员记录
-                List<CheckInRecord> children = checkInRecordDao.findByMainRecordAndDeleted(dbCir,
-                        Constants.DELETED_FALSE);
-                checkInRecord.setCustomer(null);
-                boolean updateRoomPriceS = false;
-                boolean updateName = false;
-                //主单修改了房价码
-                if (!dbCir.getRoomPriceScheme().getId().equals(checkInRecord.getRoomPriceScheme().getId())) {
-                    updateRoomPriceS = true;
-                }
-                if(!dbCir.getName().equals(checkInRecord.getName())){//主单修改名称
-                    updateName = true;
-                    if(checkInRecord.getAccount() != null){
-                        Account account = accountService.findById(checkInRecord.getAccount().getId());//连同主单账号名称一起修改
-                        account.setName(checkInRecord.getName());
-                        accountService.modify(account);
+            if(updateTime){
+                if(dbCir.getMainRecord() != null){
+                    CheckInRecord main = dbCir.getMainRecord();
+                    if(checkInRecord.getArriveTime().isBefore(main.getArriveTime()) || checkInRecord.getLeaveTime().isAfter(main.getLeaveTime())){
+                        TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                        return hr.error("成员时间范围不能大于主单");
                     }
                 }
-                for (int i = 0; i < children.size(); i++) {
-                    CheckInRecord cir = children.get(i);
-                    if(updateRoomPriceS){//主单修改了房价码
-                        Map<String, Object> map = roomPriceSchemeDao.roomTypeAndPriceScheme(cir.getRoomType().getId(), checkInRecord.getRoomPriceScheme().getId());
-                        Double price = MapUtils.getDouble(map, "price");
-                        if (price == null) {
-                            price = cir.getRoomType().getPrice();
-                        }
-                        //修改所有主单下数据的房价码
-                        cir.setRoomPriceScheme(checkInRecord.getRoomPriceScheme());
-                        cir.setPersonalPrice(price * cir.getPersonalPercentage());
-                        String setMealId = MapUtils.getString(map, "setMealId");
-                        if (setMealId != null) {
-                            SetMeal sm = new SetMeal();
-                            sm.setId(setMealId);
-                            //修改所有主单下数据的包价
-                            cir.setSetMeal(sm);
-                        } else {
-                            cir.setSetMeal(null);
-                        }
-                    }
-                    if(updateName){//主单修改名称
-                        cir.setGroupName(checkInRecord.getName());
-                    }
-                    cir.setCorp(checkInRecord.getCorp());
-                    checkInRecordDao.saveAndFlush(cir);
-                }
-
-                // 修改的离店时间小于之前时间（改小）
-                if (checkInRecord.getLeaveTime().isBefore(dbCir.getLeaveTime())) {
+                boolean b = roomStatisticsService.extendTime(new CheckInRecordWrapper(dbCir),
+                        checkInRecord.getArriveTime(), checkInRecord.getLeaveTime());
+                if (!b) {
                     TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-                    return hr.error("离店时间小于之前时间，不能修改");
-                    // 释放资源
-                    // ...释放资源代码
-                    // ...
+                    return hr.error("资源不足");
                 }
-                if (checkInRecord.getLeaveTime().isAfter(dbCir.getLeaveTime())) {// 改大
-                    for (int i = 0; i < children.size(); i++) {
-                        CheckInRecord cir = children.get(i);
-                        if (cir.getRoomType() != null) {
-                            // 查询房类资源是否满足
-                            boolean b = roomStatisticsService.extendTime(new CheckInRecordWrapper(cir), checkInRecord.getLeaveTime().toLocalDate());
-                            if (!b) {
-                                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-                                return hr.error("资源不足");
-                            }
-                        }
-                        //修改所有主单下数据的房价码
-                        cir.setRoomPriceScheme(checkInRecord.getRoomPriceScheme());
-                        cir.setArriveTime(checkInRecord.getArriveTime());
-                        cir.setLeaveTime(checkInRecord.getLeaveTime());
-                        checkInRecordDao.saveAndFlush(cir);
-                    }
-                }
-
             }
-            if ((Constants.Type.CHECK_IN_RECORD_RESERVE).equals(dbCir.getType())) {
-                return hr.error("预留信息请去“修改预留”界面");
-            }
-            hr.addData(checkInRecordDao.saveAndFlush(checkInRecord));
         }
+        hr.addData(checkInRecordDao.saveAndFlush(checkInRecord));
         return hr.ok();
     }
 
@@ -539,6 +525,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
             ncir.setRoomCount(1);
             ncir.setAccount(account);
             ncir.setGroupType(cir.getGroupType());// 设置分组类型（团队/散客）
+            ncir.setFitType(cir.getFitType());
 //			ncir.setReserveId(cir.getId());// 添加预留记录id
             ncir.setMainRecord(cir.getMainRecord());
             //如果有主单，添加主单团名
@@ -560,7 +547,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
     public CheckInRecord book(CheckInRecord checkInRecord) {
         String orderNum = businessSeqService.fetchNextSeqNum(checkInRecord.getHotelCode(),
                 Constants.Key.BUSINESS_ORDER_NUM_SEQ_KEY);
-        if (checkInRecord.getName() == null) {
+        if (checkInRecord.getName() == null || "".equals(checkInRecord.getName())) {
             checkInRecord.setName("同行主账户"+orderNum);
         }
         checkInRecord.setGroupName(checkInRecord.getName());
@@ -595,6 +582,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                     item.setGroupType(checkInRecord.getGroupType());
                     item.setGroupName(checkInRecord.getGroupName());
                     item.setHotelCode(checkInRecord.getHotelCode());
+                    item.setFitType(checkInRecord.getFitType());
                     item.setMainRecord(checkInRecord);
                     item.setCheckInCount(0);
                     if (item.getRoomType() == null) {
@@ -1140,6 +1128,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
             checkInRecord.setGroupName(mainCheckInRecord.getName());
             checkInRecord.setRoomType(roomTypeService.findById(checkInRecord.getRoomTypeId()));
             checkInRecord.setMainRecord(mainCheckInRecord);
+            checkInRecord.setFitType(mainCheckInRecord.getFitType());
             checkInRecord = add(checkInRecord);
             mainCheckInRecord.setRoomCount(mainCheckInRecord.getRoomCount() + checkInRecord.getRoomCount());
 //			mainCheckInRecord.getSubRecords().add(checkInRecord);
