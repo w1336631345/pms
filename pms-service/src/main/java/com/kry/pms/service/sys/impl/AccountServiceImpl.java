@@ -136,7 +136,9 @@ public class AccountServiceImpl implements AccountService {
         Account account = findById(bill.getAccount().getId());
         if (account != null) {
             CheckInRecord cir = checkInRecordService.queryByAccountId(account.getId());
-            bill.setRoomNum(cir.getGuestRoom().getRoomNum());
+            if(cir!=null&&cir.getGuestRoom()!=null){
+                bill.setRoomNum(cir.getGuestRoom().getRoomNum());
+            }
             if (bill.getCost() != null) {
                 account.setCost(BigDecimalUtil.add(account.getCost(), bill.getCost()));
             }

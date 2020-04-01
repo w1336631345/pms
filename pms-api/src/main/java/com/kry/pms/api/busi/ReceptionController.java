@@ -125,13 +125,14 @@ public class ReceptionController extends BaseController<String> {
 	 * @return
 	 */
 	@PostMapping(path="/bill/check")
-	public HttpResponse<Account> customerCheckBill(@RequestBody BillCheckBo	billCheckBo){
+	public HttpResponse<AccountSummaryVo> customerCheckBill(@RequestBody BillCheckBo	billCheckBo){
 		billCheckBo.setHotelCode(getCurrentHotleCode());
 		billCheckBo.setShiftCode(getShiftCode());
 		billCheckBo.setOperationEmployee(getCurrentEmployee());
-		HttpResponse<Account> rep = new HttpResponse<Account>();
+		HttpResponse<AccountSummaryVo> rep = new HttpResponse<AccountSummaryVo>();
 		DtoResponse<Account> data = accountService.checkCustomerBill(billCheckBo);
 		BeanUtils.copyProperties(data, rep);
+		rep.setData(new AccountSummaryVo(data.getData()));
 		return rep;
 	}
 

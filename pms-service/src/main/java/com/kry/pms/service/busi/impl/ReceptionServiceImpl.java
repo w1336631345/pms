@@ -274,10 +274,10 @@ public class ReceptionServiceImpl implements ReceptionService {
 		CheckInRecord cir = checkInRecordService.findById(id);
 		AccountSummaryVo asv = null;
 		if (cir != null && cir.getGroupType() != null) {
+			if(cir.getMainRecord()!=null){
+				cir = cir.getMainRecord();
+			}
 			if(Constants.Type.CHECK_IN_RECORD_GROUP_TYPE_YES.equals(cir.getGroupType())||"T".equals(cir.getFitType())){
-				if(cir.getMainRecord()!=null){
-					cir = cir.getMainRecord();
-				}
 				asv = new AccountSummaryVo();
 				asv.setName("团队所有账务");
 				asv.setType("temp");

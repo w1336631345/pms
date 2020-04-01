@@ -22,7 +22,7 @@ import lombok.Setter;
 public class Customer extends PersistenceModel {
 	@Column
 	private String name;
-	@OneToMany
+	@ManyToMany
 	private List<CustomerInvoiceInfo> invoiceInfos;
 	@OneToOne
 	private CustomerLevel customerLevel;//客户等级
