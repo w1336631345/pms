@@ -100,6 +100,12 @@ public class RoomStatisticsServiceImpl implements RoomStatisticsService {
     }
 
     @Override
+    public boolean extendTime(UseInfoAble info, LocalDateTime newStartTime, LocalDateTime newEndTime) {
+        return false;
+    }
+
+
+    @Override
     public boolean cancelCheckOut(UseInfoAble info) {
         roomUsageService.changeUseStatus(info.guestRoom(), info.getBusinessKey(), Constants.Status.ROOM_USAGE_CHECK_IN);
         return false;
