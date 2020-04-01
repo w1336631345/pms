@@ -385,8 +385,9 @@ public class RoomUsageServiceImpl implements RoomUsageService {
                 }
                 modify(ru);
             }
+        }else{
+            return false;
         }
-
         return true;
     }
 
