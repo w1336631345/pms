@@ -1005,7 +1005,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
     }
 
     public Collection<AccountSummaryVo> getAccountSummaryByOrderNum2(String orderNum, String type) {
-        List<AccountSummaryVo> list = checkInRecordDao.querySummeryByOrderNumAndTypeAndDeleted(orderNum, type, Constants.DELETED_FALSE);
+        List<AccountSummaryVo> list = checkInRecordDao.querySummeryByOrderNumAndType(orderNum, type);
         return accountListToTree(list);
     }
 
