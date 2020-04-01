@@ -1234,9 +1234,11 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
     }
     private DtoResponse<String> hangUp(CheckInRecord cir){
         DtoResponse<String> rep = new DtoResponse<String>();
-        cir.setActualTimeOfLeave(LocalDateTime.now());
         cir.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_OUT_UNSETTLED);
-        roomStatisticsService.checkOut(new CheckInRecordWrapper(cir));
+        if(Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN.equals(cir.getStatus())){
+            cir.setActualTimeOfLeave(LocalDateTime.now());
+            roomStatisticsService.checkOut(new CheckInRecordWrapper(cir));
+        }
         modify(cir);
         return rep;
     }
