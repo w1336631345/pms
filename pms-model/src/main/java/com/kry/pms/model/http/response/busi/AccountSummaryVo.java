@@ -22,6 +22,7 @@ public class AccountSummaryVo {
     private Double creditLimit;
     private Double availableCreditLimit;
     private String settleType;
+    private Double personalPrice;
     private String roomStatus;
     private String accountCode;
     private LocalDateTime arriveTime;
@@ -33,7 +34,9 @@ public class AccountSummaryVo {
 
     }
 
-    public AccountSummaryVo(String orderNum, String id, String name, Double total, String roomNum, String type, Double pay, Double cost, Double creditLimit, Double availableCreditLimit, String roomStatus, String accountCode, LocalDateTime arriveTime, LocalDateTime leaveTime, String guestRoomId) {
+    public AccountSummaryVo(String orderNum, String id, String name, Double total, String roomNum,
+                            String type, Double pay, Double cost, Double creditLimit, Double availableCreditLimit,
+                            String roomStatus, String accountCode, LocalDateTime arriveTime, LocalDateTime leaveTime, String guestRoomId,Double personalPrice) {
         this.orderNum = orderNum;
         this.id = id;
         this.name = name;
@@ -49,6 +52,7 @@ public class AccountSummaryVo {
         this.arriveTime = arriveTime;
         this.leaveTime = leaveTime;
         this.guestRoomId = guestRoomId;
+        this.personalPrice = personalPrice;
     }
 
     public AccountSummaryVo(Account acc) {
@@ -76,6 +80,7 @@ public class AccountSummaryVo {
         this(cir.getAccount(), null);
         this.roomStatus = cir.getStatus();
         this.orderNum = cir.getOrderNum();
+        this.personalPrice = cir.getPersonalPrice();
         this.arriveTime = cir.getActualTimeOfArrive() != null ? cir.getActualTimeOfArrive() : cir.getArriveTime();
         this.leaveTime = cir.getActualTimeOfLeave() != null ? cir.getActualTimeOfLeave() : cir.getLeaveTime();
     }
