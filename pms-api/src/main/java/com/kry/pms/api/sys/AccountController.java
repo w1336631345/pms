@@ -56,9 +56,9 @@ public class AccountController extends BaseController<Account> {
 	}
 
 	@GetMapping("/settleInfo/{type}/{id}")
-	public HttpResponse<SettleInfoVo> getSettleInfo(@PathVariable String type,@PathVariable String id,String extFee) {
+	public HttpResponse<SettleInfoVo> getSettleInfo(@PathVariable String type,@PathVariable String id,String extFee,String orderNum) {
 		 HttpResponse<SettleInfoVo> response = new HttpResponse<SettleInfoVo>();
-		 SettleInfoVo settleInfoVo = accountService.getSettleInfo(type,id,extFee,getCurrentHotleCode());
+		 SettleInfoVo settleInfoVo = accountService.getSettleInfo(type,id,extFee,getCurrentHotleCode(),orderNum);
 		 if(settleInfoVo==null){
 		 	response.setCode(Constants.BusinessCode.CODE_ILLEGAL_OPERATION);
 		 	response.setMessage("无法生成结帐信息");

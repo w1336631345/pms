@@ -11,6 +11,7 @@ public class SettleInfoVo {
 	private boolean settlEnable =true;
 	private String message;
 	private String name;
+	private String orderNum;
 	private String settleType;
 	private Double total = 0.0;
 	private Double cost = 0.0;

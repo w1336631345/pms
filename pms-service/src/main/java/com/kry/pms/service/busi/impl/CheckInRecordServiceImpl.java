@@ -1245,6 +1245,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
         return list;
     }
 
+
     // 取消排房
     @Override
     @Transactional

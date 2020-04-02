@@ -15,6 +15,7 @@ import com.kry.pms.model.persistence.goods.Product;
 import com.kry.pms.model.persistence.room.GuestRoom;
 import com.kry.pms.service.busi.*;
 import com.kry.pms.service.goods.ProductService;
+import com.kry.pms.service.room.GuestRoomService;
 import org.apache.commons.collections4.MapUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,6 +62,8 @@ public class AccountServiceImpl implements AccountService {
     RoomRecordDao roomRecordDao;
     @Autowired
     ProductService productService;
+    @Autowired
+    GuestRoomService guestRoomService;
 
     @Override
     public Account add(Account account) {
@@ -549,7 +552,7 @@ public class AccountServiceImpl implements AccountService {
     }
 
         @Override
-        public SettleInfoVo getSettleInfo (String type, String id, String extFee, String hotelCode){
+        public SettleInfoVo getSettleInfo (String type, String id, String extFee, String hotelCode,String orderNum){
             SettleInfoVo siv = null;
             switch (type) {
                 case Constants.Type.SETTLE_TYPE_ACCOUNT:
@@ -565,7 +568,7 @@ public class AccountServiceImpl implements AccountService {
                     siv = getIGroupAccountSettleInfo(id, extFee, hotelCode);
                     break;
                 case Constants.Type.SETTLE_TYPE_ROOM:
-                    siv = getRoomSettleInfo(id, extFee, hotelCode);
+                    siv = getRoomSettleInfo(id, extFee, hotelCode,orderNum);
                     break;
                 case Constants.Type.SETTLE_TYPE_LINK:
                     siv = getLinkSettleInfo(id, extFee, hotelCode);
@@ -589,8 +592,9 @@ public class AccountServiceImpl implements AccountService {
             }
         }
 
-        private SettleInfoVo getRoomSettleInfo (String id, String extFee, String hotelCode){
-            List<CheckInRecord> cirs = checkInRecordService.findByGuestRoomAndStatusAndDeleted(id, Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN, Constants.DELETED_FALSE);
+        private SettleInfoVo getRoomSettleInfo (String id, String extFee, String hotelCode,String orderNum){
+            GuestRoom guestRoom = guestRoomService.findById(id);
+            List<CheckInRecord> cirs = checkInRecordService.findByOrderNumAndGuestRoomAndDeleted(orderNum, guestRoom, Constants.DELETED_FALSE);
             return createSettleInfo(cirs, extFee, hotelCode);
         }
 
