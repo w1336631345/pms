@@ -562,7 +562,7 @@ public class AccountServiceImpl implements AccountService {
                     siv = getGroupAccountSettleInfo(id, extFee, hotelCode);
                     break;
                 case Constants.Type.SETTLE_TYPE_IGROUP:
-                    siv = getGroupAccountSettleInfo(id, extFee, hotelCode);
+                    siv = getIGroupAccountSettleInfo(id, extFee, hotelCode);
                     break;
                 case Constants.Type.SETTLE_TYPE_ROOM:
                     siv = getRoomSettleInfo(id, extFee, hotelCode);
@@ -613,15 +613,27 @@ public class AccountServiceImpl implements AccountService {
             return bill;
         }
 
-        private SettleInfoVo getGroupAccountSettleInfo (String id, String extFee, String hotelCode){
+        private SettleInfoVo getGroupAccountSettleInfo(String id,String extFee,String hotelCode){
             CheckInRecord cir = checkInRecordService.queryByAccountId(id);
-            SettleInfoVo settleInfoVo = new SettleInfoVo();
+            SettleInfoVo settleInfoVo = null;
+            if (cir != null) {
+                settleInfoVo = createSettleInfo(cir, extFee, hotelCode);
+            } else {
+                return null;
+            }
+            return settleInfoVo;
+        }
+
+        private SettleInfoVo getIGroupAccountSettleInfo (String id, String extFee, String hotelCode){
+            CheckInRecord cir = checkInRecordService.queryByAccountId(id);
+            SettleInfoVo settleInfoVo = null;
             if (cir != null) {
                 List<CheckInRecord> cirs = checkInRecordService.findByOrderNumC(cir.getOrderNum());
                 settleInfoVo = createSettleInfo(cirs, extFee, hotelCode);
             } else {
                 return null;
             }
+            countSettleInfo(settleInfoVo,cir.getAccount());
             return settleInfoVo;
         }
 

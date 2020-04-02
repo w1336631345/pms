@@ -281,13 +281,20 @@ public class RoomTypeQuantityServiceImpl implements RoomTypeQuantityService {
     private void bookRoomType(RoomType roomType, LocalDate startDate, LocalDate endDate, int quantity) {
         RoomTypeQuantity rtq = null;
         LocalDate currentDate = startDate;
+        int i = 0;
         while (currentDate.isBefore(endDate)) {
             rtq = findByRoomTypeAndQuantityDateForUpdate(roomType, currentDate);
+            if(i==0){
+                rtq.setWillArriveTotal(rtq.getWillLeaveTotal()+quantity);
+            }
             rtq.setPredictableTotal(rtq.getPredictableTotal() - quantity);
             rtq.setReserveTotal(rtq.getReserveTotal() + quantity);
             currentDate = currentDate.plusDays(1);
             modify(rtq);
+            i++;
         }
+        rtq.setWillLeaveTotal(rtq.getWillArriveTotal()+quantity);
+        modify(rtq);
     }
 
     private void assignRoomType(RoomType roomType, LocalDate startDate, LocalDate endDate, int quantity) {
