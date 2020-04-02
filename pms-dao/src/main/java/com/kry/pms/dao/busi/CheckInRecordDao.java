@@ -307,6 +307,12 @@ public interface CheckInRecordDao extends BaseDao<CheckInRecord> {
 	List<Map<String, Object>> resourceStatistics(@Param("orderNum") String orderNum, @Param("arriveTime") String arriveTime,
 									   @Param("leaveTime") String leaveTime);
 
+	@Query(nativeQuery = true, value = " select room_type_id, sum(human_count) humanCount, sum(room_count) roomCount, sum(purchase_price) cost \n" +
+			"  from t_checkin_record where deleted = 0 and type_ = 'R' and order_num = :orderNum \n" +
+			"  and DATE_FORMAT(arrive_time,'%Y-%m-%d') <= :nowTime and DATE_FORMAT(leave_time,'%Y-%m-%d') >= :nowTime " +
+			"  and room_type_id = :roomTypeId group by room_type_id ")
+	Map<String, Object> resourceStatisticsR(@Param("orderNum") String orderNum, @Param("nowTime") String nowTime , @Param("roomTypeId") String roomTypeId);
+
     List<CheckInRecord> findByGuestRoomIdAndDeleted(String guestRoomId, int deleted);
 
     @Query(nativeQuery = true, value = " select tcr.id  from t_checkin_record tcr \n" +
