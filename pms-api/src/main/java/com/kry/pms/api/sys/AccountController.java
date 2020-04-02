@@ -25,68 +25,72 @@ import java.util.List;
 @RestController
 @RequestMapping(path = "/api/v1/sys/account")
 public class AccountController extends BaseController<Account> {
-	@Autowired
-	AccountService accountService;
-	@Autowired
-	EmployeeService employeeService;
+    @Autowired
+    AccountService accountService;
+    @Autowired
+    EmployeeService employeeService;
 
-	@PostMapping
-	public HttpResponse<Account> add(@RequestBody Account account) {
-		return getDefaultResponse().addData(accountService.add(account));
-	}
+    @PostMapping
+    public HttpResponse<Account> add(@RequestBody Account account) {
+        return getDefaultResponse().addData(accountService.add(account));
+    }
 
-	@PutMapping
-	public HttpResponse<Account> modify(@RequestBody Account account) {
-		return getDefaultResponse().addData(accountService.modify(account));
-	}
+    @PutMapping
+    public HttpResponse<Account> modify(@RequestBody Account account) {
+        return getDefaultResponse().addData(accountService.modify(account));
+    }
 
-	@DeleteMapping
-	public HttpResponse<String> delete(String id) {
-		HttpResponse<String> rep = new HttpResponse<>();
-		accountService.delete(id);
-		return rep;
-	}
+    @DeleteMapping
+    public HttpResponse<String> delete(String id) {
+        HttpResponse<String> rep = new HttpResponse<>();
+        accountService.delete(id);
+        return rep;
+    }
 
-	@GetMapping(path = "/personPrice")
-	public HttpResponse<Double> queryRoomPrice(String id) {
-		HttpResponse<Double> rep = new HttpResponse<>();
-		DtoResponse<Double> response = accountService.queryRoomPrice(id);
-		BeanUtils.copyProperties(response, rep);
-		return rep;
-	}
+    @GetMapping(path = "/personPrice")
+    public HttpResponse<Double> queryRoomPrice(String id) {
+        HttpResponse<Double> rep = new HttpResponse<>();
+        DtoResponse<Double> response = accountService.queryRoomPrice(id);
+        BeanUtils.copyProperties(response, rep);
+        return rep;
+    }
 
-	@GetMapping("/settleInfo/{type}/{id}")
-	public HttpResponse<SettleInfoVo> getSettleInfo(@PathVariable String type,@PathVariable String id,String extFee,String orderNum) {
-		 HttpResponse<SettleInfoVo> response = new HttpResponse<SettleInfoVo>();
-		 SettleInfoVo settleInfoVo = accountService.getSettleInfo(type,id,extFee,getCurrentHotleCode(),orderNum);
-		 if(settleInfoVo==null){
-		 	response.setCode(Constants.BusinessCode.CODE_ILLEGAL_OPERATION);
-		 	response.setMessage("无法生成结帐信息");
-		 }
-		 return response.addData(settleInfoVo);
-	}
+    @GetMapping("/settleInfo/{type}/{id}")
+    public HttpResponse<SettleInfoVo> getSettleInfo(@PathVariable String type, @PathVariable String id, String extFee, String orderNum) {
+        HttpResponse<SettleInfoVo> response = new HttpResponse<SettleInfoVo>();
+        SettleInfoVo settleInfoVo = accountService.getSettleInfo(type, id, extFee, getCurrentHotleCode(), orderNum);
+        if (settleInfoVo == null) {
+            response.setCode(Constants.BusinessCode.CODE_ILLEGAL_OPERATION);
+            response.setMessage("无法生成结帐信息");
+        } else if (!settleInfoVo.isSettlEnable()) {
+            response.setStatus(Constants.BusinessCode.CODE_ILLEGAL_OPERATION);
+            response.setMessage(settleInfoVo.getMessage());
+        }
+        return response.addData(settleInfoVo);
+    }
 
-	@GetMapping
-	public HttpResponse<PageResponse<Account>> query(HttpServletRequest request)
-			throws InstantiationException, IllegalAccessException {
-		HttpResponse<PageResponse<Account>> rep = new HttpResponse<PageResponse<Account>>();
-		PageRequest<Account> req = parse2PageRequest(request);
-		return rep.addData(accountService.listPage(req));
-	}
+    @GetMapping
+    public HttpResponse<PageResponse<Account>> query(HttpServletRequest request)
+            throws InstantiationException, IllegalAccessException {
+        HttpResponse<PageResponse<Account>> rep = new HttpResponse<PageResponse<Account>>();
+        PageRequest<Account> req = parse2PageRequest(request);
+        return rep.addData(accountService.listPage(req));
+    }
 
-	/**
-	 * 功能描述: <br>查询包价所需的入账账户
-	 * 〈〉
-	 * @Param: [request]
-	 * @Return: com.kry.pms.base.HttpResponse<java.util.List<com.kry.pms.model.persistence.sys.Account>>
-	 * @Author: huanghaibin
-	 * @Date: 2020/1/20 16:35
-	 */
-	@GetMapping(path = "/getInner")
-	public HttpResponse<List<Account>> list(HttpServletRequest request){
-		HttpResponse<List<Account>> rep = new HttpResponse<List<Account>>();
-		return rep.addData(accountService.findByHotelCodeAndType(getCurrentHotleCode()));
-	}
+    /**
+     * 功能描述: <br>查询包价所需的入账账户
+     * 〈〉
+     *
+     * @Param: [request]
+     * @Return: com.kry.pms.base.HttpResponse<java.util.List < com.kry.pms.model.persistence.sys.Account>>
+     * @Author: huanghaibin
+     * @Date: 2020/1/20 16:35
+     */
+    @GetMapping(path = "/getInner")
+    public HttpResponse<List<Account>> list(HttpServletRequest request) {
+        HttpResponse<List<Account>> rep = new HttpResponse<List<Account>>();
+        return rep.addData(accountService.findByHotelCodeAndType(getCurrentHotleCode()));
+    }
 
 
 }

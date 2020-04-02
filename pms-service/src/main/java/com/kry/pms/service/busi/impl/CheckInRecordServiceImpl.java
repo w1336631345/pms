@@ -1009,6 +1009,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                 asv.setRoomNum(item.getRoomNum());
                 asv.setId(item.getGuestRoomId());
                 asv.setName(item.getRoomNum());
+                asv.setOrderNum(item.getOrderNum());
                 asv.setChildren(new ArrayList<AccountSummaryVo>());
                 asvm.put(item.getRoomNum(), asv);
             } else {

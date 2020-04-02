@@ -540,11 +540,14 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public boolean accountCheck(String id) {
         Account account = findById(id);
+        return accountCheck(account);
+    }
+    private boolean accountCheck(Account account){
         if (account == null) {
             return false;
         } else if (account.getTotal() != 0.0) {
             return false;
-        } else if (billService.countUnSettleBill(id) != 0) {
+        } else if (billService.countUnSettleBill(account.getId()) != 0) {
             return false;
         } else {
             return true;
@@ -621,7 +624,14 @@ public class AccountServiceImpl implements AccountService {
             CheckInRecord cir = checkInRecordService.queryByAccountId(id);
             SettleInfoVo settleInfoVo = null;
             if (cir != null) {
-                settleInfoVo = createSettleInfo(cir, extFee, hotelCode);
+                List<CheckInRecord> cirs = checkInRecordService.findByOrderNumC(cir.getOrderNum());
+                if(accountCheck(cirs)){
+                    settleInfoVo = createSettleInfo(cir, Constants.Type.EXT_FEE_NONE, hotelCode);
+                }else{
+                    settleInfoVo = new SettleInfoVo();
+                    settleInfoVo.setSettlEnable(false);
+                    settleInfoVo.setMessage("请先结清其他帐务");
+                }
             } else {
                 return null;
             }
@@ -643,9 +653,13 @@ public class AccountServiceImpl implements AccountService {
 
         private boolean accountCheck (List < CheckInRecord > cirs) {
             for (CheckInRecord cir : cirs) {
-
+                if(Constants.Type.CHECK_IN_RECORD_CUSTOMER.equals(cir.getType())){
+                    if(!accountCheck(cir.getAccount())){
+                        return false;
+                    }
+                }
             }
-            return false;
+            return true;
         }
 
         private int queryAccountCount (String orderNum, String status){
