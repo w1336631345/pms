@@ -2078,7 +2078,26 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
     @Override
     public List<Map<String, Object>> resourceStatistics(String orderNum, String arriveTime, String leaveTime) {
         List<Map<String, Object>> list = checkInRecordDao.resourceStatistics(orderNum, arriveTime, leaveTime);
-        return list;
+        List<Map<String, Object>> rList = new ArrayList<>();
+        for(int i = 0; i<list.size(); i++){
+            Map<String, Object> newMap = new HashMap<>(list.get(i));
+            String now = MapUtils.getString(list.get(i), "date");
+            String roomTypeId = MapUtils.getString(list.get(i), "roomTypeId");
+            Integer humanCount = MapUtils.getInteger(list.get(i), "humanCount");
+            Integer roomCount = MapUtils.getInteger(list.get(i), "roomCount");
+            Double cost = MapUtils.getDouble(list.get(i), "cost");
+            Map<String, Object> map = checkInRecordDao.resourceStatisticsR(orderNum, now, roomTypeId);
+            if(map != null){
+                Integer hCount = MapUtils.getInteger(map, "humanCount");
+                Integer rCount = MapUtils.getInteger(map, "roomCount");
+                Double c = MapUtils.getDouble(map, "cost");
+                newMap.put("humanCount", humanCount + hCount);
+                newMap.put("roomCount", roomCount + rCount);
+                newMap.put("cost", cost + c);
+            }
+            rList.add(newMap);
+        }
+        return rList;
     }
 
 }
