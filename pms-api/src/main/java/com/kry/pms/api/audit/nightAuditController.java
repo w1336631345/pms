@@ -185,10 +185,6 @@ public class nightAuditController extends BaseController {
 //            return rep.error("夜审时间未到");
             }
         }
-        if(ids != null){
-            System.out.println("传过来的id数："+ids.length);
-        }
-
         User loginUser = getUser();
         if(loginUser == null){
             return rep.loginError();

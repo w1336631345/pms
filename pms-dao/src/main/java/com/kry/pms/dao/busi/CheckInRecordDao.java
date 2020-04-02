@@ -43,6 +43,21 @@ public interface CheckInRecordDao extends BaseDao<CheckInRecord> {
 					+ " and if(:hotelCode is not null && :hotelCode != '', tcr.hotel_code=:hotelCode, 1=1 ) ")
 	Page<Map<String, Object>> unreturnedGuests(Pageable page, @Param("mainNum") String mainNum,
 											   @Param("status") String status, @Param("hotelCode") String hotelCode);
+	@Query(nativeQuery = true, value = "select trt.`name` roomtype, tcr.room_count, tgr.room_num, tc.`name`, tc.mobile, DATE_FORMAT(tcr.arrive_time,'%Y-%m-%d %T') arrive_time,  "
+			+ " DATE_FORMAT(tcr.leave_time,'%Y-%m-%d %T') leave_time, tcr.hold_time, tcr.group_name groupname, tcr.`status`, tcr.id, tcr.hotel_code, "
+			+ " ta.cost, ta.total, ta.pay, ta.id accountId, tcr.group_type, tcr.order_num "
+			+ " from t_checkin_record tcr LEFT JOIN t_guest_room tgr on tcr.guest_room_id = tgr.id "
+			+ " left join t_room_type trt on tgr.room_type_id = trt.id "
+			+ " left join t_customer tc on tcr.customer_id = tc.id "
+			+ " left join t_account ta on tcr.account_id = ta.id "
+			+ " where tcr.type_ != 'G' "
+			+ " and if(:mainNum = 'N', SYSDATE() > tcr.arrive_time, 1=1 ) "
+			+ " and if(:mainNum = 'A', SYSDATE() > tcr.leave_time, 1=1 ) "
+			+ " and if(:status = 'X', tcr.deleted = 1, tcr.deleted = 0 ) "
+			+ " and if(:status is not null && :status != '', tcr.`status`=:status, 1=1 ) "
+			+ " and if(:hotelCode is not null && :hotelCode != '', tcr.hotel_code=:hotelCode, 1=1 ) ")
+	List<Map<String, Object>> unreturnedGuests( @Param("mainNum") String mainNum,
+											   @Param("status") String status, @Param("hotelCode") String hotelCode);
 
 	@Query(value = "select status, count(id) scount from t_checkin_record "
 			+ " where type_ != 'G' "

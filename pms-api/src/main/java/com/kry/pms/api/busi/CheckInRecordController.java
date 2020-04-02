@@ -273,8 +273,8 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
      * @Author: huanghaibin
      * @Date: 2020/3/31 19:14
      */
-    @PostMapping(path = "/callOffG")
-    public HttpResponse callOffG(@RequestBody String id) {
+    @GetMapping(path = "/callOffG")
+    public HttpResponse callOffG(String id) {
         HttpResponse rep = new HttpResponse();
         rep = checkInRecordService.callOffG(id);
         return rep;
@@ -287,8 +287,8 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
      * @Author: huanghaibin
      * @Date: 2020/3/31 19:48
      */
-    @PostMapping(path = "/recovery")
-    public HttpResponse recovery(@RequestBody String id) {
+    @GetMapping(path = "/recovery")
+    public HttpResponse recovery(String id) {
         HttpResponse rep = new HttpResponse();
         rep = checkInRecordService.recovery(id);
         return rep;

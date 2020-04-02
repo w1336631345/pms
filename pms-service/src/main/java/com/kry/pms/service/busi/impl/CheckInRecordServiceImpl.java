@@ -27,6 +27,7 @@ import com.kry.pms.service.sys.BusinessSeqService;
 import com.kry.pms.service.sys.SqlTemplateService;
 import com.kry.pms.service.sys.SystemConfigService;
 import com.kry.pms.service.util.UpdateUtil;
+import com.sun.xml.internal.bind.v2.runtime.reflect.opt.Const;
 import freemarker.template.TemplateException;
 import org.apache.commons.collections4.MapUtils;
 import org.springframework.beans.BeanUtils;
@@ -255,10 +256,15 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
         HttpResponse hr = new HttpResponse();
         for (int i = 0; i < ids.length; i++) {
             CheckInRecord cir = findById(ids[i]);
-//            cir.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_ASSIGN);//取消入住，退回排房状态，但排房还是预定
+            if(!Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN.equals(cir.getStatus())){
+                return hr.error("不是入住状态，取消入住失败");
+            }
+            //取消入住，退回排房状态，但排房还是预定
             cir.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION);
             checkInRecordDao.save(cir);
-            roomStatisticsService.cancleCheckIn(new CheckInRecordWrapper(cir));
+            if(Constants.Type.CHECK_IN_RECORD_CUSTOMER.equals(cir.getType())){
+                roomStatisticsService.cancleCheckIn(new CheckInRecordWrapper(cir));
+            }
         }
         return hr;
     }
@@ -1394,6 +1400,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
     }
     //主单的取消预订
     @Override
+    @Transactional
     public HttpResponse callOffG(String id){
         HttpResponse hr = new HttpResponse();
         CheckInRecord cir = checkInRecordDao.getOne(id);
@@ -1403,18 +1410,28 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                 return hr.error("存在排房或入住，主单取消失败");
             }else {//没有成员排房或入住，查出预留单，全部删除
                 List<String> rList = checkInRecordDao.listIdByType(id, Constants.Type.CHECK_IN_RECORD_RESERVE, Constants.DELETED_FALSE);
+                int hcount = 0;
+                int rcount = 0;
                 for(int i=0; i<rList.size(); i++){
                     offReserve(rList.get(i));//删除预留单
+                    CheckInRecord r = checkInRecordDao.getOne(rList.get(i));
+                    hcount = hcount + r.getHumanCount();
+                    rcount = rcount + r.getRoomCount();
                 }
                 //删除预留单后删除主单
+                cir.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_CANCLE_BOOK);
                 cir.setDeleted(Constants.DELETED_TRUE);
+                cir.setHumanCount(cir.getHumanCount() - hcount);
+                cir.setRoomCount(cir.getRoomCount() - rcount);
                 update(cir);
             }
         }else if(Constants.Type.CHECK_IN_RECORD_RESERVE.equals(cir.getType())) {//如果是预留单
             return hr.error("预留单，请选择修改预留");
         }else {
             if(Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION.equals(cir.getStatus())){
-
+                String[] ids = new String[1];
+                ids[0] = id;
+                callOffReserve(ids);
             }else {
                 return hr.error("选数据状态错误");
             }
@@ -1431,6 +1448,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                 return hr.error("正常主单无需恢复");
             }else{
                 cir.setDeleted(Constants.DELETED_FALSE);
+                cir.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION);
                 update(cir);
             }
         }else {
