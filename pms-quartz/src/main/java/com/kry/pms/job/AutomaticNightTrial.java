@@ -4,14 +4,12 @@ import com.kry.pms.base.Constants;
 import com.kry.pms.base.HttpResponse;
 import com.kry.pms.controller.SessionController;
 import com.kry.pms.dao.ScheduleJobDaoRepository;
+import com.kry.pms.dao.busi.CheckInRecordDao;
 import com.kry.pms.model.ScheduleJobModel;
-import com.kry.pms.model.persistence.busi.Bill;
 import com.kry.pms.model.persistence.busi.DailyVerify;
 import com.kry.pms.model.persistence.busi.RoomRecord;
-import com.kry.pms.model.persistence.goods.Product;
 import com.kry.pms.model.persistence.quartz.QuartzSet;
 import com.kry.pms.model.persistence.sys.User;
-import com.kry.pms.service.ScheduleJobService;
 import com.kry.pms.service.busi.BillService;
 import com.kry.pms.service.busi.CheckInRecordService;
 import com.kry.pms.service.busi.DailyVerifyService;
@@ -20,15 +18,16 @@ import com.kry.pms.service.goods.ProductService;
 import com.kry.pms.service.quratz.impl.QuartzSetService;
 import com.kry.pms.service.sys.BusinessSeqService;
 import com.kry.pms.service.sys.UserService;
+import org.apache.commons.collections4.MapUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 功能描述: <br>自动夜审功能实现类
@@ -59,6 +58,8 @@ public class AutomaticNightTrial {
     BusinessSeqService businessSeqService;
     @Autowired
     DailyVerifyService dailyVerifyService;
+    @Autowired
+    CheckInRecordDao checkInRecordDao;
 
     //查询所有开启自动夜审的酒店
     public List<QuartzSet> getAll(){
@@ -92,6 +93,20 @@ public class AutomaticNightTrial {
                 userService.modify(user);
             }
             LocalDate businessDate = businessSeqService.getBuinessDate(hotelCode);
+            //在入账之前，先要处理需要处理的数据（应到未到，应退未退）
+            List<Map<String, Object>> p = checkInRecordDao.unreturnedGuests("N", "R", hotelCode);
+            String ids[] = new String[1];
+            //处理应到未到
+            for(int j=0; j<p.size(); j++){
+                ids[0] = MapUtils.getString(p.get(j), "id");
+                checkInRecordService.callOffReserveAudit(ids);
+            }
+            List<Map<String, Object>> out = checkInRecordDao.unreturnedGuests("A", "I", hotelCode);
+            //处理应退未退
+            for(int o=0; o<out.size(); o++){
+                String id = MapUtils.getString(out.get(o), "id");
+                checkInRecordService.hangUp(id);
+            }
             //查询需要自动入账的记录（注：自动入账为最近营业日期的账，入账后营业日期+1，下面是查询的所有记录，后期整改）
             List<RoomRecord> list = roomRecordService.accountEntryListAll(listQ.get(i).getHotelCode(), businessDate);
             billService.putAcountAUTO(list, businessDate);//保存到bill

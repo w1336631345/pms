@@ -95,6 +95,7 @@ public class NightAuditServiceImpl implements NightAuditService {
      * @Date: 2019/11/23 15:20
      */
     @Override
+    @Transactional
     public HttpResponse manualAdd(User loginUser, String[] ids, String shiftCode) {
         HttpResponse hr = new HttpResponse();
         //入账只入当前营业日期的账
@@ -121,11 +122,11 @@ public class NightAuditServiceImpl implements NightAuditService {
         }
         LocalDate now = LocalDate.now();
         if(businessDate.isAfter(now)){
-            hr.error("今日入账完成，请明日再进行入账操作");
+            return hr.error("营业日期大于自然日期");
         }
         DailyVerify dailyVerify = dailyVerifyService.findByHotelCodeAndBusinessDate(loginUser.getHotelCode(), businessDate);
         if(dailyVerify != null){
-            return hr.ok("今日入账已经完成");
+            return hr.error("今日入账完成，请明日再进行入账操作");
         }
         //默认手动点击入账为当前营业日期的账
         List<RoomRecord> list = roomRecordService.accountEntryListAll(loginUser.getHotelCode(), businessDate);
