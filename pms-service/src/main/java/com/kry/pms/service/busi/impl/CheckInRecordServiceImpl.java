@@ -2114,7 +2114,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
         DtoResponse<String> rep = new DtoResponse<String>();
         if (Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN.equals(cir.getStatus())) {
             cir.setActualTimeOfLeave(LocalDateTime.now());
-            if (Constants.Type.CHECK_IN_RECORD_CUSTOMER.equals(cir.getStatus())) {
+            if (Constants.Type.CHECK_IN_RECORD_CUSTOMER.equals(cir.getType())) {
                 accountService.enterExtFee(cir, extFee);
                 roomStatisticsService.checkOut(new CheckInRecordWrapper(cir));
             }
