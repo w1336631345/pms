@@ -83,7 +83,8 @@ public interface CheckInRecordDao extends BaseDao<CheckInRecord> {
             "   left join t_discount_scheme tds on trr.discount_scheme_id = tds.id \n" +
             " where 1=1 \n" +
             " and tcr.hotel_code = :hotelCode \n" +
-            " and trr.record_date = :businessDate ",
+            " and trr.record_date = :businessDate " +
+			" and tcr.`status` = :status ",
 			countQuery = " select count(trr.id) " +
                     " from t_room_record trr \n" +
                     "   left join t_checkin_record tcr on trr.check_in_record_id = tcr.id\n" +
@@ -96,9 +97,10 @@ public interface CheckInRecordDao extends BaseDao<CheckInRecord> {
                     "   left join t_discount_scheme tds on trr.discount_scheme_id = tds.id \n" +
                     " where 1=1 \n" +
                     " and tcr.hotel_code = :hotelCode \n" +
-                    " and trr.record_date = :businessDate ")
+                    " and trr.record_date = :businessDate " +
+					" and tcr.`status` = :status ")
 	Page<Map<String, Object>> accountEntryListMap(Pageable page, @Param("hotelCode") String hotelCode,
-                                                  @Param("businessDate") LocalDate businessDate);
+                                                  @Param("businessDate") LocalDate businessDate, @Param("status") String status);
 
 	List<CheckInRecord> findByOrderNumAndTypeAndDeleted(String orderNum, String type, int deletedFalse);
 
@@ -318,4 +320,7 @@ public interface CheckInRecordDao extends BaseDao<CheckInRecord> {
     @Query(nativeQuery = true, value = " select tcr.id  from t_checkin_record tcr \n" +
 			" where tcr.main_record_id = ?1 and tcr.type_ = ?2 and tcr.deleted = ?3 ")
     List<String> listIdByType(String mainId, String type, int deleted);
+
+    @Query(nativeQuery = true, value = " select tcr.* from t_checkin_record tcr where id = ?1 ")
+    CheckInRecord byId(String id);
 }

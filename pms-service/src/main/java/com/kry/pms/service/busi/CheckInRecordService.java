@@ -33,7 +33,7 @@ public interface CheckInRecordService extends BaseService<CheckInRecord> {
 
 	CheckInRecord update(CheckInRecord checkInRecord);
 
-	CheckInRecord updateAll(CheckUpdateItemTestBo checkUpdateItemTestBo);
+	HttpResponse updateAll(CheckUpdateItemTestBo checkUpdateItemTestBo);
 
 	HttpResponse cancelIn(String[] ids);
 
@@ -181,4 +181,6 @@ public interface CheckInRecordService extends BaseService<CheckInRecord> {
     HttpResponse callOffG(String id);
 
 	HttpResponse recovery(String id);
+
+    CheckInRecord byId(String id);
 }
