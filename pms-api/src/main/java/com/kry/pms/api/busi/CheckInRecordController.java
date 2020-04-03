@@ -196,8 +196,8 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
         if (user == null) {
             return hr.loginError();
         }
-        checkInRecordService.updateAll(checkUpdateItemTestBo);
-        return hr.ok();
+        hr = checkInRecordService.updateAll(checkUpdateItemTestBo);
+        return hr;
     }
 
     /**
@@ -620,6 +620,22 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
         User user = getUser();
         List<Map<String, Object>> list = checkInRecordService.resourceStatistics(orderNum, arriveTime, leaveTime);
         hr.addData(list);
+        return hr.ok();
+    }
+
+    /**
+     * 功能描述: <br>只查询CheckInRecord对象，不查询外间关系的对象
+     * 〈〉
+     * @Param: [id]
+     * @Return: com.kry.pms.base.HttpResponse
+     * @Author: huanghaibin
+     * @Date: 2020/4/3 14:23
+     */
+    @GetMapping(value = "/byId")
+    public HttpResponse byId(String id) {
+        HttpResponse hr = new HttpResponse();
+        CheckInRecord cir = checkInRecordService.byId(id);
+        hr.addData(cir);
         return hr.ok();
     }
 

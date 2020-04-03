@@ -228,7 +228,9 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
     }
 
     @Override
-    public CheckInRecord updateAll(CheckUpdateItemTestBo checkUpdateItemTestBo) {
+    @Transactional
+    public HttpResponse updateAll(CheckUpdateItemTestBo checkUpdateItemTestBo) {
+        HttpResponse hr = new HttpResponse();
         String[] ids = checkUpdateItemTestBo.getIds();
         for (int i = 0; i < ids.length; i++) {
             CheckInRecord cir = findById(ids[i]);
@@ -241,12 +243,37 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                     newRemark = oldRemark;
                 }
             }
-            UpdateUtil.copyNullProperties(checkUpdateItemTestBo, cir);
             cir.setRemark(newRemark);
-//			modify(cir);
+            boolean updateTime = false;
+            LocalDateTime at = checkUpdateItemTestBo.getArriveTime();
+            LocalDateTime lt = checkUpdateItemTestBo.getLeaveTime();
+            if(at == null || "".equals(at)){
+                at = cir.getArriveTime();
+            }
+            if(lt == null || "".equals(lt)){
+                lt = cir.getLeaveTime();
+            }
+            if(!cir.getArriveTime().isEqual(at) || !cir.getLeaveTime().isEqual(lt)){
+                updateTime = true;
+            }
+            if(updateTime){
+                if(cir.getMainRecord() != null){
+                    CheckInRecord main = cir.getMainRecord();
+                    if(cir.getArriveTime().isBefore(main.getArriveTime()) || cir.getLeaveTime().isAfter(main.getLeaveTime())){
+                        TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                        return hr.error("成员时间范围不能大于主单");
+                    }
+                }
+                boolean b = roomStatisticsService.extendTime(new CheckInRecordWrapper(cir), at, lt);
+                if (!b) {
+                    TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                    return hr.error("资源不足");
+                }
+            }
+            UpdateUtil.copyNullProperties(checkUpdateItemTestBo, cir);
             checkInRecordDao.save(cir);
         }
-        return null;
+        return hr;
     }
 
     @Transactional
@@ -953,7 +980,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
     public PageResponse<Map<String, Object>> accountEntryListMap(int pageIndex, int pageSize, User user) {
         Pageable page = org.springframework.data.domain.PageRequest.of(pageIndex - 1, pageSize);
         LocalDate businessDate = businessSeqService.getBuinessDate(user.getHotelCode());
-        Page<Map<String, Object>> p = checkInRecordDao.accountEntryListMap(page, user.getHotelCode(), businessDate);
+        Page<Map<String, Object>> p = checkInRecordDao.accountEntryListMap(page, user.getHotelCode(), businessDate, Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN);
         PageResponse<Map<String, Object>> pr = new PageResponse<>();
         pr.setPageSize(p.getNumberOfElements());
         pr.setPageCount(p.getTotalPages());
@@ -2086,7 +2113,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
             Integer roomCount = MapUtils.getInteger(list.get(i), "roomCount");
             Double cost = MapUtils.getDouble(list.get(i), "cost");
             Map<String, Object> map = checkInRecordDao.resourceStatisticsR(orderNum, now, roomTypeId);
-            if(map != null){
+            if(map != null && map.size() > 0){
                 Integer hCount = MapUtils.getInteger(map, "humanCount");
                 Integer rCount = MapUtils.getInteger(map, "roomCount");
                 Double c = MapUtils.getDouble(map, "cost");
@@ -2097,6 +2124,12 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
             rList.add(newMap);
         }
         return rList;
+    }
+
+    @Override
+    public CheckInRecord byId(String id){
+        CheckInRecord cir = checkInRecordDao.byId(id);
+        return cir;
     }
 
 }
