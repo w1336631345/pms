@@ -12,6 +12,7 @@ import com.kry.pms.model.persistence.room.GuestRoom;
 import com.kry.pms.model.persistence.room.RoomTag;
 import com.kry.pms.model.persistence.room.RoomType;
 import com.kry.pms.model.persistence.sys.Account;
+import org.hibernate.annotations.Fetch;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -22,26 +23,26 @@ import java.util.List;
 @Table(name = "t_checkin_record")
 //@NamedEntityGraph(name = "CheckInRecord.roomPriceScheme", attributeNodes = {@NamedAttributeNode("roomPriceScheme")})
 public class CheckInRecord extends PersistenceModel {
-	@OneToOne(cascade = CascadeType.DETACH)
+	@OneToOne(cascade = CascadeType.DETACH,fetch=FetchType.LAZY)
 	private Customer customer;// 客户
 	@ManyToOne
 	@JoinColumn(name = "booking_record_id")
 	private BookingRecord BookingRecord;// 预订记录id
 
-	@OneToOne
+	@OneToOne(fetch=FetchType.LAZY)
 	private RoomPriceSchemeItem priceSchemeItem;// 房价方案
-	@OneToOne
+	@OneToOne(fetch=FetchType.LAZY)
 	private GuestRoom guestRoom;// 房间
 	@Column(name = "name_")
 	private String name;// 姓名
-	@OneToOne
+	@OneToOne(fetch=FetchType.LAZY)
 	@JsonIgnoreProperties(value={"hibernateLazyInitializer","handler","fieldHandler"})
 	private RoomPriceScheme roomPriceScheme;// 房价方案
-	@OneToOne
+	@OneToOne(fetch=FetchType.LAZY)
 	private RoomType roomType;// 房间类型
 	@Column
 	private String orderType;
-	@ManyToOne
+	@ManyToOne(fetch=FetchType.LAZY)
 	@JoinColumn(name = "main_record_id")
 	private CheckInRecord mainRecord;// 主单id
 	@Transient
@@ -109,7 +110,7 @@ public class CheckInRecord extends PersistenceModel {
 	private String fitType;//散客类别 T：散客团， P 散客
 	@ManyToOne
 	private Group group;// 团队信息
-	@OneToOne(cascade = CascadeType.PERSIST)
+	@OneToOne(fetch=FetchType.LAZY,cascade = CascadeType.PERSIST)
 	private Account account;// 账号
 	@Transient
 	private String roomTypeId;// 房间类型id
@@ -117,25 +118,25 @@ public class CheckInRecord extends PersistenceModel {
 	private String contactName;// 预订人
 	@Column
 	private String contactMobile;// 预订人电话
-	@OneToOne
+	@OneToOne(fetch=FetchType.LAZY)
 	private MarketingSources marketingSources;// 市场来源
 //	@OneToOne
 //	private ProtocolCorpation protocolCorpation;// 协议单位
 	@ManyToOne
 	private Customer corp;//协议单位
-	@OneToOne
+	@OneToOne(fetch=FetchType.LAZY)
 	private Employee operationEmployee;// 操作人
-	@OneToOne
+	@OneToOne(fetch=FetchType.LAZY)
 	private DistributionChannel distributionChannel;// 市场渠道
 //	@OneToOne
 //	private Employee marketEmployee;// 销售员
-	@OneToOne
+	@OneToOne(fetch=FetchType.LAZY)
 	private SalesMen salesMen;
 	@Column
 	private String remark;
 	@Transient
 	private String mainRecordId;// 主单id
-	@OneToOne
+	@OneToOne(fetch=FetchType.LAZY)
 	private DiscountScheme discountScheme;// 优惠方案
 	// 预留记录id
 	@Column

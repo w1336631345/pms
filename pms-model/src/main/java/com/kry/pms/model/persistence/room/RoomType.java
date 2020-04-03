@@ -23,7 +23,7 @@ public class RoomType extends PersistenceModel {
 	private String code;
 	@Column(columnDefinition = "varchar(400) default NULL COMMENT '描述'")
 	private String description;
-	@ManyToOne
+	@ManyToOne(fetch=FetchType.LAZY)
 	private Building building;
 	@Column(columnDefinition = "int(8) COMMENT '排序'")
 	private Integer sortCode;

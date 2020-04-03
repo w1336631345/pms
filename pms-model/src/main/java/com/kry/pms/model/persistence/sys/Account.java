@@ -49,11 +49,11 @@ public class Account extends PersistenceModel {
 	private Double creditLimit ; //信用额度
 	@Column
 	private Double availableCreditLimit;//可用信用额度
-	@OneToOne
+	@OneToOne(fetch=FetchType.LAZY)
 	private Employee operationEmployee;
 	@Column(columnDefinition = "varchar(255) COMMENT '操作员备注'")
 	private String operationRemark;
-	@ManyToOne
+	@ManyToOne(fetch=FetchType.LAZY)
 	private Customer customer;
 	@OneToOne
 	private Group group;
