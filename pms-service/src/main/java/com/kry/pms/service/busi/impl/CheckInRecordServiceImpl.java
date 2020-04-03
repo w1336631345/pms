@@ -51,7 +51,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Service
-public abstract class CheckInRecordServiceImpl implements CheckInRecordService {
+public class CheckInRecordServiceImpl implements CheckInRecordService {
     @Autowired
     CheckInRecordDao checkInRecordDao;
     @Autowired
@@ -2172,6 +2172,11 @@ public abstract class CheckInRecordServiceImpl implements CheckInRecordService {
     public boolean hangUp(String checkInRecordId, String extFee) {
         hangUp(findById(checkInRecordId),extFee);
         return true;
+    }
+
+    @Override
+    public DtoResponse<String> hangUpByAccountId(String id) {
+        return null;
     }
 
 
