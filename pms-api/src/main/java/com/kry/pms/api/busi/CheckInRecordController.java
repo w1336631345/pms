@@ -330,9 +330,9 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
     }
 
     @GetMapping("/hangUp/account/{accountId}")
-    public HttpResponse<String> hangUp(@PathVariable("accountId") String id) {
+    public HttpResponse<String> hangUp(@PathVariable("accountId") String id,String type,String extFee,String orderNum) {
         HttpResponse<String> rep = new HttpResponse<>();
-        DtoResponse<String> response = checkInRecordService.hangUpByAccountId(id);
+        DtoResponse<String> response = checkInRecordService.hangUp(id,type,extFee,orderNum);
         BeanUtils.copyProperties(response, rep);
         return rep;
     }

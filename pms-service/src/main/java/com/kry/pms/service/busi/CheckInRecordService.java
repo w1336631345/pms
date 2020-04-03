@@ -103,7 +103,9 @@ public interface CheckInRecordService extends BaseService<CheckInRecord> {
 	 * @param id checkinrecord  的   id
 	 * @return
 	 */
-	public DtoResponse<String> hangUp(String id);
+	public DtoResponse<String> hangUp(String id,String type,String extFee,String orderNum);
+
+	public boolean hangUp(String checkInRecordId,String extFee);
 
 	public DtoResponse<String> hangUpByAccountId(String id);
 

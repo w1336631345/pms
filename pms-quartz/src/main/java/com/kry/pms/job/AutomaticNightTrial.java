@@ -105,7 +105,7 @@ public class AutomaticNightTrial {
             //处理应退未退
             for(int o=0; o<out.size(); o++){
                 String id = MapUtils.getString(out.get(o), "id");
-                checkInRecordService.hangUp(id);
+                checkInRecordService.hangUp(id,Constants.Type.EXT_FEE_NONE);
             }
             //查询需要自动入账的记录（注：自动入账为最近营业日期的账，入账后营业日期+1，下面是查询的所有记录，后期整改）
             List<RoomRecord> list = roomRecordService.accountEntryListAll(listQ.get(i).getHotelCode(), businessDate);
