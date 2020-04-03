@@ -51,7 +51,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Service
-public class CheckInRecordServiceImpl implements CheckInRecordService {
+public abstract class CheckInRecordServiceImpl implements CheckInRecordService {
     @Autowired
     CheckInRecordDao checkInRecordDao;
     @Autowired
@@ -217,7 +217,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
         if (cir.getGuestRoom() != null && cir.getCustomer() != null) {
             if (dbCir.getCustomer() != null && dbCir.getCustomer().getId().equals(cir.getCustomer().getId())) {
                 guestRoomStatusService.updateSummary(cir.getGuestRoom(), dbCir.getCustomer().getName(),
-						cir.getCustomer().getName());
+                        cir.getCustomer().getName());
             }
         }
     }
@@ -228,7 +228,9 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
     }
 
     @Override
-    public CheckInRecord updateAll(CheckUpdateItemTestBo checkUpdateItemTestBo) {
+    @Transactional
+    public HttpResponse updateAll(CheckUpdateItemTestBo checkUpdateItemTestBo) {
+        HttpResponse hr = new HttpResponse();
         String[] ids = checkUpdateItemTestBo.getIds();
         for (int i = 0; i < ids.length; i++) {
             CheckInRecord cir = findById(ids[i]);
@@ -241,12 +243,37 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                     newRemark = oldRemark;
                 }
             }
-            UpdateUtil.copyNullProperties(checkUpdateItemTestBo, cir);
             cir.setRemark(newRemark);
-//			modify(cir);
+            boolean updateTime = false;
+            LocalDateTime at = checkUpdateItemTestBo.getArriveTime();
+            LocalDateTime lt = checkUpdateItemTestBo.getLeaveTime();
+            if(at == null || "".equals(at)){
+                at = cir.getArriveTime();
+            }
+            if(lt == null || "".equals(lt)){
+                lt = cir.getLeaveTime();
+            }
+            if(!cir.getArriveTime().isEqual(at) || !cir.getLeaveTime().isEqual(lt)){
+                updateTime = true;
+            }
+            if(updateTime){
+                if(cir.getMainRecord() != null){
+                    CheckInRecord main = cir.getMainRecord();
+                    if(cir.getArriveTime().isBefore(main.getArriveTime()) || cir.getLeaveTime().isAfter(main.getLeaveTime())){
+                        TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                        return hr.error("成员时间范围不能大于主单");
+                    }
+                }
+                boolean b = roomStatisticsService.extendTime(new CheckInRecordWrapper(cir), at, lt);
+                if (!b) {
+                    TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                    return hr.error("资源不足");
+                }
+            }
+            UpdateUtil.copyNullProperties(checkUpdateItemTestBo, cir);
             checkInRecordDao.save(cir);
         }
-        return null;
+        return hr;
     }
 
     @Transactional
@@ -953,7 +980,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
     public PageResponse<Map<String, Object>> accountEntryListMap(int pageIndex, int pageSize, User user) {
         Pageable page = org.springframework.data.domain.PageRequest.of(pageIndex - 1, pageSize);
         LocalDate businessDate = businessSeqService.getBuinessDate(user.getHotelCode());
-        Page<Map<String, Object>> p = checkInRecordDao.accountEntryListMap(page, user.getHotelCode(), businessDate);
+        Page<Map<String, Object>> p = checkInRecordDao.accountEntryListMap(page, user.getHotelCode(), businessDate, Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN);
         PageResponse<Map<String, Object>> pr = new PageResponse<>();
         pr.setPageSize(p.getNumberOfElements());
         pr.setPageCount(p.getTotalPages());
@@ -1221,29 +1248,8 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
         Example<CheckInRecord> ex = Example.of(exCir);
         return checkInRecordDao.findAll(ex);
     }
-    @Transactional
-    @Override
-    public DtoResponse<String> hangUp(String id) {
-        CheckInRecord cir = findById(id);
-        return hangUp(cir);
-    }
-    private DtoResponse<String> hangUp(CheckInRecord cir){
-        DtoResponse<String> rep = new DtoResponse<String>();
-        cir.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_OUT_UNSETTLED);
-        if(Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN.equals(cir.getStatus())){
-            cir.setActualTimeOfLeave(LocalDateTime.now());
-            roomStatisticsService.checkOut(new CheckInRecordWrapper(cir));
-        }
-        modify(cir);
-        return rep;
-    }
 
-    @Transactional
-    @Override
-    public DtoResponse<String> hangUpByAccountId(String id) {
-        CheckInRecord cir = checkInRecordDao.findByAccountId(id);
-        return hangUp(cir);
-    }
+
 
     @Override
     public List<CheckInRecord> findByOrderNumAndGuestRoomAndDeleted(String orderNum, GuestRoom guestRoom, int delete) {
@@ -2098,5 +2104,75 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
         }
         return rList;
     }
+
+    @Override
+    public CheckInRecord byId(String id){
+        CheckInRecord cir = checkInRecordDao.byId(id);
+        return cir;
+    }
+    private DtoResponse<String> hangUp(CheckInRecord cir, String extFee) {
+        DtoResponse<String> rep = new DtoResponse<String>();
+        if (Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN.equals(cir.getStatus())) {
+            cir.setActualTimeOfLeave(LocalDateTime.now());
+            if (Constants.Type.CHECK_IN_RECORD_CUSTOMER.equals(cir.getStatus())) {
+                accountService.enterExtFee(cir, extFee);
+                roomStatisticsService.checkOut(new CheckInRecordWrapper(cir));
+            }
+        }
+        cir.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_OUT_UNSETTLED);
+        modify(cir);
+        return rep;
+    }
+
+    private boolean hangUp(List<CheckInRecord> cirs, String extFee) {
+        for (CheckInRecord cir : cirs) {
+            hangUp(cir, extFee);
+        }
+        return true;
+    }
+    @Transactional
+    public DtoResponse<String> hangUp(String id, String type, String extFeeType,String orderNum) {
+        DtoResponse<String> rep = new DtoResponse<>();
+        boolean result = true;
+        CheckInRecord cir = null;
+        switch (type) {
+            case Constants.Type.SETTLE_TYPE_ACCOUNT:
+                hangUp(queryByAccountId(id), extFeeType);
+                break;
+            case Constants.Type.SETTLE_TYPE_GROUP:
+                cir = queryByAccountId(id);
+                if (cir != null) {
+                    hangUp(cir, extFeeType);
+                    hangUp(findByOrderNumC(cir.getOrderNum()), extFeeType);
+                }
+                break;
+            case Constants.Type.SETTLE_TYPE_IGROUP:
+                cir = queryByAccountId(id);
+                if (cir != null) {
+                    hangUp(cir, extFeeType);
+                    hangUp(findByOrderNumC(cir.getOrderNum()), extFeeType);
+                }
+                break;
+            case Constants.Type.SETTLE_TYPE_ROOM:
+                GuestRoom guestRoom = guestRoomService.findById(id);
+                if(guestRoom!=null){
+                    hangUp(findByOrderNumAndGuestRoomAndDeleted(orderNum,guestRoom,Constants.DELETED_FALSE),extFeeType);
+                }
+                break;
+            case Constants.Type.SETTLE_TYPE_LINK:
+                hangUp(findByLinkId(id),extFeeType);
+                break;
+            default:
+                break;
+        }
+        return rep;
+    }
+
+    @Override
+    public boolean hangUp(String checkInRecordId, String extFee) {
+        hangUp(findById(checkInRecordId),extFee);
+        return true;
+    }
+
 
 }
