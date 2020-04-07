@@ -222,18 +222,27 @@ public class RoomTypeQuantityServiceImpl implements RoomTypeQuantityService {
                                        String newUsageStatus, int quantity) {
         RoomTypeQuantity rtq = null;
         LocalDate currentDate = startDate;
+        int i = 0;
         while (currentDate.isBefore(endDate)) {
             rtq = findByRoomTypeAndQuantityDateForUpdate(roomType, currentDate);
-            plusQuantity(rtq, oldUsageStatus, -quantity);
-            plusQuantity(rtq, newUsageStatus, quantity);
+            plusQuantity(rtq, oldUsageStatus, newUsageStatus, quantity);
+            if (i == 0) {
+                if(Constants.Status.ROOM_USAGE_ASSIGN.equals(newUsageStatus) && Constants.Status.ROOM_USAGE_CHECK_IN.equals(oldUsageStatus)){
+                    rtq.setWillArriveTotal(rtq.getWillArriveTotal() + quantity);
+                }
+                else if(Constants.Status.ROOM_USAGE_CHECK_IN.equals(newUsageStatus)){
+                    rtq.setWillArriveTotal(rtq.getWillArriveTotal()-quantity);
+                }
+            }
             currentDate = currentDate.plusDays(1);
             modify(rtq);
+            i++;
         }
-
     }
 
-    private void plusQuantity(RoomTypeQuantity rtq, String status, int quantity) {
-        switch (status) {
+
+    private void plusQuantity(RoomTypeQuantity rtq, String oldUsageStatus, String newUsageStatus, int quantity) {
+        switch (oldUsageStatus) {
             case Constants.Status.ROOM_USAGE_CHECK_IN:
                 rtq.setUsedTotal(rtq.getUsedTotal() + quantity);
                 break;
@@ -263,6 +272,36 @@ public class RoomTypeQuantityServiceImpl implements RoomTypeQuantityService {
             default:
                 break;
         }
+        switch (newUsageStatus) {
+            case Constants.Status.ROOM_USAGE_CHECK_IN:
+                rtq.setUsedTotal(rtq.getUsedTotal() - quantity);
+                break;
+            case Constants.Status.ROOM_USAGE_ASSIGN:
+                rtq.setBookingTotal(rtq.getBookingTotal() - quantity);
+                break;
+            case Constants.Status.ROOM_USAGE_BOOK:
+                rtq.setReserveTotal(rtq.getReserveTotal() - quantity);
+                break;
+            case Constants.Status.ROOM_USAGE_FREE:
+                rtq.setPredictableTotal(rtq.getPredictableTotal() - quantity);
+                break;
+            case Constants.Status.ROOM_USAGE_PREDICTABLE:
+                rtq.setPredictableTotal(rtq.getPredictableTotal() - quantity);
+            case Constants.Status.ROOM_USAGE_CHECK_OUT:
+//			rtq.setPredictableTotal(rtq.getPredictableTotal() + quantity);
+                break;
+            case Constants.Status.ROOM_USAGE_LOCKED:
+                rtq.setLockedTotal(rtq.getLockedTotal() - quantity);
+                break;
+            case Constants.Status.ROOM_USAGE_REPARIE:
+                rtq.setRepairTotal(rtq.getRepairTotal() - quantity);
+                break;
+            case Constants.Status.ROOM_USAGE_RESERVATION:
+                rtq.setReserveTotal(rtq.getReserveTotal() - quantity);
+                break;
+            default:
+                break;
+        }
 
     }
 
@@ -284,8 +323,8 @@ public class RoomTypeQuantityServiceImpl implements RoomTypeQuantityService {
         int i = 0;
         while (currentDate.isBefore(endDate)) {
             rtq = findByRoomTypeAndQuantityDateForUpdate(roomType, currentDate);
-            if(i==0){
-                rtq.setWillArriveTotal(rtq.getWillLeaveTotal()+quantity);
+            if (i == 0) {
+                rtq.setWillArriveTotal(rtq.getWillArriveTotal() + quantity);
             }
             rtq.setPredictableTotal(rtq.getPredictableTotal() - quantity);
             rtq.setReserveTotal(rtq.getReserveTotal() + quantity);
@@ -293,7 +332,7 @@ public class RoomTypeQuantityServiceImpl implements RoomTypeQuantityService {
             modify(rtq);
             i++;
         }
-        rtq.setWillLeaveTotal(rtq.getWillArriveTotal()+quantity);
+        rtq.setWillLeaveTotal(rtq.getWillLeaveTotal() + quantity);
         modify(rtq);
     }
 
@@ -460,8 +499,8 @@ public class RoomTypeQuantityServiceImpl implements RoomTypeQuantityService {
         LocalDate currentDate = info.getStartTime().toLocalDate();
         while (currentDate.isBefore(extendTime.toLocalDate())) {
             rtq = findByRoomTypeAndQuantityDateForUpdate(info.roomType(), currentDate);
-            rtq.setPredictableTotal(rtq.getPredictableTotal()-1);
-            rtq.setBookingTotal(rtq.getBookingTotal()+1);
+            rtq.setPredictableTotal(rtq.getPredictableTotal() - 1);
+            rtq.setBookingTotal(rtq.getBookingTotal() + 1);
             currentDate = currentDate.plusDays(1);
             modify(rtq);
         }
