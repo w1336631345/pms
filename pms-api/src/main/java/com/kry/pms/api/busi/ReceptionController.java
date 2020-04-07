@@ -132,7 +132,9 @@ public class ReceptionController extends BaseController<String> {
 		HttpResponse<AccountSummaryVo> rep = new HttpResponse<AccountSummaryVo>();
 		DtoResponse<Account> data = accountService.checkCustomerBill(billCheckBo);
 		BeanUtils.copyProperties(data, rep);
-		rep.setData(new AccountSummaryVo(data.getData()));
+		if(data.getData()!=null){
+			rep.setData(new AccountSummaryVo(data.getData()));
+		}
 		return rep;
 	}
 

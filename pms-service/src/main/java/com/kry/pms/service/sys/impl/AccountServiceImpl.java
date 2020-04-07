@@ -257,6 +257,7 @@ public class AccountServiceImpl implements AccountService {
         } else {
             rep.error(Constants.BusinessCode.CODE_PARAMETER_INVALID, "转账目标账户有误，请重新选择");
         }
+        rep.setData(account);
         return rep;
     }
 
