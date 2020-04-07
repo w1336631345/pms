@@ -25,13 +25,13 @@ public class RoomUsage implements Serializable {
 	@GenericGenerator(name = "uuid", strategy = "uuid")
 	@Column(columnDefinition = "varchar(64)")
 	protected String id;
-	@OneToOne(fetch = FetchType.LAZY)
+	@OneToOne(fetch = FetchType.EAGER)
 	private RoomUsage preRoomUsage;
-	@OneToOne(fetch = FetchType.LAZY)
+	@OneToOne(fetch = FetchType.EAGER)
 	private RoomUsage postRoomUsage;
 	@Column
 	private Integer humanCount;
-	@OneToOne
+	@OneToOne(fetch = FetchType.LAZY)
 	private GuestRoom guestRoom;
 	@Column
 	private LocalDateTime startDateTime;

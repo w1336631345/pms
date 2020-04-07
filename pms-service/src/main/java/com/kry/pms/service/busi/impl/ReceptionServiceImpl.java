@@ -334,17 +334,14 @@ public class ReceptionServiceImpl implements ReceptionService {
 
 	@Override
 	@Transactional
-	public DtoResponse<String> checkInAll(String[] ids) {
+	public DtoResponse<String> checkInAll(String[] ids,String hotelCode) {
+		LocalDate businessDate = businessSeqService.getBuinessDate(hotelCode);
 		DtoResponse<String> rep = new DtoResponse<>();
 		for (int i = 0; i < ids.length; i++) {
 			CheckInRecord cir = checkInRecordService.findById(ids[i]);
 			//判断是否是营业日期
-			LocalDate businessDate = businessSeqService.getBuinessDate(cir.getHotelCode());
-			DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 			LocalDateTime arriveTime = cir.getArriveTime();
-			String bDate = businessDate.format(fmt);
-			String aDate = arriveTime.format(fmt);
-			if(!bDate.equals(aDate)){
+			if(!businessDate.isEqual(arriveTime.toLocalDate())){
 				rep.setStatus(Constants.BusinessCode.CODE_PARAMETER_INVALID);
 				rep.setMessage("请核对营业日期与入住日期是否相同");
 				return  rep;
@@ -359,18 +356,18 @@ public class ReceptionServiceImpl implements ReceptionService {
 			cir.setActualTimeOfArrive(LocalDateTime.now());
 			rep = checkIn(cir);
 			// 不是主单G
-			if (!(Constants.Type.CHECK_IN_RECORD_GROUP).equals(cir.getType())) {
-				if(cir.getMainRecord() != null){
-					String mainRecordId = cir.getMainRecord().getId();
-					CheckInRecord cirMain = checkInRecordService.findById(mainRecordId);
-					if (!(Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN).equals(cirMain.getStatus())) {//主单如果不是入住状态，主单跟着入住
-						if(cirMain.getActualTimeOfArrive() == null){
-							cirMain.setActualTimeOfArrive(LocalDateTime.now());
-						}
-						rep = checkIn(cirMain);
-					}
-				}
-			}
+//			if (!(Constants.Type.CHECK_IN_RECORD_GROUP).equals(cir.getType())) {
+//				if(cir.getMainRecord() != null){
+//					String mainRecordId = cir.getMainRecord().getId();
+//					CheckInRecord cirMain = checkInRecordService.findById(mainRecordId);
+//					if (!(Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN).equals(cirMain.getStatus())) {//主单如果不是入住状态，主单跟着入住
+//						if(cirMain.getActualTimeOfArrive() == null){
+//							cirMain.setActualTimeOfArrive(LocalDateTime.now());
+//						}
+//						rep = checkIn(cirMain);
+//					}
+//				}
+//			}
 		}
 		return rep;
 	}

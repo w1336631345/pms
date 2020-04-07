@@ -53,5 +53,5 @@ public interface ReceptionService {
 
 	public DtoResponse<List<AccountSummaryVo>> groupCheckBillConfirm(String id);
 
-    DtoResponse<String> checkInAll(String[] ids);
+    DtoResponse<String> checkInAll(String[] ids,String hotelCode);
 }
