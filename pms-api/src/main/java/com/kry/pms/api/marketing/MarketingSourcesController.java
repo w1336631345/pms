@@ -25,6 +25,11 @@ public class MarketingSourcesController extends BaseController<MarketingSources>
 	MarketingSourcesService marketingSourcesService;
 	@PostMapping
 	public HttpResponse<MarketingSources> add(@RequestBody MarketingSources marketingSources) {
+		HttpResponse hr = new HttpResponse();
+		marketingSources.setHotelCode(getCurrentHotleCode());
+		if(marketingSourcesService.add(marketingSources) == null){
+			return hr.error("代码重复");
+		}
 		return getDefaultResponse().addData(marketingSourcesService.add(marketingSources));
 	}
 

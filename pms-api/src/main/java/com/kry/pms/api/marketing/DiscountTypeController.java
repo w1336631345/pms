@@ -19,6 +19,11 @@ public class DiscountTypeController extends BaseController<DiscountType> {
 	DiscountTypeService discountTypeService;
 	@PostMapping
 	public HttpResponse<DiscountType> add(@RequestBody DiscountType discountType) {
+		HttpResponse hr = new HttpResponse();
+		discountType.setHotelCode(getCurrentHotleCode());
+		if(discountTypeService.add(discountType) == null){
+			return hr.error("代码重复");
+		}
 		return getDefaultResponse().addData(discountTypeService.add(discountType));
 	}
 

@@ -22,8 +22,12 @@ public class  DiscountSchemeServiceImpl implements  DiscountSchemeService{
 	 
 	 @Override
 	public DiscountScheme add(DiscountScheme discountScheme) {
-		return discountSchemeDao.saveAndFlush(discountScheme);
-	}
+	 	DiscountScheme ds = discountSchemeDao.findByHotelCodeAndDeletedAndCode(discountScheme.getHotelCode(), Constants.DELETED_FALSE, discountScheme.getCode());
+	 	if(ds == null){
+			return discountSchemeDao.saveAndFlush(discountScheme);
+		}
+		 return null;
+	 }
 
 	@Override
 	public void delete(String id) {

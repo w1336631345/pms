@@ -8,4 +8,6 @@ import java.util.List;
 public interface SetMealDao extends BaseDao<SetMeal>{
 
     List<SetMeal> findByHotelCodeAndDeleted(String hotelCode, int deleted);
+
+    SetMeal findByHotelCodeAndDeletedAndCode(String hotelCode, int deleted, String code);
 }

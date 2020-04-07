@@ -260,11 +260,11 @@ public class ReceptionServiceImpl implements ReceptionService {
 		cir.setActualTimeOfArrive(LocalDateTime.now());
 		cir.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN);
 		checkInRecordService.modify(cir);
-		List<CheckInRecord> togetherRecord = checkInRecordService.findRoomTogetherRecord(cir,
-				Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION);
-		if (togetherRecord != null && !togetherRecord.isEmpty()) {
-			rep.setCode(1);
-		}
+//		List<CheckInRecord> togetherRecord = checkInRecordService.findRoomTogetherRecord(cir,
+//				Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION);
+//		if (togetherRecord != null && !togetherRecord.isEmpty()) {
+//			rep.setCode(1);
+//		}
 		roomStatisticsService.checkIn(new CheckInRecordWrapper(cir));
 		return rep;
 	}

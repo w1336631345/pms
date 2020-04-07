@@ -22,7 +22,11 @@ public class  DistributionChannelServiceImpl implements  DistributionChannelServ
 	 
 	 @Override
 	public DistributionChannel add(DistributionChannel distributionChannel) {
-		return distributionChannelDao.saveAndFlush(distributionChannel);
+		 DistributionChannel dc = distributionChannelDao.findByHotelCodeAndDeletedAndCode(distributionChannel.getHotelCode(), Constants.DELETED_FALSE, distributionChannel.getCode());
+		 if(dc == null){
+			 return distributionChannelDao.saveAndFlush(distributionChannel);
+		 }
+		 return null;
 	}
 
 	@Override

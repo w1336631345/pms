@@ -22,7 +22,11 @@ public class  SetMealServiceImpl implements  SetMealService{
 	 
 	 @Override
 	public SetMeal add(SetMeal setMeal) {
-		return setMealDao.saveAndFlush(setMeal);
+		 SetMeal sm = setMealDao.findByHotelCodeAndDeletedAndCode(setMeal.getHotelCode(), Constants.DELETED_FALSE, setMeal.getCode());
+		 if(sm == null){
+			 return setMealDao.saveAndFlush(setMeal);
+		 }
+		 return null;
 	}
 
 	@Override

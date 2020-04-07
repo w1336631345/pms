@@ -27,6 +27,11 @@ public class SetMealController extends BaseController<SetMeal> {
 	SetMealService setMealService;
 	@PostMapping
 	public HttpResponse<SetMeal> add(@RequestBody SetMeal setMeal) {
+		HttpResponse hr = new HttpResponse();
+		setMeal.setHotelCode(getCurrentHotleCode());
+		if(setMealService.add(setMeal) == null){
+			return hr.error("代码重复");
+		}
 		return getDefaultResponse().addData(setMealService.add(setMeal));
 	}
 

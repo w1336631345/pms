@@ -21,7 +21,11 @@ public class DiscountTypeServiceImpl implements DiscountTypeService {
 	 
 	 @Override
 	public DiscountType add(DiscountType discountType) {
-		return discountTypeDao.saveAndFlush(discountType);
+		 DiscountType dt = discountTypeDao.findByHotelCodeAndDeletedAndCode(discountType.getHotelCode(), Constants.DELETED_FALSE, discountType.getCode());
+		 if(dt == null){
+			 return discountTypeDao.saveAndFlush(discountType);
+		 }
+		 return null;
 	}
 
 	@Override

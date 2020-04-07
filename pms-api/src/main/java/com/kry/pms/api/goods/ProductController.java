@@ -19,6 +19,9 @@ import com.kry.pms.base.PageResponse;
 import com.kry.pms.model.persistence.goods.Product;
 import com.kry.pms.service.goods.ProductService;
 
+import java.util.List;
+import java.util.Map;
+
 @RestController
 @RequestMapping(path = "/api/v1/goods/product")
 public class ProductController extends BaseController<Product> {
@@ -54,6 +57,21 @@ public class ProductController extends BaseController<Product> {
 		HttpResponse<PageResponse<Product>> rep = new HttpResponse<PageResponse<Product>>();
 		PageRequest<Product> req = parse2PageRequest(request);
 		return rep.addData(productService.listPage(req));
+	}
+
+	/**
+	 * 功能描述: <br>团付设置列表
+	 * 〈〉
+	 * @Param: []
+	 * @Return: com.kry.pms.base.HttpResponse<java.util.List<java.util.Map<java.lang.String,java.lang.Object>>>
+	 * @Author: huanghaibin
+	 * @Date: 2020/4/7 15:14
+	 */
+	@GetMapping(path = "/getPaySetList")
+	public HttpResponse<List<Map<String, Object>>> getPaySetList(){
+		HttpResponse rep = new HttpResponse();
+		List<Map<String, Object>> list = productService.getPaySetList(getCurrentHotleCode());
+		return rep.addData(list);
 	}
 
 }

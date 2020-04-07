@@ -9,4 +9,6 @@ public interface DistributionChannelDao extends BaseDao<DistributionChannel>{
 
 	List<DistributionChannel> findByHotelCodeAndDeleted(String currentHotleCode, int deleted);
 
+	DistributionChannel findByHotelCodeAndDeletedAndCode(String hotelCode, int deleted, String code);
+
 }

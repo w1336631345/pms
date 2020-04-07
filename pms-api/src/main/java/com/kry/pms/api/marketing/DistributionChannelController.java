@@ -25,6 +25,11 @@ public class DistributionChannelController extends BaseController<DistributionCh
 	DistributionChannelService distributionChannelService;
 	@PostMapping
 	public HttpResponse<DistributionChannel> add(@RequestBody DistributionChannel distributionChannel) {
+		HttpResponse hr = new HttpResponse();
+		distributionChannel.setHotelCode(getCurrentHotleCode());
+		if(distributionChannelService.add(distributionChannel) == null){
+			return hr.error("代码重复");
+		}
 		return getDefaultResponse().addData(distributionChannelService.add(distributionChannel));
 	}
 

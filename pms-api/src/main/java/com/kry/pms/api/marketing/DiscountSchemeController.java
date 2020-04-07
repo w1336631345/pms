@@ -19,6 +19,11 @@ public class DiscountSchemeController extends BaseController<DiscountScheme> {
 	DiscountSchemeService discountSchemeService;
 	@PostMapping
 	public HttpResponse<DiscountScheme> add(@RequestBody DiscountScheme discountScheme) {
+		HttpResponse hr = new HttpResponse();
+		discountScheme.setHotelCode(getCurrentHotleCode());
+		if(discountSchemeService.add(discountScheme) == null){
+			return hr.error("代码重复");
+		}
 		return getDefaultResponse().addData(discountSchemeService.add(discountScheme));
 	}
 

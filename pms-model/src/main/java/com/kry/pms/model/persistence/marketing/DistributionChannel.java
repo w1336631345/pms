@@ -20,6 +20,8 @@ import lombok.Setter;
 @Table(name = "t_distribution_channel")
 public class DistributionChannel extends PersistenceModel {
 	@Column
+	private String code;
+	@Column
 	private String name;
 	@Column
 	private String description;

@@ -297,12 +297,13 @@ public interface CheckInRecordDao extends BaseDao<CheckInRecord> {
 			" sum(t.human_count) humanCount, sum(t.room_count) roomCount, sum(t.cost) cost \n" +
 			" from \n" +
 			" (select date from t_date) date left join \n" +
-			" (select  trr.record_date,tgr.room_type_id, trt.`code`, tcr.human_count, tcr.room_count,  trt.`name`, \n" +
-			" trt.price, tcr.personal_price, IFNULL(trr.cost,tcr.personal_price) cost \n" +
+			" (select  trr.record_date,tgr.room_type_id, tgr.room_num, trt.`code`, tcr.room_count, trt.`name`, \n" +
+			" sum(tcr.human_count) human_count, sum(IFNULL(trr.cost,tcr.personal_price)) cost  \n" +
 			" from t_checkin_record tcr left join t_room_record trr on tcr.id = trr.check_in_record_id \n" +
 			" left join t_guest_room tgr on trr.guest_room_id = tgr.id \n" +
 			" left join t_room_type trt on tgr.room_type_id = trt.id \n" +
 			" where tcr.order_num = :orderNum \n" +
+			" group by trr.record_date,tgr.room_type_id, tgr.room_num, trt.`code`, tcr.human_count, trt.`name` \n" +
 			" ) t on date.date = t.record_date \n" +
 			" where date.date >= :arriveTime and date.date < :leaveTime \n" +
 			" group by date.date, t.`name`, t.room_type_id, t.`code`  ")

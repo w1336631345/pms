@@ -22,7 +22,11 @@ public class  MarketingSourcesServiceImpl implements  MarketingSourcesService{
 	 
 	 @Override
 	public MarketingSources add(MarketingSources marketingSources) {
-		return marketingSourcesDao.saveAndFlush(marketingSources);
+		 MarketingSources ms = marketingSourcesDao.findByHotelCodeAndDeletedAndCode(marketingSources.getHotelCode(), Constants.DELETED_FALSE, marketingSources.getCode());
+		 if(ms == null){
+			 return marketingSourcesDao.saveAndFlush(marketingSources);
+		 }
+		 return null;
 	}
 
 	@Override

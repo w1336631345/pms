@@ -1,6 +1,7 @@
 package com.kry.pms.service.goods.impl;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
@@ -81,7 +82,10 @@ public class  ProductServiceImpl implements  ProductService{
 		return convent(productDao.findAll(ex, req));
 	}
 	 
-	 
-	 
+	 @Override
+	 public List<Map<String, Object>> getPaySetList(String hotelCode){
+	 	List<Map<String, Object>> list = productDao.getPaySetList(hotelCode);
+	 	return list;
+	 }
 	 
 }
