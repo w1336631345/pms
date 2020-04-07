@@ -16,6 +16,7 @@ public class RoomTypeQuantityVo implements Serializable {
 	private Integer predictableTotal;// 可预订的
 	private Integer bookingTotal = 0;
 	private Integer willLeaveTotal = 0;
+	private Integer willArriveTotal = 0;
 	private Integer repairTotal = 0;
 	private Integer lockedTotal = 0;
 	private Integer usedTotal = 0;
