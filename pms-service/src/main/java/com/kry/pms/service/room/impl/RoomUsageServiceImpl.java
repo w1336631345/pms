@@ -858,9 +858,13 @@ public class RoomUsageServiceImpl implements RoomUsageService {
 
     @Override
     public boolean freeCheck(GuestRoom gr, LocalDateTime startTime, LocalDateTime endDateTime) {
+        RoomUsage data = null;
         if (endDateTime != null) {
+            data = roomUsageDao.queryGuestRoomUsable(gr.getId(),startTime,endDateTime);
+        }else{
+            data = roomUsageDao.queryGuestRoomUsable(gr.getId(),startTime);
         }
-        return false;
+        return data!=null;
     }
 
 }
