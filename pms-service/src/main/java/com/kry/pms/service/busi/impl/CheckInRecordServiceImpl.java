@@ -360,7 +360,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 
     @Transactional
     @Override
-    public DtoResponse<List<CheckInRecord>> checkOut(String type, String id) {
+    public DtoResponse<List<CheckInRecord>> checkOut(String type, String id,String orderNum) {
         switch (type) {
             case Constants.Type.SETTLE_TYPE_ACCOUNT:
                 return checkOutAccout(id);
@@ -374,7 +374,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
             case Constants.Type.SETTLE_TYPE_IGROUP:
                 return checkOutGroup(id);
             case Constants.Type.SETTLE_TYPE_ROOM:
-                return checkOutRoom(id);
+                return checkOutRoom(id,orderNum);
             case Constants.Type.SETTLE_TYPE_LINK:
                 return checkOutLink(id);
             default:
@@ -392,8 +392,13 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
         return checkOut(cirs);
     }
 
-    private DtoResponse<List<CheckInRecord>> checkOutRoom(String id) {
-        return checkOut(findByGuestRoomAndStatusAndDeleted(id, Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN, Constants.DELETED_FALSE));
+    private DtoResponse<List<CheckInRecord>> checkOutRoom(String id,String orderNum) {
+        GuestRoom guestRoom = guestRoomService.findById(id);
+        if(guestRoom!=null){
+            return checkOut(findByOrderNumAndGuestRoomAndDeleted(orderNum, guestRoom, Constants.DELETED_FALSE));
+        }else{
+            return null;
+        }
     }
 
     private DtoResponse<List<CheckInRecord>> checkOutGroup(String id) {

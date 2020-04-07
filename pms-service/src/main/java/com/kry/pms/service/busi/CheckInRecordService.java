@@ -39,7 +39,7 @@ public interface CheckInRecordService extends BaseService<CheckInRecord> {
 
 	public void checkIn(CheckInBo checkInBo, DtoResponse<List<CheckInRecord>> rep);
 
-	public DtoResponse<List<CheckInRecord>> checkOut(String type,String id);
+	public DtoResponse<List<CheckInRecord>> checkOut(String type,String id,String orderNum);
 
 	public CheckInRecord checkInByTempName(String string, String roomId, DtoResponse<String> response);
 
