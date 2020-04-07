@@ -244,36 +244,6 @@ public class RoomTypeQuantityServiceImpl implements RoomTypeQuantityService {
     private void plusQuantity(RoomTypeQuantity rtq, String oldUsageStatus, String newUsageStatus, int quantity) {
         switch (oldUsageStatus) {
             case Constants.Status.ROOM_USAGE_CHECK_IN:
-                rtq.setUsedTotal(rtq.getUsedTotal() + quantity);
-                break;
-            case Constants.Status.ROOM_USAGE_ASSIGN:
-                rtq.setBookingTotal(rtq.getBookingTotal() + quantity);
-                break;
-            case Constants.Status.ROOM_USAGE_BOOK:
-                rtq.setReserveTotal(rtq.getReserveTotal() + quantity);
-                break;
-            case Constants.Status.ROOM_USAGE_FREE:
-                rtq.setPredictableTotal(rtq.getPredictableTotal() + quantity);
-                break;
-            case Constants.Status.ROOM_USAGE_PREDICTABLE:
-                rtq.setPredictableTotal(rtq.getPredictableTotal() + quantity);
-            case Constants.Status.ROOM_USAGE_CHECK_OUT:
-//			rtq.setPredictableTotal(rtq.getPredictableTotal() + quantity);
-                break;
-            case Constants.Status.ROOM_USAGE_LOCKED:
-                rtq.setLockedTotal(rtq.getLockedTotal() + quantity);
-                break;
-            case Constants.Status.ROOM_USAGE_REPARIE:
-                rtq.setRepairTotal(rtq.getRepairTotal() + quantity);
-                break;
-            case Constants.Status.ROOM_USAGE_RESERVATION:
-                rtq.setReserveTotal(rtq.getReserveTotal() + quantity);
-                break;
-            default:
-                break;
-        }
-        switch (newUsageStatus) {
-            case Constants.Status.ROOM_USAGE_CHECK_IN:
                 rtq.setUsedTotal(rtq.getUsedTotal() - quantity);
                 break;
             case Constants.Status.ROOM_USAGE_ASSIGN:
@@ -298,6 +268,36 @@ public class RoomTypeQuantityServiceImpl implements RoomTypeQuantityService {
                 break;
             case Constants.Status.ROOM_USAGE_RESERVATION:
                 rtq.setReserveTotal(rtq.getReserveTotal() - quantity);
+                break;
+            default:
+                break;
+        }
+        switch (newUsageStatus) {
+            case Constants.Status.ROOM_USAGE_CHECK_IN:
+                rtq.setUsedTotal(rtq.getUsedTotal() + quantity);
+                break;
+            case Constants.Status.ROOM_USAGE_ASSIGN:
+                rtq.setBookingTotal(rtq.getBookingTotal() + quantity);
+                break;
+            case Constants.Status.ROOM_USAGE_BOOK:
+                rtq.setReserveTotal(rtq.getReserveTotal() + quantity);
+                break;
+            case Constants.Status.ROOM_USAGE_FREE:
+                rtq.setPredictableTotal(rtq.getPredictableTotal() + quantity);
+                break;
+            case Constants.Status.ROOM_USAGE_PREDICTABLE:
+                rtq.setPredictableTotal(rtq.getPredictableTotal() + quantity);
+            case Constants.Status.ROOM_USAGE_CHECK_OUT:
+//			rtq.setPredictableTotal(rtq.getPredictableTotal() + quantity);
+                break;
+            case Constants.Status.ROOM_USAGE_LOCKED:
+                rtq.setLockedTotal(rtq.getLockedTotal() + quantity);
+                break;
+            case Constants.Status.ROOM_USAGE_REPARIE:
+                rtq.setRepairTotal(rtq.getRepairTotal() + quantity);
+                break;
+            case Constants.Status.ROOM_USAGE_RESERVATION:
+                rtq.setReserveTotal(rtq.getReserveTotal() + quantity);
                 break;
             default:
                 break;
