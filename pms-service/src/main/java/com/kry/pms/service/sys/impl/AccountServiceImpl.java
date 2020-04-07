@@ -352,7 +352,8 @@ public class AccountServiceImpl implements AccountService {
 
     private DtoResponse<Account> checkRoomBill(BillCheckBo billCheckBo) {
         DtoResponse<Account> rep = new DtoResponse<Account>();
-        List<CheckInRecord> cirs = checkInRecordService.findByGuestRoomAndStatusAndDeleted(billCheckBo.getAccountId(), null, Constants.DELETED_FALSE);
+        GuestRoom guestRoom = guestRoomService.findById(billCheckBo.getAccountId());
+        List<CheckInRecord> cirs = checkInRecordService.findByOrderNumAndGuestRoomAndDeleted(billCheckBo.getOrderNum(), guestRoom, Constants.DELETED_FALSE);
         if (!cirs.isEmpty() && cirs.size() == 0) {
             billCheckBo.setCheckType(Constants.Type.SETTLE_TYPE_ACCOUNT);
             billCheckBo.setAccountId(cirs.get(0).getAccount().getId());
