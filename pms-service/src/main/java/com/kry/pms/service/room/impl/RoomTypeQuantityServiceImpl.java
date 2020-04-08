@@ -230,7 +230,9 @@ public class RoomTypeQuantityServiceImpl implements RoomTypeQuantityService {
                 if(Constants.Status.ROOM_USAGE_ASSIGN.equals(newUsageStatus) && Constants.Status.ROOM_USAGE_CHECK_IN.equals(oldUsageStatus)){
                     rtq.setWillArriveTotal(rtq.getWillArriveTotal() + quantity);
                 }
-                if(Constants.Status.ROOM_USAGE_CHECK_IN.equals(newUsageStatus)||Constants.Status.ROOM_USAGE_PREDICTABLE.equals(newUsageStatus)){
+                else if(Constants.Status.ROOM_USAGE_PREDICTABLE.equals(newUsageStatus)&&Constants.Status.ROOM_USAGE_ASSIGN.equals(oldUsageStatus)){
+                    rtq.setWillArriveTotal(rtq.getWillArriveTotal()-quantity);
+                }else if(Constants.Status.ROOM_USAGE_CHECK_IN.equals(newUsageStatus)){
                     rtq.setWillArriveTotal(rtq.getWillArriveTotal()-quantity);
                 }
             }
