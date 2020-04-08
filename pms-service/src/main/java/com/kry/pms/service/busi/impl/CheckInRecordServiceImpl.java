@@ -2109,6 +2109,62 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
         }
         return rList;
     }
+    @Override
+    public List<Map<String, Object>> resourceStatisticsTo(String orderNum, String arriveTime, String leaveTime) {
+        List<Map<String, Object>> rlist = new ArrayList<>();
+        List<String> list = checkInRecordDao.getTime(arriveTime, leaveTime);
+        List<String> roomType = checkInRecordDao.getAllRoomType(orderNum);
+        for(int i=0; i<list.size(); i++){
+            String now = list.get(i);
+            for(int j=0; j<roomType.size(); j++){
+                Map<String, Object> map = new HashMap<>();
+                map.put("date",now);
+                map.put("roomTypeId", roomType.get(j));
+                Map<String, Object> cmap = checkInRecordDao.countMap(orderNum,now,roomType.get(j));
+                int humanCount = 0, roomCount = 0;
+                Double cost = 0.0;
+                if(cmap != null && cmap.size() > 0){
+                    map.put("code", MapUtils.getString(cmap, "code"));
+                    map.put("roomType", MapUtils.getString(cmap, "roomType"));
+                    Integer hCount = MapUtils.getInteger(cmap, "humanCount");
+                    if(hCount != null){
+                        humanCount = humanCount + hCount;
+                    }
+                    Integer rCount = MapUtils.getInteger(cmap, "roomCount");
+                    if(rCount != null){
+                        roomCount = roomCount + rCount;
+                    }
+                    Double c = MapUtils.getDouble(cmap, "cost");
+                    if(c != null){
+                        cost = cost + c;
+                    }
+                }
+                Map<String, Object> rmap = checkInRecordDao.resourceStatisticsR(orderNum, now, roomType.get(j));
+                if(rmap != null && rmap.size() > 0){
+                    map.put("code", MapUtils.getString(rmap, "code"));
+                    map.put("roomType", MapUtils.getString(rmap, "roomType"));
+                    Integer hCount = MapUtils.getInteger(rmap, "humanCount");
+                    if(hCount != null){
+                        humanCount = humanCount + hCount;
+                    }
+                    Integer rCount = MapUtils.getInteger(rmap, "roomCount");
+                    if(rCount != null){
+                        roomCount = roomCount + rCount;
+                    }
+                    Double c = MapUtils.getDouble(rmap, "cost");
+                    if(c != null){
+                        cost = cost + c;
+                    }
+                }
+                map.put("humanCount", humanCount);
+                map.put("roomCount", roomCount);
+                map.put("cost", cost);
+                rlist.add(map);
+            }
+        }
+
+        return rlist;
+    }
 
     @Override
     public CheckInRecord byId(String id){

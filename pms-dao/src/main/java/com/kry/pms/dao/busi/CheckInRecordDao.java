@@ -293,6 +293,7 @@ public interface CheckInRecordDao extends BaseDao<CheckInRecord> {
 	@Query(nativeQuery = true, value = " select t.room_requirement from t_room_requirement t where t.check_in_record_id = ?1 ")
 	List<String> getRoomRequirement(String checkInId);
 
+	//资源统计所有查询-下方
 	@Query(nativeQuery = true, value = " select DATE_FORMAT(date.date,'%Y-%m-%d') date, t.room_type_id roomTypeId, t.`code`, t.`name` roomType, \n" +
 			" sum(t.human_count) humanCount, sum(t.room_count) roomCount, sum(t.cost) cost \n" +
 			" from \n" +
@@ -303,18 +304,39 @@ public interface CheckInRecordDao extends BaseDao<CheckInRecord> {
 			" left join t_guest_room tgr on trr.guest_room_id = tgr.id \n" +
 			" left join t_room_type trt on tgr.room_type_id = trt.id \n" +
 			" where tcr.order_num = :orderNum \n" +
-			" group by trr.record_date,tgr.room_type_id, tgr.room_num, trt.`code`, tcr.human_count, trt.`name` \n" +
+			" group by trr.record_date,tgr.room_type_id, tgr.room_num, trt.`code`, tcr.room_count, trt.`name` \n" +
 			" ) t on date.date = t.record_date \n" +
 			" where date.date >= :arriveTime and date.date < :leaveTime \n" +
 			" group by date.date, t.`name`, t.room_type_id, t.`code`  ")
 	List<Map<String, Object>> resourceStatistics(@Param("orderNum") String orderNum, @Param("arriveTime") String arriveTime,
 									   @Param("leaveTime") String leaveTime);
-
-	@Query(nativeQuery = true, value = " select room_type_id, sum(human_count) humanCount, sum(room_count) roomCount, sum(purchase_price) cost \n" +
-			"  from t_checkin_record where deleted = 0 and type_ = 'R' and order_num = :orderNum \n" +
-			"  and DATE_FORMAT(arrive_time,'%Y-%m-%d') <= :nowTime and DATE_FORMAT(leave_time,'%Y-%m-%d') >= :nowTime " +
-			"  and room_type_id = :roomTypeId group by room_type_id ")
+	@Query(nativeQuery = true, value = " select tcr.room_type_id, trt.`code`, trt.`name`, " +
+			" sum(tcr.human_count) humanCount, sum(tcr.room_count) roomCount, sum(tcr.purchase_price) cost \n" +
+			"  from t_checkin_record tcr left join t_room_type trt on tcr.room_type_id = trt.id " +
+			" where tcr.deleted = 0 and tcr.type_ = 'R' and tcr.order_num = :orderNum \n" +
+			"  and DATE_FORMAT(tcr.arrive_time,'%Y-%m-%d') <= :nowTime and DATE_FORMAT(tcr.leave_time,'%Y-%m-%d') >= :nowTime " +
+			"  and tcr.room_type_id = :roomTypeId group by tcr.room_type_id ")
 	Map<String, Object> resourceStatisticsR(@Param("orderNum") String orderNum, @Param("nowTime") String nowTime , @Param("roomTypeId") String roomTypeId);
+	@Query(nativeQuery = true, value = " select DISTINCT tcr.room_type_id from t_checkin_record tcr \n" +
+			" where tcr.order_num = :orderNum  and deleted = 0 and tcr.room_type_id is not null ")
+	List<String> getAllRoomType(@Param("orderNum") String orderNum);
+	@Query(nativeQuery = true, value = " select DATE_FORMAT(date,'%Y-%m-%d') date  from t_date \n" +
+			" where date >= :arriveTime and date < :leaveTime  ")
+	List<String> getTime(@Param("arriveTime") String arriveTime, @Param("leaveTime") String leaveTime);
+	@Query(nativeQuery = true, value = " select t.record_date, t.room_type_id roomTypeId, t.`code`, t.`name` roomType, \n" +
+			" sum(t.human_count) humanCount, sum(t.room_count) roomCount, sum(t.cost) cost \n" +
+			" from (\n" +
+			" select  trr.record_date,tcr.room_type_id, tgr.room_num, trt.`code`, tcr.room_count, trt.`name`, \n" +
+			" sum(tcr.human_count) human_count, sum(IFNULL(trr.cost,tcr.personal_price)) cost  \n" +
+			" from t_checkin_record tcr left join t_room_record trr on tcr.id = trr.check_in_record_id \n" +
+			" left join t_guest_room tgr on trr.guest_room_id = tgr.id \n" +
+			" left join t_room_type trt on tgr.room_type_id = trt.id \n" +
+			" where tcr.order_num = :orderNum and trr.record_date = :nowTime \n" +
+			" and tcr.room_type_id = :roomTypeId\n" +
+			" group by trr.record_date,tcr.room_type_id, tgr.room_num, trt.`code`, tcr.room_count, trt.`name` \n" +
+			" ) t group by t.record_date, t.`name`, t.room_type_id, t.`code`  ")
+	Map<String, Object> countMap(@Param("orderNum") String orderNum, @Param("nowTime") String nowTime , @Param("roomTypeId") String roomTypeId);
+	//资源统计所有查询接口-上方
 
     List<CheckInRecord> findByGuestRoomIdAndDeleted(String guestRoomId, int deleted);
 

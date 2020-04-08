@@ -618,7 +618,8 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
     public HttpResponse resourceStatistics(String orderNum, String arriveTime, String leaveTime) {
         HttpResponse hr = new HttpResponse();
         User user = getUser();
-        List<Map<String, Object>> list = checkInRecordService.resourceStatistics(orderNum, arriveTime, leaveTime);
+//        List<Map<String, Object>> list = checkInRecordService.resourceStatistics(orderNum, arriveTime, leaveTime);
+        List<Map<String, Object>> list = checkInRecordService.resourceStatisticsTo(orderNum, arriveTime, leaveTime);
         hr.addData(list);
         return hr.ok();
     }

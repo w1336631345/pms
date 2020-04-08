@@ -182,5 +182,7 @@ public interface CheckInRecordService extends BaseService<CheckInRecord> {
 
 	HttpResponse recovery(String id);
 
+    List<Map<String, Object>> resourceStatisticsTo(String orderNum, String arriveTime, String leaveTime);
+
     CheckInRecord byId(String id);
 }
