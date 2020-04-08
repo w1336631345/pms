@@ -2,6 +2,7 @@ package com.kry.pms.dao.busi;
 
 import java.util.List;
 
+import com.kry.pms.model.dto.BillStatistics;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -21,4 +22,6 @@ public interface BillDao extends BaseDao<Bill> {
 
     @Query(nativeQuery = true, value = "select count(id) from t_bill where account_id = ?1 and status = 'NEED_SETTLED'")
     int countUnSellteBill(String accountId);
+    @Query(value = "select new com.kry.pms.model.dto.BillStatistics(sum(cost),sum(pay)) from Bill where account =?1 and status =?2")
+    BillStatistics sumNeedSettle(Account account,String status);
 }

@@ -11,6 +11,7 @@ import java.util.Map;
 import javax.transaction.Transactional;
 
 import com.kry.pms.dao.busi.RoomRecordDao;
+import com.kry.pms.model.dto.BillStatistics;
 import com.kry.pms.model.persistence.goods.Product;
 import com.kry.pms.model.persistence.room.GuestRoom;
 import com.kry.pms.service.busi.*;
@@ -712,26 +713,37 @@ public class AccountServiceImpl implements AccountService {
         return info;
     }
 
+    private void countNeedSettleBill(SettleInfoVo info,Account account){
+        BillStatistics temp = billService.sumNeedSettle(account);
+        if(temp.getCost()!=null){
+            info.setCost(BigDecimalUtil.add(info.getCost(), temp.getCost()));
+        }
+        if(temp.getPay()!=null){
+            info.setPay(BigDecimalUtil.add(info.getPay(), temp.getPay()));
+        }
+
+    }
     private void countSettleInfo(SettleInfoVo info, Account account) {
-        if (account.getCost() != null) {
-            info.setCost(BigDecimalUtil.add(info.getCost(), account.getCost()));
-        }
-        if (account.getPay() != null) {
-            info.setPay(BigDecimalUtil.add(info.getPay(), account.getPay()));
-        }
-        if (account.getCreditLimit() != null) {
-            info.setCreditLimit(BigDecimalUtil.add(info.getCreditLimit(), account.getCreditLimit()));
-        }
-        if (account.getAvailableCreditLimit() != null) {
-            info.setAvailableCreditLimit(
-                    BigDecimalUtil.add(info.getAvailableCreditLimit(), account.getAvailableCreditLimit()));
-        }
-        if (account.getTotal() != null) {
-            info.setTotal(BigDecimalUtil.add(info.getTotal(), account.getTotal()));
-        }
-        if (account.getCurrentBillSeq() != null) {
-            info.setTotalSeq(info.getTotalSeq() == null ? 0 : info.getTotalSeq() + account.getCurrentBillSeq());
-        }
+        countNeedSettleBill(info,account);
+//        if (account.getCost() != null) {
+//            info.setCost(BigDecimalUtil.add(info.getCost(), account.getCost()));
+//        }
+//        if (account.getPay() != null) {
+//            info.setPay(BigDecimalUtil.add(info.getPay(), account.getPay()));
+//        }
+//        if (account.getCreditLimit() != null) {
+//            info.setCreditLimit(BigDecimalUtil.add(info.getCreditLimit(), account.getCreditLimit()));
+//        }
+//        if (account.getAvailableCreditLimit() != null) {
+//            info.setAvailableCreditLimit(
+//                    BigDecimalUtil.add(info.getAvailableCreditLimit(), account.getAvailableCreditLimit()));
+//        }
+//        if (account.getTotal() != null) {
+//            info.setTotal(BigDecimalUtil.add(info.getTotal(), account.getTotal()));
+//        }
+//        if (account.getCurrentBillSeq() != null) {
+//            info.setTotalSeq(info.getTotalSeq() == null ? 0 : info.getTotalSeq() + account.getCurrentBillSeq());
+//        }
     }
 
     private SettleInfoVo getLinkSettleInfo(String id, String extFee, String hotelCode) {

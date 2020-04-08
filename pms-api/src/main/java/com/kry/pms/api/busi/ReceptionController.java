@@ -72,7 +72,7 @@ public class ReceptionController extends BaseController<String> {
 	@PostMapping(path = "/checkInAll")
 	public HttpResponse checkIn(@RequestBody String[] ids) {
 		HttpResponse<String> rep = new HttpResponse<String>();
-		BeanUtils.copyProperties(receptionService.checkInAll(ids), rep);
+		BeanUtils.copyProperties(receptionService.checkInAll(ids,getCurrentHotleCode()), rep);
 		return rep;
 	}
 	/**

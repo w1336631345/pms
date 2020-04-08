@@ -14,6 +14,7 @@ import javax.transaction.Transactional;
 import com.kry.pms.dao.busi.CheckInRecordDao;
 import com.kry.pms.dao.goods.ProductDao;
 import com.kry.pms.dao.goods.SetMealDao;
+import com.kry.pms.model.dto.BillStatistics;
 import com.kry.pms.model.persistence.goods.SetMeal;
 import com.kry.pms.service.sys.SqlTemplateService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -508,5 +509,10 @@ public class BillServiceImpl implements BillService {
     @Override
     public int countUnSettleBill(String accountId) {
         return billDao.countUnSellteBill(accountId);
+    }
+
+    @Override
+    public BillStatistics sumNeedSettle(Account account) {
+        return billDao.sumNeedSettle(account,Constants.Status.BILL_NEED_SETTLED);
     }
 }

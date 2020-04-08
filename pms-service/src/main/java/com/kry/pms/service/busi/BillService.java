@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.kry.pms.base.DtoResponse;
+import com.kry.pms.model.dto.BillStatistics;
 import com.kry.pms.model.http.request.busi.BillOperationBo;
 import com.kry.pms.model.http.request.busi.BillQueryBo;
 import com.kry.pms.model.http.request.busi.BillSettleBo;
@@ -77,4 +78,6 @@ public interface BillService extends BaseService<Bill> {
 	public List queryByBo(BillQueryBo query);
 
     int countUnSettleBill(String accountId);
+
+	BillStatistics sumNeedSettle(Account account);
 }
