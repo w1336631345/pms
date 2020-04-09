@@ -227,13 +227,12 @@ public class RoomTypeQuantityServiceImpl implements RoomTypeQuantityService {
             rtq = findByRoomTypeAndQuantityDateForUpdate(roomType, currentDate);
             plusQuantity(rtq, oldUsageStatus, newUsageStatus, quantity);
             if (i == 0) {
-                if(Constants.Status.ROOM_USAGE_ASSIGN.equals(newUsageStatus) && Constants.Status.ROOM_USAGE_CHECK_IN.equals(oldUsageStatus)){
+                if (Constants.Status.ROOM_USAGE_ASSIGN.equals(newUsageStatus) && Constants.Status.ROOM_USAGE_CHECK_IN.equals(oldUsageStatus)) {
                     rtq.setWillArriveTotal(rtq.getWillArriveTotal() + quantity);
-                }
-                else if(Constants.Status.ROOM_USAGE_PREDICTABLE.equals(newUsageStatus)&&Constants.Status.ROOM_USAGE_ASSIGN.equals(oldUsageStatus)){
-                    rtq.setWillArriveTotal(rtq.getWillArriveTotal()-quantity);
-                }else if(Constants.Status.ROOM_USAGE_CHECK_IN.equals(newUsageStatus)){
-                    rtq.setWillArriveTotal(rtq.getWillArriveTotal()-quantity);
+                } else if (Constants.Status.ROOM_USAGE_PREDICTABLE.equals(newUsageStatus) && (Constants.Status.ROOM_USAGE_ASSIGN.equals(oldUsageStatus) || Constants.Status.ROOM_USAGE_RESERVATION.equals(oldUsageStatus))) {
+                    rtq.setWillArriveTotal(rtq.getWillArriveTotal() - quantity);
+                } else if (Constants.Status.ROOM_USAGE_CHECK_IN.equals(newUsageStatus)) {
+                    rtq.setWillArriveTotal(rtq.getWillArriveTotal() - quantity);
                 }
             }
             currentDate = currentDate.plusDays(1);
