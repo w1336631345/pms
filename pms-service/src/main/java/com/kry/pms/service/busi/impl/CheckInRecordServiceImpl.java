@@ -1423,16 +1423,16 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                 int hcount = 0;
                 int rcount = 0;
                 for(int i=0; i<rList.size(); i++){
-                    offReserve(rList.get(i));//删除预留单
-                    CheckInRecord r = checkInRecordDao.getOne(rList.get(i));
-                    hcount = hcount + r.getHumanCount();
-                    rcount = rcount + r.getRoomCount();
+                    offReserve(rList.get(i));//删除预留单（该方法里已经做了主单房数和人数的修改）
+//                    CheckInRecord r = checkInRecordDao.getOne(rList.get(i));
+//                    hcount = hcount + r.getHumanCount();
+//                    rcount = rcount + r.getRoomCount();
                 }
                 //删除预留单后删除主单
                 cir.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_CANCLE_BOOK);
                 cir.setDeleted(Constants.DELETED_TRUE);
-                cir.setHumanCount(cir.getHumanCount() - hcount);
-                cir.setRoomCount(cir.getRoomCount() - rcount);
+//                cir.setHumanCount(cir.getHumanCount() - hcount);
+//                cir.setRoomCount(cir.getRoomCount() - rcount);
                 update(cir);
             }
         }else if(Constants.Type.CHECK_IN_RECORD_RESERVE.equals(cir.getType())) {//如果是预留单

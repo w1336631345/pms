@@ -12,7 +12,7 @@ public interface BookkeepingSetService extends BaseService<BookkeepingSet>{
 
     BookkeepingSet isExist(String hotelCode, String accountId, String productId);
 
-    HttpResponse addList(List<BookkeepingSet> list, String hotelCode);
+    HttpResponse addList(List<BookkeepingSet> list,String accountId, String hotelCode);
 
     List<BookkeepingSet> findSet(String hotelCode, String accountId);
 }
