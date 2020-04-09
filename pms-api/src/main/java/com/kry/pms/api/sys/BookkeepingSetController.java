@@ -40,10 +40,10 @@ public class BookkeepingSetController extends BaseController<BookkeepingSet> {
 	 * @Date: 2019/12/30 17:31
 	 */
 	@PostMapping(path = "/addList")
-	public HttpResponse addList(@RequestBody List<BookkeepingSet> list) {
+	public HttpResponse addList(@RequestBody List<BookkeepingSet> list, String accountId) {
 		HttpResponse hr = new HttpResponse();
 		User user = getUser();
-		hr = bookkeepingSetService.addList(list, user.getHotelCode());
+		hr = bookkeepingSetService.addList(list,accountId, user.getHotelCode());
 		return hr;
 	}
 

@@ -75,13 +75,10 @@ public class  BookkeepingSetServiceImpl implements  BookkeepingSetService{
 	 }
 
 	@Override
-	public HttpResponse addList(List<BookkeepingSet> list, String hotelCode) {
-	 	if(list != null && !list.isEmpty()){
-	 		String accountId = list.get(0).getAccountId();
-			List<BookkeepingSet> oldList = bookkeepingSetDao.findByHotelCodeAndAccountId(hotelCode, accountId);
-			for(int j=0; j<oldList.size(); j++){
-				bookkeepingSetDao.deleteById(oldList.get(j).getId());
-			}
+	public HttpResponse addList(List<BookkeepingSet> list,String accountId, String hotelCode) {
+		List<BookkeepingSet> oldList = bookkeepingSetDao.findByHotelCodeAndAccountId(hotelCode, accountId);
+		for(int j=0; j<oldList.size(); j++){
+			bookkeepingSetDao.deleteById(oldList.get(j).getId());
 		}
 	 	HttpResponse hr = new HttpResponse();
 	 	for(int i=0; i<list.size(); i++){
