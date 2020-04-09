@@ -22,7 +22,7 @@ public interface RoomUsageDao extends BaseDao<RoomUsage> {
 	@Query(value = "select a.* from  t_room_usage a,t_guest_room b where a.guest_room_id = b.id and b.roomNum =?1 and a.end_date_time >=?2 order by a.start_date_time desc limit 2", nativeQuery = true)
 	public List<RoomUsage> queryRoomUsable(String roomNum, LocalDateTime startTime);
 
-	@Query(value = "select a.* from  t_room_usage a,t_guest_room b where a.guest_room_id = b.id and a.guest_room_id =?1 and a.end_date_time >=?2 order by a.start_date_time desc limit 1", nativeQuery = true)
+	@Query(value = "select a.* from  t_room_usage a where a.guest_room_id =?1 and a.start_date_time <=?2 and a.usage_status != 'F'order by a.start_date_time desc limit 1", nativeQuery = true)
 	public RoomUsage queryGuestRoomUsable(String id, LocalDateTime startTime);
 
 	public RoomUsage findByGuestRoomIdAndBusinesskey(String id, String businessKey);
