@@ -6,6 +6,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import com.kry.pms.model.persistence.sys.User;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,8 +31,11 @@ public class EmployeeController extends BaseController<Employee> {
 	@Autowired
 	EmployeeService employeeService;
 	@PostMapping
-	public HttpResponse<Employee> add(@RequestBody Employee employee) {
-		return getDefaultResponse().addData(employeeService.add(employee));
+	public HttpResponse<String> add(@RequestBody Employee employee) {
+		employee.setHotelCode(getCurrentHotleCode());
+		HttpResponse<String> response = new HttpResponse<>();
+		BeanUtils.copyProperties(employeeService.createEmployee(employee),response);
+		return response;
 	}
 
 	@PutMapping
