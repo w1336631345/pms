@@ -121,7 +121,7 @@ public class CheckInRecordWrapper implements UseInfoAble {
     @Override
     public boolean isTodayArrive() {
         if (this.checkInRecord.getArriveTime() != null) {
-            return this.checkInRecord.getLeaveTime().toLocalDate().isEqual(LocalDate.now());
+            return this.checkInRecord.getArriveTime().toLocalDate().isEqual(LocalDate.now());
         }
         return false;
     }

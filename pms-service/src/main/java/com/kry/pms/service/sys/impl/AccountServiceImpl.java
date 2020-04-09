@@ -345,6 +345,8 @@ public class AccountServiceImpl implements AccountService {
             bills = new ArrayList<>();
             for (Bill eb : billCheckBo.getExtBills()) {
                 eb.setHotelCode(billCheckBo.getHotelCode());
+                eb.setOperationEmployee(billCheckBo.getOperationEmployee());
+                eb.setShiftCode(billCheckBo.getShiftCode());
                 eb.setFeeFlag(Constants.Type.BILL_FLAG_EXT_ROOM_FEE);
                 bills.add(billService.add(eb));
             }

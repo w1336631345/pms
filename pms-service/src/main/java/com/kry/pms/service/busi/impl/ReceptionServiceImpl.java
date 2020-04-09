@@ -337,6 +337,14 @@ public class ReceptionServiceImpl implements ReceptionService {
 	public DtoResponse<String> checkInAll(String[] ids,String hotelCode) {
 		LocalDate businessDate = businessSeqService.getBuinessDate(hotelCode);
 		DtoResponse<String> rep = new DtoResponse<>();
+		CheckInRecord checkInRecord = checkInRecordService.findById(ids[0]);
+		if (checkInRecord!=null&&!(Constants.Type.CHECK_IN_RECORD_GROUP).equals(checkInRecord.getType())) {
+			if (checkInRecord.getMainRecord()!=null&&!(Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN).equals(checkInRecord.getMainRecord().getStatus())){
+				rep.setStatus(Constants.BusinessCode.CODE_PARAMETER_INVALID);
+				rep.setMessage("主单未入住，请先入住主单");
+				return rep;
+			}
+		}
 		for (int i = 0; i < ids.length; i++) {
 			CheckInRecord cir = checkInRecordService.findById(ids[i]);
 			//判断是否是营业日期
