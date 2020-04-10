@@ -1423,7 +1423,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                 int hcount = 0;
                 int rcount = 0;
                 for(int i=0; i<rList.size(); i++){
-                    offReserve(rList.get(i));//删除预留单（该方法里已经做了主单房数和人数的修改）
+                    hr = offReserve(rList.get(i));//删除预留单（该方法里已经做了主单房数和人数的修改）
 //                    CheckInRecord r = checkInRecordDao.getOne(rList.get(i));
 //                    hcount = hcount + r.getHumanCount();
 //                    rcount = rcount + r.getRoomCount();
@@ -1441,12 +1441,12 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
             if(Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION.equals(cir.getStatus())){
                 String[] ids = new String[1];
                 ids[0] = id;
-                callOffReserve(ids);
+                hr = callOffReserve(ids);
             }else {
                 return hr.error("选数据状态错误");
             }
         }
-        return hr.ok();
+        return hr;
     }
     //主单恢复
     @Override
