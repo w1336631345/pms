@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: test
+    active: prod
   freemarker:
     template-loader-path: classpath:/templates/
     suffix: .ftl
