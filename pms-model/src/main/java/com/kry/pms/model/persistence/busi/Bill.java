@@ -1,6 +1,7 @@
 package com.kry.pms.model.persistence.busi;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -82,5 +83,9 @@ public class Bill extends PersistenceModel {
 	private String roomRecordId;
 	@Column
 	private String feeFlag;
-	
+	@Column
+	private String transactionId;
+	@Column
+	private String paymentPlatform;
+
 }

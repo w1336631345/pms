@@ -2,6 +2,7 @@ package com.kry.pms.shiro;
 
 import java.util.List;
 
+import com.kry.pms.base.Constants;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
@@ -35,8 +36,8 @@ public class UserRealm extends AuthorizingRealm {
 		// 查询用户信息
 		List<User>  user = userDao.getByUsernameAndPassword(username, password);
 		// 账号不存在
-		if (user == null || user.isEmpty()) {
-			throw new UnknownAccountException("账号或密码不正确");
+		if (user == null || user.isEmpty()|| !Constants.Status.NORMAL.equals(user.get(0).getStatus())) {
+			throw new UnknownAccountException("账号或密码不正确,或者账号不可登录");
 		}
 		if(("audit").equals(user.get(0).getAllowLogin())){
 			throw new UnknownAccountException("夜审稽核中，禁止登录");

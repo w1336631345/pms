@@ -23,7 +23,11 @@
 			<artifactId>pms-base</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
-		
+		<dependency>
+			<groupId>com.github.binarywang</groupId>
+			<artifactId>weixin-java-mp</artifactId>
+			<version>3.6.0</version>
+		</dependency>
 	</dependencies>
 	
 	<build>
@@ -32,10 +36,6 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>
-					<!-- 源码的编译器版本 -->
-					<source>1.8</source>
-					<!-- class的编译器版本 -->
-					<target>1.8</target>
 					<mainClass>com.kry.pms.ext.api.ExtApiApplication</mainClass>
 				</configuration>
 				<executions>

@@ -68,6 +68,19 @@ public class  UserServiceImpl implements  UserService{
 	 	User user = userDao.findByUsernameAndPasswordAndHotelCode(username, password, hotelCode);
 	 	return user;
 	 }
-	 
-	 
+
+	@Override
+	public User findByOpenId(String openId) {
+		return userDao.findByOpenIdAndStatus(openId,Constants.Status.NORMAL);
+	}
+
+	@Override
+	public boolean bindWx(User user, String openId) {
+	 	user = findById(user.getId());
+	 	user.setOpenId(openId);
+	 	modify(user);
+		return true;
+	}
+
+
 }

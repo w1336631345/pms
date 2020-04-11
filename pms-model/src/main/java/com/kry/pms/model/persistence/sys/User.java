@@ -26,6 +26,8 @@ public class User extends PersistenceModel {
 	@Column
 	private String mobile;
 	@Column
+	private String openId;
+	@Column
 	@JsonIgnore
 	private String password;
 	@Column(name = "type_")

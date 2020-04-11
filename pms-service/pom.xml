@@ -68,7 +68,6 @@
             <version>2.9.9</version>
             <scope>compile</scope>
         </dependency>
-
     </dependencies>
 	<build>
 		<plugins>

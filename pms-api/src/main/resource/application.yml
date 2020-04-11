@@ -1,3 +1,23 @@
 spring:
   profiles:
-    active: prod
+    active: test
+  freemarker:
+    template-loader-path: classpath:/templates/
+    suffix: .ftl
+    charset: UTF-8
+qiniu:
+  oss:
+    access-key: 5azdaObcIs01xmYikeM6dSPB4O32Dy97t5Z4R45K
+    secret-key: Bw62mruVQ2-tamUe5YllBf9MFyO67VptKNciuNMl
+    bucket: pms-oss
+    path: http://pkoqxs4zt.bkt.clouddn.com
+    image-host: http://oss.rooibook.com/
+wx:
+  mp:
+    configs:
+      - appId: wx77721a0d0343057a
+        secret: d427febd1b3871447b69b5cc8e9cd4e7
+        token: aa2434123
+        aesKey:
+      - appId: wxbcfff4011bf72ced
+        secret: 75bbc37d0948f08ea99391add1d1833b
