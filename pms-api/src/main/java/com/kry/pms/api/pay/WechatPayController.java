@@ -24,7 +24,7 @@ import java.util.Map;
  * @Date: 2020/4/10 19:58
  */
 @RestController
-@RequestMapping("/api/v1/audit/wechatPay")
+@RequestMapping("/api/v1/pay/wechatPay")
 public class WechatPayController {
     @Autowired
     WechatPayService wechatPayService;
@@ -70,12 +70,30 @@ public class WechatPayController {
      * @Date: 2020/4/10 19:48
      */
     @RequestMapping("/sweepPay")
-    public HttpResponse sweepPay(String auth_code, HttpServletRequest request) throws Exception {
+    public HttpResponse sweepPay(Integer total_fee, String productName, String auth_code, HttpServletRequest request) throws Exception {
         HttpResponse hr = new HttpResponse();
         if("".equals(auth_code) || auth_code == null){
             return hr.error("未获取到支付条形码");
         }
-        Map<String, Object> map = wechatPayService.sweepPay(auth_code, request);
+        Map<String, Object> map = wechatPayService.sweepPay(total_fee,productName, auth_code, request);
+        hr.addData(map);
+        return hr;
+    }
+    /**
+     * 功能描述: <br>退款申请
+     * 〈〉
+     * @Param: [transaction_id]
+     * @Return: com.kry.pms.base.HttpResponse
+     * @Author: huanghaibin
+     * @Date: 2020/4/11 17:39
+     */
+    @RequestMapping("/refund")
+    public HttpResponse refund(String transaction_id) throws Exception {
+        HttpResponse hr = new HttpResponse();
+        if("".equals(transaction_id) || transaction_id == null){
+            return hr.error("请传入微信订单号");
+        }
+        Map<String, Object> map = wechatPayService.refund(transaction_id);
         hr.addData(map);
         return hr;
     }

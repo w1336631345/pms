@@ -341,7 +341,7 @@ public class ReceptionServiceImpl implements ReceptionService {
 		if (checkInRecord!=null&&!(Constants.Type.CHECK_IN_RECORD_GROUP).equals(checkInRecord.getType())) {
 			if (checkInRecord.getMainRecord()!=null&&!(Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN).equals(checkInRecord.getMainRecord().getStatus())){
 				rep.setStatus(Constants.BusinessCode.CODE_PARAMETER_INVALID);
-				rep.setMessage("主单未入住，请先入住主单");
+				rep.setMessage("请先做团队主单入住，再做成员入住");
 				return rep;
 			}
 		}

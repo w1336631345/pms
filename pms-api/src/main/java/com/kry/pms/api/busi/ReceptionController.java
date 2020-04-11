@@ -50,7 +50,7 @@ public class ReceptionController extends BaseController<String> {
 	}
 
 	/**
-	 * 入住
+	 * 出
 	 *
 	 * @param
 	 * @return

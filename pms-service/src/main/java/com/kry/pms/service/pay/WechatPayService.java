@@ -14,7 +14,9 @@ public interface WechatPayService {
 
     Map<String, Object> login(String code, HttpServletRequest request) throws WeixinException, IOException;
 
-    Map<String, Object> sweepPay(String auth_code, HttpServletRequest request) throws Exception;
+    Map<String, Object> sweepPay(Integer total_fee, String body, String auth_code, HttpServletRequest request) throws Exception;
 
     void wxNotify(HttpServletRequest request, HttpServletResponse response) throws Exception;
+
+    Map<String, Object> refund(String transaction_id) throws Exception;
 }

@@ -2,16 +2,22 @@ package com.kry.pms.service.pay.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kry.pms.dao.pay.WechatPayRecordDao;
 import com.kry.pms.model.http.response.pay.Json;
 import com.kry.pms.model.http.response.pay.OAuthJsToken;
 import com.kry.pms.model.persistence.pay.WechatPay;
+import com.kry.pms.model.persistence.pay.WechatPayRecord;
 import com.kry.pms.pay.IpUtils;
 import com.kry.pms.pay.StringUtils;
 import com.kry.pms.pay.weixin.PayUtil;
+import com.kry.pms.service.pay.WechatPayRecordService;
 import com.kry.pms.service.pay.WechatPayService;
+import com.kry.pms.util.BeanToMapUtils;
+import com.kry.pms.util.ChangeCharUtil;
 import org.apache.commons.collections4.MapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.weixin4j.WeixinException;
 import org.weixin4j.WeixinSupport;
@@ -26,10 +32,14 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
 public class WechatPayServiceImpl extends WeixinSupport implements WechatPayService  {
+
+	@Autowired
+	WechatPayRecordDao wechatPayRecordDao;
 
 	private Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -170,66 +180,6 @@ public class WechatPayServiceImpl extends WeixinSupport implements WechatPayServ
         }
         return ret;
     }
-
-    @Override
-	public Map<String, Object> sweepPay(String auth_code, HttpServletRequest request) throws Exception {
-		Map<String, Object> map = new HashMap<>();
-		//生成的随机字符串
-		String nonce_str = StringUtils.getRandomStringByLength(32);
-		//商品名称
-		String body = "test";
-		String attach = "订单额外描述";
-		//获取本机的ip地址
-		String spbill_create_ip = IpUtils.getIpAddr(request);
-
-		Date date = new Date();
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmsssss");
-		String orderNo = sdf.format(date);
-		String money = "1";//支付金额，单位：分，这边需要转成字符串类型，否则后面的签名会失败
-
-		Map<String, String> packageParams = new HashMap<String, String>();
-		packageParams.put("appid", WechatPay.appid);
-		packageParams.put("auth_code", auth_code);
-		packageParams.put("body", body);
-		packageParams.put("mch_id", WechatPay.mch_id);
-		packageParams.put("nonce_str", nonce_str);
-		packageParams.put("out_trade_no", orderNo);//商户订单号
-		packageParams.put("spbill_create_ip", spbill_create_ip);
-		packageParams.put("total_fee", money);//支付金额，这边需要转成字符串类型，否则后面的签名会失败
-
-		// 除去数组中的空值和签名参数
-		packageParams = PayUtil.paraFilter(packageParams);
-		String prestr = PayUtil.createLinkString(packageParams); // 把数组所有元素，按照“参数=参数值”的模式用“&”字符拼接成字符串
-		//MD5运算生成签名，这里是第一次签名，用于调用统一下单接口
-		String mysign = PayUtil.sign(prestr, WechatPay.key, "utf-8").toUpperCase();
-		logger.info("=======================spbill_create_ip：" + spbill_create_ip + "=====================");
-		logger.info("=======================第一次签名1：" + mysign + "=====================");
-		//拼接统一下单接口使用的xml数据，要将上一步生成的签名一起拼接进去
-		String xml = "<xml>" + "<appid>" + WechatPay.appid  + "</appid>"
-				+ "<auth_code>" + auth_code + "</auth_code>"
-				+ "<body>" + body + "</body>"
-				+ "<mch_id>" + WechatPay.mch_id + "</mch_id>"
-				+ "<nonce_str>" + nonce_str + "</nonce_str>"
-				+ "<out_trade_no>" + orderNo + "</out_trade_no>"
-				+ "<spbill_create_ip>" + spbill_create_ip + "</spbill_create_ip>"
-				+ "<total_fee>" + money + "</total_fee>"
-				+ "<sign>" + mysign + "</sign>"
-				+ "</xml>";
-		System.out.println("调试模式_统一下单接口 请求XML数据：" + xml);
-		//调用统一下单接口，并接受返回的结果
-		String result = PayUtil.httpRequest(WechatPay.pay_url, "POST", xml);
-		System.out.println("调试模式_统一下单接口 返回XML数据1：" + result);
-		// 将解析结果存储在HashMap中
-		map = PayUtil.doXMLParse(result);
-		String resultCode = MapUtils.getString(map, "result_code");
-		if("SUCCESS".equals(resultCode)){
-			//支付成功
-		}else {
-			//支付失败
-		}
-		return map;
-	}
-
 	@Override
 	public void wxNotify(HttpServletRequest request, HttpServletResponse response) throws Exception{
 		BufferedReader br = new BufferedReader(new InputStreamReader((ServletInputStream)request.getInputStream()));
@@ -272,5 +222,125 @@ public class WechatPayServiceImpl extends WeixinSupport implements WechatPayServ
 		out.flush();
 		out.close();
 	}
+
+	@Override
+	public Map<String, Object> sweepPay(Integer total_fee, String body, String auth_code, HttpServletRequest request) throws Exception {
+		Map<String, Object> map = new HashMap<>();
+		//生成的随机字符串
+		String nonce_str = StringUtils.getRandomStringByLength(32);
+		//商品描述
+//		String body = body;
+		String attach = "订单额外描述";
+		//获取本机的ip地址
+		String spbill_create_ip = IpUtils.getIpAddr(request);
+
+		Date date = new Date();
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmsssss");
+		String orderNo = sdf.format(date);
+		Integer money = total_fee;//支付金额，单位：分，这边需要转成字符串类型，否则后面的签名会失败
+
+		Map<String, String> packageParams = new HashMap<String, String>();
+		packageParams.put("appid", WechatPay.appid);
+		packageParams.put("auth_code", auth_code);
+		packageParams.put("body", body);
+		packageParams.put("mch_id", WechatPay.mch_id);
+		packageParams.put("nonce_str", nonce_str);
+		packageParams.put("out_trade_no", orderNo);//商户订单号
+		packageParams.put("spbill_create_ip", spbill_create_ip);
+		packageParams.put("total_fee", money.toString());//支付金额，这边需要转成字符串类型，否则后面的签名会失败
+
+		// 除去数组中的空值和签名参数
+		packageParams = PayUtil.paraFilter(packageParams);
+		String prestr = PayUtil.createLinkString(packageParams); // 把数组所有元素，按照“参数=参数值”的模式用“&”字符拼接成字符串
+		//MD5运算生成签名，这里是第一次签名，用于调用统一下单接口
+		String mysign = PayUtil.sign(prestr, WechatPay.key, "utf-8").toUpperCase();
+		logger.info("=======================spbill_create_ip：" + spbill_create_ip + "=====================");
+		logger.info("=======================第一次签名1：" + mysign + "=====================");
+		//拼接统一下单接口使用的xml数据，要将上一步生成的签名一起拼接进去
+		String xml = "<xml>" + "<appid>" + WechatPay.appid  + "</appid>"
+				+ "<auth_code>" + auth_code + "</auth_code>"
+				+ "<body>" + body + "</body>"
+				+ "<mch_id>" + WechatPay.mch_id + "</mch_id>"
+				+ "<nonce_str>" + nonce_str + "</nonce_str>"
+				+ "<out_trade_no>" + orderNo + "</out_trade_no>"
+				+ "<spbill_create_ip>" + spbill_create_ip + "</spbill_create_ip>"
+				+ "<total_fee>" + money + "</total_fee>"
+				+ "<sign>" + mysign + "</sign>"
+				+ "</xml>";
+		System.out.println("调试模式_统一下单接口 请求XML数据：" + xml);
+		//调用统一下单接口，并接受返回的结果
+		String result = PayUtil.httpRequest(WechatPay.pay_url, "POST", xml);
+		System.out.println("调试模式_统一下单接口 返回XML数据1：" + result);
+		// 将解析结果存储在HashMap中
+		map = PayUtil.doXMLParse(result);
+		String resultCode = MapUtils.getString(map, "result_code");
+		if("SUCCESS".equals(resultCode)){
+			//支付成功
+		}else {
+			//支付失败
+		}
+		map = ChangeCharUtil.humpToLineMap(map);
+		WechatPayRecord wpr = BeanToMapUtils.toBean(WechatPayRecord.class, map);
+		wpr.setBody(body);
+		wechatPayRecordDao.saveAndFlush(wpr);//保存记录
+		return map;
+	}
+
+	@Override
+	public Map<String, Object> refund(String transaction_id) throws Exception {
+//		WechatPayRecord wpr = new WechatPayRecord();
+		WechatPayRecord wpr = wechatPayRecordDao.findByTransactionId(transaction_id);
+		Map<String, Object> map = new HashMap<>();
+		//生成的随机字符串
+		String nonce_str = StringUtils.getRandomStringByLength(32);
+
+		Date date = new Date();
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmsssss");
+		String out_refund_no = sdf.format(date);
+
+		Map<String, String> packageParams = new HashMap<String, String>();
+		packageParams.put("appid", WechatPay.appid);
+		packageParams.put("mch_id", WechatPay.mch_id);
+		packageParams.put("nonce_str", nonce_str);
+		packageParams.put("transaction_id", transaction_id);//微信订单号
+//		packageParams.put("out_trade_no", wpr.getOut_trade_no());//商户订单号(与微信订单号 二选一)
+		packageParams.put("out_refund_no", out_refund_no);//商户退款单号
+		packageParams.put("total_fee", wpr.getTotalFee());//支付金额，这边需要转成字符串类型，否则后面的签名会失败
+		packageParams.put("refund_fee", wpr.getTotalFee());//退款金额，可以部分退款
+
+		// 除去数组中的空值和签名参数
+		packageParams = PayUtil.paraFilter(packageParams);
+		String prestr = PayUtil.createLinkString(packageParams); // 把数组所有元素，按照“参数=参数值”的模式用“&”字符拼接成字符串
+		//MD5运算生成签名，这里是第一次签名，用于调用统一下单接口
+		String mysign = PayUtil.sign(prestr, WechatPay.key, "utf-8").toUpperCase();
+		logger.info("=======================第一次签名1：" + mysign + "=====================");
+		//拼接统一下单接口使用的xml数据，要将上一步生成的签名一起拼接进去
+		String xml = "<xml>" + "<appid>" + WechatPay.appid  + "</appid>"
+				+ "<mch_id>" + WechatPay.mch_id + "</mch_id>"
+				+ "<nonce_str>" + nonce_str + "</nonce_str>"
+				+ "<transaction_id>" + transaction_id + "</transaction_id>"
+				+ "<out_refund_no>" + out_refund_no + "</out_refund_no>"
+				+ "<total_fee>" +  wpr.getTotalFee() + "</total_fee>"
+				+ "<refund_fee>" +  wpr.getTotalFee() + "</refund_fee>"
+				+ "<sign>" + mysign + "</sign>"
+				+ "</xml>";
+		System.out.println("调试模式_统一下单接口 请求XML数据：" + xml);
+		//调用统一下单接口，并接受返回的结果
+		String result = PayUtil.httpRequest(WechatPay.refund_url, "POST", xml);
+		System.out.println("调试模式_统一下单接口 返回XML数据1：" + result);
+		// 将解析结果存储在HashMap中
+		map = PayUtil.doXMLParse(result);
+		String resultCode = MapUtils.getString(map, "result_code");
+		if("SUCCESS".equals(resultCode)){
+			//支付成功
+		}else {
+			//支付失败
+		}
+//		WechatPayRecord wpr = BeanToMapUtils.toBean(WechatPayRecord.class, map);
+//		wpr.setBody(body);
+//		wechatPayRecordDao.saveAndFlush(wpr);//保存记录
+		return map;
+	}
+
 
 }
