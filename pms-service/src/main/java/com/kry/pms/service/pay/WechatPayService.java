@@ -18,5 +18,14 @@ public interface WechatPayService {
 
     void wxNotify(HttpServletRequest request, HttpServletResponse response) throws Exception;
 
-    Map<String, Object> refund(String transaction_id) throws Exception;
+    Map<String, Object> refund(String refund_fee, String transaction_id) throws Exception;
+
+    String doRefund(String mchId, String url, String data) throws Exception;
+
+    Map<String, Object> orderquery(String out_trade_no, String transaction_id) throws Exception;
+
+    //撤销订单
+    Map<String, Object> reverse(String transaction_id) throws Exception;
+
+    Map<String, Object> refundquery(String refund_id) throws Exception;
 }
