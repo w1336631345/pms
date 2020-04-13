@@ -656,6 +656,39 @@ public class RoomUsageServiceImpl implements RoomUsageService {
 
     }
 
+    @Override
+    public boolean extendTime(UseInfoAble info, LocalDateTime newStartTime, LocalDateTime newEndTime) {
+        RoomUsage ru = roomUsageDao.queryGuestRoomUsable(info.guestRoom().getId(), info.getStartTime(), info.getEndTime());
+        LocalDateTime endTime =newEndTime;
+        LocalDateTime startTime = newStartTime;
+        if (ru != null) {
+            RoomUsage postRu = ru.getPostRoomUsage();
+            RoomUsage preRu = ru.getPreRoomUsage();
+            if (postRu != null && Constants.Status.ROOM_STATUS_FREE.equals(postRu.getUsageStatus())&&preRu != null && Constants.Status.ROOM_STATUS_FREE.equals(preRu.getUsageStatus())) {
+                if (endTime.isBefore(postRu.getEndDateTime())&&startTime.isAfter(preRu.getStartDateTime())) {
+                    ru.setEndDateTime(endTime);
+                    ru.setStartDateTime(startTime);
+                    updateDuration(ru);
+                    postRu.setStartDateTime(endTime);
+                    preRu.setEndDateTime(startTime);
+                    updateDuration(postRu);
+                    updateDuration(preRu);
+                    modify(preRu);
+                    modify(ru);
+                    modify(postRu);
+                    roomTypeQuantityService.useRoomType(info, endTime);
+                    return true;
+                } else {
+                    return false;
+                }
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
+
     private boolean use(UseInfoAble info, String status) {
         RoomUsage ru = roomUsageDao.queryGuestRoomUsable(info.guestRoom().getId(), info.getStartTime(), info.getEndTime());
         LocalDateTime startTime = info.getStartTime();

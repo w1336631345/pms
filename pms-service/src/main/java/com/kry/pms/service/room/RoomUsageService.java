@@ -111,4 +111,6 @@ public interface RoomUsageService extends BaseService<RoomUsage> {
 	boolean unLock(UseInfoAble info, LocalDateTime cancleDateTime);
 
     boolean extendTime(UseInfoAble info, LocalDate extendDate);
+
+    boolean extendTime(UseInfoAble info, LocalDateTime newStartTime, LocalDateTime newEndTime);
 }

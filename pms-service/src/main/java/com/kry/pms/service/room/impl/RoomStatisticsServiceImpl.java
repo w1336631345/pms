@@ -101,8 +101,11 @@ public class RoomStatisticsServiceImpl implements RoomStatisticsService {
 
     @Override
     public boolean extendTime(UseInfoAble info, LocalDateTime newStartTime, LocalDateTime newEndTime) {
-
-        return false;
+        if(newStartTime==null){
+            return extendTime(info,newEndTime.toLocalDate());
+        }else{
+            return roomUsageService.extendTime(info,newStartTime,newEndTime);
+        }
     }
 
 
