@@ -65,4 +65,6 @@ public interface GuestRoomStatusService extends BaseService<GuestRoomStatus> {
     void lock(UseInfoAble info);
 
     void clearUseInfo(UseInfoAble info);
+
+    void updateStatus(UseInfoAble info);
 }

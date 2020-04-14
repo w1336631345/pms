@@ -483,6 +483,20 @@ public class GuestRoomStatusServiceImpl implements GuestRoomStatusService {
         status.setRoomStatus(Constants.Status.ROOM_STATUS_VACANT_DIRTY);
         modify(status);
     }
+
+    @Override
+    public void updateStatus(UseInfoAble info) {
+        GuestRoomStatus status = guestRoomStatusDao.findByGuestRoomId(info.guestRoom().getId());
+        status.setFree(info.isFree());
+        status.setGroup(info.isGroup());
+        status.setOta(info.isOTA());
+        status.setHourRoom(info.isHourRoom());
+        status.setOverdued(info.isArrears());
+        status.setVip(info.isVIP());
+        status.setWillArrive(false);
+        modify(status);
+    }
+
     private void clearStatus(GuestRoomStatus status){
         status.setFree(false);
         status.setGroup(false);

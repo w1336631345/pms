@@ -154,6 +154,7 @@ public class SqlTemplateServiceImpl implements SqlTemplateService {
         if (st != null) {
             String templateValue = st.getSql();
             StringWriter stringWriter = new StringWriter();
+            parmrs.put("hotelCode",hotelCode);
             Template template = new Template(hotelCode, templateValue, configuration);
             template.process(parmrs, stringWriter);
             String data = stringWriter.toString();
@@ -173,6 +174,7 @@ public class SqlTemplateServiceImpl implements SqlTemplateService {
             String templateValue = st.getSql();
             StringWriter stringWriter = new StringWriter();
             Template template = new Template(hotelCode, templateValue, configuration);
+            pageRequest.getExb().put("hotelCode",hotelCode);
             template.process(pageRequest.getExb(), stringWriter);
             String data = stringWriter.toString();
             String countSql = SqlUtil.getCountSQL(data);

@@ -108,6 +108,14 @@ public class RoomStatisticsServiceImpl implements RoomStatisticsService {
         }
     }
 
+    @Override
+    public boolean updateGuestRoomStatus(UseInfoAble info) {
+        if(Constants.Status.ROOM_STATUS_OCCUPY_CLEAN.equals(info.getRoomStatus())&&info.getStartTime().isBefore(LocalDateTime.now())&&info.getEndTime().isAfter(LocalDateTime.now())){
+            guestRoomStatusService.updateStatus(info);
+        }
+        return true;
+    }
+
 
     @Override
     public boolean cancelCheckOut(UseInfoAble info) {

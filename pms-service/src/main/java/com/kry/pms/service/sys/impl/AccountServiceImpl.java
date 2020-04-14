@@ -668,6 +668,9 @@ public class AccountServiceImpl implements AccountService {
                 settleInfoVo = createSettleInfo(cir, Constants.Type.EXT_FEE_NONE, hotelCode);
             } else {
                 settleInfoVo = new SettleInfoVo();
+
+
+
                 settleInfoVo.setSettlEnable(false);
                 settleInfoVo.setMessage("请先结清其他帐务");
             }

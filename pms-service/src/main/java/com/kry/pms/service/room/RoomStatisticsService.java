@@ -109,4 +109,6 @@ public interface RoomStatisticsService {
 	public boolean extendTime(UseInfoAble info, LocalDate extendDate);
 
 	public boolean extendTime(UseInfoAble info,LocalDateTime newStartTime,LocalDateTime newEndTime);
+
+	public boolean updateGuestRoomStatus(UseInfoAble info);
 }

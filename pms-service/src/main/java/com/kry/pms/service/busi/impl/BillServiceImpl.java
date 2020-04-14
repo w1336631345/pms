@@ -90,7 +90,7 @@ public class BillServiceImpl implements BillService {
                 bill.setType(p.getType());
                 bill.setCreateDate(LocalDateTime.now());
                 bill.setBusinessDate(businessSeqService.getBuinessDate(p.getHotelCode()));
-                if (bill.getStatus() == null) {
+                if (bill.getStatus() == null||Constants.Status.NORMAL.equals(bill.getStatus())) {
                     bill.setStatus(Constants.Status.BILL_NEED_SETTLED);
                 }
             }
