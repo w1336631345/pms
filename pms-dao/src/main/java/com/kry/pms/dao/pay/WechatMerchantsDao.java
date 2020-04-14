@@ -8,6 +8,6 @@ import java.util.List;
 
 public interface WechatMerchantsDao extends BaseDao<WechatMerchants> {
 
-    List<WechatMerchants> findByHotelCode(String code);
+    WechatMerchants findByHotelCode(String hotelCode);
 
 }
