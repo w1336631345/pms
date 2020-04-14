@@ -19,7 +19,7 @@ public class WechatPay {
     //签名方式
     public static final String SIGNTYPE = "MD5";
     //交易类型
-    public static final String TRADETYPE = "JSAPI";
+    public static final String TRADETYPE = "MICROPAY";
     //微信扫码收款接口地址
     public static final String pay_url = "https://api.mch.weixin.qq.com/pay/micropay";
 //    public static final String pay_url = "https://api.mch.weixin.qq.com/sandboxnew/pay/micropay";//测试接口

@@ -1,5 +1,6 @@
 package com.kry.pms.api.pay;
 
+import com.kry.pms.api.BaseController;
 import com.kry.pms.base.HttpResponse;
 import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
@@ -25,7 +26,7 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping("/api/v1/pay/wechatPay")
-public class WechatPayController {
+public class WechatPayController extends BaseController {
     @Autowired
     WechatPayService wechatPayService;
 
@@ -75,7 +76,7 @@ public class WechatPayController {
         if("".equals(auth_code) || auth_code == null){
             return hr.error("未获取到支付条形码");
         }
-        Map<String, Object> map = wechatPayService.sweepPay(total_fee,productName, auth_code, request);
+        Map<String, Object> map = wechatPayService.sweepPay(total_fee,productName, auth_code, request, getCurrentHotleCode());
         hr.addData(map);
         return hr;
     }
@@ -93,7 +94,7 @@ public class WechatPayController {
         if("".equals(transaction_id) || transaction_id == null){
             return hr.error("请传入微信订单号");
         }
-        Map<String, Object> map = wechatPayService.refund(refund_fee, transaction_id);
+        Map<String, Object> map = wechatPayService.refund(refund_fee, transaction_id, getCurrentHotleCode());
         hr.addData(map);
         return hr;
     }
@@ -114,7 +115,7 @@ public class WechatPayController {
                 return hr.error("请传入微信订单号");
             }
         }
-        Map<String, Object> map = wechatPayService.orderquery(out_trade_no, transaction_id);
+        Map<String, Object> map = wechatPayService.orderquery(out_trade_no, transaction_id, getCurrentHotleCode());
         hr.addData(map);
         return hr;
     }
@@ -135,7 +136,7 @@ public class WechatPayController {
         if("".equals(transaction_id) || transaction_id == null){
             return hr.error("请传入微信订单号");
         }
-        Map<String, Object> map = wechatPayService.reverse(transaction_id);
+        Map<String, Object> map = wechatPayService.reverse(transaction_id, getCurrentHotleCode());
         hr.addData(map);
         return hr;
     }
@@ -153,7 +154,7 @@ public class WechatPayController {
         if("".equals(refund_id) || refund_id == null){
             return hr.error("请传入微信订单号");
         }
-        Map<String, Object> map = wechatPayService.refundquery(refund_id);
+        Map<String, Object> map = wechatPayService.refundquery(refund_id, getCurrentHotleCode());
         hr.addData(map);
         return hr;
     }

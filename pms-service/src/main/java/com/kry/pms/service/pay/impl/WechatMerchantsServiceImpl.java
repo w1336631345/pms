@@ -53,8 +53,8 @@ public class WechatMerchantsServiceImpl implements WechatMerchantsService {
 
 	@Override
 	public List<WechatMerchants> getAllByHotelCode(String code) {
-//		return null;//默认不实现
-		return wechatMerchantsDao.findByHotelCode(code);
+		return null;//默认不实现
+//		return wechatMerchantsDao.findByHotelCode(code);
 	}
 
 	@Override
