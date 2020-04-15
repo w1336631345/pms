@@ -363,7 +363,7 @@ public class WechatPayServiceImpl extends WeixinSupport implements WechatPayServ
 	//申请退款（接口调用）
 	@Override
 	public String doRefund(String mchId, String url, String data, String path) throws Exception {
-		path = "E:\\certificate\\apiclient_cert.p12";
+//		path = "E:\\certificate\\apiclient_cert.p12";
 		/**
 		 * 注意PKCS12证书 是从微信商户平台-》账户设置-》 API安全 中下载的
 		 */
