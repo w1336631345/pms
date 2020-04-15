@@ -9,5 +9,5 @@ public interface WechatPayRecordService extends BaseService<WechatPayRecord> {
 
     void deleteTrue(String id);
 
-    HttpResponse resultUpdate(String out_trade_no, String trade_state, String trade_state_desc, String currentHotleCode);
+    HttpResponse resultUpdate(String out_trade_no, String trade_state, String trade_state_desc, String transaction_id, String currentHotleCode);
 }
