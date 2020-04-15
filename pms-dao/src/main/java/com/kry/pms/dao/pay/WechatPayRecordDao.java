@@ -11,4 +11,6 @@ public interface WechatPayRecordDao extends BaseDao<WechatPayRecord> {
 
     WechatPayRecord findByTransactionId(String transaction_id);
 
+    WechatPayRecord findByOutTradeNoAndHotelCode(String outTradeNo, String hotelCode);
+
 }

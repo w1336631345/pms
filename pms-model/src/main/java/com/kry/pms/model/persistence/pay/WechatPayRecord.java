@@ -38,5 +38,9 @@ public class WechatPayRecord extends PersistenceModel {
     private String errCode;
     @Column(columnDefinition = "varchar(128) COMMENT '错误代码描述'")
     private String errCodeDes;
+    @Column(columnDefinition = "varchar(64) COMMENT '交易状态'")
+    private String tradeState;
+    @Column(columnDefinition = "varchar(256) COMMENT '交易状态描述'")
+    private String tradeStateDesc;
 
 }

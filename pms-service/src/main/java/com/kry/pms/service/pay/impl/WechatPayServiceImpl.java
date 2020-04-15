@@ -298,6 +298,7 @@ public class WechatPayServiceImpl extends WeixinSupport implements WechatPayServ
 		Map<String, Object> mapw = ChangeCharUtil.humpToLineMap(map);
 		WechatPayRecord wpr = BeanToMapUtils.toBean(WechatPayRecord.class, mapw);
 		wpr.setTotalFee(total_fee.toString());
+		wpr.setHotelCode(hotelCode);
 		wpr.setBody(body);
 		wechatPayRecordDao.saveAndFlush(wpr);//保存记录
 		hr.addData(map);
@@ -310,6 +311,19 @@ public class WechatPayServiceImpl extends WeixinSupport implements WechatPayServ
 		HttpResponse hr = new HttpResponse();
 //		WechatPayRecord wpr = new WechatPayRecord();
 		WechatPayRecord wpr = wechatPayRecordDao.findByTransactionId(transaction_id);
+		String totalFee = null;
+		if(wpr == null){//如果是要用户输入密码，数据库没有记录transaction_id
+			HttpResponse h = orderquery(null, transaction_id, hotelCode);
+			Map<String, Object> map = (Map<String, Object>) h.getData();
+			String trade_state = MapUtils.getString(map, "trade_state");
+			if("SUCCESS".equals(trade_state)){
+				totalFee = MapUtils.getString(map, "total_fee");
+			}else {
+				return hr.error("该订单用户并未成功支付，无法退款");
+			}
+		}else {
+			totalFee = wpr.getTotalFee();
+		}
 		Map<String, Object> map = new HashMap<>();
 		//生成的随机字符串
 		String nonce_str = StringUtils.getRandomStringByLength(32);
@@ -329,11 +343,11 @@ public class WechatPayServiceImpl extends WeixinSupport implements WechatPayServ
 		packageParams.put("transaction_id", transaction_id);//微信订单号
 //		packageParams.put("out_trade_no", wpr.getOut_trade_no());//商户订单号(与微信订单号 二选一)
 		packageParams.put("out_refund_no", out_refund_no);//商户退款单号
-		packageParams.put("total_fee", wpr.getTotalFee());//支付金额，这边需要转成字符串类型，否则后面的签名会失败
+		packageParams.put("total_fee", totalFee);//支付金额，这边需要转成字符串类型，否则后面的签名会失败
 		if(refund_fee != null || !"".equals(refund_fee)){
 			packageParams.put("refund_fee", refund_fee);//退款金额，可以部分退款
 		}else {
-			packageParams.put("refund_fee", wpr.getTotalFee());//退款金额，全部退款
+			packageParams.put("refund_fee", totalFee);//退款金额，全部退款
 		}
 
 		// 除去数组中的空值和签名参数
@@ -347,7 +361,7 @@ public class WechatPayServiceImpl extends WeixinSupport implements WechatPayServ
 		//调用统一下单接口，并接受返回的结果
 //		String result = PayUtil.httpRequest(WechatPay.refund_url, "POST", xml);
 		String path = wm.getCerPath();
-		String result = doRefund(wm.getMchId(), WechatPay.refund_url, xml, path);
+		String result = doRefund(wm.getMchId(), WechatPay.refund_url, xml, path, hotelCode);
 		System.out.println("调试模式_统一下单接口 返回XML数据1：" + result);
 		// 将解析结果存储在HashMap中
 		map = PayUtil.doXMLParse(result);
@@ -362,7 +376,7 @@ public class WechatPayServiceImpl extends WeixinSupport implements WechatPayServ
 	}
 	//申请退款（接口调用）
 	@Override
-	public String doRefund(String mchId, String url, String data, String path) throws Exception {
+	public String doRefund(String mchId, String url, String data, String path, String hotelCode) throws Exception {
 //		path = "E:\\certificate\\apiclient_cert.p12";
 		/**
 		 * 注意PKCS12证书 是从微信商户平台-》账户设置-》 API安全 中下载的

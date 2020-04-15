@@ -51,4 +51,19 @@ public class WechatPayRecordController extends BaseController<WechatPayRecord> {
 		return rep.addData(list);
 	}
 
+	/**
+	 * 功能描述: <br>用户输入支付密码后查询结果，更改数据库支付数据结果
+	 * 〈〉
+	 * @Param: [out_trade_no, trade_state, trade_state_desc]
+	 * @Return: com.kry.pms.base.HttpResponse
+	 * @Author: huanghaibin
+	 * @Date: 2020/4/15 15:43
+	 */
+	@GetMapping(path = "/resultUpdate")
+	public HttpResponse resultUpdate(String out_trade_no, String trade_state, String trade_state_desc){
+		HttpResponse rep = new HttpResponse();
+		rep = wechatPayRecordService.resultUpdate(out_trade_no, trade_state, trade_state_desc, getCurrentHotleCode());
+		return rep;
+	}
+
 }

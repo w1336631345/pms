@@ -1,6 +1,7 @@
 package com.kry.pms.service.pay.impl;
 
 import com.kry.pms.base.Constants;
+import com.kry.pms.base.HttpResponse;
 import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
 import com.kry.pms.dao.org.CorporationDao;
@@ -39,6 +40,19 @@ public class WechatPayRecordServiceImpl implements WechatPayRecordService {
 	@Override
 	public void deleteTrue(String id) {
 		wechatPayRecordDao.deleteById(id);
+	}
+
+	@Override
+	public HttpResponse resultUpdate(String out_trade_no, String trade_state, String trade_state_desc, String hotleCode) {
+	 	HttpResponse hr = new HttpResponse();
+		WechatPayRecord wpr = wechatPayRecordDao.findByOutTradeNoAndHotelCode(out_trade_no, hotleCode);
+		if(wpr == null){
+			return hr.error("订单不存在");
+		}
+		wpr.setTradeState(trade_state);
+		wpr.setTradeStateDesc(trade_state_desc);
+		hr.addData(wechatPayRecordDao.saveAndFlush(wpr));
+		return hr;
 	}
 
 	@Override

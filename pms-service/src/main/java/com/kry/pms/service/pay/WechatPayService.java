@@ -21,7 +21,7 @@ public interface WechatPayService {
 
     HttpResponse refund(String refund_fee, String transaction_id, String hotelCode) throws Exception;
 
-    String doRefund(String mchId, String url, String data, String path) throws Exception;
+    String doRefund(String mchId, String url, String data, String path, String hotelCode) throws Exception;
 
     HttpResponse orderquery(String out_trade_no, String transaction_id, String hotelCode) throws Exception;
 
