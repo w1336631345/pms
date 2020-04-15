@@ -39,6 +39,8 @@ public class Bill extends PersistenceModel {
 	@OneToOne
 	private GuestRoom guestRoom;
 	@Column
+	private String showName;
+	@Column
 	private String roomNum;
 	@OneToOne
 	private Product product;

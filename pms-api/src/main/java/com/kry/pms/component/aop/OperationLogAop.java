@@ -23,8 +23,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
-@Aspect
-@Component
+//@Aspect
+//@Component
 public class OperationLogAop {
     private static final String NAME_METHOD_FIND_BY_ID = "findById";
     private static final String NAME_METHOD_GET_ID = "getId";

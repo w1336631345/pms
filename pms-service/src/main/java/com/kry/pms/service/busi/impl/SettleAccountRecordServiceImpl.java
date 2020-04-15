@@ -187,6 +187,20 @@ public class SettleAccountRecordServiceImpl implements SettleAccountRecordServic
 //		BeanUtils.copyProperties(crep, rep);
         return rep;
     }
+    @Override
+    public SettleAccountRecord createToAr(BillCheckBo billCheckBo, Account account, Account targetAccount){
+        SettleAccountRecord scr = new SettleAccountRecord();
+        scr.setRecordNum(businessSeqService.fetchNextSeqNum(targetAccount.getHotelCode(),
+                Constants.Key.BUSINESS_BUSINESS_SETTLE_SEQ_KEY));
+        scr.setShiftCode(billCheckBo.getShiftCode());
+        scr.setAccount(account);
+        scr.setTargetAccount(targetAccount);
+        scr.setSettleWay(billCheckBo.getCheckWay());
+        scr.setHotelCode(account.getHotelCode());
+        scr.setOperationEmployee(billCheckBo.getOperationEmployee());
+        scr.setSettleTime(LocalDateTime.now());
+        return add(scr);
+    }
 
     @Override
     public SettleAccountRecord create(BillCheckBo billCheckBo, Account account, Account targetAccount) {

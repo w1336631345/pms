@@ -1,12 +1,9 @@
 package com.kry.pms.service.sys.impl;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import javax.transaction.Transactional;
 
@@ -298,7 +295,63 @@ public class AccountServiceImpl implements AccountService {
         return rep;
     }
 
+    private DtoResponse<Account> checkAccountByAr(BillCheckBo billCheckBo) {
+        DtoResponse<Account> rep = new DtoResponse<Account>();
+        Account account = findById(billCheckBo.getAccountId());
+        Account targetAccount = findById(billCheckBo.getTargetAccountId());
+        LocalDateTime now = LocalDateTime.now();
+        if (account!=null) {
+            SettleAccountRecord settleAccountRecord = settleAccountRecordService.createToAr(billCheckBo, account, targetAccount);
+            List<Bill> bills = null;
+            if (Constants.Type.SETTLE_TYPE_ACCOUNT.equals(billCheckBo.getCheckType())) {
+                bills = billService.findByAccountAndStatus(account, Constants.Status.BILL_NEED_SETTLED);
+            } else if (Constants.Type.SETTLE_TYPE_PART.equals(billCheckBo.getCheckType())) {
+                bills = billService.findByIds(billCheckBo.getBillIds());
+            }
+            if (bills == null || bills.isEmpty()) {
+                rep.error(Constants.BusinessCode.CODE_PARAMETER_INVALID,"没有待转帐务，请核实！");
+            } else {
+                double pay = 0.0, cost = 0.0;
+                for (Bill bill : bills) {
+                    if (bill.getCost() != null) {
+                        cost = BigDecimalUtil.add(cost, bill.getCost());
+                    }
+                    if (bill.getPay() != null) {
+                        pay = BigDecimalUtil.add(pay, bill.getPay());
+                    }
+                    bill.setStatus(Constants.Status.BILL_SETTLED);
+                    bill.setCurrentSettleAccountRecordNum(settleAccountRecord.getRecordNum());
+                    billService.modify(bill);
+                }
+                double processTotal = BigDecimalUtil.sub(cost, pay);
+                if (processTotal == billCheckBo.getTotal()) {
+                    if (targetAccount != null) {
+                        Bill payBill = billService.createToArBill(account,processTotal,pay,billCheckBo.getOperationEmployee(),billCheckBo.getShiftCode(),settleAccountRecord.getRecordNum(),"To:"+targetAccount.getCode());
+                        Bill costBill = billService.createArSettleBill(targetAccount, billCheckBo.getTotal(), cost, pay, billCheckBo.getOperationEmployee(), billCheckBo.getShiftCode());
+                        List<Bill> flatBills = new ArrayList<>();
+                        flatBills.add(payBill);
+                        flatBills.add(costBill);
+                        settleAccountRecord.setFlatBills(flatBills);
+                        settleAccountRecord.setBills(bills);
+                        settleAccountRecord.setExtBills(billCheckBo.getExtBills());
+                        settleAccountRecordService.modify(settleAccountRecord);
+                    } else {
+                        rep.error(Constants.BusinessCode.CODE_PARAMETER_INVALID, "转账目标AR账户无法找到");
+                    }
+                } else {
+                    rep.error(Constants.BusinessCode.CODE_PARAMETER_INVALID, "入账金额:" + billCheckBo.getTotal() + "待结帐 消费：" + cost + "付款：" + pay + "合计：" + processTotal);
+                }
+            }
+        }else{
+            rep.error(Constants.BusinessCode.CODE_PARAMETER_INVALID, "结帐账户无法找到");
+        }
+        return rep;
+    }
+
     private DtoResponse<Account> checkAccountBill(BillCheckBo billCheckBo) {
+        if(billCheckBo.getCheckWay()!=null&&billCheckBo.getCheckWay().equals(Constants.Type.BILL_CHECK_WAY_SETTLED_AR)){
+            return checkAccountByAr(billCheckBo);
+        }
         DtoResponse<Account> rep = new DtoResponse<Account>();
         Account account = findById(billCheckBo.getAccountId());
         List<Bill> bills = null;
@@ -321,6 +374,7 @@ public class AccountServiceImpl implements AccountService {
                 bills = billService.checkBillIds(billCheckBo.getBillIds(), total, rep,
                         settleAccountRecord.getRecordNum());
             }
+
             if (rep.getStatus() == 0) {
                 settleAccountRecord.setBills(bills);
                 settleAccountRecord.setFlatBills(flatBills);
@@ -610,8 +664,8 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public Bill enterExtFee(CheckInRecord cir, String type) {
         if (cir.getAccount() != null) {
-            Bill bill  = createExtFee(cir,type);
-            if(bill!=null){
+            Bill bill = createExtFee(cir, type);
+            if (bill != null) {
                 return billService.add(bill);
             }
         }
@@ -627,7 +681,7 @@ public class AccountServiceImpl implements AccountService {
     }
 
     private Bill createExtFee(CheckInRecord cir, String type) {
-        if(cir.getPersonalPrice()>0.0){
+        if (cir.getPersonalPrice() > 0.0) {
             Product product = null;
             double cost = 0.0;
             if (Constants.Type.EXT_FEE_HALF.equals(type)) {
@@ -668,7 +722,6 @@ public class AccountServiceImpl implements AccountService {
                 settleInfoVo = createSettleInfo(cir, Constants.Type.EXT_FEE_NONE, hotelCode);
             } else {
                 settleInfoVo = new SettleInfoVo();
-
 
 
                 settleInfoVo.setSettlEnable(false);
@@ -718,18 +771,19 @@ public class AccountServiceImpl implements AccountService {
         return info;
     }
 
-    private void countNeedSettleBill(SettleInfoVo info,Account account){
+    private void countNeedSettleBill(SettleInfoVo info, Account account) {
         BillStatistics temp = billService.sumNeedSettle(account);
-        if(temp.getCost()!=null){
+        if (temp.getCost() != null) {
             info.setCost(BigDecimalUtil.add(info.getCost(), temp.getCost()));
         }
-        if(temp.getPay()!=null){
+        if (temp.getPay() != null) {
             info.setPay(BigDecimalUtil.add(info.getPay(), temp.getPay()));
         }
 
     }
+
     private void countSettleInfo(SettleInfoVo info, Account account) {
-        countNeedSettleBill(info,account);
+        countNeedSettleBill(info, account);
 //        if (account.getCost() != null) {
 //            info.setCost(BigDecimalUtil.add(info.getCost(), account.getCost()));
 //        }

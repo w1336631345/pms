@@ -162,7 +162,8 @@ public class Constants {
 		
 		public static final String BILL_CHECK_WAY_SETTLED = "S";
 		public static final String BILL_CHECK_WAY_TRANSFER = "T";
-		
+		public static final String BILL_CHECK_WAY_SETTLED_AR= "TAR";
+
 		public static final String CREDIT_GRANT_EMPLOYEE="E";
 
 		public static final String EXT_FEE_NONE = "N";
@@ -255,5 +256,6 @@ public class Constants {
 	public interface Code {
 		public static final String  HALF_DAY_ROOM_FEE = "1002";
 		public static final String  FULL_DAY_ROOM_FEE = "1001";
+		public static final String  TO_AR = "9014";
 	}
 }
