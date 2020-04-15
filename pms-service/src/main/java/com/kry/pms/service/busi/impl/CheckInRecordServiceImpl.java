@@ -174,6 +174,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                 }
                 cir.setCorp(checkInRecord.getCorp());
                 checkInRecordDao.saveAndFlush(cir);
+                roomStatisticsService.updateGuestRoomStatus(new CheckInRecordWrapper(cir));
             }
         }else {//不是主单，是宾客信息
             checkInRecord.setMainRecord(dbCir.getMainRecord());
@@ -210,6 +211,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
             }
         }
         hr.addData(checkInRecordDao.saveAndFlush(checkInRecord));
+        roomStatisticsService.updateGuestRoomStatus(new CheckInRecordWrapper(checkInRecord));
         return hr.ok();
     }
 
@@ -272,6 +274,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
             }
             UpdateUtil.copyNullProperties(checkUpdateItemTestBo, cir);
             checkInRecordDao.save(cir);
+            roomStatisticsService.updateGuestRoomStatus(new CheckInRecordWrapper(cir));
         }
         return hr;
     }

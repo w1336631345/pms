@@ -76,8 +76,7 @@ public class WechatPayController extends BaseController {
         if("".equals(auth_code) || auth_code == null){
             return hr.error("未获取到支付条形码");
         }
-        Map<String, Object> map = wechatPayService.sweepPay(total_fee,productName, auth_code, request, getCurrentHotleCode());
-        hr.addData(map);
+        hr = wechatPayService.sweepPay(total_fee,productName, auth_code, request, getCurrentHotleCode());
         return hr;
     }
     /**
@@ -94,8 +93,7 @@ public class WechatPayController extends BaseController {
         if("".equals(transaction_id) || transaction_id == null){
             return hr.error("请传入微信订单号");
         }
-        Map<String, Object> map = wechatPayService.refund(refund_fee, transaction_id, getCurrentHotleCode());
-        hr.addData(map);
+        hr = wechatPayService.refund(refund_fee, transaction_id, getCurrentHotleCode());
         return hr;
     }
 
@@ -115,8 +113,7 @@ public class WechatPayController extends BaseController {
                 return hr.error("请传入微信订单号");
             }
         }
-        Map<String, Object> map = wechatPayService.orderquery(out_trade_no, transaction_id, getCurrentHotleCode());
-        hr.addData(map);
+        hr = wechatPayService.orderquery(out_trade_no, transaction_id, getCurrentHotleCode());
         return hr;
     }
 
@@ -136,8 +133,7 @@ public class WechatPayController extends BaseController {
         if("".equals(transaction_id) || transaction_id == null){
             return hr.error("请传入微信订单号");
         }
-        Map<String, Object> map = wechatPayService.reverse(transaction_id, getCurrentHotleCode());
-        hr.addData(map);
+        hr = wechatPayService.reverse(transaction_id, getCurrentHotleCode());
         return hr;
     }
     /**
@@ -154,8 +150,7 @@ public class WechatPayController extends BaseController {
         if("".equals(refund_id) || refund_id == null){
             return hr.error("请传入微信订单号");
         }
-        Map<String, Object> map = wechatPayService.refundquery(refund_id, getCurrentHotleCode());
-        hr.addData(map);
+        hr = wechatPayService.refundquery(refund_id, getCurrentHotleCode());
         return hr;
     }
     /**
