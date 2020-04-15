@@ -174,6 +174,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                 }
                 cir.setCorp(checkInRecord.getCorp());
                 checkInRecordDao.saveAndFlush(cir);
+                roomStatisticsService.updateGuestRoomStatus(new CheckInRecordWrapper(cir));
             }
         }else {//不是主单，是宾客信息
             checkInRecord.setMainRecord(dbCir.getMainRecord());
@@ -210,6 +211,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
             }
         }
         hr.addData(checkInRecordDao.saveAndFlush(checkInRecord));
+        roomStatisticsService.updateGuestRoomStatus(new CheckInRecordWrapper(checkInRecord));
         return hr.ok();
     }
 
@@ -272,6 +274,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
             }
             UpdateUtil.copyNullProperties(checkUpdateItemTestBo, cir);
             checkInRecordDao.save(cir);
+            roomStatisticsService.updateGuestRoomStatus(new CheckInRecordWrapper(cir));
         }
         return hr;
     }
@@ -529,6 +532,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                 account = new Account(0, 0);
                 account.setRoomNum(gr.getRoomNum());
                 account.setCustomer(customer);
+                account.setHotelCode(gr.getHotelCode());
                 account.setName(customer.getName());//设置账号名和用户名相同
                 account.setCode(businessSeqService.fetchNextSeqNum(gr.getHotelCode(),
                         Constants.Key.BUSINESS_BUSINESS_CUSTOMER_ACCOUNT_SEQ_KEY));
@@ -634,8 +638,10 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 
         } else {
             Customer customer = checkInRecord.getCustomer();
+            customer.setHotelCode(checkInRecord.getHotelCode());
             if (customer == null || customer.getId() == null) {
                 customer = new Customer();
+                customer.setHotelCode(checkInRecord.getHotelCode());
                 customer = customerService.add(customer);
             }
             checkInRecord.setCustomer(customer);

@@ -2,6 +2,7 @@ package com.kry.pms.service.pay.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kry.pms.base.HttpResponse;
 import com.kry.pms.dao.pay.WechatMerchantsDao;
 import com.kry.pms.dao.pay.WechatPayRecordDao;
 import com.kry.pms.dao.pay.WechatRefundRecordDao;
@@ -15,7 +16,6 @@ import com.kry.pms.pay.IpUtils;
 import com.kry.pms.pay.StringUtils;
 import com.kry.pms.pay.XMLBeanUtil;
 import com.kry.pms.pay.weixin.PayUtil;
-import com.kry.pms.service.pay.WechatPayRecordService;
 import com.kry.pms.service.pay.WechatPayService;
 import com.kry.pms.util.BeanToMapUtils;
 import com.kry.pms.util.ChangeCharUtil;
@@ -24,12 +24,10 @@ import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.conn.ssl.SSLContexts;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
-import org.aspectj.util.FileUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,10 +42,8 @@ import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
-import java.net.URL;
 import java.security.KeyStore;
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
 import java.util.*;
 
 import static org.apache.http.conn.ssl.SSLContexts.*;
@@ -246,8 +242,9 @@ public class WechatPayServiceImpl extends WeixinSupport implements WechatPayServ
 
 	//付款码支付
 	@Override
-	public Map<String, Object> sweepPay(Integer total_fee, String body, String auth_code,
-                                        HttpServletRequest request, String hotelCode) throws Exception {
+	public HttpResponse sweepPay(Integer total_fee, String body, String auth_code,
+								 HttpServletRequest request, String hotelCode) throws Exception {
+		HttpResponse hr = new HttpResponse();
 		Map<String, Object> map = new HashMap<>();
 		//生成的随机字符串
 		String nonce_str = StringUtils.getRandomStringByLength(32);
@@ -262,7 +259,9 @@ public class WechatPayServiceImpl extends WeixinSupport implements WechatPayServ
 		String orderNo = sdf.format(date);
 		Integer money = total_fee;//支付金额，单位：分，这边需要转成字符串类型，否则后面的签名会失败
         WechatMerchants wm = wechatMerchantsDao.findByHotelCode(hotelCode);
-
+		if(wm == null){
+			return hr.error("请检查微信商户信息是否录入");
+		}
 		Map<String, String> packageParams = new HashMap<String, String>();
 		packageParams.put("appid", wm.getAppid());
 		packageParams.put("auth_code", auth_code);
@@ -299,16 +298,32 @@ public class WechatPayServiceImpl extends WeixinSupport implements WechatPayServ
 		Map<String, Object> mapw = ChangeCharUtil.humpToLineMap(map);
 		WechatPayRecord wpr = BeanToMapUtils.toBean(WechatPayRecord.class, mapw);
 		wpr.setTotalFee(total_fee.toString());
+		wpr.setHotelCode(hotelCode);
 		wpr.setBody(body);
 		wechatPayRecordDao.saveAndFlush(wpr);//保存记录
-		return map;
+		hr.addData(map);
+		return hr;
 	}
 
 	//申请退款（参数整理）
 	@Override
-	public Map<String, Object> refund(String refund_fee, String transaction_id, String hotelCode) throws Exception {
+	public HttpResponse refund(String refund_fee, String transaction_id, String hotelCode) throws Exception {
+		HttpResponse hr = new HttpResponse();
 //		WechatPayRecord wpr = new WechatPayRecord();
 		WechatPayRecord wpr = wechatPayRecordDao.findByTransactionId(transaction_id);
+		String totalFee = null;
+		if(wpr == null){//如果是要用户输入密码，数据库没有记录transaction_id
+			HttpResponse h = orderquery(null, transaction_id, hotelCode);
+			Map<String, Object> map = (Map<String, Object>) h.getData();
+			String trade_state = MapUtils.getString(map, "trade_state");
+			if("SUCCESS".equals(trade_state)){
+				totalFee = MapUtils.getString(map, "total_fee");
+			}else {
+				return hr.error("该订单用户并未成功支付，无法退款");
+			}
+		}else {
+			totalFee = wpr.getTotalFee();
+		}
 		Map<String, Object> map = new HashMap<>();
 		//生成的随机字符串
 		String nonce_str = StringUtils.getRandomStringByLength(32);
@@ -318,6 +333,9 @@ public class WechatPayServiceImpl extends WeixinSupport implements WechatPayServ
 		String out_refund_no = sdf.format(date);
 
         WechatMerchants wm = wechatMerchantsDao.findByHotelCode(hotelCode);
+        if(wm == null){
+        	return hr.error("请检查微信商户信息是否录入");
+		}
 		Map<String, String> packageParams = new HashMap<String, String>();
 		packageParams.put("appid", wm.getAppid());
 		packageParams.put("mch_id", wm.getMchId());
@@ -325,11 +343,11 @@ public class WechatPayServiceImpl extends WeixinSupport implements WechatPayServ
 		packageParams.put("transaction_id", transaction_id);//微信订单号
 //		packageParams.put("out_trade_no", wpr.getOut_trade_no());//商户订单号(与微信订单号 二选一)
 		packageParams.put("out_refund_no", out_refund_no);//商户退款单号
-		packageParams.put("total_fee", wpr.getTotalFee());//支付金额，这边需要转成字符串类型，否则后面的签名会失败
+		packageParams.put("total_fee", totalFee);//支付金额，这边需要转成字符串类型，否则后面的签名会失败
 		if(refund_fee != null || !"".equals(refund_fee)){
 			packageParams.put("refund_fee", refund_fee);//退款金额，可以部分退款
 		}else {
-			packageParams.put("refund_fee", wpr.getTotalFee());//退款金额，全部退款
+			packageParams.put("refund_fee", totalFee);//退款金额，全部退款
 		}
 
 		// 除去数组中的空值和签名参数
@@ -342,7 +360,8 @@ public class WechatPayServiceImpl extends WeixinSupport implements WechatPayServ
         String xml = XMLBeanUtil.map2XmlString(packageParams);
 		//调用统一下单接口，并接受返回的结果
 //		String result = PayUtil.httpRequest(WechatPay.refund_url, "POST", xml);
-		String result = doRefund(wm.getMchId(), WechatPay.refund_url, xml);
+		String path = wm.getCerPath();
+		String result = doRefund(wm.getMchId(), WechatPay.refund_url, xml, path, hotelCode);
 		System.out.println("调试模式_统一下单接口 返回XML数据1：" + result);
 		// 将解析结果存储在HashMap中
 		map = PayUtil.doXMLParse(result);
@@ -352,15 +371,13 @@ public class WechatPayServiceImpl extends WeixinSupport implements WechatPayServ
 		}else {
 			//支付失败
 		}
-//		WechatPayRecord wpr = BeanToMapUtils.toBean(WechatPayRecord.class, map);
-//		wpr.setBody(body);
-//		wechatPayRecordDao.saveAndFlush(wpr);//保存记录
-		return map;
+		hr.addData(map);
+		return hr;
 	}
 	//申请退款（接口调用）
 	@Override
-	public String doRefund(String mchId, String url, String data) throws Exception {
-		String path = "E:\\certificate\\apiclient_cert.p12";
+	public String doRefund(String mchId, String url, String data, String path, String hotelCode) throws Exception {
+//		path = "E:\\certificate\\apiclient_cert.p12";
 		/**
 		 * 注意PKCS12证书 是从微信商户平台-》账户设置-》 API安全 中下载的
 		 */
@@ -409,12 +426,16 @@ public class WechatPayServiceImpl extends WeixinSupport implements WechatPayServ
 
 	//查询订单
 	@Override
-	public Map<String, Object> orderquery(String out_trade_no, String transaction_id, String hotelCode) throws Exception {
+	public HttpResponse orderquery(String out_trade_no, String transaction_id, String hotelCode) throws Exception {
+		HttpResponse hr = new HttpResponse();
 		Map<String, Object> map = new HashMap<>();
 		//生成的随机字符串
 		String nonce_str = StringUtils.getRandomStringByLength(32);
 
         WechatMerchants wm = wechatMerchantsDao.findByHotelCode(hotelCode);
+        if(wm == null){
+        	return hr.error("请检查微信商户信息是否录入");
+		}
 		Map<String, String> packageParams = new HashMap<String, String>();
 		packageParams.put("appid", wm.getAppid());
 		packageParams.put("mch_id", wm.getMchId());
@@ -439,17 +460,22 @@ public class WechatPayServiceImpl extends WeixinSupport implements WechatPayServ
 		System.out.println("调试模式_统一下单接口 返回XML数据1：" + result);
 		// 将解析结果存储在HashMap中
 		map = PayUtil.doXMLParse(result);
-		return map;
+		hr.addData(map);
+		return hr;
 	}
 
 	//撤销订单
 	@Override
-	public Map<String, Object> reverse(String transaction_id, String hotelCode) throws Exception {
+	public HttpResponse reverse(String transaction_id, String hotelCode) throws Exception {
+		HttpResponse hr = new HttpResponse();
 		Map<String, Object> map = new HashMap<>();
 		//生成的随机字符串
 		String nonce_str = StringUtils.getRandomStringByLength(32);
 
         WechatMerchants wm = wechatMerchantsDao.findByHotelCode(hotelCode);
+		if(wm == null){
+			return hr.error("请检查微信商户信息是否录入");
+		}
 		Map<String, String> packageParams = new HashMap<String, String>();
 		packageParams.put("appid", wm.getAppid());
 		packageParams.put("mch_id", wm.getMchId());
@@ -470,16 +496,21 @@ public class WechatPayServiceImpl extends WeixinSupport implements WechatPayServ
 		System.out.println("调试模式_统一下单接口 返回XML数据1：" + result);
 		// 将解析结果存储在HashMap中
 		map = PayUtil.doXMLParse(result);
-		return map;
+		hr.addData(map);
+		return hr;
 	}
 	//退款查询
 	@Override
-	public Map<String, Object> refundquery(String refund_id, String hotelCode) throws Exception {
+	public HttpResponse refundquery(String refund_id, String hotelCode) throws Exception {
+		HttpResponse hr = new HttpResponse();
 		Map<String, Object> map = new HashMap<>();
 		//生成的随机字符串
 		String nonce_str = StringUtils.getRandomStringByLength(32);
 
         WechatMerchants wm = wechatMerchantsDao.findByHotelCode(hotelCode);
+		if(wm == null){
+			return hr.error("请检查微信商户信息是否录入");
+		}
 		Map<String, String> packageParams = new HashMap<String, String>();
 		packageParams.put("appid", wm.getAppid());
 		packageParams.put("mch_id", wm.getMchId());
@@ -500,7 +531,8 @@ public class WechatPayServiceImpl extends WeixinSupport implements WechatPayServ
 		System.out.println("调试模式_统一下单接口 返回XML数据1：" + result);
 		// 将解析结果存储在HashMap中
 		map = PayUtil.doXMLParse(result);
-		return map;
+		hr.addData(map);
+		return hr;
 	}
 
 }
