@@ -532,6 +532,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                 account = new Account(0, 0);
                 account.setRoomNum(gr.getRoomNum());
                 account.setCustomer(customer);
+                account.setHotelCode(gr.getHotelCode());
                 account.setName(customer.getName());//设置账号名和用户名相同
                 account.setCode(businessSeqService.fetchNextSeqNum(gr.getHotelCode(),
                         Constants.Key.BUSINESS_BUSINESS_CUSTOMER_ACCOUNT_SEQ_KEY));
@@ -637,8 +638,10 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 
         } else {
             Customer customer = checkInRecord.getCustomer();
+            customer.setHotelCode(checkInRecord.getHotelCode());
             if (customer == null || customer.getId() == null) {
                 customer = new Customer();
+                customer.setHotelCode(checkInRecord.getHotelCode());
                 customer = customerService.add(customer);
             }
             checkInRecord.setCustomer(customer);
