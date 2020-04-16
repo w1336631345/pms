@@ -15,4 +15,6 @@ public interface ProductService extends BaseService<Product>{
     Product findFullRoomFee(String hotelCode);
 
     List<Map<String, Object>> getPaySetList(String hotelCode);
+
+    Product findToArProduct(String hotelCode);
 }

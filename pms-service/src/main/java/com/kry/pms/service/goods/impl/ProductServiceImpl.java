@@ -87,5 +87,10 @@ public class  ProductServiceImpl implements  ProductService{
 	 	List<Map<String, Object>> list = productDao.getPaySetList(hotelCode);
 	 	return list;
 	 }
-	 
+
+	@Override
+	public Product findToArProduct(String hotelCode) {
+		return productDao.findByHotelCodeAndCode(hotelCode,Constants.Code.TO_AR);
+	}
+
 }

@@ -90,7 +90,7 @@ public class BillServiceImpl implements BillService {
                 bill.setType(p.getType());
                 bill.setCreateDate(LocalDateTime.now());
                 bill.setBusinessDate(businessSeqService.getBuinessDate(p.getHotelCode()));
-                if (bill.getStatus() == null||Constants.Status.NORMAL.equals(bill.getStatus())) {
+                if (bill.getStatus() == null || Constants.Status.NORMAL.equals(bill.getStatus())) {
                     bill.setStatus(Constants.Status.BILL_NEED_SETTLED);
                 }
             }
@@ -112,6 +112,16 @@ public class BillServiceImpl implements BillService {
         }
         billDao.saveAndFlush(bill);
     }
+
+    private Bill addArBill(Bill bill) {
+        if (bill.getStatus() == null || Constants.Status.NORMAL.equals(bill.getStatus())) {
+            bill.setStatus(Constants.Status.BILL_NEED_SETTLED);
+        }
+        Account account = accountService.billEntry(bill);
+        bill.setAccount(account);
+        return billDao.saveAndFlush(bill);
+    }
+
 
     @Override
     public Bill modify(Bill bill) {
@@ -198,7 +208,7 @@ public class BillServiceImpl implements BillService {
 
     @Override
     public List<Bill> findByAccountAndStatus(Account account, String status) {
-        return billDao.findByAccountAndStatus(account,status);
+        return billDao.findByAccountAndStatus(account, status);
     }
 
     @Override
@@ -280,20 +290,20 @@ public class BillServiceImpl implements BillService {
             CheckInRecord cir = checkInRecordDao.getOne(checkInRecordId);
             SetMeal sm = cir.getSetMeal();
             Product p = productDao.findByHotelCodeAndCode(rr.getHotelCode(), "1000");//这里必须改修改，不能写死，要找到夜间稽核类型（在product中加）
-            if(sm != null){
-                if(sm.getProduct() != null){//如果有包价，就一笔整的包价价格账，一笔负的价格账，正负得0
+            if (sm != null) {
+                if (sm.getProduct() != null) {//如果有包价，就一笔整的包价价格账，一笔负的价格账，正负得0
                     Product product = sm.getProduct();//入账项目
-                    addAudit(product,sm.getTotal(), sm.getAccount(), cir.getHotelCode(), emp, shiftCode, null, "M");
-                    addAudit(product, -sm.getTotal(), sm.getAccount(), cir.getHotelCode(), emp, shiftCode, null,"M");
+                    addAudit(product, sm.getTotal(), sm.getAccount(), cir.getHotelCode(), emp, shiftCode, null, "M");
+                    addAudit(product, -sm.getTotal(), sm.getAccount(), cir.getHotelCode(), emp, shiftCode, null, "M");
                 }
             }
-            addAudit(p, rr.getCost(), cir.getAccount(), cir.getHotelCode(), emp, shiftCode, rr.getId(),"M");
+            addAudit(p, rr.getCost(), cir.getAccount(), cir.getHotelCode(), emp, shiftCode, rr.getId(), "M");
             rr.setIsAccountEntry("PAY");// 入账成功后roomRecord里面入账状态改为pay
             roomRecordService.modify(rr);
         }
     }
 
-    public void addAudit(Product product, Double cost, Account account, String hotelCode, Employee emp, String shiftCode, String roomRecordId, String type){
+    public void addAudit(Product product, Double cost, Account account, String hotelCode, Employee emp, String shiftCode, String roomRecordId, String type) {
         //入账只入当前营业日期的账
         LocalDate businessDate = businessSeqService.getBuinessDate(hotelCode);
         Bill bill = new Bill();
@@ -303,10 +313,10 @@ public class BillServiceImpl implements BillService {
         bill.setQuantity(1);
         bill.setAccount(account);
         bill.setHotelCode(hotelCode);
-        if("M".equals(type)){
+        if ("M".equals(type)) {
             bill.setOperationRemark("夜审手动入账");
         }
-        if("A".equals(type)){
+        if ("A".equals(type)) {
             bill.setOperationRemark("自动夜审入账");
         }
         bill.setOperationEmployee(emp);
@@ -325,10 +335,10 @@ public class BillServiceImpl implements BillService {
             CheckInRecord cir = checkInRecordDao.getOne(checkInRecordId);
             SetMeal sm = cir.getSetMeal();
             Product p = productDao.findByHotelCodeAndCode(rr.getHotelCode(), "1000");//这里必须改修改，不能写死，要找到夜间稽核类型（在product中加）
-            if(sm != null){
-                if(sm.getProduct() != null){//如果有包价，就一笔整的包价价格账，一笔负的价格账，正负得0
+            if (sm != null) {
+                if (sm.getProduct() != null) {//如果有包价，就一笔整的包价价格账，一笔负的价格账，正负得0
                     Product product = sm.getProduct();//入账项目
-                    addAudit(product,sm.getTotal(), sm.getAccount(), cir.getHotelCode(), null, null, null, "A");
+                    addAudit(product, sm.getTotal(), sm.getAccount(), cir.getHotelCode(), null, null, null, "A");
                     addAudit(product, -sm.getTotal(), sm.getAccount(), cir.getHotelCode(), null, null, null, "A");
                 }
             }
@@ -503,7 +513,7 @@ public class BillServiceImpl implements BillService {
     @Override
     public List queryByBo(BillQueryBo query) {
         org.springframework.data.domain.PageRequest req = org.springframework.data.domain.PageRequest.of(1, 10);
-       return  sqlTemplateService.processTemplateQuery(query.getHotelCode(),BillService.class.getSimpleName(),"queryByBo",query);
+        return sqlTemplateService.processTemplateQuery(query.getHotelCode(), BillService.class.getSimpleName(), "queryByBo", query);
     }
 
     @Override
@@ -513,6 +523,35 @@ public class BillServiceImpl implements BillService {
 
     @Override
     public BillStatistics sumNeedSettle(Account account) {
-        return billDao.sumNeedSettle(account,Constants.Status.BILL_NEED_SETTLED);
+        return billDao.sumNeedSettle(account, Constants.Status.BILL_NEED_SETTLED);
+    }
+
+    @Override
+    public Bill createArSettleBill(Account targetAccount, double total, double cost, double pay, Employee operationEmployee, String shiftCode) {
+        Bill bill = new Bill();
+        bill.setCost(cost);
+        bill.setPay(pay);
+        bill.setOperationEmployee(operationEmployee);
+        bill.setShiftCode(shiftCode);
+        bill.setAccount(targetAccount);
+        bill.setHotelCode(targetAccount.getHotelCode());
+        bill.setTotal(total);
+        return addArBill(bill);
+    }
+
+    @Override
+    public Bill createToArBill(Account account, double processTotal, double pay, Employee operationEmployee, String shiftCode,String recordNum,String remark) {
+        Bill bill = new Bill();
+        bill.setProduct(productService.findToArProduct(operationEmployee.getHotelCode()));
+        bill.setPay(processTotal);
+        bill.setTotal(processTotal);
+        bill.setOperationEmployee(operationEmployee);
+        bill.setShiftCode(shiftCode);
+        bill.setAccount(account);
+        bill.setRemark(remark);
+        bill.setCurrentSettleAccountRecordNum(recordNum);
+        bill.setStatus(Constants.Status.BILL_SETTLED);
+        bill.setHotelCode(operationEmployee.getHotelCode());
+        return add(bill);
     }
 }
