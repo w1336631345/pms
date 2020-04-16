@@ -185,4 +185,6 @@ public interface CheckInRecordService extends BaseService<CheckInRecord> {
     List<Map<String, Object>> resourceStatisticsTo(String orderNum, String arriveTime, String leaveTime);
 
     CheckInRecord byId(String id);
+
+    HttpResponse printing(String checkInRecordId);
 }

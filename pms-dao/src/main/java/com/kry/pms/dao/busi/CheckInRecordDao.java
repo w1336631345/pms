@@ -346,4 +346,34 @@ public interface CheckInRecordDao extends BaseDao<CheckInRecord> {
 
     @Query(nativeQuery = true, value = " select tcr.* from t_checkin_record tcr where id = ?1 ")
     CheckInRecord byId(String id);
+
+	@Query(nativeQuery = true, value = " select \n" +
+			" tcr.name_,\n" +
+			" ta.`code`,\n" +
+			" tgr.room_num,\n" +
+			" trt.`name` roomTypeName,\n" +
+			" tcr.personal_price,\n" +
+			" DATE_FORMAT(tcr.arrive_time,'%Y-%m-%d %T') arrive_time,\n" +
+			" DATE_FORMAT(tcr.leave_time,'%Y-%m-%d %T') leave_time,\n" +
+			" tcr.days,\n" +
+			" tc.`name`,\n" +
+			" tc.certificate_type,\n" +
+			" tc.id_card_num,\n" +
+			" tc.nationality,\n" +
+			" tc.gender,\n" +
+			" tc.address,\n" +
+			" tc.mobile,\n" +
+			" tcr.remark,\n" +
+			" ta.pay,\n" +
+			" te.`name` emp\n" +
+			"from t_checkin_record tcr \n" +
+			" left join t_customer tc on tcr.customer_id = tc.id\n" +
+			" left join t_account ta on tcr.account_id = ta.id\n" +
+			" left join t_guest_room tgr on tcr.guest_room_id = tgr.id\n" +
+			" left join t_room_type trt on tgr.room_type_id = trt.id\n" +
+			" left join t_user tu on tcr.create_user = tu.id\n" +
+			" left join t_employee te on tu.id = te.user_id\n" +
+			" where tcr.id = :checkInRecordId ")
+	Map<String, Object> printing(@Param("checkInRecordId") String checkInRecordId);
+
 }

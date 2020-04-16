@@ -48,6 +48,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 @Service
@@ -208,9 +209,17 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                     TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                     return hr.error("资源不足");
                 }
+                //需要修改天数和roomRecord
+                int days = (int) checkInRecord.getArriveTime().toLocalDate()
+                        .until(checkInRecord.getLeaveTime().toLocalDate(), ChronoUnit.DAYS);
+                List<RoomRecord> list = roomRecordService.findByHotelCodeAndCheckInRecord(checkInRecord.getHotelCode(), checkInRecord.getId());
+                for (int r = 0; r < list.size(); r++) {
+                    roomRecordService.deleteTrue(list.get(r).getId());
+                }
             }
         }
         hr.addData(checkInRecordDao.saveAndFlush(checkInRecord));
+        roomRecordService.createRoomRecord(checkInRecord);
         roomStatisticsService.updateGuestRoomStatus(new CheckInRecordWrapper(checkInRecord));
         return hr.ok();
     }
@@ -271,9 +280,18 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                     TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                     return hr.error("资源不足");
                 }
+                //需要修改天数和roomRecord
+                int days = (int) at.toLocalDate()
+                        .until(lt.toLocalDate(), ChronoUnit.DAYS);
+                cir.setDays(days);
+                List<RoomRecord> list = roomRecordService.findByHotelCodeAndCheckInRecord(cir.getHotelCode(), cir.getId());
+                for (int r = 0; r < list.size(); r++) {
+                    roomRecordService.deleteTrue(list.get(r).getId());
+                }
             }
             UpdateUtil.copyNullProperties(checkUpdateItemTestBo, cir);
             checkInRecordDao.save(cir);
+            roomRecordService.createRoomRecord(cir);
             roomStatisticsService.updateGuestRoomStatus(new CheckInRecordWrapper(cir));
         }
         return hr;
@@ -2246,5 +2264,12 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
         return null;
     }
 
+    @Override
+    public HttpResponse printing(String checkInRecordId){
+        HttpResponse hr = new HttpResponse();
+        Map<String, Object> map = checkInRecordDao.printing(checkInRecordId);
+        hr.addData(map);
+        return hr;
+    }
 
 }

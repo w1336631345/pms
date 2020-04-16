@@ -640,4 +640,18 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
         return hr.ok();
     }
 
+    /**
+     * 功能描述: <br>主单打印要的数据
+     * 〈〉
+     * @Param: [checkInRecordId]
+     * @Return: com.kry.pms.base.HttpResponse
+     * @Author: huanghaibin
+     * @Date: 2020/4/16 16:59
+     */
+    @GetMapping(value = "/printing")
+    public HttpResponse printing(String checkInRecordId) {
+        HttpResponse hr = new HttpResponse();
+        hr = checkInRecordService.printing(checkInRecordId);
+        return hr.ok();
+    }
 }
