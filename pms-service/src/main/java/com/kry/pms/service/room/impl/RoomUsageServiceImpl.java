@@ -613,10 +613,10 @@ public class RoomUsageServiceImpl implements RoomUsageService {
                 info.getBusinessKey());
         if (ru != null) {
             if (unUse(ru, cancleDateTime)) {
-                if (cancleDateTime.isBefore(info.getStartTime())) {
+                if (!cancleDateTime.isAfter(info.getStartTime())) {
                     roomTypeQuantityService.changeRoomTypeQuantity(info.roomType(), info.getStartTime().toLocalDate(),
                             info.getEndTime().toLocalDate(), ru.getUsageStatus(), Constants.Status.ROOM_USAGE_FREE, 1);
-                } else if (cancleDateTime.isBefore(info.getEndTime())) {
+                } else if (!cancleDateTime.isAfter(info.getEndTime())) {
                     roomTypeQuantityService.changeRoomTypeQuantity(info.roomType(), cancleDateTime.toLocalDate(),
                             info.getEndTime().toLocalDate(), ru.getUsageStatus(), Constants.Status.ROOM_USAGE_FREE, 1);
                 }
