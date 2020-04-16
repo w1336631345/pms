@@ -630,11 +630,11 @@ public class RoomUsageServiceImpl implements RoomUsageService {
 
     @Override
     public boolean extendTime(UseInfoAble info, LocalDate extendDate) {
-        RoomUsage ru = roomUsageDao.queryGuestRoomUsable(info.guestRoom().getId(), info.getStartTime(), info.getEndTime());
+        RoomUsage ru = roomUsageDao.findByGuestRoomIdAndBusinesskey(info.guestRoom().getId(),info.getBusinessKey());
         LocalDateTime endTime = LocalDateTime.of(extendDate, LocalTime.NOON);
         if (ru != null) {
             RoomUsage postRu = ru.getPostRoomUsage();
-            if (postRu != null && Constants.Status.ROOM_STATUS_FREE.equals(postRu.getUsageStatus())) {
+            if (postRu != null && Constants.Status.ROOM_USAGE_FREE.equals(postRu.getUsageStatus())) {
                 if (endTime.isBefore(postRu.getEndDateTime())) {
                     ru.setEndDateTime(endTime);
                     updateDuration(ru);
@@ -658,13 +658,13 @@ public class RoomUsageServiceImpl implements RoomUsageService {
 
     @Override
     public boolean extendTime(UseInfoAble info, LocalDateTime newStartTime, LocalDateTime newEndTime) {
-        RoomUsage ru = roomUsageDao.queryGuestRoomUsable(info.guestRoom().getId(), info.getStartTime(), info.getEndTime());
+        RoomUsage ru = roomUsageDao.findByGuestRoomIdAndBusinesskey(info.guestRoom().getId(),info.getBusinessKey());
         LocalDateTime endTime =newEndTime;
         LocalDateTime startTime = newStartTime;
         if (ru != null) {
             RoomUsage postRu = ru.getPostRoomUsage();
             RoomUsage preRu = ru.getPreRoomUsage();
-            if (postRu != null && Constants.Status.ROOM_STATUS_FREE.equals(postRu.getUsageStatus())&&preRu != null && Constants.Status.ROOM_STATUS_FREE.equals(preRu.getUsageStatus())) {
+            if (postRu != null && Constants.Status.ROOM_USAGE_FREE.equals(postRu.getUsageStatus())&&preRu != null && Constants.Status.ROOM_USAGE_FREE.equals(preRu.getUsageStatus())) {
                 if (endTime.isBefore(postRu.getEndDateTime())&&startTime.isAfter(preRu.getStartDateTime())) {
                     ru.setEndDateTime(endTime);
                     ru.setStartDateTime(startTime);

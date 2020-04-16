@@ -2,6 +2,7 @@ package com.kry.pms.service.room.impl;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 import com.kry.pms.model.persistence.room.GuestRoom;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -101,16 +102,26 @@ public class RoomStatisticsServiceImpl implements RoomStatisticsService {
 
     @Override
     public boolean extendTime(UseInfoAble info, LocalDateTime newStartTime, LocalDateTime newEndTime) {
-        if(newStartTime==null){
-            return extendTime(info,newEndTime.toLocalDate());
-        }else{
-            return roomUsageService.extendTime(info,newStartTime,newEndTime);
+        if(newStartTime!=null){
+            newStartTime = LocalDateTime.of(newStartTime.toLocalDate(),LocalTime.NOON);
+        }
+        if(newEndTime!=null){
+            newEndTime = LocalDateTime.of(newEndTime.toLocalDate(),LocalTime.NOON);
+        }
+        if (newStartTime == null || newStartTime.isEqual(info.getStartTime())) {
+            if (newEndTime == null || (newEndTime != null && newEndTime.isEqual(info.getEndTime()))) {
+                return true;
+            } else {
+                return extendTime(info, newEndTime.toLocalDate());
+            }
+        } else {
+            return roomUsageService.extendTime(info, newStartTime, newEndTime);
         }
     }
 
     @Override
     public boolean updateGuestRoomStatus(UseInfoAble info) {
-        if(Constants.Status.ROOM_STATUS_OCCUPY_CLEAN.equals(info.getRoomStatus())&&info.getStartTime().isBefore(LocalDateTime.now())&&info.getEndTime().isAfter(LocalDateTime.now())){
+        if (Constants.Status.ROOM_STATUS_OCCUPY_CLEAN.equals(info.getRoomStatus()) && info.getStartTime().isBefore(LocalDateTime.now()) && info.getEndTime().isAfter(LocalDateTime.now())) {
             guestRoomStatusService.updateStatus(info);
         }
         return true;
@@ -119,7 +130,7 @@ public class RoomStatisticsServiceImpl implements RoomStatisticsService {
 
     @Override
     public boolean cancelCheckOut(UseInfoAble info) {
-      return roomUsageService.changeUseStatus(info.guestRoom(), info.getBusinessKey(), Constants.Status.ROOM_USAGE_CHECK_IN);
+        return roomUsageService.changeUseStatus(info.guestRoom(), info.getBusinessKey(), Constants.Status.ROOM_USAGE_CHECK_IN);
     }
 
     @Override
