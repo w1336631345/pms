@@ -60,9 +60,9 @@ public class WechatPayRecordController extends BaseController<WechatPayRecord> {
 	 * @Date: 2020/4/15 15:43
 	 */
 	@GetMapping(path = "/resultUpdate")
-	public HttpResponse resultUpdate(String out_trade_no, String trade_state, String trade_state_desc){
+	public HttpResponse resultUpdate(String out_trade_no, String trade_state, String trade_state_desc, String transaction_id){
 		HttpResponse rep = new HttpResponse();
-		rep = wechatPayRecordService.resultUpdate(out_trade_no, trade_state, trade_state_desc, getCurrentHotleCode());
+		rep = wechatPayRecordService.resultUpdate(out_trade_no, trade_state, trade_state_desc, transaction_id, getCurrentHotleCode());
 		return rep;
 	}
 
