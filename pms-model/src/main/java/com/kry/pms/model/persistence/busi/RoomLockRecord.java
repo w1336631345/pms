@@ -118,5 +118,4 @@ public class RoomLockRecord extends PersistenceModel implements UseInfoAble{
 	public LocalDateTime getActualStartTime() {
 		return null;
 	}
-
 }

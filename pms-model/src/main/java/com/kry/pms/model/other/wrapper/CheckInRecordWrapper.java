@@ -14,6 +14,8 @@ import java.time.LocalTime;
 public class CheckInRecordWrapper implements UseInfoAble {
 
     private CheckInRecord checkInRecord;
+    private LocalDateTime startTime;
+    private LocalDateTime endTime;
 
     public CheckInRecordWrapper(CheckInRecord checkInRecord) {
         this.checkInRecord = checkInRecord;
@@ -69,33 +71,39 @@ public class CheckInRecordWrapper implements UseInfoAble {
 
     @Override
     public boolean isVIP() {
-        if(this.checkInRecord.getVipCode()==null){
+        if (this.checkInRecord.getVipCode() == null) {
             return false;
-        }else{
+        } else {
             return true;
         }
     }
 
     @Override
     public LocalDateTime getStartTime() {
-        LocalDate localDate = null;
-        if (this.checkInRecord.getActualTimeOfArrive() != null) {
-            return this.checkInRecord.getActualTimeOfArrive();
-        } else {
-            localDate =  this.checkInRecord.getArriveTime().toLocalDate();
+        if (this.startTime != null) {
+            return this.startTime;
         }
-        return LocalDateTime.of(localDate,LocalTime.NOON);
+        if (this.checkInRecord.getActualTimeOfArrive() != null) {
+            this.startTime = this.checkInRecord.getActualTimeOfArrive();
+        } else {
+            LocalDate localDate = this.checkInRecord.getArriveTime().toLocalDate();
+            this.startTime = LocalDateTime.of(localDate, LocalTime.NOON);
+        }
+        return startTime;
     }
 
     @Override
     public LocalDateTime getEndTime() {
-        LocalDate localDate = null;
-        if (this.checkInRecord.getActualTimeOfLeave() != null) {
-            return this.checkInRecord.getActualTimeOfLeave();
-        }else{
-            localDate = this.checkInRecord.getLeaveTime().toLocalDate();
+        if (this.endTime != null) {
+            return endTime;
         }
-        return LocalDateTime.of(localDate, LocalTime.NOON);
+        if (this.checkInRecord.getActualTimeOfLeave() != null) {
+            this.endTime = this.checkInRecord.getActualTimeOfLeave();
+        } else {
+            LocalDate localDate = this.checkInRecord.getLeaveTime().toLocalDate();
+            this.endTime = LocalDateTime.of(localDate, LocalTime.NOON);
+        }
+        return this.endTime;
     }
 
     @Override
@@ -106,6 +114,16 @@ public class CheckInRecordWrapper implements UseInfoAble {
     @Override
     public String useType() {
         return null;
+    }
+
+    @Override
+    public void setStartTime(LocalDateTime startTime) {
+        this.startTime = startTime;
+    }
+
+    @Override
+    public void setEndTime(LocalDateTime endTime) {
+        this.endTime = endTime;
     }
 
     @JsonIgnore
@@ -151,7 +169,7 @@ public class CheckInRecordWrapper implements UseInfoAble {
 
     @Override
     public String getRoomStatus() {
-        if(checkInRecord.getMarketingSources()!=null&&"HU".equals(checkInRecord.getMarketingSources().getCode())){
+        if (checkInRecord.getMarketingSources() != null && "HU".equals(checkInRecord.getMarketingSources().getCode())) {
             return "HU";
         }
         if (checkInRecord.getStatus() != null) {

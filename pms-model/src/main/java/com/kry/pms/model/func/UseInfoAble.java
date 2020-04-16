@@ -102,4 +102,7 @@ public interface UseInfoAble {
     public String nextStatus();
 
     public String useType();
+
+    public void setStartTime(LocalDateTime startTime);
+    public void setEndTime(LocalDateTime endTime);
 }
