@@ -169,6 +169,14 @@ public class AuthController {
     @RequestMapping(path = "/admin/bind_wx", method = RequestMethod.POST)
     public HttpResponse<String> bindWx(String username, String password, String hotelCode,String openId, String shift) {
         HttpResponse<String> response = new HttpResponse<>();
+        if(hotelCode==null){
+            ServletRequestAttributes servletRequestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+            HttpServletRequest request = servletRequestAttributes.getRequest();
+            String serverName = request.getServerName();
+            if(serverName!=null&&serverName.endsWith(".pms.rooibook.com")){
+                hotelCode = serverName.substring(0,serverName.indexOf("."));
+            }
+        }
         password = MD5Utils.encrypt(username, hotelCode, password);
         UsernamePasswordToken token = new UsernamePasswordToken(username, password);
         Subject subject = SecurityUtils.getSubject();
