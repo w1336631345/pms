@@ -212,14 +212,21 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                 //需要修改天数和roomRecord
                 int days = (int) checkInRecord.getArriveTime().toLocalDate()
                         .until(checkInRecord.getLeaveTime().toLocalDate(), ChronoUnit.DAYS);
-                List<RoomRecord> list = roomRecordService.findByHotelCodeAndCheckInRecord(checkInRecord.getHotelCode(), checkInRecord.getId());
-                for (int r = 0; r < list.size(); r++) {
-                    roomRecordService.deleteTrue(list.get(r).getId());
+                List<CheckInRecord> together = checkInTogether(checkInRecord.getHotelCode(), checkInRecord.getOrderNum(), checkInRecord.getGuestRoom().getId());
+                for(int t=0; t<together.size(); t++){
+                    List<RoomRecord> list = roomRecordService.findByHotelCodeAndCheckInRecord(checkInRecord.getHotelCode(), together.get(t).getId());
+                    for (int r = 0; r < list.size(); r++) {
+                        roomRecordService.deleteTrue(list.get(r).getId());
+                    }
+                    together.get(t).setDays(days);
+                    together.get(t).setArriveTime(checkInRecord.getArriveTime());
+                    together.get(t).setLeaveTime(checkInRecord.getLeaveTime());
+                    checkInRecordDao.saveAndFlush(together.get(t));
+                    roomRecordService.createRoomRecord(together.get(t));
                 }
             }
         }
         hr.addData(checkInRecordDao.saveAndFlush(checkInRecord));
-        roomRecordService.createRoomRecord(checkInRecord);
         roomStatisticsService.updateGuestRoomStatus(new CheckInRecordWrapper(checkInRecord));
         return hr.ok();
     }
@@ -283,15 +290,21 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                 //需要修改天数和roomRecord
                 int days = (int) at.toLocalDate()
                         .until(lt.toLocalDate(), ChronoUnit.DAYS);
-                cir.setDays(days);
-                List<RoomRecord> list = roomRecordService.findByHotelCodeAndCheckInRecord(cir.getHotelCode(), cir.getId());
-                for (int r = 0; r < list.size(); r++) {
-                    roomRecordService.deleteTrue(list.get(r).getId());
+                List<CheckInRecord> together = checkInTogether(cir.getHotelCode(), cir.getOrderNum(), cir.getGuestRoom().getId());
+                for(int t=0; t<together.size(); t++){
+                    List<RoomRecord> list = roomRecordService.findByHotelCodeAndCheckInRecord(cir.getHotelCode(), together.get(t).getId());
+                    for (int r = 0; r < list.size(); r++) {
+                        roomRecordService.deleteTrue(list.get(r).getId());
+                    }
+                    together.get(t).setDays(days);
+                    together.get(t).setArriveTime(cir.getArriveTime());
+                    together.get(t).setLeaveTime(cir.getLeaveTime());
+                    checkInRecordDao.saveAndFlush(together.get(t));
+                    roomRecordService.createRoomRecord(together.get(t));
                 }
             }
             UpdateUtil.copyNullProperties(checkUpdateItemTestBo, cir);
             checkInRecordDao.save(cir);
-            roomRecordService.createRoomRecord(cir);
             roomStatisticsService.updateGuestRoomStatus(new CheckInRecordWrapper(cir));
         }
         return hr;
@@ -1726,6 +1739,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
         checkInRecord.setPersonalPercentage(0.0);
         checkInRecord.setCustomer(customer);
         checkInRecord.setName(customer.getName());
+        checkInRecord.setActualTimeOfArrive(LocalDateTime.now());
         if (cir.getTogetherCode() == null) {
             String togetherNum = businessSeqService.fetchNextSeqNum(hotelCode, Constants.Key.TOGETHER_NUM_KEY);
             for (int i = 0; i < list.size(); i++) {

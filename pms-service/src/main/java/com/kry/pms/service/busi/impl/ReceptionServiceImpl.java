@@ -257,14 +257,17 @@ public class ReceptionServiceImpl implements ReceptionService {
 	@Override
 	public DtoResponse<String> checkIn(CheckInRecord cir) {
 		DtoResponse<String> rep = new DtoResponse<>();
-		cir.setActualTimeOfArrive(LocalDateTime.now());
+		LocalDateTime now = LocalDateTime.now();
+		cir.setActualTimeOfArrive(now);
 		cir.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN);
 		checkInRecordService.modify(cir);
-//		List<CheckInRecord> togetherRecord = checkInRecordService.findRoomTogetherRecord(cir,
-//				Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION);
-//		if (togetherRecord != null && !togetherRecord.isEmpty()) {
-//			rep.setCode(1);
-//		}
+		List<CheckInRecord> together = checkInRecordService.checkInTogether(cir.getHotelCode(), cir.getOrderNum(), cir.getGuestRoom().getId());
+		for(int i=0; i<together.size(); i++){
+			CheckInRecord c = together.get(i);
+			c.setActualTimeOfArrive(now);
+			c.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN);
+			checkInRecordService.modify(c);
+		}
 		roomStatisticsService.checkIn(new CheckInRecordWrapper(cir));
 		return rep;
 	}
@@ -363,19 +366,6 @@ public class ReceptionServiceImpl implements ReceptionService {
 			}
 			cir.setActualTimeOfArrive(LocalDateTime.now());
 			rep = checkIn(cir);
-			// 不是主单G
-//			if (!(Constants.Type.CHECK_IN_RECORD_GROUP).equals(cir.getType())) {
-//				if(cir.getMainRecord() != null){
-//					String mainRecordId = cir.getMainRecord().getId();
-//					CheckInRecord cirMain = checkInRecordService.findById(mainRecordId);
-//					if (!(Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN).equals(cirMain.getStatus())) {//主单如果不是入住状态，主单跟着入住
-//						if(cirMain.getActualTimeOfArrive() == null){
-//							cirMain.setActualTimeOfArrive(LocalDateTime.now());
-//						}
-//						rep = checkIn(cirMain);
-//					}
-//				}
-//			}
 		}
 		return rep;
 	}
