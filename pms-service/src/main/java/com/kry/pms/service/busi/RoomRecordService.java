@@ -30,4 +30,6 @@ public interface RoomRecordService extends BaseService<RoomRecord> {
     Map<String, Object> recordDateAndRoomPrice(String recordDate, String checkInRecordId);
 
     List<RoomRecord> getByTimeAndCheckId(String recordDate, String checkInRecordId);
+
+    public int autoOpenLock();
 }

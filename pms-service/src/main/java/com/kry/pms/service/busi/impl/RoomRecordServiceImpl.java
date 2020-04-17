@@ -242,4 +242,10 @@ public class RoomRecordServiceImpl implements RoomRecordService {
 		return list;
 	}
 
+	@Override
+	public int autoOpenLock() {
+
+		return 0;
+	}
+
 }

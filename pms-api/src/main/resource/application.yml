@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: test
+    active: prod
   freemarker:
     template-loader-path: classpath:/templates/
     suffix: .ftl
@@ -15,9 +15,9 @@ qiniu:
 wx:
   mp:
     configs:
-      - appId: wx77721a0d0343057a
+      - appId: wxb16fd80662516230
         secret: d427febd1b3871447b69b5cc8e9cd4e7
         token: aa2434123
         aesKey:
-      - appId: wxbcfff4011bf72ced
-        secret: 75bbc37d0948f08ea99391add1d1833b
+      - appId: wxea2e9f546f106998
+        secret: 977f160c186209dd9546d73740344729

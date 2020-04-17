@@ -458,6 +458,7 @@ public class GuestRoomStatusServiceImpl implements GuestRoomStatusService {
     public void clearLockInfo(UseInfoAble info){
         GuestRoomStatus status = findGuestRoomStatusByGuestRoom(info.guestRoom());
         LocalDateTime now = LocalDateTime.now();
+        //徐老板说不会存在，锁定结束仍然是锁定状态的情况，2020-04-17
         if(now.isAfter(info.getStartTime())&&now.isBefore(info.getEndTime())){
             status.setRoomStatus(info.nextStatus());
             clearStatus(status);

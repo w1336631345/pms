@@ -21,7 +21,7 @@ public class WxRedirectController {
     private final WxMpService wxService;
 
     @RequestMapping("/greet")
-    public String greetUser(@PathVariable String appid, @RequestParam String code, ModelMap map) {
+    public String greetUser(@PathVariable String appid, @RequestParam String code,@RequestParam String state, ModelMap map) {
         if (!this.wxService.switchover(appid)) {
             throw new IllegalArgumentException(String.format("未找到对应appid=[%s]的配置，请核实！", appid));
         }
