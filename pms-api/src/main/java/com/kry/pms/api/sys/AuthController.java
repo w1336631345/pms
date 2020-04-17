@@ -152,7 +152,7 @@ public class AuthController {
         User cuser = userService.findByOpenId(user.getOpenId());
         String shift = (String) request.getAttribute("shift");
         Map<String, String> data = new HashMap<>();
-        if (user == null) {
+        if (cuser == null) {
             data.put("status", "1");
             data.put("avatar", user.getHeadImgUrl());
             data.put("openId", user.getOpenId());
