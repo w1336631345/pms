@@ -24,6 +24,8 @@ import com.kry.pms.service.org.EmployeeService;
 import com.kry.pms.util.StringUtil;
 import com.kry.pms.utils.ShiroUtils;
 import org.springframework.http.HttpRequest;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 
 public class BaseController<T> {
@@ -51,7 +53,14 @@ public class BaseController<T> {
     }
 
     public String getCurrentHotleCode() {
-        return getUser().getHotelCode();
+        ServletRequestAttributes servletRequestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        HttpServletRequest request = servletRequestAttributes.getRequest();
+        String serverName = request.getServerName();
+        if(serverName!=null&&serverName.endsWith(".pms.rooibook.com")){
+            return  serverName.substring(0,serverName.indexOf("."));
+        }else{
+            return getUser().getHotelCode();
+        }
     }
 
     public HttpResponse<T> getDefaultResponse() {

@@ -32,6 +32,8 @@ import com.kry.pms.service.sys.ShiftService;
 import com.kry.pms.service.sys.UserService;
 import com.kry.pms.utils.MD5Utils;
 import com.kry.pms.utils.ShiroUtils;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
@@ -56,6 +58,14 @@ public class AuthController {
     @RequestMapping(path = "/admin/login", method = RequestMethod.POST)
     public HttpResponse<String> loginTest(String username, String password, String hotelCode, String shift) {
         HttpResponse<String> response = new HttpResponse<>();
+        if(hotelCode==null){
+            ServletRequestAttributes servletRequestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+            HttpServletRequest request = servletRequestAttributes.getRequest();
+            String serverName = request.getServerName();
+            if(serverName!=null&&serverName.endsWith(".pms.rooibook.com")){
+                hotelCode = serverName.substring(0,serverName.indexOf("."));
+            }
+        }
         password = MD5Utils.encrypt(username, hotelCode, password);
         UsernamePasswordToken token = new UsernamePasswordToken(username, password);
         Subject subject = SecurityUtils.getSubject();
