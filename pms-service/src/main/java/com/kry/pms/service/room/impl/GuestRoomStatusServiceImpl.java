@@ -457,7 +457,6 @@ public class GuestRoomStatusServiceImpl implements GuestRoomStatusService {
     @Override
     public void clearLockInfo(UseInfoAble info){
         GuestRoomStatus status = findGuestRoomStatusByGuestRoom(info.guestRoom());
-        Duration duration = Duration.between(info.getStartTime(), LocalDateTime.now());
         LocalDateTime now = LocalDateTime.now();
         if(now.isAfter(info.getStartTime())&&now.isBefore(info.getEndTime())){
             status.setRoomStatus(info.nextStatus());

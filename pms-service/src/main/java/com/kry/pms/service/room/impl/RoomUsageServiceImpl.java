@@ -507,6 +507,7 @@ public class RoomUsageServiceImpl implements RoomUsageService {
                     npru.setPreRoomUsage(pru);
                     modify(npru);
                 }
+                return true;
             } else {
                 if (npru.getUsageStatus().equals(Constants.Status.ROOM_USAGE_FREE)) {
                     npru.setStartDateTime(ru.getStartDateTime());
@@ -552,6 +553,7 @@ public class RoomUsageServiceImpl implements RoomUsageService {
                     npru.setPreRoomUsage(nru);
                     modify(npru);
                 }
+                return true;
             } else {
                 return false;
             }
@@ -621,6 +623,7 @@ public class RoomUsageServiceImpl implements RoomUsageService {
                             info.getEndTime().toLocalDate(), ru.getUsageStatus(), Constants.Status.ROOM_USAGE_FREE, 1);
                 }
                 guestRoomStatusService.clearLockInfo(info);
+                return true;
             }
         }
         return false;
