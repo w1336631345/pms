@@ -162,7 +162,7 @@ public class AuthController {
             data.put("status", "0");
             data.put("token", sessionId);
         }
-        ModelAndView mv = new ModelAndView("/wx_login_result");
+        ModelAndView mv = new ModelAndView("/wx_login_result",data);
         return mv;
     }
     @ResponseBody
