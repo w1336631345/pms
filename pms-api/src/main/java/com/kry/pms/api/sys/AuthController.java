@@ -150,7 +150,7 @@ public class AuthController {
     public ModelAndView loginWxForPage(HttpServletRequest request) throws JSONException {
         WxMpUser user = (WxMpUser) request.getAttribute("user");
         User cuser = userService.findByOpenId(user.getOpenId());
-        String shift = (String) request.getAttribute("shift");
+        String shift = (String) request.getAttribute("state");
         Map<String, String> data = new HashMap<>();
         if (cuser == null) {
             data.put("status", "1");
