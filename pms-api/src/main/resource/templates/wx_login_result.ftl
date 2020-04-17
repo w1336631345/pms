@@ -4,12 +4,8 @@
         window.onload =function() {
             var data = {};
             data.status='${status}';
-            <#if status==0>
-                data.status = '${token}';
-            </#if>
-            <#if status == 1>
-                    data.openId = '${openId}';
-             </#if>
+            <#if token??> data.token = '${token}'; </#if>
+            <#if openId??> data.openId = '${openId}'; </#if>
             window.parent.postMessage(data,'*');
         };
     </script>
