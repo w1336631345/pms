@@ -22,6 +22,6 @@ public class MD5Utils {
 		return newPassword;
 	}
 	public static void main(String[] args) {
-		System.out.println(MD5Utils.encrypt("admin","0000", "123456"));
+		System.out.println(MD5Utils.encrypt("yyf","yyf", "123456"));
 	}
 }
