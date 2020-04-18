@@ -41,7 +41,8 @@ public class ScheduleQuartzJob implements Job {
             //所有酒店都要执行，不用区分hotelCode，实时导入房间状态，固定时间复制某些数据到临时表
 //            roomReportService.copyData(businessDate.toString());
 //            roomReportService.copyData(LocalDate.now().toString());
-        }else if(("AUDIT").equals(type_)){
+        }
+        if(("AUDIT").equals(type_)){
             //入账到bill
             automaticNightTrial.accountEntryListAll(hotelCode);
             //自动生成报表
