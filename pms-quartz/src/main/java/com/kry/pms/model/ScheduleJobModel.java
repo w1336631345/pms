@@ -2,6 +2,9 @@ package com.kry.pms.model;
 
 import lombok.Data;
 import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -31,15 +34,16 @@ public class ScheduleJobModel {
     // 0 - 代表正在执行  1 - 已删除  2 - 暂停
     @Column(columnDefinition = "tinyint(1) default '2' COMMENT '0 - 正在执行  1 - 已删除  2 - 暂停'")
     private Integer status;
-
+    @CreatedDate
     @Column(columnDefinition = "datetime NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间'")
     protected LocalDateTime createDate;
     @CreatedBy
     @Column(columnDefinition = "varchar(255) COMMENT '创建人'")
     protected String createUser;
+    @LastModifiedDate
     @Column(columnDefinition = "datetime NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间'")
     protected LocalDateTime updateDate;
-    @CreatedBy
+    @LastModifiedBy
     @Column(columnDefinition = "varchar(255) COMMENT '修改人'")
     protected String updateUser;
 
@@ -47,4 +51,15 @@ public class ScheduleJobModel {
     private String hotelCode;
     @Column(columnDefinition = "varchar(32) default 'AUDIT' COMMENT 'ALL全部执行  AUDIT夜审入账 NORMAL平常的'")
     private String type_;
+
+    @Column(columnDefinition = "varchar(1000) COMMENT '描述'")
+    private String remark;
+    @Column(columnDefinition = "varchar(500) COMMENT '方法所在类全路径'")
+    private String classPath;
+    @Column(columnDefinition = "varchar(256) COMMENT '方法名称'")
+    private String methodName;
+    @Column(columnDefinition = "varchar(64) COMMENT '参数类型'")
+    private String paramsType;
+    @Column(columnDefinition = "varchar(64) COMMENT '参数值'")
+    private String paramsValue;
 }

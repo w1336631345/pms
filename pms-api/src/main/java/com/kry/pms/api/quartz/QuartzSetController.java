@@ -7,9 +7,11 @@ import com.kry.pms.model.persistence.quartz.QuartzSet;
 import com.kry.pms.model.persistence.sys.Account;
 import com.kry.pms.model.persistence.sys.User;
 import com.kry.pms.service.quratz.impl.QuartzSetService;
+import com.kry.pms.service.quratz.impl.QuartzTestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 @RestController
@@ -18,6 +20,14 @@ public class QuartzSetController extends BaseController<QuartzSet> {
 
     @Autowired
     QuartzSetService quartzSetService;
+    @Autowired
+    QuartzTestService quartzTestService;
+    @GetMapping(path = "/test")
+    public HttpResponse test() throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+        HttpResponse hr = new HttpResponse();
+        quartzSetService.getTest();
+        return hr;
+    }
 
     @PostMapping(path = "/modify")
     public HttpResponse<QuartzSet> modify(@RequestBody QuartzSet quartzSet) {

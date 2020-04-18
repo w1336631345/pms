@@ -39,6 +39,14 @@ public class  DistributionChannelServiceImpl implements  DistributionChannelServ
 	}
 
 	@Override
+	public void deleteTrue(String id) {
+		DistributionChannel distributionChannel = distributionChannelDao.findById(id).get();
+		if (distributionChannel != null) {
+			distributionChannelDao.deleteById(id);
+		}
+	}
+
+	@Override
 	public DistributionChannel modify(DistributionChannel distributionChannel) {
 		return distributionChannelDao.saveAndFlush(distributionChannel);
 	}

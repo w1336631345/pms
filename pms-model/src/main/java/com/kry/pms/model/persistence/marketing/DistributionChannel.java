@@ -25,4 +25,10 @@ public class DistributionChannel extends PersistenceModel {
 	private String name;
 	@Column
 	private String description;
+	@Column
+	private String type;//Y团队，N散客
+	@Column(columnDefinition = "varchar(100) COMMENT '集团编码'")
+	private String clusterCode;
+	@Column(columnDefinition = "varchar(100) COMMENT '是否启用'")
+	private String isUsed;
 }
