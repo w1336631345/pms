@@ -70,7 +70,7 @@ public class ScheduleJobService {
     private void startScheduleByInit(ScheduleJobModel po){
         try {
             Scheduler scheduler = sf.getScheduler();
-            startJob(scheduler, po.getGroupName(), po.getJobName(), po.getHotelCode(), po.getCron(), po.getType_());
+            startJob(scheduler, po);
             scheduler.start();
         }catch (Exception e){
             log.error("exception:{}", e);
@@ -95,7 +95,7 @@ public class ScheduleJobService {
         }
         try {
             Scheduler scheduler = sf.getScheduler();
-            startJob(scheduler, model.getGroupName(), model.getJobName(), model.getHotelCode(), model.getCron(), model.getType_());
+            startJob(scheduler, model);
             scheduler.start();
             ScheduleJobModel scheduleJobPo = new ScheduleJobModel();
             scheduleJobPo.setGroupName(model.getGroupName());
@@ -129,7 +129,7 @@ public class ScheduleJobService {
         }
         try {
             Scheduler scheduler = sf.getScheduler();
-            startJob(scheduler, po.getGroupName(), po.getJobName(), po.getHotelCode(), po.getCron(), po.getType_());
+            startJob(scheduler, po);
             scheduler.start();
             po.setStatus(0);//更新状态为开启0
             po.setUpdateDate(LocalDateTime.now());
@@ -277,25 +277,27 @@ public class ScheduleJobService {
         }
     }
     // 开启任务
-    private void startJob(Scheduler scheduler, String group, String name, String hotelCode, String cron, String type_)
+    private void startJob(Scheduler scheduler, ScheduleJobModel sjm)
             throws SchedulerException {
         // 通过JobBuilder构建JobDetail实例，JobDetail规定只能是实现Job接口的实例
         // 在map中可传入自定义参数，在job中使用
         JobDataMap map = new JobDataMap();
-        map.put("group", group);
-        map.put("name", name);
-        map.put("hotelCode", hotelCode);
-        map.put("type_", type_);
+        map.put("group", sjm.getGroupName());
+        map.put("name", sjm.getJobName());
+        map.put("hotelCode", sjm.getHotelCode());
+        map.put("type_", sjm.getType_());
+        map.put("scheduleJobModelId", sjm.getId());
+        map.put("scheduleJobModel", sjm);
 
         // JobDetail 是具体Job实例
-        JobDetail jobDetail = JobBuilder.newJob(ScheduleQuartzJob.class).withIdentity(name, group)
+        JobDetail jobDetail = JobBuilder.newJob(ScheduleQuartzJob.class).withIdentity(sjm.getJobName(), sjm.getGroupName())
                 .usingJobData(map)
                 .build();
         // 基于表达式构建触发器
-        CronScheduleBuilder cronScheduleBuilder = CronScheduleBuilder.cronSchedule(cron);
+        CronScheduleBuilder cronScheduleBuilder = CronScheduleBuilder.cronSchedule(sjm.getCron());
         // CronTrigger表达式触发器 继承于Trigger
         // TriggerBuilder 用于构建触发器实例
-        CronTrigger cronTrigger = TriggerBuilder.newTrigger().withIdentity(name, group)
+        CronTrigger cronTrigger = TriggerBuilder.newTrigger().withIdentity(sjm.getJobName(), sjm.getGroupName())
                 .withSchedule(cronScheduleBuilder).build();
         scheduler.scheduleJob(jobDetail, cronTrigger);
     }

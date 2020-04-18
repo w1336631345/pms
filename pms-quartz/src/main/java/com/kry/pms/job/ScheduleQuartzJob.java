@@ -1,5 +1,6 @@
 package com.kry.pms.job;
 
+import com.kry.pms.model.ScheduleJobModel;
 import com.kry.pms.service.audit.NightAuditService;
 import com.kry.pms.service.report.RoomReportService;
 import com.kry.pms.service.sys.BusinessSeqService;
@@ -27,15 +28,13 @@ public class ScheduleQuartzJob implements Job {
         String group = context.getJobDetail().getJobDataMap().get("group").toString();
         String name = context.getJobDetail().getJobDataMap().get("name").toString();
         String hotelCode = context.getJobDetail().getJobDataMap().get("hotelCode").toString();
-        Object otype_ = context.getJobDetail().getJobDataMap().get("type_");
-        String type_ = null;
+        String type_ = context.getJobDetail().getJobDataMap().get("type_").toString();
+        ScheduleJobModel sjm = (ScheduleJobModel) context.getJobDetail().getJobDataMap().get("scheduleJobModel");
+
         log.info("执行了task...group:{}, name:{}, hotelCode:{}", group, name, hotelCode);
+        System.out.println("成功传入对象ScheduleJobModel："+sjm.getId());
         // 可在此执行定时任务的具体业务
         // ...
-        if(type_ == null){
-        }else {
-            type_ = otype_.toString();
-        }
         if(("ALL").equals(type_)){
             LocalDate businessDate = businessSeqService.getBuinessDate(hotelCode);
             //所有酒店都要执行，不用区分hotelCode，实时导入房间状态，固定时间复制某些数据到临时表

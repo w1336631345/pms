@@ -169,7 +169,7 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
     }
 
     @GetMapping(path = "/orderNum2/{orderNum}")
-    public HttpResponse<List<Map<String, Object>>> findDetailByOrderNumSQL(@PathVariable("orderNum") String orderNum) {
+    public HttpResponse<List<Map<String, Object>>> findDetailByOrderNumSQL(@PathVariable("orderNum") String orderNum) throws IOException, TemplateException {
         HttpResponse<List<Map<String, Object>>> rep = new HttpResponse<List<Map<String, Object>>>();
         rep.addData(checkInRecordService.findByOrderNum2(getCurrentHotleCode(), orderNum));
         return rep;
