@@ -151,7 +151,8 @@ public class SqlTemplateServiceImpl implements SqlTemplateService {
 
     @Override
     public List<Map<String, Object>> processByCode(String hotelCode, String code, Map<String, Object> parmrs) throws IOException, TemplateException {
-        SqlTemplate st = sqlTemplateDao.findByHotelCodeAndCode(hotelCode, code);
+//        SqlTemplate st = sqlTemplateDao.findByHotelCodeAndCode(hotelCode, code);
+        SqlTemplate st = sqlTemplateDao.findByCode(code);
         if (st != null) {
             String templateValue = st.getSql();
             StringWriter stringWriter = new StringWriter();
