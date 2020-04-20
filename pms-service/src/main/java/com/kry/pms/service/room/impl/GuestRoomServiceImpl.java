@@ -172,6 +172,7 @@ public class GuestRoomServiceImpl implements GuestRoomService {
         long d = Duration.between(ru.getStartDateTime(), ru.getEndDateTime()).get(ChronoUnit.SECONDS);
         ru.setDuration(d / 3600);
         ru.setGuestRoom(gr);
+        ru.setHotelCode(gr.getHotelCode());
         roomUsageDao.saveAndFlush(ru);
     }
 

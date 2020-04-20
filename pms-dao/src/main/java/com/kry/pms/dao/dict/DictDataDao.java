@@ -11,4 +11,5 @@ public interface DictDataDao extends BaseDao<DictData>{
      List<DictData> findByHotelCodeAndSafeLevel(String hotelCode,int safeLevel);
 
     DictData findByHotelCodeAndCode(String hotelCode, String code);
+    DictData findByHotelCodeAndCodeAndDeleted(String hotelCode, String code,int deleted);
 }

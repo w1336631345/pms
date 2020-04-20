@@ -42,6 +42,8 @@ public class RoomUsage implements Serializable {
 	@Column
 	private String businesskey;
 	@Column
+	private String hotelCode;
+	@Column
 	private String businessInfo;
 	@Column
 	private Long duration;
