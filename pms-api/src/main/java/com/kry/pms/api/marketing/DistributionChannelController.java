@@ -41,7 +41,7 @@ public class DistributionChannelController extends BaseController<DistributionCh
 	@DeleteMapping
 	public HttpResponse<String> delete(String id) {
 		HttpResponse<String> rep = new HttpResponse<>();
-		distributionChannelService.delete(id);
+		distributionChannelService.deleteTrue(id);
 		return rep;
 	}
 

@@ -1175,8 +1175,12 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
     }
 
     @Override
-    public List<Map<String, Object>> findByOrderNum2(String hotelCode, String orderNum) {
-        return sqlTemplateService.processTemplateQuery(hotelCode, CheckInRecordService.class.getSimpleName(), "findByOrderNum2", orderNum);
+    public List<Map<String, Object>> findByOrderNum2(String hotelCode, String orderNum) throws IOException, TemplateException {
+        Map<String, Object> map = new HashMap<>();
+        map.put("orderNum", orderNum);
+//        List list = sqlTemplateService.processTemplateQuery(hotelCode, CheckInRecordService.class.getSimpleName(), "findByOrderNum2", orderNum);
+        List<Map<String, Object>> list = sqlTemplateService.processByCode(hotelCode,"findByOrderNum2", map);
+        return list;
     }
 
     @Override

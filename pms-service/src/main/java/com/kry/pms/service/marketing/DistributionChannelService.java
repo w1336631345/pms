@@ -7,6 +7,8 @@ import com.kry.pms.service.BaseService;
 
 public interface DistributionChannelService extends BaseService<DistributionChannel>{
 
-	List<DistributionChannel> getAllByHotelCode(String currentHotleCode, int deletedFalse);
+    void deleteTrue(String id);
+
+    List<DistributionChannel> getAllByHotelCode(String currentHotleCode, int deletedFalse);
 
 }

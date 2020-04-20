@@ -91,7 +91,8 @@ public class SqlTemplateServiceImpl implements SqlTemplateService {
 
     @Override
     public String getSql(String hotelCode, String entityName, String methodName, Object object) {
-        SqlTemplate st = sqlTemplateDao.findByHotelCodeAndEntityNameAndMethodName(hotelCode, entityName, methodName);
+//        SqlTemplate st = sqlTemplateDao.findByHotelCodeAndEntityNameAndMethodName(hotelCode, entityName, methodName);
+        SqlTemplate st = sqlTemplateDao.findByEntityNameAndMethodName(entityName, methodName);
         if (st != null) {
             String templateValue = st.getSql();
             try {
@@ -150,7 +151,8 @@ public class SqlTemplateServiceImpl implements SqlTemplateService {
 
     @Override
     public List<Map<String, Object>> processByCode(String hotelCode, String code, Map<String, Object> parmrs) throws IOException, TemplateException {
-        SqlTemplate st = sqlTemplateDao.findByHotelCodeAndCode(hotelCode, code);
+//        SqlTemplate st = sqlTemplateDao.findByHotelCodeAndCode(hotelCode, code);
+        SqlTemplate st = sqlTemplateDao.findByCode(code);
         if (st != null) {
             String templateValue = st.getSql();
             StringWriter stringWriter = new StringWriter();
@@ -168,7 +170,8 @@ public class SqlTemplateServiceImpl implements SqlTemplateService {
 
     @Override
     public PageResponse<Map<String, Object>> queryForPage(String hotelCode, String code, PageRequest<Map<String, Object>> pageRequest) throws IOException, TemplateException {
-        SqlTemplate st = sqlTemplateDao.findByHotelCodeAndCode(hotelCode, code);
+//        SqlTemplate st = sqlTemplateDao.findByHotelCodeAndCode(hotelCode, code);
+        SqlTemplate st = sqlTemplateDao.findByCode(code);
         PageResponse<Map<String, Object>> rep = new PageResponse<>();
         if (st != null) {
             String templateValue = st.getSql();

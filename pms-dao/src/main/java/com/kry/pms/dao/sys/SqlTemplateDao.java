@@ -7,5 +7,9 @@ public interface SqlTemplateDao extends BaseDao<SqlTemplate>{
 
     SqlTemplate findByHotelCodeAndEntityNameAndMethodName(String hotelCode, String entityName, String methodName);
 
+    SqlTemplate findByEntityNameAndMethodName(String entityName, String methodName);
+
     SqlTemplate findByHotelCodeAndCode(String hotelCode, String code);
+
+    SqlTemplate findByCode(String code);
 }

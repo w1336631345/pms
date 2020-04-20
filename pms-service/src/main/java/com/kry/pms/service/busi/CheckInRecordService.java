@@ -86,7 +86,7 @@ public interface CheckInRecordService extends BaseService<CheckInRecord> {
 
     List<Map<String, Object>> findByOrderNumC2(String hotelCode, String orderNum) throws IOException, TemplateException;
 
-    List<Map<String, Object>> findByOrderNum2(String hotelCode, String orderNum);
+    List<Map<String, Object>> findByOrderNum2(String hotelCode, String orderNum) throws IOException, TemplateException;
 
 	List<Map<String, Object>> sqlOrderNum(String orderNum);
 

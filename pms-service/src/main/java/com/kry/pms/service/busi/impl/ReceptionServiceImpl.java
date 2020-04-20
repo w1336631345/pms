@@ -212,6 +212,7 @@ public class ReceptionServiceImpl implements ReceptionService {
 	}
 
 	@Override
+	@Transactional
 	public DtoResponse<String> checkInM(String id) {
 		DtoResponse<String> rep = new DtoResponse<>();
 		CheckInRecord cir = checkInRecordService.findById(id);
@@ -261,12 +262,14 @@ public class ReceptionServiceImpl implements ReceptionService {
 		cir.setActualTimeOfArrive(now);
 		cir.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN);
 		checkInRecordService.modify(cir);
-		List<CheckInRecord> together = checkInRecordService.checkInTogether(cir.getHotelCode(), cir.getOrderNum(), cir.getGuestRoom().getId());
-		for(int i=0; i<together.size(); i++){
-			CheckInRecord c = together.get(i);
-			c.setActualTimeOfArrive(now);
-			c.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN);
-			checkInRecordService.modify(c);
+		if(Constants.Type.CHECK_IN_RECORD_CUSTOMER.equals(cir.getType())){
+			List<CheckInRecord> together = checkInRecordService.checkInTogether(cir.getHotelCode(), cir.getOrderNum(), cir.getGuestRoom().getId());
+			for(int i=0; i<together.size(); i++){
+				CheckInRecord c = together.get(i);
+				c.setActualTimeOfArrive(now);
+				c.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN);
+				checkInRecordService.modify(c);
+			}
 		}
 		roomStatisticsService.checkIn(new CheckInRecordWrapper(cir));
 		return rep;

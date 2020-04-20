@@ -2,7 +2,6 @@ package com.kry.pms.controller;
 
 import com.kry.pms.base.HttpResponse;
 import com.kry.pms.model.ScheduleJobModel;
-import com.kry.pms.model.persistence.quartz.QuartzSet;
 import com.kry.pms.model.persistence.sys.User;
 import com.kry.pms.service.ScheduleJobService;
 import com.kry.pms.utils.ShiroUtils;
