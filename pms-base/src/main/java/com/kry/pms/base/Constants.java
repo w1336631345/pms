@@ -258,4 +258,10 @@ public class Constants {
 		public static final String  FULL_DAY_ROOM_FEE = "1001";
 		public static final String  TO_AR = "9014";
 	}
+
+	public interface quartzType {
+		public static final String NIGHT_AUDIT = "AUDIT";// 夜审入账方式-自动入账
+		public static final String ALL = "ALL";// 夜审入账方式-手动入账
+		public static final String NORMAL = "NORMAL";// 夜审入账方式-手动入账
+	}
 }

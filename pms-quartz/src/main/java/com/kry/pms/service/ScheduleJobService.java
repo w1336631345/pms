@@ -10,6 +10,7 @@ import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
 import org.quartz.impl.matchers.GroupMatcher;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
@@ -28,6 +29,10 @@ public class ScheduleJobService {
 
     @Autowired
     private ScheduleJobDaoRepository scheduleJobDaoRepository;
+    @Autowired
+    SchedulerFactoryBean schedulerFactoryBean;
+    @Autowired
+    Scheduler scheduler;
 
     // 项目重启后，初始化原本已经运行的定时任务
     @PostConstruct
@@ -69,7 +74,8 @@ public class ScheduleJobService {
      */
     private void startScheduleByInit(ScheduleJobModel po){
         try {
-            Scheduler scheduler = sf.getScheduler();
+//            Scheduler scheduler = sf.getScheduler();
+//            Scheduler scheduler = schedulerFactoryBean.getScheduler();
             startJob(scheduler, po);
             scheduler.start();
         }catch (Exception e){
@@ -94,7 +100,8 @@ public class ScheduleJobService {
             throw new RuntimeException("group和job名称已存在");
         }
         try {
-            Scheduler scheduler = sf.getScheduler();
+//            Scheduler scheduler = sf.getScheduler();
+//            Scheduler scheduler = schedulerFactoryBean.getScheduler();
             startJob(scheduler, model);
             scheduler.start();
             ScheduleJobModel scheduleJobPo = new ScheduleJobModel();
@@ -128,7 +135,8 @@ public class ScheduleJobService {
             }
         }
         try {
-            Scheduler scheduler = sf.getScheduler();
+//            Scheduler scheduler = sf.getScheduler();
+//            Scheduler scheduler = schedulerFactoryBean.getScheduler();
             startJob(scheduler, po);
             scheduler.start();
             po.setStatus(0);//更新状态为开启0
@@ -151,7 +159,8 @@ public class ScheduleJobService {
         try {
             ScheduleJobModel po = scheduleJobDaoRepository.findByIdAndStatus(model.getId(), 0);
             // 获取调度对象
-            Scheduler scheduler = sf.getScheduler();
+//            Scheduler scheduler = sf.getScheduler();
+//            Scheduler scheduler = schedulerFactoryBean.getScheduler();
             // 获取触发器
             TriggerKey triggerKey = new TriggerKey(po.getJobName(), po.getGroupName());
             CronTrigger cronTrigger = (CronTrigger) scheduler.getTrigger(triggerKey);
@@ -181,7 +190,8 @@ public class ScheduleJobService {
             return hr.error(4040,"定时任务不存在");
         }
         try {
-            Scheduler scheduler = sf.getScheduler();
+//            Scheduler scheduler = sf.getScheduler();
+//            Scheduler scheduler = schedulerFactoryBean.getScheduler();
             JobKey jobKey = new JobKey(po.getJobName(), po.getGroupName());
             JobDetail jobDetail = scheduler.getJobDetail(jobKey);
             if (jobDetail == null)
@@ -205,7 +215,8 @@ public class ScheduleJobService {
             return hr.error(4040,"定时任务不存在");
         }
         try {
-            Scheduler scheduler = sf.getScheduler();
+//            Scheduler scheduler = sf.getScheduler();
+//            Scheduler scheduler = schedulerFactoryBean.getScheduler();
             JobKey jobKey = new JobKey(po.getJobName(), po.getGroupName());
             JobDetail jobDetail = scheduler.getJobDetail(jobKey);
             if (jobDetail == null)
@@ -232,7 +243,8 @@ public class ScheduleJobService {
             return hr.ok("任务已经删除");
         }
         try {
-            Scheduler scheduler = sf.getScheduler();
+//            Scheduler scheduler = sf.getScheduler();
+//            Scheduler scheduler = schedulerFactoryBean.getScheduler();
             JobKey jobKey = new JobKey(po.getJobName(), po.getGroupName());
             JobDetail jobDetail = scheduler.getJobDetail(jobKey);
             if (jobDetail == null)
@@ -251,7 +263,8 @@ public class ScheduleJobService {
      */
     public void scheduleDeleteAll() {
         try {
-            Scheduler scheduler = sf.getScheduler();
+//            Scheduler scheduler = sf.getScheduler();
+//            Scheduler scheduler = schedulerFactoryBean.getScheduler();
             // 获取有所的组
             List<String> jobGroupNameList = scheduler.getJobGroupNames();
             for (String jobGroupName : jobGroupNameList) {
@@ -282,11 +295,6 @@ public class ScheduleJobService {
         // 通过JobBuilder构建JobDetail实例，JobDetail规定只能是实现Job接口的实例
         // 在map中可传入自定义参数，在job中使用
         JobDataMap map = new JobDataMap();
-        map.put("group", sjm.getGroupName());
-        map.put("name", sjm.getJobName());
-        map.put("hotelCode", sjm.getHotelCode());
-        map.put("type_", sjm.getType_());
-        map.put("scheduleJobModelId", sjm.getId());
         map.put("scheduleJobModel", sjm);
 
         // JobDetail 是具体Job实例

@@ -62,4 +62,6 @@ public class ScheduleJobModel {
     private String paramsType;
     @Column(columnDefinition = "varchar(64) COMMENT '参数值'")
     private String paramsValue;
+    @Column(columnDefinition = "varchar(64) COMMENT '对象名称'")
+    private String className;
 }

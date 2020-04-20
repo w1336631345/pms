@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -97,8 +98,8 @@ public class QuartzSetServiceImpl implements QuartzSetService {
     public String getTest() throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InstantiationException, InvocationTargetException {
         Class<?> cla = Class.forName("com.kry.pms.service.quratz.impl.QuartzTestServiceImpl");
         Object o = cla.newInstance();
-        Method method = cla.getMethod("getTest",String.class);
-        method.invoke(o, new Object[] {"sdfsd"});
+        Method method = cla.getMethod("getTest",String.class,String.class);
+        method.invoke(o, new Object[] {"sdfsd", "123123"});
         return null;
     }
 
@@ -108,6 +109,8 @@ public class QuartzSetServiceImpl implements QuartzSetService {
         qs.setCron("0/30 * * * * ? ");
         qs.setCronTime("30s/次");
         qs.setHotelCode(hotelCode);
+        qs.setCreateDate(LocalDateTime.now());
+        qs.setUpdateDate(LocalDateTime.now());
         qs.setStatus("1");
         quartzSetDao.save(qs);
     }
