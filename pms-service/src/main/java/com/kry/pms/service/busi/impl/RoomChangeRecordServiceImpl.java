@@ -69,6 +69,11 @@ public class RoomChangeRecordServiceImpl implements RoomChangeRecordService {
 		List<CheckInRecord> list = checkInRecordDao.findByOrderNumAndGuestRoomAndDeleted(cir.getOrderNum(), cir.getGuestRoom(), Constants.DELETED_FALSE);
 		for(int i=0; i<list.size(); i++){
 			CheckInRecord cirs = list.get(i);
+			if(!Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN.equals(cirs.getStatus()) && !Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION.equals(cirs.getStatus())){
+				System.out.println("不是入住或者预订状态");
+				System.out.println(cirs.getStatus());
+				continue;
+			}
 
 			LocalDateTime arriveTime = cirs.getArriveTime();
 			LocalDateTime leaveTime = cirs.getLeaveTime();
@@ -99,19 +104,6 @@ public class RoomChangeRecordServiceImpl implements RoomChangeRecordService {
 				TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 				return hr.error("已经过了离店时间，禁止换房操作");
 			}
-
-//			if(Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN.equals(cirs.getStatus())){//入住状态
-//				roomStatisticsService.cancleCheckIn(new CheckInRecordWrapper(cirs));
-//			}
-//			roomStatisticsService.cancleAssign(new CheckInRecordWrapper(cirs));
-//			roomStatisticsService.cancleReserve(new CheckInRecordWrapper(cirs));
-			//需要删除roomRecord的记录
-//			List<RoomRecord> roomRecords = roomRecordService.findByHotelCodeAndCheckInRecord(cirs.getHotelCode(), cirs.getId());
-//			for(int r=0; r<roomRecords.size(); r++){
-//				roomRecordService.deleteTrue(roomRecords.get(r).getId());
-//			}
-
-
 
 			//修改roomRecord完毕
 			GuestRoom newgr = guestRoomDao.getOne(entity.getNewGuestRoom().getId());
@@ -150,16 +142,6 @@ public class RoomChangeRecordServiceImpl implements RoomChangeRecordService {
 					roomStatisticsService.checkIn(new CheckInRecordWrapper(cirs));
 				}
 			}
-
-//			roomStatisticsService.reserve(new CheckInRecordWrapper(cirs));
-//			if(Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION.equals(cirs.getStatus())){
-//				roomStatisticsService.assignRoom(new CheckInRecordWrapper(cirs));
-//			}
-//			if(Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN.equals(cirs.getStatus())){
-//				roomStatisticsService.checkIn(new CheckInRecordWrapper(cirs));
-//			}
-//			roomRecordService.createRoomRecord(cirs);
-
 		}
 		hr.setData(roomChangeRecordDao.save(entity));
 		return hr;

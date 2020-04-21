@@ -84,9 +84,13 @@ public class RoomLinkServiceImpl implements RoomLinkService {
             String[] id = roomLinkBo.getId();
             for(int j=0; j<id.length; j++){
                 CheckInRecord cir = checkInRecordService.findById(id[j]);
-                cir.setRoomLinkId(roomLinkId);
-                cir.setRoomLinkIdM("M");//因为初次联房，设置联房原数据是主数据
-                checkInRecordService.update(cir);
+                if(cir.getRoomLinkId() == null || "".equals(cir.getRoomLinkId())){
+                    cir.setRoomLinkId(roomLinkId);
+                    cir.setRoomLinkIdM("M");//因为初次联房，设置联房原数据是主数据
+                    checkInRecordService.update(cir);
+                }else{
+                    roomLinkId = cir.getRoomLinkId();
+                }
             }
         }
         for(int i=0; i<ids.length; i++){
