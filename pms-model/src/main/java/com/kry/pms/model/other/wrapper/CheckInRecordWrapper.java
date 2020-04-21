@@ -30,6 +30,9 @@ public class CheckInRecordWrapper implements UseInfoAble {
     @JsonIgnore
     @Override
     public String getBusinessKey() {
+        if(this.checkInRecord.getOrderNumOld()!=null){
+            return this.checkInRecord.getOrderNumOld();
+        }
         return this.checkInRecord.getOrderNum();
     }
 

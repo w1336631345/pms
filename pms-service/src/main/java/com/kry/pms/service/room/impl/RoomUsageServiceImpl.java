@@ -573,20 +573,20 @@ public class RoomUsageServiceImpl implements RoomUsageService {
         if (info.guestRoom() != null) {
             RoomUsage ru = roomUsageDao.findByGuestRoomIdAndBusinesskey(info.guestRoom().getId(),
                     info.getBusinessKey());
-            if (ru.getUniqueIds().contains(info.uniqueId())) {
+            if (ru.getUniqueIds()!=null&&ru.getUniqueIds().contains(info.uniqueId())) {
                 ru.getUniqueIds().remove(info.uniqueId());
-                if (ru.getUniqueIds().isEmpty()) {
-                    if (info.getEndTime().equals(ru.getEndDateTime())) {
-                        ru.setUsageStatus(Constants.Status.ROOM_USAGE_CHECK_OUT);
-                    } else {
-                        if (info.getEndTime().isBefore(ru.getEndDateTime())) {
-                            roomTypeQuantityService.changeRoomTypeQuantity(info.roomType(), info.getEndTime().toLocalDate(),
-                                    ru.getEndDateTime().toLocalDate(), ru.getUsageStatus(), Constants.Status.ROOM_USAGE_PREDICTABLE, 1);
-                            unUse(ru);
-                        }
+            }
+            if (ru.getUniqueIds()==null||ru.getUniqueIds().isEmpty()) {
+                if (info.getEndTime().equals(ru.getEndDateTime())) {
+                    ru.setUsageStatus(Constants.Status.ROOM_USAGE_CHECK_OUT);
+                } else {
+                    if (info.getEndTime().isBefore(ru.getEndDateTime())) {
+                        roomTypeQuantityService.changeRoomTypeQuantity(info.roomType(), info.getEndTime().toLocalDate(),
+                                ru.getEndDateTime().toLocalDate(), ru.getUsageStatus(), Constants.Status.ROOM_USAGE_PREDICTABLE, 1);
+                        unUse(ru);
                     }
-                    guestRoomStatusService.clearUseInfo(info);
                 }
+                guestRoomStatusService.clearUseInfo(info);
             }
         }
         return false;
