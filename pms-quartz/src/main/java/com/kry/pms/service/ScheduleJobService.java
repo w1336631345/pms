@@ -25,14 +25,14 @@ import java.util.Set;
 public class ScheduleJobService {
 
     // 获取工厂类
-    private StdSchedulerFactory sf = new StdSchedulerFactory();
+    private StdSchedulerFactory sf = new StdSchedulerFactory();//没有交给spring,导致job类无法注入
 
     @Autowired
     private ScheduleJobDaoRepository scheduleJobDaoRepository;
     @Autowired
-    SchedulerFactoryBean schedulerFactoryBean;
+    SchedulerFactoryBean schedulerFactoryBean;//实现spring注入功能，交给spring管理
     @Autowired
-    Scheduler scheduler;
+    Scheduler scheduler;//来至于JobSpringConfig里的bean
 
     // 项目重启后，初始化原本已经运行的定时任务
     @PostConstruct
