@@ -10,9 +10,11 @@ import lombok.Data;
 public class CustomerVo {
 	private String name;
 	private String mobile;
-	private GuestInfo guestInfo;
+//	private GuestInfo guestInfo;
 	private Integer checkInCount;
 	private String currentStatus;
+	private String nationality;//国籍
+	private String nation;//民族
 
 	public static CustomerVo convert(Customer c) {
 		CustomerVo cv = new CustomerVo();
