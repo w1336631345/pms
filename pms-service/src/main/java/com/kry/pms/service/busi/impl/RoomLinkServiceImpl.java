@@ -150,6 +150,10 @@ public class RoomLinkServiceImpl implements RoomLinkService {
                     cirRoomNum.setRoomLinkId(null);
                     cirRoomNum.setOrderNum(orderNum);
                     checkInRecordService.update(cirRoomNum);
+                }else {
+                    if(list.size() == 1){
+                        return hr.error("原订单不支持删除");
+                    }
                 }
             }
         }
