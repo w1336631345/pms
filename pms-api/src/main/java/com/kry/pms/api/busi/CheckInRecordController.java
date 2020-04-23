@@ -338,7 +338,7 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
     }
 
     @GetMapping("/checkOut/{type}/{id}")
-    public HttpResponse<List<CheckInRecord>> hangUp(@PathVariable("type") String type, @PathVariable("id") String id,String orderNum) {
+    public HttpResponse<List<CheckInRecord>> checkOut(@PathVariable("type") String type, @PathVariable("id") String id,String orderNum) {
         HttpResponse<List<CheckInRecord>> rep = new HttpResponse<>();
         DtoResponse<List<CheckInRecord>> response = checkInRecordService.checkOut(type, id,orderNum);
         BeanUtils.copyProperties(response, rep);

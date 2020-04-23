@@ -125,10 +125,10 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
         if (!dbCir.getRoomPriceScheme().getId().equals(checkInRecord.getRoomPriceScheme().getId())) {
             updateRoomPriceS = true;
         }
-        if(!dbCir.getName().equals(checkInRecord.getName())){//主单修改名称
+        if (!dbCir.getName().equals(checkInRecord.getName())) {//主单修改名称
             updateName = true;
         }
-        if(!dbCir.getArriveTime().isEqual(checkInRecord.getArriveTime()) || !dbCir.getLeaveTime().isEqual(checkInRecord.getLeaveTime())){
+        if (!dbCir.getArriveTime().isEqual(checkInRecord.getArriveTime()) || !dbCir.getLeaveTime().isEqual(checkInRecord.getLeaveTime())) {
             updateTime = true;
         }
         // 如果是主单操作，判断是不是修改的时间
@@ -136,8 +136,8 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
             // 查询主单下的成员记录
             List<CheckInRecord> children = checkInRecordDao.findByMainRecordAndDeleted(dbCir, Constants.DELETED_FALSE);
             checkInRecord.setCustomer(null);
-            if(updateName){//主单修改名称
-                if(checkInRecord.getAccount() != null){
+            if (updateName) {//主单修改名称
+                if (checkInRecord.getAccount() != null) {
                     Account account = accountService.findById(checkInRecord.getAccount().getId());//连同主单账号名称一起修改
                     account.setName(checkInRecord.getName());
                     accountService.modify(account);
@@ -146,7 +146,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 
             for (int i = 0; i < children.size(); i++) {
                 CheckInRecord cir = children.get(i);
-                if(updateRoomPriceS){//主单修改了房价码
+                if (updateRoomPriceS) {//主单修改了房价码
                     Map<String, Object> map = roomPriceSchemeDao.roomTypeAndPriceScheme(cir.getRoomType().getId(), checkInRecord.getRoomPriceScheme().getId());
                     Double price = MapUtils.getDouble(map, "price");
                     if (price == null) {
@@ -165,11 +165,11 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                         cir.setSetMeal(null);
                     }
                 }
-                if(updateName){//主单修改名称
+                if (updateName) {//主单修改名称
                     cir.setGroupName(checkInRecord.getName());
                 }
-                if(updateTime){
-                    if(checkInRecord.getArriveTime().isAfter(cir.getArriveTime()) || checkInRecord.getLeaveTime().isBefore(cir.getLeaveTime())){
+                if (updateTime) {
+                    if (checkInRecord.getArriveTime().isAfter(cir.getArriveTime()) || checkInRecord.getLeaveTime().isBefore(cir.getLeaveTime())) {
                         TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                         return hr.error("主单时间范围不能小于成员时间范围");
                     }
@@ -178,7 +178,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                 checkInRecordDao.saveAndFlush(cir);
                 roomStatisticsService.updateGuestRoomStatus(new CheckInRecordWrapper(cir));
             }
-        }else {//不是主单，是宾客信息
+        } else {//不是主单，是宾客信息
             checkInRecord.setMainRecord(dbCir.getMainRecord());
             if (checkInRecord.getCustomer() != null) {
                 if (checkInRecord.getCustomer().getId() != null) {
@@ -186,7 +186,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                     if (c != null) {
                         if (!dbCir.getName().equals(c.getName())) {
                             checkInRecord.setName(c.getName());
-                            if(checkInRecord.getAccount() != null){
+                            if (checkInRecord.getAccount() != null) {
                                 Account account = accountService.findById(checkInRecord.getAccount().getId());//连同主单账号名称一起修改
                                 account.setCustomer(c);
                                 account.setName(c.getName());
@@ -196,10 +196,10 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                     }
                 }
             }
-            if(updateTime){
-                if(dbCir.getMainRecord() != null){
+            if (updateTime) {
+                if (dbCir.getMainRecord() != null) {
                     CheckInRecord main = dbCir.getMainRecord();
-                    if(checkInRecord.getArriveTime().isBefore(main.getArriveTime()) || checkInRecord.getLeaveTime().isAfter(main.getLeaveTime())){
+                    if (checkInRecord.getArriveTime().isBefore(main.getArriveTime()) || checkInRecord.getLeaveTime().isAfter(main.getLeaveTime())) {
                         TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                         return hr.error("成员时间范围不能大于主单");
                     }
@@ -214,7 +214,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                 int days = (int) checkInRecord.getArriveTime().toLocalDate()
                         .until(checkInRecord.getLeaveTime().toLocalDate(), ChronoUnit.DAYS);
                 List<CheckInRecord> together = checkInTogether(checkInRecord.getHotelCode(), checkInRecord.getOrderNum(), checkInRecord.getGuestRoom().getId());
-                for(int t=0; t<together.size(); t++){
+                for (int t = 0; t < together.size(); t++) {
                     List<RoomRecord> list = roomRecordService.findByHotelCodeAndCheckInRecord(checkInRecord.getHotelCode(), together.get(t).getId());
                     for (int r = 0; r < list.size(); r++) {
                         roomRecordService.deleteTrue(list.get(r).getId());
@@ -266,19 +266,19 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
             boolean updateTime = false;
             LocalDateTime at = checkUpdateItemTestBo.getArriveTime();
             LocalDateTime lt = checkUpdateItemTestBo.getLeaveTime();
-            if(at == null || "".equals(at)){
+            if (at == null || "".equals(at)) {
                 at = cir.getArriveTime();
             }
-            if(lt == null || "".equals(lt)){
+            if (lt == null || "".equals(lt)) {
                 lt = cir.getLeaveTime();
             }
-            if(!cir.getArriveTime().isEqual(at) || !cir.getLeaveTime().isEqual(lt)){
+            if (!cir.getArriveTime().isEqual(at) || !cir.getLeaveTime().isEqual(lt)) {
                 updateTime = true;
             }
-            if(updateTime){
-                if(cir.getMainRecord() != null){
+            if (updateTime) {
+                if (cir.getMainRecord() != null) {
                     CheckInRecord main = cir.getMainRecord();
-                    if(cir.getArriveTime().isBefore(main.getArriveTime()) || cir.getLeaveTime().isAfter(main.getLeaveTime())){
+                    if (cir.getArriveTime().isBefore(main.getArriveTime()) || cir.getLeaveTime().isAfter(main.getLeaveTime())) {
                         TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                         return hr.error("成员时间范围不能大于主单");
                     }
@@ -292,7 +292,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                 int days = (int) at.toLocalDate()
                         .until(lt.toLocalDate(), ChronoUnit.DAYS);
                 List<CheckInRecord> together = checkInTogether(cir.getHotelCode(), cir.getOrderNum(), cir.getGuestRoom().getId());
-                for(int t=0; t<together.size(); t++){
+                for (int t = 0; t < together.size(); t++) {
                     List<RoomRecord> list = roomRecordService.findByHotelCodeAndCheckInRecord(cir.getHotelCode(), together.get(t).getId());
                     for (int r = 0; r < list.size(); r++) {
                         roomRecordService.deleteTrue(list.get(r).getId());
@@ -317,13 +317,13 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
         HttpResponse hr = new HttpResponse();
         for (int i = 0; i < ids.length; i++) {
             CheckInRecord cir = findById(ids[i]);
-            if(!Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN.equals(cir.getStatus())){
+            if (!Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN.equals(cir.getStatus())) {
                 return hr.error("不是入住状态，取消入住失败");
             }
             //取消入住，退回排房状态，但排房还是预定
             cir.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION);
             checkInRecordDao.save(cir);
-            if(Constants.Type.CHECK_IN_RECORD_CUSTOMER.equals(cir.getType())){
+            if (Constants.Type.CHECK_IN_RECORD_CUSTOMER.equals(cir.getType())) {
                 roomStatisticsService.cancleCheckIn(new CheckInRecordWrapper(cir));
             }
         }
@@ -395,7 +395,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 
     @Transactional
     @Override
-    public DtoResponse<List<CheckInRecord>> checkOut(String type, String id,String orderNum) {
+    public DtoResponse<List<CheckInRecord>> checkOut(String type, String id, String orderNum) {
         switch (type) {
             case Constants.Type.SETTLE_TYPE_ACCOUNT:
                 return checkOutAccout(id);
@@ -409,7 +409,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
             case Constants.Type.SETTLE_TYPE_IGROUP:
                 return checkOutGroup(id);
             case Constants.Type.SETTLE_TYPE_ROOM:
-                return checkOutRoom(id,orderNum);
+                return checkOutRoom(id, orderNum);
             case Constants.Type.SETTLE_TYPE_LINK:
                 return checkOutLink(id);
             default:
@@ -427,11 +427,11 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
         return checkOut(cirs);
     }
 
-    private DtoResponse<List<CheckInRecord>> checkOutRoom(String id,String orderNum) {
+    private DtoResponse<List<CheckInRecord>> checkOutRoom(String id, String orderNum) {
         GuestRoom guestRoom = guestRoomService.findById(id);
-        if(guestRoom!=null){
+        if (guestRoom != null) {
             return checkOut(findByOrderNumAndGuestRoomAndDeleted(orderNum, guestRoom, Constants.DELETED_FALSE));
-        }else{
+        } else {
             return null;
         }
     }
@@ -450,6 +450,11 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
         if (rep.getStatus() != 0) {
             BeanUtils.copyProperties(rep, response);
         } else {
+            List<CheckInRecord> togethers = checkInTogetherByStatus(cir.getHotelCode(), cir.getOrderNum(), cir.getGuestRoom().getId(), Arrays.asList(Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN,
+                    Constants.Status.CHECKIN_RECORD_STATUS_ASSIGN));
+            if(togethers!=null){
+                rep.setStatus(1);
+            }
             data.add(rep.getData());
         }
         return response.addData(data);
@@ -459,7 +464,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
         DtoResponse<List<CheckInRecord>> response = new DtoResponse<>();
         List<CheckInRecord> data = new ArrayList<>();
         for (CheckInRecord cir : cirs) {
-            if(Constants.Status.CHECKIN_RECORD_STATUS_CHECK_OUT.equals(cir.getStatus())){
+            if (Constants.Status.CHECKIN_RECORD_STATUS_CHECK_OUT.equals(cir.getStatus())) {
                 continue;
             }
             DtoResponse<CheckInRecord> rep = checkOut(cir);
@@ -621,7 +626,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
         String orderNum = businessSeqService.fetchNextSeqNum(checkInRecord.getHotelCode(),
                 Constants.Key.BUSINESS_ORDER_NUM_SEQ_KEY);
         if (checkInRecord.getName() == null || "".equals(checkInRecord.getName())) {
-            checkInRecord.setName("同行主账户"+orderNum);
+            checkInRecord.setName("同行主账户" + orderNum);
         }
         checkInRecord.setGroupName(checkInRecord.getName());
         checkInRecord.setOrderNum(orderNum);
@@ -1000,7 +1005,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
         Map<String, Object> emap = new HashMap<>();
         emap.put("hotelCode", user.getHotelCode());
         emap.put("status", "I");
-        emap.put("type","C");
+        emap.put("type", "C");
         map.put("equals", emap);
         Specification<CheckInRecord> specification = psf.createSpecification(map);
         Page<CheckInRecord> p = checkInRecordDao.findAll(specification, page);
@@ -1019,6 +1024,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
         List<CheckInRecord> list = checkInRecordDao.findAll(specification);
         return list;
     }
+
     @Override
     public PageResponse<Map<String, Object>> accountEntryListMap(int pageIndex, int pageSize, User user) {
         Pageable page = org.springframework.data.domain.PageRequest.of(pageIndex - 1, pageSize);
@@ -1034,13 +1040,13 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
     }
 
     @Override
-    public PageResponse<Map<String, Object>> unreturnedGuests(int pageIndex, int pageSize,String mainNum, String status, User user) {
+    public PageResponse<Map<String, Object>> unreturnedGuests(int pageIndex, int pageSize, String mainNum, String status, User user) {
         Pageable page = org.springframework.data.domain.PageRequest.of(pageIndex - 1, pageSize);
         String hotelCode = null;
         if (user != null) {
             hotelCode = user.getHotelCode();
         }
-        Page<Map<String, Object>> p = checkInRecordDao.unreturnedGuests(page,mainNum, status, hotelCode);
+        Page<Map<String, Object>> p = checkInRecordDao.unreturnedGuests(page, mainNum, status, hotelCode);
         PageResponse<Map<String, Object>> pr = new PageResponse<>();
         pr.setPageSize(p.getNumberOfElements());
         pr.setPageCount(p.getTotalPages());
@@ -1154,6 +1160,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
     public PageResponse<Map<String, Object>> querySummaryListToBySql(String hotelCode, PageRequest pageRequest) throws IOException, TemplateException {
         return sqlTemplateService.queryForPage(hotelCode, "resverList", pageRequest);
     }
+
     @Override
     public PageResponse<Map<String, Object>> querySummaryListToBySqlTotal(String hotelCode, PageRequest pageRequest) throws IOException, TemplateException {
         return sqlTemplateService.queryForPage(hotelCode, "resverListTotal", pageRequest);
@@ -1184,7 +1191,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
         Map<String, Object> map = new HashMap<>();
         map.put("orderNum", orderNum);
 //        List list = sqlTemplateService.processTemplateQuery(hotelCode, CheckInRecordService.class.getSimpleName(), "findByOrderNum2", orderNum);
-        List<Map<String, Object>> list = sqlTemplateService.processByCode(hotelCode,"findByOrderNum2", map);
+        List<Map<String, Object>> list = sqlTemplateService.processByCode(hotelCode, "findByOrderNum2", map);
         return list;
     }
 
@@ -1301,7 +1308,6 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
     }
 
 
-
     @Override
     public List<CheckInRecord> findByOrderNumAndGuestRoomAndDeleted(String orderNum, GuestRoom guestRoom, int delete) {
         List<CheckInRecord> list = checkInRecordDao.findByOrderNumAndGuestRoomAndDeleted(orderNum, guestRoom, delete);
@@ -1416,14 +1422,14 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
             if (("G").equals(cir.getType())) {
                 return hr.error("此处不能取消主单");
             }
-            if(("R").equals(cir.getType())){//如果取消的是预留单
+            if (("R").equals(cir.getType())) {//如果取消的是预留单
                 humanCount = cir.getHumanCount();
                 roomCount = cir.getRoomCount();
                 cir.setDeleted(Constants.DELETED_TRUE);
                 cir.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_CANCLE_BOOK);
                 modify(cir);
                 roomStatisticsService.cancleReserve(new CheckInRecordWrapper(cir));//取消预
-            }else if(("C").equals(cir.getType())) {//宾客排房未入住订单的取消
+            } else if (("C").equals(cir.getType())) {//宾客排房未入住订单的取消
                 boolean b = accountService.accountCheck(cir.getAccount().getId());
                 if (!b) {
                     return hr.error(cir.getName() + "有账务未结清");
@@ -1454,21 +1460,22 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
         }
         return hr.ok();
     }
+
     //主单的取消预订
     @Override
     @Transactional
-    public HttpResponse callOffG(String id){
+    public HttpResponse callOffG(String id) {
         HttpResponse hr = new HttpResponse();
         CheckInRecord cir = checkInRecordDao.getOne(id);
-        if(Constants.Type.CHECK_IN_RECORD_GROUP.equals(cir.getType())){//如果是主单
+        if (Constants.Type.CHECK_IN_RECORD_GROUP.equals(cir.getType())) {//如果是主单
             List<String> list = checkInRecordDao.listIdByType(id, Constants.Type.CHECK_IN_RECORD_CUSTOMER, Constants.DELETED_FALSE);
-            if(list != null && !list.isEmpty()){
+            if (list != null && !list.isEmpty()) {
                 return hr.error("存在排房或入住，主单取消失败");
-            }else {//没有成员排房或入住，查出预留单，全部删除
+            } else {//没有成员排房或入住，查出预留单，全部删除
                 List<String> rList = checkInRecordDao.listIdByType(id, Constants.Type.CHECK_IN_RECORD_RESERVE, Constants.DELETED_FALSE);
                 int hcount = 0;
                 int rcount = 0;
-                for(int i=0; i<rList.size(); i++){
+                for (int i = 0; i < rList.size(); i++) {
                     hr = offReserve(rList.get(i));//删除预留单（该方法里已经做了主单房数和人数的修改）
 //                    CheckInRecord r = checkInRecordDao.getOne(rList.get(i));
 //                    hcount = hcount + r.getHumanCount();
@@ -1481,33 +1488,34 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 //                cir.setRoomCount(cir.getRoomCount() - rcount);
                 update(cir);
             }
-        }else if(Constants.Type.CHECK_IN_RECORD_RESERVE.equals(cir.getType())) {//如果是预留单
+        } else if (Constants.Type.CHECK_IN_RECORD_RESERVE.equals(cir.getType())) {//如果是预留单
             return hr.error("预留单，请选择修改预留");
-        }else {
-            if(Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION.equals(cir.getStatus())){
+        } else {
+            if (Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION.equals(cir.getStatus())) {
                 String[] ids = new String[1];
                 ids[0] = id;
                 hr = callOffReserve(ids);
-            }else {
+            } else {
                 return hr.error("选数据状态错误");
             }
         }
         return hr;
     }
+
     //主单恢复
     @Override
-    public HttpResponse recovery(String id){
+    public HttpResponse recovery(String id) {
         HttpResponse hr = new HttpResponse();
         CheckInRecord cir = checkInRecordDao.getOne(id);
-        if(Constants.Type.CHECK_IN_RECORD_GROUP.equals(cir.getType())){//如果是主单
-            if(cir.getDeleted() == 0){
+        if (Constants.Type.CHECK_IN_RECORD_GROUP.equals(cir.getType())) {//如果是主单
+            if (cir.getDeleted() == 0) {
                 return hr.error("正常主单无需恢复");
-            }else{
+            } else {
                 cir.setDeleted(Constants.DELETED_FALSE);
                 cir.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION);
                 update(cir);
             }
-        }else {
+        } else {
             return hr.error("主单恢复失败");
         }
         return hr;
@@ -1684,6 +1692,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
         });
         return list;
     }
+
     @Override
     public List<CheckInRecord> checkInTogetherByStatus(String hotelCode, String orderNum, String guestRoomId, List<String> status) {
         GuestRoom guestRoom = guestRoomService.findById(guestRoomId);
@@ -1704,7 +1713,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                 list.add(criteriaBuilder.equal(root.get("deleted"), Constants.DELETED_FALSE));
 //				list.add(criteriaBuilder.isNotNull(root.get("guestRoom")));
                 List<Predicate> predicateListOr = new ArrayList<Predicate>();
-                for(int i=0; i<status.size(); i++){
+                for (int i = 0; i < status.size(); i++) {
                     predicateListOr.add(criteriaBuilder.equal(root.get("status"), status.get(i)));
                 }
                 list.add(criteriaBuilder.or(predicateListOr.toArray(new Predicate[predicateListOr.size()])));
@@ -1741,10 +1750,10 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
     @org.springframework.transaction.annotation.Transactional(rollbackFor = Exception.class)
     public HttpResponse addTogether(String hotelCode, String orderNum, String customerId, String status, String guestRoomId) {
         HttpResponse hr = new HttpResponse();
-        String[] statusList = new String[]{"R","I"};
+        String[] statusList = new String[]{"R", "I"};
 //        List<CheckInRecord> list = checkInTogether(hotelCode, orderNum, guestRoomId);
         List<CheckInRecord> list = checkInTogetherByStatus(hotelCode, orderNum, guestRoomId, Arrays.asList(statusList));
-        if(list == null || list.isEmpty()){
+        if (list == null || list.isEmpty()) {
             return hr.error("该房间已无人在住");
         }
         CheckInRecord cir = list.get(0);
@@ -1819,9 +1828,9 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
         LocalDate date = LocalDate.now();
         DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         String recordDate = date.format(fmt);
-        String[] statusList = new String[]{"R","I"};
+        String[] statusList = new String[]{"R", "I"};
         CheckInRecord tcir = checkInRecordDao.getOne(checkInRecordId);
-        if(!Arrays.asList(statusList).contains(tcir.getStatus())){
+        if (!Arrays.asList(statusList).contains(tcir.getStatus())) {
             return hr.error("退房/结账单不再支持修改房费");
         }
 //        List<CheckInRecord> list = checkInTogether(hotelCode, orderNum, guestRoomId);
@@ -2185,7 +2194,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
     public List<Map<String, Object>> resourceStatistics(String orderNum, String arriveTime, String leaveTime) {
         List<Map<String, Object>> list = checkInRecordDao.resourceStatistics(orderNum, arriveTime, leaveTime);
         List<Map<String, Object>> rList = new ArrayList<>();
-        for(int i = 0; i<list.size(); i++){
+        for (int i = 0; i < list.size(); i++) {
             Map<String, Object> newMap = new HashMap<>(list.get(i));
             String now = MapUtils.getString(list.get(i), "date");
             String roomTypeId = MapUtils.getString(list.get(i), "roomTypeId");
@@ -2193,7 +2202,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
             Integer roomCount = MapUtils.getInteger(list.get(i), "roomCount");
             Double cost = MapUtils.getDouble(list.get(i), "cost");
             Map<String, Object> map = checkInRecordDao.resourceStatisticsR(orderNum, now, roomTypeId);
-            if(map != null && map.size() > 0){
+            if (map != null && map.size() > 0) {
                 Integer hCount = MapUtils.getInteger(map, "humanCount");
                 Integer rCount = MapUtils.getInteger(map, "roomCount");
                 Double c = MapUtils.getDouble(map, "cost");
@@ -2205,50 +2214,51 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
         }
         return rList;
     }
+
     @Override
     public List<Map<String, Object>> resourceStatisticsTo(String orderNum, String arriveTime, String leaveTime) {
         List<Map<String, Object>> rlist = new ArrayList<>();
         List<String> list = checkInRecordDao.getTime(arriveTime, leaveTime);
         List<String> roomType = checkInRecordDao.getAllRoomType(orderNum);
-        for(int i=0; i<list.size(); i++){
+        for (int i = 0; i < list.size(); i++) {
             String now = list.get(i);
-            for(int j=0; j<roomType.size(); j++){
+            for (int j = 0; j < roomType.size(); j++) {
                 Map<String, Object> map = new HashMap<>();
-                map.put("date",now);
+                map.put("date", now);
                 map.put("roomTypeId", roomType.get(j));
-                Map<String, Object> cmap = checkInRecordDao.countMap(orderNum,now,roomType.get(j));
+                Map<String, Object> cmap = checkInRecordDao.countMap(orderNum, now, roomType.get(j));
                 int humanCount = 0, roomCount = 0;
                 Double cost = 0.0;
-                if(cmap != null && cmap.size() > 0){
+                if (cmap != null && cmap.size() > 0) {
                     map.put("code", MapUtils.getString(cmap, "code"));
                     map.put("roomType", MapUtils.getString(cmap, "roomType"));
                     Integer hCount = MapUtils.getInteger(cmap, "humanCount");
-                    if(hCount != null){
+                    if (hCount != null) {
                         humanCount = humanCount + hCount;
                     }
                     Integer rCount = MapUtils.getInteger(cmap, "roomCount");
-                    if(rCount != null){
+                    if (rCount != null) {
                         roomCount = roomCount + rCount;
                     }
                     Double c = MapUtils.getDouble(cmap, "cost");
-                    if(c != null){
+                    if (c != null) {
                         cost = cost + c;
                     }
                 }
                 Map<String, Object> rmap = checkInRecordDao.resourceStatisticsR(orderNum, now, roomType.get(j));
-                if(rmap != null && rmap.size() > 0){
+                if (rmap != null && rmap.size() > 0) {
                     map.put("code", MapUtils.getString(rmap, "code"));
                     map.put("roomType", MapUtils.getString(rmap, "roomType"));
                     Integer hCount = MapUtils.getInteger(rmap, "humanCount");
-                    if(hCount != null){
+                    if (hCount != null) {
                         humanCount = humanCount + hCount;
                     }
                     Integer rCount = MapUtils.getInteger(rmap, "roomCount");
-                    if(rCount != null){
+                    if (rCount != null) {
                         roomCount = roomCount + rCount;
                     }
                     Double c = MapUtils.getDouble(rmap, "cost");
-                    if(c != null){
+                    if (c != null) {
                         cost = cost + c;
                     }
                 }
@@ -2263,10 +2273,11 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
     }
 
     @Override
-    public CheckInRecord byId(String id){
+    public CheckInRecord byId(String id) {
         CheckInRecord cir = checkInRecordDao.byId(id);
         return cir;
     }
+
     private DtoResponse<String> hangUp(CheckInRecord cir, String extFee) {
         DtoResponse<String> rep = new DtoResponse<String>();
         if (Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN.equals(cir.getStatus())) {
@@ -2287,8 +2298,9 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
         }
         return true;
     }
+
     @Transactional
-    public DtoResponse<String> hangUp(String id, String type, String extFeeType,String orderNum) {
+    public DtoResponse<String> hangUp(String id, String type, String extFeeType, String orderNum) {
         DtoResponse<String> rep = new DtoResponse<>();
         boolean result = true;
         CheckInRecord cir = null;
@@ -2312,12 +2324,12 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                 break;
             case Constants.Type.SETTLE_TYPE_ROOM:
                 GuestRoom guestRoom = guestRoomService.findById(id);
-                if(guestRoom!=null){
-                    hangUp(findByOrderNumAndGuestRoomAndDeleted(orderNum,guestRoom,Constants.DELETED_FALSE),extFeeType);
+                if (guestRoom != null) {
+                    hangUp(findByOrderNumAndGuestRoomAndDeleted(orderNum, guestRoom, Constants.DELETED_FALSE), extFeeType);
                 }
                 break;
             case Constants.Type.SETTLE_TYPE_LINK:
-                hangUp(findByLinkId(id),extFeeType);
+                hangUp(findByLinkId(id), extFeeType);
                 break;
             default:
                 break;
@@ -2327,7 +2339,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 
     @Override
     public boolean hangUp(String checkInRecordId, String extFee) {
-        hangUp(findById(checkInRecordId),extFee);
+        hangUp(findById(checkInRecordId), extFee);
         return true;
     }
 
@@ -2337,7 +2349,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
     }
 
     @Override
-    public HttpResponse printing(String checkInRecordId){
+    public HttpResponse printing(String checkInRecordId) {
         HttpResponse hr = new HttpResponse();
         Map<String, Object> map = checkInRecordDao.printing(checkInRecordId);
         hr.addData(map);
