@@ -43,6 +43,7 @@ import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import javax.persistence.criteria.*;
 import javax.transaction.Transactional;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -1153,6 +1154,10 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
     public PageResponse<Map<String, Object>> querySummaryListToBySql(String hotelCode, PageRequest pageRequest) throws IOException, TemplateException {
         return sqlTemplateService.queryForPage(hotelCode, "resverList", pageRequest);
     }
+    @Override
+    public PageResponse<Map<String, Object>> querySummaryListToBySqlTotal(String hotelCode, PageRequest pageRequest) throws IOException, TemplateException {
+        return sqlTemplateService.queryForPage(hotelCode, "resverListTotal", pageRequest);
+    }
 
     @Override
     public List<CheckInRecord> findByOrderNum(String orderNum) {
@@ -1679,6 +1684,36 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
         });
         return list;
     }
+    @Override
+    public List<CheckInRecord> checkInTogetherByStatus(String hotelCode, String orderNum, String guestRoomId, List<String> status) {
+        GuestRoom guestRoom = guestRoomService.findById(guestRoomId);
+        List<CheckInRecord> list = checkInRecordDao.findAll(new Specification<CheckInRecord>() {
+            @Override
+            public Predicate toPredicate(Root<CheckInRecord> root, CriteriaQuery<?> query,
+                                         CriteriaBuilder criteriaBuilder) {
+                List<Predicate> list = new ArrayList<Predicate>();
+                if (hotelCode != null) {
+                    list.add(criteriaBuilder.equal(root.get("hotelCode"), hotelCode));
+                }
+                if (orderNum != null) {
+                    list.add(criteriaBuilder.equal(root.get("orderNum"), orderNum));
+                }
+                if (guestRoom != null) {
+                    list.add(criteriaBuilder.equal(root.join("guestRoom"), guestRoom));
+                }
+                list.add(criteriaBuilder.equal(root.get("deleted"), Constants.DELETED_FALSE));
+//				list.add(criteriaBuilder.isNotNull(root.get("guestRoom")));
+                List<Predicate> predicateListOr = new ArrayList<Predicate>();
+                for(int i=0; i<status.size(); i++){
+                    predicateListOr.add(criteriaBuilder.equal(root.get("status"), status.get(i)));
+                }
+                list.add(criteriaBuilder.or(predicateListOr.toArray(new Predicate[predicateListOr.size()])));
+                Predicate[] array = new Predicate[list.size()];
+                return criteriaBuilder.and(list.toArray(array));
+            }
+        });
+        return list;
+    }
 
     @Override
     public List<CheckInRecord> findByTogetherCode(String hotelCode, String togetherCod) {
@@ -1704,8 +1739,14 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 
     @Override
     @org.springframework.transaction.annotation.Transactional(rollbackFor = Exception.class)
-    public void addTogether(String hotelCode, String orderNum, String customerId, String status, String guestRoomId) {
-        List<CheckInRecord> list = checkInTogether(hotelCode, orderNum, guestRoomId);
+    public HttpResponse addTogether(String hotelCode, String orderNum, String customerId, String status, String guestRoomId) {
+        HttpResponse hr = new HttpResponse();
+        String[] statusList = new String[]{"R","I"};
+//        List<CheckInRecord> list = checkInTogether(hotelCode, orderNum, guestRoomId);
+        List<CheckInRecord> list = checkInTogetherByStatus(hotelCode, orderNum, guestRoomId, Arrays.asList(statusList));
+        if(list == null || list.isEmpty()){
+            return hr.error("该房间已无人在住");
+        }
         CheckInRecord cir = list.get(0);
         CheckInRecord checkInRecord = new CheckInRecord();
         BeanUtils.copyProperties(cir, checkInRecord);
@@ -1762,6 +1803,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
             cm.setHumanCount(cm.getHumanCount() + 1);
             update(cm);
         }
+        return hr.ok();
     }
 
     @Override
@@ -1772,11 +1814,18 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
     // 独单房价
     @Override
     @org.springframework.transaction.annotation.Transactional(rollbackFor = Exception.class)
-    public void roomPriceAllocation(String hotelCode, String orderNum, String checkInRecordId, String guestRoomId) {
+    public HttpResponse roomPriceAllocation(String hotelCode, String orderNum, String checkInRecordId, String guestRoomId) {
+        HttpResponse hr = new HttpResponse();
         LocalDate date = LocalDate.now();
         DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         String recordDate = date.format(fmt);
-        List<CheckInRecord> list = checkInTogether(hotelCode, orderNum, guestRoomId);
+        String[] statusList = new String[]{"R","I"};
+        CheckInRecord tcir = checkInRecordDao.getOne(checkInRecordId);
+        if(!Arrays.asList(statusList).contains(tcir.getStatus())){
+            return hr.error("退房/结账单不再支持修改房费");
+        }
+//        List<CheckInRecord> list = checkInTogether(hotelCode, orderNum, guestRoomId);
+        List<CheckInRecord> list = checkInTogetherByStatus(hotelCode, orderNum, guestRoomId, Arrays.asList(statusList));
         for (int i = 0; i < list.size(); i++) {
             CheckInRecord cir = list.get(i);
 //            String custId = cir.getCustomer().getId();
@@ -1785,7 +1834,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                 cir.setPersonalPrice(0.0);
                 cir.setPersonalPercentage(0.0);
             } else {
-                cir.setOriginalPrice(cir.getPurchasePrice());
+                cir.setOriginalPrice(cir.getRoomType().getPrice());
                 cir.setPersonalPrice(cir.getPurchasePrice());
                 cir.setPersonalPercentage(1.0);// 因为是独单房价，占比1
             }
@@ -1799,20 +1848,24 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
             }
 
         }
+        return hr.ok();
     }
 
     // 平均房价
     @Override
     @org.springframework.transaction.annotation.Transactional(rollbackFor = Exception.class)
-    public void roomPriceAvg(String hotelCode, String orderNum, String guestRoomId) {
+    public HttpResponse roomPriceAvg(String hotelCode, String orderNum, String guestRoomId) {
+        HttpResponse hr = new HttpResponse();
         LocalDate date = LocalDate.now();
         DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         String recordDate = date.format(fmt);
-        List<CheckInRecord> list = checkInTogether(hotelCode, orderNum, guestRoomId);
+//        List<CheckInRecord> list = checkInTogether(hotelCode, orderNum, guestRoomId);
+        String[] status = new String[]{"R", "I"};
+        List<CheckInRecord> list = checkInTogetherByStatus(hotelCode, orderNum, guestRoomId, Arrays.asList(status));
         if (list != null && !list.isEmpty()) {
             Double peopleCount = Double.valueOf(list.size());
             Double roomPrice = list.get(0).getPurchasePrice();
-            Double oPrice = list.get(0).getOriginalPrice();
+            Double oPrice = list.get(0).getRoomType().getPrice();//房间原价
             DecimalFormat df = new DecimalFormat("####0.00");
             Double avg = roomPrice / peopleCount;
             Double personalPrice = Double.parseDouble(df.format(avg));
@@ -1833,6 +1886,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                 }
             }
         }
+        return hr.ok();
     }
 
     @Override

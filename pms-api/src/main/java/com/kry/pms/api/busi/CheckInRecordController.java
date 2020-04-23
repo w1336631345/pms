@@ -388,6 +388,19 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
         HttpResponse<PageResponse<Map<String, Object>>> rep = new HttpResponse<PageResponse<Map<String, Object>>>();
         return rep.addData(checkInRecordService.querySummaryListToBySql(getCurrentHotleCode(), parse2CommonPageRequest(request)));
     }
+    /**
+     * 功能描述: <br>预订列表的合计
+     * 〈〉
+     * @Param: [request]
+     * @Return: com.kry.pms.base.HttpResponse<com.kry.pms.base.PageResponse<java.util.Map<java.lang.String,java.lang.Object>>>
+     * @Author: huanghaibin
+     * @Date: 2020/4/23 16:07
+     */
+    @GetMapping(path = "/summaryTotal")
+    public HttpResponse<PageResponse<Map<String, Object>>> summaryTotal(HttpServletRequest request) throws IOException, TemplateException, IllegalAccessException, InstantiationException {
+        HttpResponse<PageResponse<Map<String, Object>>> rep = new HttpResponse<PageResponse<Map<String, Object>>>();
+        return rep.addData(checkInRecordService.querySummaryListToBySqlTotal(getCurrentHotleCode(), parse2CommonPageRequest(request)));
+    }
 
     /**
      * 功能描述: <br>同住列表
@@ -438,8 +451,8 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
     public HttpResponse addTogether(String orderNum, String customerId, String status, String guestRoomId) {
         HttpResponse hr = new HttpResponse();
         User user = getUser();
-        checkInRecordService.addTogether(user.getHotelCode(), orderNum, customerId, status, guestRoomId);
-        return hr.ok();
+        hr = checkInRecordService.addTogether(user.getHotelCode(), orderNum, customerId, status, guestRoomId);
+        return hr;
     }
 
     /**
@@ -455,8 +468,8 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
     public HttpResponse roomPriceAllocation(String orderNum, String checkInRecordId, String guestRoomId) {
         HttpResponse hr = new HttpResponse();
         User user = getUser();
-        checkInRecordService.roomPriceAllocation(user.getHotelCode(), orderNum, checkInRecordId, guestRoomId);
-        return hr.ok();
+        hr = checkInRecordService.roomPriceAllocation(user.getHotelCode(), orderNum, checkInRecordId, guestRoomId);
+        return hr;
     }
 
     /**
@@ -472,8 +485,8 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
     public HttpResponse roomPriceAvg(String orderNum, String guestRoomId) {
         HttpResponse hr = new HttpResponse();
         User user = getUser();
-        checkInRecordService.roomPriceAvg(user.getHotelCode(), orderNum, guestRoomId);
-        return hr.ok();
+        hr = checkInRecordService.roomPriceAvg(user.getHotelCode(), orderNum, guestRoomId);
+        return hr;
     }
 
     /**

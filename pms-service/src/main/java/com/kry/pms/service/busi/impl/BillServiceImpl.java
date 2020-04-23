@@ -12,11 +12,13 @@ import javax.persistence.Transient;
 import javax.transaction.Transactional;
 
 import com.kry.pms.dao.busi.CheckInRecordDao;
+import com.kry.pms.dao.busi.RoomRecordDao;
 import com.kry.pms.dao.goods.ProductDao;
 import com.kry.pms.dao.goods.SetMealDao;
 import com.kry.pms.model.dto.BillStatistics;
 import com.kry.pms.model.persistence.goods.SetMeal;
 import com.kry.pms.service.sys.SqlTemplateService;
+import org.apache.commons.collections4.MapUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Sort;
@@ -75,6 +77,8 @@ public class BillServiceImpl implements BillService {
     SetMealDao setMealDao;
     @Autowired
     ProductDao productDao;
+    @Autowired
+    RoomRecordDao roomRecordDao;
 
     @Transient
     @Override
@@ -281,7 +285,7 @@ public class BillServiceImpl implements BillService {
         return bills;
     }
 
-    // 夜审手动入账
+    // 夜审手动入账（停用）
     @Override
     public void putAcount(List<RoomRecord> ids, LocalDate businessDate, Employee emp, String shiftCode) {
         for (int i = 0; i < ids.size(); i++) {
@@ -300,6 +304,43 @@ public class BillServiceImpl implements BillService {
             addAudit(p, rr.getCost(), cir.getAccount(), cir.getHotelCode(), emp, shiftCode, rr.getId(), "M");
             rr.setIsAccountEntry("PAY");// 入账成功后roomRecord里面入账状态改为pay
             roomRecordService.modify(rr);
+        }
+    }
+    // 夜审手动入账(优化)
+//    @Override
+    public void putAcountMap(List<Map<String, Object>> list, LocalDate businessDate, Employee emp, String shiftCode) {
+        for (int i = 0; i < list.size(); i++) {
+            Map<String, Object> map = list.get(i);
+            String id = MapUtils.getString(map, "id");
+            String cirId = MapUtils.getString(map, "cirId");
+            String setMealId = MapUtils.getString(map, "setMealId");
+            String productId = MapUtils.getString(map, "productId");
+            String setMealAccountId = MapUtils.getString(map, "setMealAccountId");//这个是包价入账的账号
+            String cirAccountId = MapUtils.getString(map, "cirAccountId");//这个是包价入账的账号
+            Account setMealAccount = new Account();
+            setMealAccount.setId(setMealAccountId);
+            Account cirAccount = new Account();
+            cirAccount.setId(cirAccountId);
+            Double cost = MapUtils.getDouble(map, "cost");
+            String hotelCode = MapUtils.getString(map, "hotelCode");
+            Double setMealCost = MapUtils.getDouble(map, "setMealCost");
+
+//            RoomRecord rr = list.get(i);
+//            String checkInRecordId = rr.getCheckInRecord().getId();
+//            CheckInRecord cir = checkInRecordDao.getOne(checkInRecordId);
+//            SetMeal sm = cir.getSetMeal();
+            Product p = productDao.findByHotelCodeAndCode(hotelCode, "1000");//这里必须改修改，不能写死，要找到夜间稽核类型（在product中加）
+            if (setMealId != null && !"".equals(setMealId)) {
+                if (productId != null && !"".equals(productId)) {//如果有包价，就一笔整的包价价格账，一笔负的价格账，正负得0
+                    Product product = new Product();//入账项目
+                    product.setId(productId);
+                    addAudit(product, setMealCost, setMealAccount, hotelCode, emp, shiftCode, null, "M");
+                    addAudit(product, -setMealCost, setMealAccount, hotelCode, emp, shiftCode, null, "M");
+                }
+            }
+            addAudit(p, cost, cirAccount, hotelCode, emp, shiftCode, id, "M");
+            // 入账成功后roomRecord里面入账状态改为pay
+            roomRecordDao.updateIsAccountEntry("PAY", id);
         }
     }
 

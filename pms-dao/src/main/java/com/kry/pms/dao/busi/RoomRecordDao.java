@@ -7,6 +7,7 @@ import java.util.Map;
 import com.kry.pms.dao.BaseDao;
 import com.kry.pms.model.persistence.busi.CheckInRecord;
 import com.kry.pms.model.persistence.busi.RoomRecord;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -26,5 +27,9 @@ public interface RoomRecordDao extends BaseDao<RoomRecord>{
 	@Query(nativeQuery = true, value = " select * from t_room_record \n" +
 			" where record_date >= :recordDate and check_in_record_id = :checkInRecordId ")
 	List<RoomRecord> recordDateAndCheckInRecord(@Param("recordDate") LocalDate recordDate, @Param("checkInRecordId") String checkInRecordId);
+
+	@Modifying
+	@Query(value = " update t_room_record set is_account_entry = ?1 where id = ?2 ",nativeQuery = true)
+	int updateIsAccountEntry(String isAccountEntry, String id);
 
 }

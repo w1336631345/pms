@@ -82,7 +82,9 @@ public interface CheckInRecordService extends BaseService<CheckInRecord> {
 
     PageResponse<Map<String, Object>> querySummaryListToBySql(String hotelCode, PageRequest pageRequest) throws IOException, TemplateException;
 
-    public List<CheckInRecord> findByOrderNum(String orderNum);
+	PageResponse<Map<String, Object>> querySummaryListToBySqlTotal(String hotelCode, PageRequest pageRequest) throws IOException, TemplateException;
+
+	public List<CheckInRecord> findByOrderNum(String orderNum);
 
     List<Map<String, Object>> findByOrderNumC2(String hotelCode, String orderNum) throws IOException, TemplateException;
 
@@ -136,17 +138,19 @@ public interface CheckInRecordService extends BaseService<CheckInRecord> {
 
 	List<CheckInRecord> checkInTogether(String hotelCode, String orderNum, String guestRoomId);
 
-	List<CheckInRecord> findByTogetherCode(String hotelCode, String togetherCod);
+    List<CheckInRecord> checkInTogetherByStatus(String hotelCode, String orderNum, String guestRoomId, List<String> status);
 
-	void addTogether(String hotelCode, String orderNum, String customerId, String status, String guestRoomId);
+    List<CheckInRecord> findByTogetherCode(String hotelCode, String togetherCod);
+
+	HttpResponse addTogether(String hotelCode, String orderNum, String customerId, String status, String guestRoomId);
 
 	// 独单房价
 	@org.springframework.transaction.annotation.Transactional(rollbackFor = Exception.class)
-	void roomPriceAllocation(String hotelCode, String orderNum, String checkInRecordId, String guestRoomId);
+	HttpResponse roomPriceAllocation(String hotelCode, String orderNum, String checkInRecordId, String guestRoomId);
 
 	// 平均房价
 	@org.springframework.transaction.annotation.Transactional(rollbackFor = Exception.class)
-	void roomPriceAvg(String hotelCode, String orderNum, String guestRoomId);
+	HttpResponse roomPriceAvg(String hotelCode, String orderNum, String guestRoomId);
 
 	public CheckInRecord queryByAccountId(String id);
 
