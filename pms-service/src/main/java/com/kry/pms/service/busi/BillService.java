@@ -37,7 +37,11 @@ public interface BillService extends BaseService<Bill> {
 
 	//夜审手动入账
 	void putAcount(List<RoomRecord> ids, LocalDate businessDate, Employee emp, String shiftCode);
-	//夜审自动入账
+
+    // 夜审手动入账(优化)
+    void putAcountMap(List<Map<String, Object>> list, LocalDate businessDate, Employee emp, String shiftCode);
+
+    //夜审自动入账
 	void putAcountAUTO(List<RoomRecord> ids, LocalDate businessDate);
 
 	public List<Bill> checkAccountAllBill(Account account,double total,DtoResponse<Account> rep, String orderNum);

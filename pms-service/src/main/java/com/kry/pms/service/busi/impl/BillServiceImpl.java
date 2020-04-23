@@ -307,7 +307,7 @@ public class BillServiceImpl implements BillService {
         }
     }
     // 夜审手动入账(优化)
-//    @Override
+    @Override
     public void putAcountMap(List<Map<String, Object>> list, LocalDate businessDate, Employee emp, String shiftCode) {
         for (int i = 0; i < list.size(); i++) {
             Map<String, Object> map = list.get(i);
@@ -324,11 +324,6 @@ public class BillServiceImpl implements BillService {
             Double cost = MapUtils.getDouble(map, "cost");
             String hotelCode = MapUtils.getString(map, "hotelCode");
             Double setMealCost = MapUtils.getDouble(map, "setMealCost");
-
-//            RoomRecord rr = list.get(i);
-//            String checkInRecordId = rr.getCheckInRecord().getId();
-//            CheckInRecord cir = checkInRecordDao.getOne(checkInRecordId);
-//            SetMeal sm = cir.getSetMeal();
             Product p = productDao.findByHotelCodeAndCode(hotelCode, "1000");//这里必须改修改，不能写死，要找到夜间稽核类型（在product中加）
             if (setMealId != null && !"".equals(setMealId)) {
                 if (productId != null && !"".equals(productId)) {//如果有包价，就一笔整的包价价格账，一笔负的价格账，正负得0

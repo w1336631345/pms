@@ -203,6 +203,12 @@ public class RoomRecordServiceImpl implements RoomRecordService {
 	}
 
 	@Override
+	public List<Map<String, Object>> accountEntryListAllMap(LocalDate businessDate, String hotelCode, String isAccountEntry) {
+		List<Map<String, Object>> list = roomRecordDao.auditRoomRecord(businessDate, hotelCode, isAccountEntry);
+		return list;
+	}
+
+	@Override
 	public List<RoomRecord> findByHotelCodeAndCheckInRecord(String hotelCode, String checkInRecordId){
 		CheckInRecord cir = checkInRecordService.findById(checkInRecordId);
 //		List<RoomRecord> list = roomRecordDao.findByHotelCodeAndCheckInRecord(hotelCode, cir);

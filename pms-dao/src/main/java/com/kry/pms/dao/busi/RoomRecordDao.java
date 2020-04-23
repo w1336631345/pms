@@ -32,4 +32,22 @@ public interface RoomRecordDao extends BaseDao<RoomRecord>{
 	@Query(value = " update t_room_record set is_account_entry = ?1 where id = ?2 ",nativeQuery = true)
 	int updateIsAccountEntry(String isAccountEntry, String id);
 
+	@Query(nativeQuery = true, value = " select \n" +
+			" trr.id, \n" +
+			" tcr.id cirId, \n" +
+			" tsm.id setMealId, \n" +
+			" tsm.product_id productId, \n" +
+			" tsm.account_id setMealAccountId, \n" +
+			" tcr.account_id cirAccountId, \n" +
+			" trr.cost, \n" +
+			" tcr.hotel_code hotelCode, \n" +
+			" tsm.total setMealCost \n" +
+			" from t_room_record trr \n" +
+			"  left join t_checkin_record tcr on trr.check_in_record_id = tcr.id \n" +
+			"  left join t_set_meal tsm on tcr.set_meal_id = tsm.id \n" +
+			" where trr.record_date = ?1 \n" +
+			"  and trr.hotel_code = ?2 \n" +
+			"  and trr.is_account_entry = ?3 ")
+	List<Map<String, Object>> auditRoomRecord(LocalDate recordDate, String hotelCode, String isAccountEntry);
+
 }
