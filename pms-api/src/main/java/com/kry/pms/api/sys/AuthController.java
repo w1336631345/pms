@@ -72,8 +72,8 @@ public class AuthController {
         try {
             subject.login(token);
             String hotelCodet = ShiroUtils.getUser().getHotelCode();
-            Shift newShift = shiftService.createOrUpdate(shift, ShiroUtils.getUser());
-            subject.getSession().setAttribute(Constants.Key.SESSION_ATTR_SHIFT_CODE, newShift.getShiftCode());
+//            Shift newShift = shiftService.createOrUpdate(shift, ShiroUtils.getUser());
+            subject.getSession().setAttribute(Constants.Key.SESSION_ATTR_SHIFT_CODE, shift);
             String id = (String) subject.getSession().getId();
             response.addData(id);
             return response.ok("登录成功");
@@ -86,9 +86,9 @@ public class AuthController {
         UsernamePasswordToken token = new UsernamePasswordToken(user.getUsername(), user.getPassword());
         Subject subject = SecurityUtils.getSubject();
         subject.login(token);
-        String hotelCodet = ShiroUtils.getUser().getHotelCode();
-        Shift newShift = shiftService.createOrUpdate(shift, ShiroUtils.getUser());
-        subject.getSession().setAttribute(Constants.Key.SESSION_ATTR_SHIFT_CODE, newShift.getShiftCode());
+        String hotelCode = ShiroUtils.getUser().getHotelCode();
+//        Shift newShift = shiftService.createOrUpdate(shift, ShiroUtils.getUser());
+        subject.getSession().setAttribute(Constants.Key.SESSION_ATTR_SHIFT_CODE, shift);
         return (String) subject.getSession().getId();
 
     }
