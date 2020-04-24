@@ -55,7 +55,7 @@ public interface CheckInRecordService extends BaseService<CheckInRecord> {
     List<CheckInRecord> bookByRoomList(CheckInRecordListBo cirlb);
 
     @Transactional
-	CheckInRecord bookByRoomTypeTest(CheckInRecord checkInRecord);
+	HttpResponse bookByRoomTypeTest(CheckInRecord checkInRecord);
 
     //单房预订
     CheckInRecord singleRoom(CheckInRecord checkInRecord);

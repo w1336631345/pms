@@ -715,7 +715,15 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 
     @Override
     @Transactional
-    public CheckInRecord bookByRoomTypeTest(CheckInRecord checkInRecord) {
+    public HttpResponse bookByRoomTypeTest(CheckInRecord checkInRecord) {
+        HttpResponse hr = new HttpResponse();
+        if (Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN.equals(checkInRecord.getStatus())) {
+            LocalDate businessDate = businessSeqService.getBuinessDate(checkInRecord.getHotelCode());
+            LocalDate aDate = checkInRecord.getArriveTime().toLocalDate();
+            if(!businessDate.isEqual(aDate)){
+                return  hr.error("请核对营业日期与入住日期是否相同");
+            }
+        }
         String orderNum = businessSeqService.fetchNextSeqNum(checkInRecord.getHotelCode(),
                 Constants.Key.BUSINESS_ORDER_NUM_SEQ_KEY);
         checkInRecord.setOrderNum(orderNum);
@@ -763,7 +771,8 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
             roomStatisticsService.checkIn(new CheckInRecordWrapper(checkInRecord));
         }
         roomRecordService.createRoomRecord(cir);
-        return cir;
+        hr.addData(cir);
+        return hr;
     }
 
     //单房预订

@@ -199,8 +199,10 @@ public class nightAuditController extends BaseController {
                 principalCollection = (SimplePrincipalCollection) session.getAttribute(DefaultSubjectContext.PRINCIPALS_SESSION_KEY);
                 user = (User) principalCollection.getPrimaryPrincipal();
                 if(user != null){
-                    if(!user.getId().equals(loginUser.getId())){
+                    if(user.getHotelCode().equals(loginUser.getHotelCode())){
+                        if(!user.getId().equals(loginUser.getId())){
 //                        return rep.error("还有其他用户在线，请先做下线操作");
+                        }
                     }
                 }
             }
