@@ -313,10 +313,15 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 
     @Transactional
     @Override
-    public HttpResponse cancelIn(String[] ids) {
+    public HttpResponse cancelIn(String[] ids, String hotelCode) {
         HttpResponse hr = new HttpResponse();
+        LocalDate businessDate = businessSeqService.getBuinessDate(hotelCode);
         for (int i = 0; i < ids.length; i++) {
             CheckInRecord cir = findById(ids[i]);
+            LocalDate arriveTime = cir.getArriveTime().toLocalDate();
+            if(!businessDate.isEqual(arriveTime)){
+                return hr.error("请核对营业日期与到店日期是否相同");
+            }
             if (!Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN.equals(cir.getStatus())) {
                 return hr.error("不是入住状态，取消入住失败");
             }
@@ -697,7 +702,8 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
     }
 
     @Override
-    public List<CheckInRecord> bookByRoomList(CheckInRecordListBo cirlb) {
+    @Transactional
+    public List<CheckInRecord> bookByRoomList(CheckInRecordListBo cirlb, String hotelCode) {
         List<CheckInRecord> list = cirlb.getCirs();
         String roomLinkId = null;
         if (cirlb.getIsRoomLink()) {
@@ -708,6 +714,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
         }
         for (int i = 0; i < list.size(); i++) {
             list.get(i).setRoomLinkId(roomLinkId);
+            list.get(i).setHotelCode(hotelCode);
             bookByRoomTypeTest(list.get(i));
         }
         return list;

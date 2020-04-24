@@ -218,7 +218,7 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
         if (user == null) {
             return hr.loginError();
         }
-        checkInRecordService.cancelIn(ids);
+        checkInRecordService.cancelIn(ids, getCurrentHotleCode());
         return hr.ok();
     }
 
@@ -321,7 +321,7 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
     @PostMapping(path = "/bookByRoomList")
     public HttpResponse bookByRoomList(@RequestBody CheckInRecordListBo checkInRecordListBo) {
         HttpResponse hr = new HttpResponse();
-        List<CheckInRecord> list = checkInRecordService.bookByRoomList(checkInRecordListBo);
+        List<CheckInRecord> list = checkInRecordService.bookByRoomList(checkInRecordListBo, getCurrentHotleCode());
         hr.addData(list);
         return hr.ok();
     }
