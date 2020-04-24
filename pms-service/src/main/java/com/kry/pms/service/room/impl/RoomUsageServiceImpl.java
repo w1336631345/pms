@@ -655,6 +655,112 @@ public class RoomUsageServiceImpl implements RoomUsageService {
         return use(info, status);
     }
 
+    @Override
+    public boolean changeRoom(UseInfoAble info, GuestRoom newGuestRoom, LocalDateTime changeTime) {
+        RoomUsage ru = roomUsageDao.findByGuestRoomIdAndBusinesskey(info.guestRoom().getId(), info.getBusinessKey());
+        if(ru!=null){
+           if( use(newGuestRoom,ru.getUsageStatus(),changeTime,info.getEndTime(),info.getBusinessKey(),info.getSummaryInfo(),info.uniqueId())&&unUse(ru,changeTime)){
+               return true;
+           }
+        }
+        return false;
+    }
+
+    private boolean use(GuestRoom gr,String status, LocalDateTime startTime, LocalDateTime endTime,
+                        String businesskey, String businessInfo,String uniqueId){
+        RoomUsage ru = roomUsageDao.queryGuestRoomUsable(gr.getId(), startTime, endTime);
+        RoomUsage data = null;
+        if (ru != null) {
+            if (ru.getStartDateTime().isEqual(startTime)) {
+                if (ru.getEndDateTime().isEqual(endTime)) {
+                    ru.setEndDateTime(endTime);
+                    ru.setBusinessInfo(businessInfo);
+                    ru.setBusinesskey(businesskey);
+                    ru.setUsageStatus(status);
+                    data = modify(ru);
+                } else {
+                    RoomUsage npur = new RoomUsage();
+                    BeanUtils.copyProperties(ru, npur);
+                    npur.setUniqueIds(null);
+                    npur.setPostRoomUsage(ru.getPostRoomUsage());
+                    ru.setEndDateTime(endTime);
+                    ru.setBusinessInfo(businessInfo);
+                    ru.setBusinesskey(businesskey);
+                    ru.setUsageStatus(status);
+                    ru = modify(ru);
+                    npur.setStartDateTime(endTime);
+                    npur.setPreRoomUsage(ru);
+                    npur.setId(null);
+                    updateDuration(npur);
+                    add(npur);
+                    ru.setPostRoomUsage(npur);
+                    updateDuration(ru);
+                    data = modify(ru);
+                }
+            } else {
+                if (ru.getEndDateTime().isEqual(endTime)) {
+                    RoomUsage npur = new RoomUsage();
+                    BeanUtils.copyProperties(ru, npur);
+                    npur.setUniqueIds(null);
+                    ru.setEndDateTime(startTime);
+                    ru.setUsageStatus(status);
+                    ru.setBusinessInfo(businessInfo);
+                    updateDuration(ru);
+                    npur.setStartDateTime(endTime);
+                    npur.setId(null);
+                    npur.setBusinesskey(businesskey);
+                    ru = modify(ru);
+                    npur.setPreRoomUsage(ru);
+                    updateDuration(npur);
+                    data = add(npur);
+                    ru.setPostRoomUsage(npur);
+                    modify(ru);
+                } else {
+                    RoomUsage cru = new RoomUsage();
+                    RoomUsage pru = new RoomUsage();
+                    BeanUtils.copyProperties(ru, cru);
+                    BeanUtils.copyProperties(ru, pru);
+                    cru.setUniqueIds(null);
+                    pru.setUniqueIds(null);
+                    cru.setId(null);
+                    cru.setStartDateTime(startTime);
+                    cru.setEndDateTime(endTime);
+                    cru.setBusinessInfo(businessInfo);
+                    cru.setBusinesskey(businesskey);
+                    updateDuration(cru);
+                    cru.setUsageStatus(status);
+                    ru = modify(ru);
+                    cru.setPreRoomUsage(ru);
+                    cru = add(cru);
+
+                    ru.setEndDateTime(startTime);
+                    updateDuration(ru);
+                    ru.setPostRoomUsage(cru);
+                    modify(ru);
+
+                    pru.setId(null);
+                    pru.setStartDateTime(endTime);
+                    pru.setPreRoomUsage(cru);
+                    updateDuration(pru);
+                    add(pru);
+                    cru.setPostRoomUsage(pru);
+                    data = modify(cru);
+                }
+            }
+            if (data.getUniqueIds() == null) {
+                data.setUniqueIds(new HashSet<String>());
+            } else {
+                data.getUniqueIds().clear();
+            }
+            data.getUniqueIds().add(uniqueId);
+            modify(data);
+        } else {
+            return false;
+        }
+        return true;
+    }
+
+
     private boolean use(UseInfoAble info, String status) {
         RoomUsage ru = roomUsageDao.queryGuestRoomUsable(info.guestRoom().getId(), info.getStartTime(), info.getEndTime());
         LocalDateTime startTime = info.getStartTime();

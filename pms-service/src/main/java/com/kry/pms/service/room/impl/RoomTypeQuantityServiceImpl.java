@@ -608,6 +608,26 @@ public class RoomTypeQuantityServiceImpl implements RoomTypeQuantityService {
     }
 
     @Override
+    public boolean changeRoom(RoomType roomType, RoomType newRoomType,String status, LocalDateTime startTime, LocalDateTime endTime, LocalDateTime changeTime) {
+        changeRoomTypeQuantity(roomType,changeTime.toLocalDate(),endTime.toLocalDate(),status,Constants.Status.ROOM_USAGE_FREE,1);
+        changeRoomTypeQuantity(newRoomType,changeTime.toLocalDate(),endTime.toLocalDate(),Constants.Status.ROOM_USAGE_FREE,status,1);
+        return true;
+    }
+
+    @Override
+    public boolean extendTime(RoomType roomType, String roomStatus, LocalDateTime startTime, LocalDateTime endTime, LocalDateTime newStartTime, LocalDateTime newEndTime) {
+        if(newStartTime!=null){
+            changeRoomTypeQuantity(roomType,newStartTime.toLocalDate(),startTime.toLocalDate(),Constants.Status.ROOM_USAGE_FREE,roomStatus,1);
+        }
+        if(newEndTime!=null){
+            changeRoomTypeQuantity(roomType,endTime.toLocalDate(),newEndTime.toLocalDate(),Constants.Status.ROOM_USAGE_FREE,roomStatus,1);
+        }
+
+        return true;
+    }
+
+
+    @Override
     public void initNewType(RoomType roomType) {
         LocalDate planDate = businessSeqService.getPlanDate(roomType.getHotelCode());
         LocalDate quantityDate = LocalDate.now();

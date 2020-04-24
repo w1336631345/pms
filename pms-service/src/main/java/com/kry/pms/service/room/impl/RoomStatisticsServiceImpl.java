@@ -102,11 +102,12 @@ public class RoomStatisticsServiceImpl implements RoomStatisticsService {
 
     @Override
     public boolean extendTime(UseInfoAble info, LocalDateTime newStartTime, LocalDateTime newEndTime) {
-        if(newStartTime!=null){
-            newStartTime = LocalDateTime.of(newStartTime.toLocalDate(),LocalTime.NOON);
+        roomTypeQuantityService.extendTime(info.roomType(), info.getRoomStatus(), info.getStartTime(), info.getEndTime(), newStartTime, newEndTime);
+        if (newStartTime != null) {
+            newStartTime = LocalDateTime.of(newStartTime.toLocalDate(), LocalTime.NOON);
         }
-        if(newEndTime!=null){
-            newEndTime = LocalDateTime.of(newEndTime.toLocalDate(),LocalTime.NOON);
+        if (newEndTime != null) {
+            newEndTime = LocalDateTime.of(newEndTime.toLocalDate(), LocalTime.NOON);
         }
         if (newStartTime == null || newStartTime.isEqual(info.getStartTime())) {
             if (newEndTime == null || (newEndTime != null && newEndTime.isEqual(info.getEndTime()))) {
@@ -128,7 +129,11 @@ public class RoomStatisticsServiceImpl implements RoomStatisticsService {
     }
 
     @Override
-    public boolean changeRoom(UseInfoAble useInfoAble, GuestRoom newGuestRoom, LocalDateTime changeTime) {
+    public boolean changeRoom(UseInfoAble info, GuestRoom newGuestRoom, LocalDateTime changeTime) {
+        roomUsageService.changeRoom(info, newGuestRoom, changeTime);
+        if (!newGuestRoom.getRoomType().getId().equals(info.roomType().getId())) {
+            roomTypeQuantityService.changeRoom(info.roomType(), newGuestRoom.getRoomType(), info.getRoomStatus(), info.getStartTime(), info.getEndTime(), changeTime);
+        }
         return false;
     }
 
