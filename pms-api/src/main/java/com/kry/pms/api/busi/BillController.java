@@ -77,12 +77,12 @@ public class BillController extends BaseController<Bill> {
 		PageRequest<Bill> req = parse2PageRequest(request);
 		return rep.addData(billService.listPage(req));
 	}
-	@GetMapping(path="/all")
-	public HttpResponse<List> queryByBo(BillQueryBo query) throws InstantiationException, IllegalAccessException{
-		query.setHotelCode(getCurrentHotleCode());
-		HttpResponse<List> rep = new HttpResponse<List>();
-		return rep.addData(billService.queryByBo(query));
-	}
+//	@PostMapping(path="/all")
+//	public HttpResponse<List> queryByBo(@RequestBody BillQueryBo query) throws InstantiationException, IllegalAccessException{
+//		query.setHotelCode(getCurrentHotleCode());
+//		HttpResponse<List> rep = new HttpResponse<List>();
+//		return rep.addData(billService.queryByBo(query));
+//	}
 	
 	@GetMapping(path = "/offset/{id}")
 	public HttpResponse<String> offset(@PathVariable String id) throws InstantiationException, IllegalAccessException{

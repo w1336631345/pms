@@ -127,6 +127,11 @@ public class RoomStatisticsServiceImpl implements RoomStatisticsService {
         return true;
     }
 
+    @Override
+    public boolean changeRoom(UseInfoAble useInfoAble, GuestRoom newGuestRoom, LocalDateTime changeTime) {
+        return false;
+    }
+
 
     @Override
     public boolean cancelCheckOut(UseInfoAble info) {

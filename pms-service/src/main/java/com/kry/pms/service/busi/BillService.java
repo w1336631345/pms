@@ -79,7 +79,7 @@ public interface BillService extends BaseService<Bill> {
 	public DtoResponse<List<Bill>> transfer(Bill bill, Account targetAccount, String shiftCode,
 			Employee operationEmployee, String recordNum);
 
-	public List queryByBo(BillQueryBo query);
+//	public List queryByBo(BillQueryBo query);
 
     int countUnSettleBill(String accountId);
 
