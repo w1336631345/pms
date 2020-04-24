@@ -35,7 +35,7 @@ public interface CheckInRecordService extends BaseService<CheckInRecord> {
 
 	HttpResponse updateAll(CheckUpdateItemTestBo checkUpdateItemTestBo);
 
-	HttpResponse cancelIn(String[] ids);
+	HttpResponse cancelIn(String[] ids, String hotelCode);
 
 	public void checkIn(CheckInBo checkInBo, DtoResponse<List<CheckInRecord>> rep);
 
@@ -52,7 +52,7 @@ public interface CheckInRecordService extends BaseService<CheckInRecord> {
 
 	public CheckInRecord book(CheckInRecord checkInRecord);
 
-    List<CheckInRecord> bookByRoomList(CheckInRecordListBo cirlb);
+    List<CheckInRecord> bookByRoomList(CheckInRecordListBo cirlb, String hotelCode);
 
     @Transactional
 	HttpResponse bookByRoomTypeTest(CheckInRecord checkInRecord);

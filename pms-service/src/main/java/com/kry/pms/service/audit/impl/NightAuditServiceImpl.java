@@ -124,6 +124,9 @@ public class NightAuditServiceImpl implements NightAuditService {
         if(businessDate.isAfter(now)){
             return hr.error("营业日期大于自然日期");
         }
+        if(businessDate.isEqual(now)){
+            return hr.error("请于凌晨0点之后再做夜审");
+        }
         DailyVerify dailyVerify = dailyVerifyService.findByHotelCodeAndBusinessDate(loginUser.getHotelCode(), businessDate);
         if(dailyVerify != null){
             return hr.error("今日入账完成，请明日再进行入账操作");

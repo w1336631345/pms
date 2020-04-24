@@ -54,6 +54,77 @@ public class RoomChangeRecordServiceImpl implements RoomChangeRecordService {
 	@Override
 	@Transactional
 	public HttpResponse save(String hotelCode, RoomChangeRecord entity) {
+		LocalDateTime now = LocalDateTime.now();
+		HttpResponse hr = new HttpResponse();
+		entity.setHotelCode(hotelCode);
+		Double roomPrice = 0.0;
+		//补差价
+		if(Constants.Type.CHANGE_ROOM_PAY_B.equals(entity.getHandleType())){
+			roomPrice = entity.getNewPrice();
+		}else {//免费升级
+			roomPrice = entity.getOldPrice();
+		}
+		CheckInRecord cir = checkInRecordService.findById(entity.getCheckInRecordId());
+		GuestRoom newgr = guestRoomDao.getOne(entity.getNewGuestRoom().getId());
+		//资源调整
+		roomStatisticsService.changeRoom(new CheckInRecordWrapper(cir), newgr, LocalDateTime.now());
+		if(!Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN.equals(cir.getStatus()) && !Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION.equals(cir.getStatus())){
+			return hr.error("退房/结账等房间不能换房");
+		}
+		if(now.isAfter(cir.getLeaveTime())){
+			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+			return hr.error("已经过了离店时间，禁止换房操作");
+		}
+		//有同住记录,把所有同房间的都一起换房
+//			List<CheckInRecord> list = checkInRecordService.findByTogetherCode(hotelCode, cir.getTogetherCode());
+		List<CheckInRecord> list = checkInRecordDao.findByOrderNumAndGuestRoomAndDeleted(cir.getOrderNum(), cir.getGuestRoom(), Constants.DELETED_FALSE);
+		for(int i=0; i<list.size(); i++){
+			CheckInRecord cirs = list.get(i);
+			if(!Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN.equals(cirs.getStatus()) && !Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION.equals(cirs.getStatus())){
+				System.out.println("不是入住或者预订状态");
+				System.out.println(cirs.getStatus());
+				continue;
+			}
+
+			LocalDateTime arriveTime = cirs.getArriveTime();
+			LocalDateTime leaveTime = cirs.getLeaveTime();
+
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+			if(now.isBefore(leaveTime)){//当前时间在离店时间之前
+				List<RoomRecord> roomRecords = roomRecordDao.recordDateAndCheckInRecord(LocalDate.now(), cirs.getId());
+				for(int r=0; r<roomRecords.size(); r++){
+					RoomRecord rr = roomRecords.get(r);
+					rr.setGuestRoom(entity.getNewGuestRoom());
+					if(cirs.getPersonalPercentage() != null){
+						rr.setCost(entity.getNewPrice()*cirs.getPersonalPercentage());
+					}else {
+						rr.setCost(entity.getNewPrice());//承担全部房费
+					}
+//						rr.setCost(entity.getNewPrice());
+					rr.setCostRatio(null);
+					roomRecordService.modify(rr);
+				}
+			}
+			//修改roomRecord完毕
+			cirs.setGuestRoom(entity.getNewGuestRoom());//修改所有同住人员房间号为新房间
+			cirs.setRoomType(newgr.getRoomType());//修改新房型
+			cirs.setPurchasePrice(entity.getNewPrice());
+			//同住 承担房费占比*房价=承担房费
+			if(cir.getPersonalPercentage() != null){
+				cirs.setPersonalPrice(roomPrice*cirs.getPersonalPercentage());
+			}else {
+				cirs.setPersonalPrice(roomPrice);//承担全部房费
+			}
+			cirs = checkInRecordService.update(cirs);
+		}
+		hr.setData(roomChangeRecordDao.save(entity));
+		return hr;
+	}
+
+	//换房老接口
+	@Override
+	@Transactional
+	public HttpResponse saveOld(String hotelCode, RoomChangeRecord entity) {
 		HttpResponse hr = new HttpResponse();
 		entity.setHotelCode(hotelCode);
 		Double roomPrice = 0.0;
