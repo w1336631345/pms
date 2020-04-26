@@ -498,6 +498,30 @@ public class GuestRoomStatusServiceImpl implements GuestRoomStatusService {
         modify(status);
     }
 
+    @Override
+    public void changeRoom(GuestRoom guestRoom, GuestRoom newGuestRoom, LocalDateTime changeTime) {
+        GuestRoomStatus oldStatus = guestRoomStatusDao.findByGuestRoomId(guestRoom.getId());
+        GuestRoomStatus newStatus = guestRoomStatusDao.findByGuestRoomId(newGuestRoom.getId());
+        newStatus.setRoomStatus(oldStatus.getRoomStatus());
+        copyStatus(oldStatus,newStatus);
+        clearStatus(oldStatus);
+        if(oldStatus.getRoomStatus().equals(Constants.Status.ROOM_STATUS_OCCUPY_CLEAN)||oldStatus.getRoomStatus().equals(Constants.Status.ROOM_STATUS_OCCUPY_DIRTY)){
+            oldStatus.setRoomStatus(Constants.Status.ROOM_STATUS_VACANT_DIRTY);
+        }
+        modify(oldStatus);
+        modify(newStatus);
+    }
+
+    private void copyStatus(GuestRoomStatus src,GuestRoomStatus target){
+        target.setFree(src.getFree());
+        target.setGroup(src.getGroup());
+        target.setOta(src.getOta());
+        target.setHourRoom(src.getHourRoom());
+        target.setOverdued(src.getOverdued());
+        target.setVip(src.getVip());
+        target.setWillArrive(src.getWillArrive());
+    }
+
     private void clearStatus(GuestRoomStatus status) {
         status.setFree(false);
         status.setGroup(false);

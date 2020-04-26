@@ -11,6 +11,7 @@ import com.kry.pms.model.persistence.room.GuestRoomStatus;
 import com.kry.pms.service.BaseService;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public interface GuestRoomStatusService extends BaseService<GuestRoomStatus> {
     public void checkIn(GuestRoom guestRoom, LocalDate checkInDate, String summary, boolean group, boolean linked,
@@ -67,4 +68,6 @@ public interface GuestRoomStatusService extends BaseService<GuestRoomStatus> {
     void clearUseInfo(UseInfoAble info);
 
     void updateStatus(UseInfoAble info);
+
+    void changeRoom(GuestRoom guestRoom, GuestRoom newGuestRoom, LocalDateTime changeTime);
 }
