@@ -631,7 +631,8 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 
     @Transactional
     @Override
-    public CheckInRecord book(CheckInRecord checkInRecord) {
+    public HttpResponse book(CheckInRecord checkInRecord) {
+        HttpResponse hr = new HttpResponse();
         String orderNum = businessSeqService.fetchNextSeqNum(checkInRecord.getHotelCode(),
                 Constants.Key.BUSINESS_ORDER_NUM_SEQ_KEY);
         if (checkInRecord.getName() == null || "".equals(checkInRecord.getName())) {
@@ -678,7 +679,11 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 //                    item.setProtocolCorpation(checkInRecord.getProtocolCorpation());
                     item.setCorp(checkInRecord.getCorp());
                     item = add(item);
-                    roomStatisticsService.reserve(new CheckInRecordWrapper(item));
+                    boolean result = roomStatisticsService.reserve(new CheckInRecordWrapper(item));
+                    if(!result){
+                        TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                        return hr.error("资源不足");
+                    }
                 }
             }
 
@@ -698,7 +703,8 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
             checkInRecord.setAccount(account);
             modify(checkInRecord);
         }
-        return checkInRecord;
+        hr.setData(checkInRecord);
+        return hr;
     }
 
     @Override
@@ -712,7 +718,9 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
             roomLinkDao.save(rl);
             roomLinkId = rl.getId();
         }
+        String orderNum = businessSeqService.fetchNextSeqNum(hotelCode, Constants.Key.BUSINESS_ORDER_NUM_SEQ_KEY);
         for (int i = 0; i < list.size(); i++) {
+            list.get(i).setOrderNum(orderNum);
             list.get(i).setRoomLinkId(roomLinkId);
             list.get(i).setHotelCode(hotelCode);
             bookByRoomTypeTest(list.get(i));
@@ -731,9 +739,11 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                 return  hr.error("请核对营业日期与入住日期是否相同");
             }
         }
-        String orderNum = businessSeqService.fetchNextSeqNum(checkInRecord.getHotelCode(),
-                Constants.Key.BUSINESS_ORDER_NUM_SEQ_KEY);
-        checkInRecord.setOrderNum(orderNum);
+        if(checkInRecord.getOrderNum() == null){
+            String orderNum = businessSeqService.fetchNextSeqNum(checkInRecord.getHotelCode(),
+                    Constants.Key.BUSINESS_ORDER_NUM_SEQ_KEY);
+            checkInRecord.setOrderNum(orderNum);
+        }
         checkInRecord.setHumanCount(1);
         checkInRecord.setCheckInCount(1);
         checkInRecord.setRoomCount(1);
@@ -772,11 +782,24 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
             checkInRecord.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION);
         }
         CheckInRecord cir = add(checkInRecord);
-        roomStatisticsService.reserve(new CheckInRecordWrapper(cir));//预订
-        roomStatisticsService.assignRoom(new CheckInRecordWrapper(cir));//排房
-        if ((Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN).equals(checkInRecord.getStatus())) {
-            roomStatisticsService.checkIn(new CheckInRecordWrapper(checkInRecord));
+        boolean result = roomStatisticsService.reserve(new CheckInRecordWrapper(cir));//预订
+        if(!result){
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            return hr.error("资源不足");
         }
+        boolean result2 = roomStatisticsService.assignRoom(new CheckInRecordWrapper(cir));//排房
+        if(!result2){
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            return hr.error("资源不足");
+        }
+        if ((Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN).equals(checkInRecord.getStatus())) {
+            boolean result3 = roomStatisticsService.checkIn(new CheckInRecordWrapper(checkInRecord));
+            if(!result3){
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                return hr.error("资源不足");
+            }
+        }
+
         roomRecordService.createRoomRecord(cir);
         hr.addData(cir);
         return hr;
@@ -785,7 +808,8 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
     //单房预订
     @Override
     @Transactional
-    public CheckInRecord singleRoom(CheckInRecord checkInRecord) {
+    public HttpResponse singleRoom(CheckInRecord checkInRecord) {
+        HttpResponse hr = new HttpResponse();
         String orderNum = businessSeqService.fetchNextSeqNum(checkInRecord.getHotelCode(),
                 Constants.Key.BUSINESS_ORDER_NUM_SEQ_KEY);
         checkInRecord.setOrderNum(orderNum);
@@ -845,15 +869,24 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                     cir.setPersonalPercentage(0.0);
                 }
                 CheckInRecord c = checkInRecordDao.saveAndFlush(cir);
-                roomStatisticsService.assignRoom(new CheckInRecordWrapper(c));
+                boolean result = roomStatisticsService.assignRoom(new CheckInRecordWrapper(c));
+                if(!result){
+                    TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                    return hr.error("资源不足");
+                }
                 roomRecordService.createRoomRecord(c);
                 if (j == 0) {
-                    roomStatisticsService.reserve(new CheckInRecordWrapper(c));
+                    boolean result2 = roomStatisticsService.reserve(new CheckInRecordWrapper(c));
+                    if(!result2){
+                        TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                        return hr.error("资源不足");
+                    }
                     rcir = c;
                 }
             }
 //            CheckInRecord cir = add(checkInRecord);
-            return rcir;
+            hr.setData(rcir);
+            return hr;
         } else {//没有选择房间，生成纯预留
 //            Customer customer = null;
 //            Account account = null;
@@ -877,9 +910,14 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
             checkInRecord.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION);
 
             CheckInRecord cir = checkInRecordDao.saveAndFlush(checkInRecord);
-            roomStatisticsService.reserve(new CheckInRecordWrapper(cir));
+            boolean result3 = roomStatisticsService.reserve(new CheckInRecordWrapper(cir));
+            if(!result3){
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                return hr.error("资源不足");
+            }
             roomRecordService.createRoomRecord(cir);
-            return cir;
+            hr.setData(cir);
+            return hr;
         }
 
     }
@@ -1182,8 +1220,21 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
     }
 
     @Override
-    public PageResponse<Map<String, Object>> querySummaryListToBySqlTotal(String hotelCode, PageRequest pageRequest) throws IOException, TemplateException {
-        return sqlTemplateService.queryForPage(hotelCode, "resverListTotal", pageRequest);
+    public List<Map<String, Object>> querySummaryListToBySqlTotal(String hotelCode, Map<String, Object> params) throws IOException, TemplateException {
+        List<Map<String, Object>> list = sqlTemplateService.processByCode(hotelCode, "resverListTotal", params);
+        Map<String, Object> map = new HashMap<>();
+        if(list != null && !list.isEmpty()){
+            map.put("total", MapUtils.getDouble(list.get(0), "total"));
+            map.put("creditLimit", MapUtils.getDouble(list.get(0), "creditLimit"));
+        }
+        List<Map<String, Object>> list2 = sqlTemplateService.processByCode(hotelCode, "resverListTotal2", params);
+        if(list2 != null && !list2.isEmpty()){
+            map.put("humanCount", MapUtils.getDouble(list2.get(0), "humanCount"));
+            map.put("roomCount", MapUtils.getDouble(list2.get(0), "roomCount"));
+        }
+        List<Map<String, Object>> rlist = new ArrayList<>();
+        rlist.add(map);
+        return rlist;
     }
 
     @Override
@@ -1493,8 +1544,8 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                 return hr.error("存在排房或入住，主单取消失败");
             } else {//没有成员排房或入住，查出预留单，全部删除
                 List<String> rList = checkInRecordDao.listIdByType(id, Constants.Type.CHECK_IN_RECORD_RESERVE, Constants.DELETED_FALSE);
-                int hcount = 0;
-                int rcount = 0;
+//                int hcount = 0;
+//                int rcount = 0;
                 for (int i = 0; i < rList.size(); i++) {
                     hr = offReserve(rList.get(i));//删除预留单（该方法里已经做了主单房数和人数的修改）
 //                    CheckInRecord r = checkInRecordDao.getOne(rList.get(i));

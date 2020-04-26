@@ -50,7 +50,7 @@ public interface CheckInRecordService extends BaseService<CheckInRecord> {
 
 	public List<CheckInRecord> findDetailByBookingId(String bookId);
 
-	public CheckInRecord book(CheckInRecord checkInRecord);
+	public HttpResponse book(CheckInRecord checkInRecord);
 
     List<CheckInRecord> bookByRoomList(CheckInRecordListBo cirlb, String hotelCode);
 
@@ -58,7 +58,7 @@ public interface CheckInRecordService extends BaseService<CheckInRecord> {
 	HttpResponse bookByRoomTypeTest(CheckInRecord checkInRecord);
 
     //单房预订
-    CheckInRecord singleRoom(CheckInRecord checkInRecord);
+    HttpResponse singleRoom(CheckInRecord checkInRecord);
 
     PageResponse<CheckInRecord> notYet(int pageCount, int pageSize, String status, User user);
 
@@ -82,7 +82,7 @@ public interface CheckInRecordService extends BaseService<CheckInRecord> {
 
     PageResponse<Map<String, Object>> querySummaryListToBySql(String hotelCode, PageRequest pageRequest) throws IOException, TemplateException;
 
-	PageResponse<Map<String, Object>> querySummaryListToBySqlTotal(String hotelCode, PageRequest pageRequest) throws IOException, TemplateException;
+	List<Map<String, Object>> querySummaryListToBySqlTotal(String hotelCode, Map<String, Object> params) throws IOException, TemplateException;
 
 	public List<CheckInRecord> findByOrderNum(String orderNum);
 
