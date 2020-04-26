@@ -60,8 +60,9 @@ public interface GuestRoomStatusService extends BaseService<GuestRoomStatus> {
 
     public GuestRoomStatusVo detailGuestRoomNum(String num, String hotleCode);
 
-
     void clearLockInfo(UseInfoAble info);
+
+    void changeOverdued(GuestRoom gr,boolean status);
 
     void lock(UseInfoAble info);
 

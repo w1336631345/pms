@@ -467,6 +467,13 @@ public class GuestRoomStatusServiceImpl implements GuestRoomStatusService {
     }
 
     @Override
+    public void changeOverdued(GuestRoom gr, boolean status) {
+        GuestRoomStatus grs = findGuestRoomStatusByGuestRoom(gr);
+        grs.setOverdued(status);
+        modify(grs);
+    }
+
+    @Override
     public void lock(UseInfoAble info) {
         GuestRoomStatus status = findGuestRoomStatusByGuestRoom(info.guestRoom());
         LocalDateTime now = LocalDateTime.now();
@@ -503,16 +510,16 @@ public class GuestRoomStatusServiceImpl implements GuestRoomStatusService {
         GuestRoomStatus oldStatus = guestRoomStatusDao.findByGuestRoomId(guestRoom.getId());
         GuestRoomStatus newStatus = guestRoomStatusDao.findByGuestRoomId(newGuestRoom.getId());
         newStatus.setRoomStatus(oldStatus.getRoomStatus());
-        copyStatus(oldStatus,newStatus);
+        copyStatus(oldStatus, newStatus);
         clearStatus(oldStatus);
-        if(oldStatus.getRoomStatus().equals(Constants.Status.ROOM_STATUS_OCCUPY_CLEAN)||oldStatus.getRoomStatus().equals(Constants.Status.ROOM_STATUS_OCCUPY_DIRTY)){
+        if (oldStatus.getRoomStatus().equals(Constants.Status.ROOM_STATUS_OCCUPY_CLEAN) || oldStatus.getRoomStatus().equals(Constants.Status.ROOM_STATUS_OCCUPY_DIRTY)) {
             oldStatus.setRoomStatus(Constants.Status.ROOM_STATUS_VACANT_DIRTY);
         }
         modify(oldStatus);
         modify(newStatus);
     }
 
-    private void copyStatus(GuestRoomStatus src,GuestRoomStatus target){
+    private void copyStatus(GuestRoomStatus src, GuestRoomStatus target) {
         target.setFree(src.getFree());
         target.setGroup(src.getGroup());
         target.setOta(src.getOta());

@@ -14,6 +14,7 @@ import com.kry.pms.model.persistence.room.GuestRoom;
 import com.kry.pms.service.busi.*;
 import com.kry.pms.service.goods.ProductService;
 import com.kry.pms.service.room.GuestRoomService;
+import com.kry.pms.service.room.GuestRoomStatusService;
 import org.apache.commons.collections4.MapUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,6 +57,8 @@ public class AccountServiceImpl implements AccountService {
     CheckInRecordService checkInRecordService;
     @Autowired
     BusinessSeqService businessSeqService;
+    @Autowired
+    GuestRoomStatusService guestRoomStatusService;
     @Autowired
     RoomRecordDao roomRecordDao;
     @Autowired
@@ -135,10 +138,14 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public Account billEntry(Bill bill) {
         Account account = findById(bill.getAccount().getId());
+        double oldTotal = account.getTotal();
+        double newTotal = 0.0;
+        CheckInRecord cir = checkInRecordService.queryByAccountId(account.getId());
         if (account != null) {
-            CheckInRecord cir = checkInRecordService.queryByAccountId(account.getId());
-            if (cir != null && cir.getGuestRoom() != null) {
-                bill.setRoomNum(cir.getGuestRoom().getRoomNum());
+            if (bill.getGuestRoom() == null) {
+                if (cir != null && cir.getGuestRoom() != null) {
+                    bill.setRoomNum(cir.getGuestRoom().getRoomNum());
+                }
             }
             if (bill.getCost() != null) {
                 account.setCost(BigDecimalUtil.add(account.getCost(), bill.getCost()));
@@ -146,12 +153,19 @@ public class AccountServiceImpl implements AccountService {
             if (bill.getPay() != null) {
                 account.setPay(BigDecimalUtil.add(account.getPay(), bill.getPay()));
             }
+
             account.setTotal(BigDecimalUtil.sub(account.getCost(), account.getPay()));
         }
         account.setCurrentBillSeq(account.getCurrentBillSeq() + 1);
         account.setStatus(Constants.Status.ACCOUNT_IN);
         if (Constants.Status.BILL_NEED_SETTLED.equals(bill.getStatus())) {
 
+        }
+        newTotal = account.getTotal();
+        if ((oldTotal > 0 && newTotal < 0) || (oldTotal < 0 && newTotal >= 0)) {
+            if (cir != null && cir.getGuestRoom() != null) {
+                guestRoomStatusService.changeOverdued(cir.getGuestRoom(), newTotal < 0);
+            }
         }
         return modify(account);
     }
@@ -300,7 +314,7 @@ public class AccountServiceImpl implements AccountService {
         Account account = findById(billCheckBo.getAccountId());
         Account targetAccount = findById(billCheckBo.getTargetAccountId());
         LocalDateTime now = LocalDateTime.now();
-        if (account!=null) {
+        if (account != null) {
             SettleAccountRecord settleAccountRecord = settleAccountRecordService.createToAr(billCheckBo, account, targetAccount);
             List<Bill> bills = null;
             if (Constants.Type.SETTLE_TYPE_ACCOUNT.equals(billCheckBo.getCheckType())) {
@@ -309,7 +323,7 @@ public class AccountServiceImpl implements AccountService {
                 bills = billService.findByIds(billCheckBo.getBillIds());
             }
             if (bills == null || bills.isEmpty()) {
-                rep.error(Constants.BusinessCode.CODE_PARAMETER_INVALID,"没有待转帐务，请核实！");
+                rep.error(Constants.BusinessCode.CODE_PARAMETER_INVALID, "没有待转帐务，请核实！");
             } else {
                 double pay = 0.0, cost = 0.0;
                 for (Bill bill : bills) {
@@ -326,7 +340,7 @@ public class AccountServiceImpl implements AccountService {
                 double processTotal = BigDecimalUtil.sub(cost, pay);
                 if (processTotal == billCheckBo.getTotal()) {
                     if (targetAccount != null) {
-                        Bill payBill = billService.createToArBill(account,processTotal,pay,billCheckBo.getOperationEmployee(),billCheckBo.getShiftCode(),settleAccountRecord.getRecordNum(),"To:"+targetAccount.getCode());
+                        Bill payBill = billService.createToArBill(account, processTotal, pay, billCheckBo.getOperationEmployee(), billCheckBo.getShiftCode(), settleAccountRecord.getRecordNum(), "To:" + targetAccount.getCode());
                         Bill costBill = billService.createArSettleBill(targetAccount, billCheckBo.getTotal(), cost, pay, billCheckBo.getOperationEmployee(), billCheckBo.getShiftCode());
                         List<Bill> flatBills = new ArrayList<>();
                         flatBills.add(payBill);
@@ -342,14 +356,14 @@ public class AccountServiceImpl implements AccountService {
                     rep.error(Constants.BusinessCode.CODE_PARAMETER_INVALID, "入账金额:" + billCheckBo.getTotal() + "待结帐 消费：" + cost + "付款：" + pay + "合计：" + processTotal);
                 }
             }
-        }else{
+        } else {
             rep.error(Constants.BusinessCode.CODE_PARAMETER_INVALID, "结帐账户无法找到");
         }
         return rep;
     }
 
     private DtoResponse<Account> checkAccountBill(BillCheckBo billCheckBo) {
-        if(billCheckBo.getCheckWay()!=null&&billCheckBo.getCheckWay().equals(Constants.Type.BILL_CHECK_WAY_SETTLED_AR)){
+        if (billCheckBo.getCheckWay() != null && billCheckBo.getCheckWay().equals(Constants.Type.BILL_CHECK_WAY_SETTLED_AR)) {
             return checkAccountByAr(billCheckBo);
         }
         DtoResponse<Account> rep = new DtoResponse<Account>();
