@@ -428,6 +428,8 @@ public class RoomUsageServiceImpl implements RoomUsageService {
                     // 使用房类资源
                     roomTypeQuantityService.changeRoomTypeQuantity(info.roomType(), info.getStartTime().toLocalDate(),
                             info.getEndTime().toLocalDate(), Constants.Status.ROOM_USAGE_RESERVATION, Constants.Status.ROOM_USAGE_ASSIGN, 1);
+                }else{
+                    return false;
                 }
             } else {// 有预留
                 // 修改房间状态

@@ -391,34 +391,33 @@ public class GuestRoomStatusServiceImpl implements GuestRoomStatusService {
     public void changeStatus(UseInfoAble info) {
         GuestRoomStatus status = guestRoomStatusDao.findByGuestRoomId(info.guestRoom().getId());
         if (status != null) {
-            Duration duration = Duration.between(info.getStartTime(), LocalDateTime.now());
-            if (duration.toMinutes() < 1) {
-                if (info.getRoomStatus() != null) {
-                    if (Constants.Status.ROOM_STATUS_OCCUPY_CLEAN.equals(info.getRoomStatus())) {
-                        status.setFree(info.isFree());
-                        status.setGroup(info.isGroup());
-                        status.setOta(info.isOTA());
-                        status.setHourRoom(info.isHourRoom());
-                        status.setOverdued(info.isArrears());
-                        status.setVip(info.isVIP());
-                        status.setWillArrive(false);
-                    } else {
-                        status.setFree(false);
-                        status.setGroup(false);
-                        status.setOta(false);
-                        status.setHourRoom(false);
-                        status.setOverdued(false);
-                    }
-                    status.setRoomStatus(info.getRoomStatus());
+            if (info.getRoomStatus() != null) {
+                if (Constants.Status.ROOM_STATUS_OCCUPY_CLEAN.equals(info.getRoomStatus())) {
+                    status.setFree(info.isFree());
+                    status.setGroup(info.isGroup());
+                    status.setOta(info.isOTA());
+                    status.setHourRoom(info.isHourRoom());
+                    status.setOverdued(info.isArrears());
+                    status.setVip(info.isVIP());
+                    status.setWillArrive(false);
                 } else {
-                    if (info.isTodayArrive()) {
-                        status.setWillArrive(true);
-                    }
-                    if (info.isTodayLeave()) {
-                        status.setWillLeave(true);
-                    }
+                    status.setFree(false);
+                    status.setGroup(false);
+                    status.setOta(false);
+                    status.setHourRoom(false);
+                    status.setOverdued(false);
+                    status.setWillArrive(info.isTodayArrive());
+                }
+                status.setRoomStatus(info.getRoomStatus());
+            } else {
+                if (info.isTodayArrive()) {
+                    status.setWillArrive(true);
+                }
+                if (info.isTodayLeave()) {
+                    status.setWillLeave(true);
                 }
             }
+
             modify(status);
         }
     }
@@ -454,22 +453,24 @@ public class GuestRoomStatusServiceImpl implements GuestRoomStatusService {
         inflatRecordInfo(status);
         return GuestRoomStatusVo.covert(status);
     }
+
     @Override
-    public void clearLockInfo(UseInfoAble info){
+    public void clearLockInfo(UseInfoAble info) {
         GuestRoomStatus status = findGuestRoomStatusByGuestRoom(info.guestRoom());
         LocalDateTime now = LocalDateTime.now();
         //徐老板说不会存在，锁定结束仍然是锁定状态的情况，2020-04-17
-        if(now.isAfter(info.getStartTime())&&now.isBefore(info.getEndTime())){
+        if (now.isAfter(info.getStartTime()) && now.isBefore(info.getEndTime())) {
             status.setRoomStatus(info.nextStatus());
             clearStatus(status);
             modify(status);
         }
     }
+
     @Override
-    public void lock(UseInfoAble info){
+    public void lock(UseInfoAble info) {
         GuestRoomStatus status = findGuestRoomStatusByGuestRoom(info.guestRoom());
         LocalDateTime now = LocalDateTime.now();
-        if(now.isAfter(info.getStartTime())&&now.isBefore(info.getEndTime())){
+        if (now.isAfter(info.getStartTime()) && now.isBefore(info.getEndTime())) {
             status.setRoomStatus(info.getRoomStatus());
             clearStatus(status);
             modify(status);
@@ -479,7 +480,7 @@ public class GuestRoomStatusServiceImpl implements GuestRoomStatusService {
     @Override
     public void clearUseInfo(UseInfoAble info) {
         GuestRoomStatus status = findGuestRoomStatusByGuestRoom(info.guestRoom());
-       clearStatus(status);
+        clearStatus(status);
         status.setRoomStatus(Constants.Status.ROOM_STATUS_VACANT_DIRTY);
         modify(status);
     }
@@ -497,7 +498,7 @@ public class GuestRoomStatusServiceImpl implements GuestRoomStatusService {
         modify(status);
     }
 
-    private void clearStatus(GuestRoomStatus status){
+    private void clearStatus(GuestRoomStatus status) {
         status.setFree(false);
         status.setGroup(false);
         status.setOta(false);
