@@ -9,6 +9,7 @@ import java.util.List;
 
 import javax.transaction.Transactional;
 
+import com.kry.pms.base.HttpResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
@@ -176,7 +177,13 @@ public class ReceptionServiceImpl implements ReceptionService {
 				if (roomAssignBo.getRoomId().length <= cir.getRoomCount()) {
 					for (String roomId : roomAssignBo.getRoomId()) {
 						GuestRoom gr = guestRoomService.findById(roomId);
-						checkInRecordService.checkInByTempName(cir.getSingleRoomCount(), cir, gr, response);
+						HttpResponse hr = checkInRecordService.checkInByTempName(cir.getSingleRoomCount(), cir, gr, response);
+						if(hr.getCode() == 9999){
+							TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+							response.setStatus(Constants.BusinessCode.CODE_RESOURCE_NOT_ENOUGH);
+							response.setMessage("资源不足");
+							return response;
+						}
 					}
 				} else {
 					response.setStatus(Constants.BusinessCode.CODE_RESOURCE_NOT_ENOUGH);
