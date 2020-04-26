@@ -44,16 +44,20 @@ public class RoomStatisticsServiceImpl implements RoomStatisticsService {
 
     @Override
     public boolean assignRoom(UseInfoAble info) {
-        roomUsageService.assignRoom(info);
-        guestRoomStatusService.changeStatus(info);
-        return true;
+       if(roomUsageService.assignRoom(info)){
+           guestRoomStatusService.changeStatus(info);
+           return true;
+       }
+       return false;
     }
 
     @Override
     public boolean cancleAssign(UseInfoAble info) {
-        roomUsageService.cancleAssignRoom(info);
-        guestRoomStatusService.changeStatus(info);
-        return true;
+        if(roomUsageService.cancleAssignRoom(info)){
+            guestRoomStatusService.changeStatus(info);
+            return true;
+        }
+        return false;
     }
 
 //	@Override
@@ -70,9 +74,9 @@ public class RoomStatisticsServiceImpl implements RoomStatisticsService {
     @Override
     public boolean checkIn(UseInfoAble info) {
         if (info.guestRoom() != null) {
-            roomUsageService.checkIn(info);
+          return   roomUsageService.checkIn(info);
         }
-        return true;
+        return false;
     }
 
     @Override
@@ -85,8 +89,7 @@ public class RoomStatisticsServiceImpl implements RoomStatisticsService {
 
     @Override
     public boolean checkOut(UseInfoAble info) {
-        roomUsageService.checkOut(info);
-        return true;
+        return roomUsageService.checkOut(info);
     }
 
     @Override
