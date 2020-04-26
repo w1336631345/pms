@@ -66,7 +66,8 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
     @PostMapping(path = "/book")
     public HttpResponse<CheckInRecord> book(@RequestBody CheckInRecord checkInRecord) {
         checkInRecord.setHotelCode(getCurrentHotleCode());
-        return getDefaultResponse().addData(checkInRecordService.book(checkInRecord));
+        HttpResponse hr = checkInRecordService.book(checkInRecord);
+        return hr;
     }
 
     /**
@@ -100,7 +101,8 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
     public HttpResponse<CheckInRecord> bookOne(@RequestBody CheckInRecord checkInRecord) {
         User user = getUser();
         checkInRecord.setHotelCode(user.getHotelCode());
-        return getDefaultResponse().addData(checkInRecordService.singleRoom(checkInRecord));
+        HttpResponse hr = checkInRecordService.singleRoom(checkInRecord);
+        return hr;
     }
 
     @DeleteMapping
@@ -218,8 +220,8 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
         if (user == null) {
             return hr.loginError();
         }
-        checkInRecordService.cancelIn(ids, getCurrentHotleCode());
-        return hr.ok();
+        hr = checkInRecordService.cancelIn(ids, getCurrentHotleCode());
+        return hr;
     }
 
     /**
@@ -399,9 +401,9 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
      * @Date: 2020/4/23 16:07
      */
     @GetMapping(path = "/summaryTotal")
-    public HttpResponse<PageResponse<Map<String, Object>>> summaryTotal(HttpServletRequest request) throws IOException, TemplateException, IllegalAccessException, InstantiationException {
-        HttpResponse<PageResponse<Map<String, Object>>> rep = new HttpResponse<PageResponse<Map<String, Object>>>();
-        return rep.addData(checkInRecordService.querySummaryListToBySqlTotal(getCurrentHotleCode(), parse2CommonPageRequest(request)));
+    public HttpResponse<List<Map<String, Object>>> summaryTotal(HttpServletRequest request) throws IOException, TemplateException, IllegalAccessException, InstantiationException {
+        HttpResponse<List<Map<String, Object>>> rep = new HttpResponse<List<Map<String, Object>>>();
+        return rep.addData(checkInRecordService.querySummaryListToBySqlTotal(getCurrentHotleCode(), parse2Map(request)));
     }
 
     /**
