@@ -217,18 +217,26 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                 //需要修改天数和roomRecord
                 int days = (int) checkInRecord.getArriveTime().toLocalDate()
                         .until(checkInRecord.getLeaveTime().toLocalDate(), ChronoUnit.DAYS);
-                List<CheckInRecord> together = checkInTogether(checkInRecord.getHotelCode(), checkInRecord.getOrderNum(), checkInRecord.getGuestRoom().getId());
-                for (int t = 0; t < together.size(); t++) {
-                    List<RoomRecord> list = roomRecordService.findByHotelCodeAndCheckInRecord(checkInRecord.getHotelCode(), together.get(t).getId());
-                    for (int r = 0; r < list.size(); r++) {
-                        roomRecordService.deleteTrue(list.get(r).getId());
-                    }
-                    together.get(t).setDays(days);
-                    together.get(t).setArriveTime(checkInRecord.getArriveTime());
-                    together.get(t).setLeaveTime(checkInRecord.getLeaveTime());
-                    checkInRecordDao.saveAndFlush(together.get(t));
-                    roomRecordService.createRoomRecord(together.get(t));
+                //不同时更改同住数据
+                List<RoomRecord> list = roomRecordService.findByHotelCodeAndCheckInRecord(checkInRecord.getHotelCode(), checkInRecord.getId());
+                for (int r = 0; r < list.size(); r++) {
+                    roomRecordService.deleteTrue(list.get(r).getId());
                 }
+                checkInRecord.setDays(days);
+                roomRecordService.createRoomRecord(checkInRecord);
+                //下面是操作同住数据，同时变更
+//                List<CheckInRecord> together = checkInTogether(checkInRecord.getHotelCode(), checkInRecord.getOrderNum(), checkInRecord.getGuestRoom().getId());
+//                for (int t = 0; t < together.size(); t++) {
+//                    List<RoomRecord> list = roomRecordService.findByHotelCodeAndCheckInRecord(checkInRecord.getHotelCode(), together.get(t).getId());
+//                    for (int r = 0; r < list.size(); r++) {
+//                        roomRecordService.deleteTrue(list.get(r).getId());
+//                    }
+//                    together.get(t).setDays(days);
+//                    together.get(t).setArriveTime(checkInRecord.getArriveTime());
+//                    together.get(t).setLeaveTime(checkInRecord.getLeaveTime());
+//                    checkInRecordDao.saveAndFlush(together.get(t));
+//                    roomRecordService.createRoomRecord(together.get(t));
+//                }
             }
         }
         hr.addData(checkInRecordDao.saveAndFlush(checkInRecord));
@@ -1256,10 +1264,10 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
         if(list != null && !list.isEmpty()){
             map.put("total", MapUtils.getDouble(list.get(0), "total"));
             map.put("creditLimit", MapUtils.getDouble(list.get(0), "creditLimit"));
+            map.put("humanCount", MapUtils.getDouble(list.get(0), "humanCount"));
         }
         List<Map<String, Object>> list2 = sqlTemplateService.processByCode(hotelCode, "resverListTotal2", params);
         if(list2 != null && !list2.isEmpty()){
-            map.put("humanCount", MapUtils.getDouble(list2.get(0), "humanCount"));
             map.put("roomCount", MapUtils.getDouble(list2.get(0), "roomCount"));
         }
         List<Map<String, Object>> rlist = new ArrayList<>();
