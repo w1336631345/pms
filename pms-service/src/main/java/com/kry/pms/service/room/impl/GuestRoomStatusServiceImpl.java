@@ -536,6 +536,7 @@ public class GuestRoomStatusServiceImpl implements GuestRoomStatusService {
         status.setHourRoom(false);
         status.setOverdued(false);
         status.setWillLeave(false);
+        status.setWillArrive(false);
         status.setVip(false);
     }
 
