@@ -136,8 +136,8 @@ public class RoomStatisticsServiceImpl implements RoomStatisticsService {
         roomUsageService.changeRoom(info, newGuestRoom, changeTime);
         if (!newGuestRoom.getRoomType().getId().equals(info.roomType().getId())) {
             roomTypeQuantityService.changeRoom(info.roomType(), newGuestRoom.getRoomType(), info.getRoomStatus(), info.getStartTime(), info.getEndTime(), changeTime);
-            guestRoomStatusService.changeRoom(info.guestRoom(),newGuestRoom,changeTime);
         }
+        guestRoomStatusService.changeRoom(info.guestRoom(),newGuestRoom,changeTime);
         return false;
     }
 

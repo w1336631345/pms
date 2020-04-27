@@ -511,10 +511,10 @@ public class GuestRoomStatusServiceImpl implements GuestRoomStatusService {
         GuestRoomStatus newStatus = guestRoomStatusDao.findByGuestRoomId(newGuestRoom.getId());
         newStatus.setRoomStatus(oldStatus.getRoomStatus());
         copyStatus(oldStatus, newStatus);
-        clearStatus(oldStatus);
         if (oldStatus.getRoomStatus().equals(Constants.Status.ROOM_STATUS_OCCUPY_CLEAN) || oldStatus.getRoomStatus().equals(Constants.Status.ROOM_STATUS_OCCUPY_DIRTY)) {
             oldStatus.setRoomStatus(Constants.Status.ROOM_STATUS_VACANT_DIRTY);
         }
+        clearStatus(oldStatus);
         modify(oldStatus);
         modify(newStatus);
     }
