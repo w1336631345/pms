@@ -570,7 +570,8 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
     @PostMapping(path = "/reserve")
     public HttpResponse<List<CheckInRecord>> addReserve(@RequestBody List<CheckInRecord> checkInRecords) {
         HttpResponse<List<CheckInRecord>> rep = new HttpResponse<List<CheckInRecord>>();
-        return rep.addData(checkInRecordService.addReserve(checkInRecords));
+        rep = checkInRecordService.addReserve(checkInRecords);
+        return rep;
 
     }
     /**
@@ -585,8 +586,7 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
     @PostMapping(path = "/updateReserve")
     public HttpResponse updateReserve(@RequestBody CheckInRecord checkInRecord) {
         HttpResponse hr = new HttpResponse();
-        CheckInRecord cir = checkInRecordService.updateReserve(checkInRecord);
-        hr.addData(cir);
+        hr = checkInRecordService.updateReserve(checkInRecord);
         return hr.ok();
     }
 

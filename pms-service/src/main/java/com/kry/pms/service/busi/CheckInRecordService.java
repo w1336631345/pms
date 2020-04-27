@@ -43,7 +43,7 @@ public interface CheckInRecordService extends BaseService<CheckInRecord> {
 
 	public CheckInRecord checkInByTempName(String string, String roomId, DtoResponse<String> response);
 
-	public List<CheckInRecord> checkInByTempName(int humanCount, CheckInRecord cir, GuestRoom gr,
+	public HttpResponse checkInByTempName(int humanCount, CheckInRecord cir, GuestRoom gr,
 			DtoResponse<String> response);
 
 	public List<CheckInRecord> findByBookId(String bookId);
@@ -94,7 +94,7 @@ public interface CheckInRecordService extends BaseService<CheckInRecord> {
 
 	public CheckInRecord addReserve(CheckInRecord checkInRecord);
 
-	public List<CheckInRecord> addReserve(List<CheckInRecord> checkInRecords);
+	public HttpResponse addReserve(List<CheckInRecord> checkInRecords);
 
 	public CheckInRecord addTogether(TogetherBo togetherBo);
 
@@ -172,7 +172,7 @@ public interface CheckInRecordService extends BaseService<CheckInRecord> {
 	HttpResponse updateGroup(String[] cId, String gId, String uId, Boolean isFollowGroup);
 
 	//修改预留
-	CheckInRecord updateReserve(CheckInRecord cir);
+	HttpResponse updateReserve(CheckInRecord cir);
 
     List<CheckInRecord> getRoomLinkListTo(String id, String orderNum);
 

@@ -176,7 +176,11 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                 }
                 cir.setCorp(checkInRecord.getCorp());
                 checkInRecordDao.saveAndFlush(cir);
-                roomStatisticsService.updateGuestRoomStatus(new CheckInRecordWrapper(cir));
+                boolean b = roomStatisticsService.updateGuestRoomStatus(new CheckInRecordWrapper(cir));
+                if (!b) {
+                    TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                    return hr.error("资源异常，修改失败");
+                }
             }
         } else {//不是主单，是宾客信息
             checkInRecord.setMainRecord(dbCir.getMainRecord());
@@ -228,7 +232,11 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
             }
         }
         hr.addData(checkInRecordDao.saveAndFlush(checkInRecord));
-        roomStatisticsService.updateGuestRoomStatus(new CheckInRecordWrapper(checkInRecord));
+        boolean b = roomStatisticsService.updateGuestRoomStatus(new CheckInRecordWrapper(checkInRecord));
+        if (!b) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            return hr.error("资源异常，修改失败");
+        }
         return hr.ok();
     }
 
@@ -306,7 +314,11 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
             }
             UpdateUtil.copyNullProperties(checkUpdateItemTestBo, cir);
             checkInRecordDao.save(cir);
-            roomStatisticsService.updateGuestRoomStatus(new CheckInRecordWrapper(cir));
+            boolean result = roomStatisticsService.updateGuestRoomStatus(new CheckInRecordWrapper(cir));
+            if (!result) {
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                return hr.error("资源问题，修改失败");
+            }
         }
         return hr;
     }
@@ -329,7 +341,11 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
             cir.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION);
             checkInRecordDao.save(cir);
             if (Constants.Type.CHECK_IN_RECORD_CUSTOMER.equals(cir.getType())) {
-                roomStatisticsService.cancleCheckIn(new CheckInRecordWrapper(cir));
+                boolean result = roomStatisticsService.cancleCheckIn(new CheckInRecordWrapper(cir));
+                if (!result) {
+                    TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                    return hr.error("资源问题，取消失败");
+                }
             }
         }
         return hr;
@@ -498,7 +514,13 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                 if(Constants.Status.CHECKIN_RECORD_STATUS_OUT_UNSETTLED.equals(cir.getStatus())){
                     //S状态 不需要调整房类资源
                 }else{
-                    roomStatisticsService.checkOut(new CheckInRecordWrapper(cir));
+                    boolean b = roomStatisticsService.checkOut(new CheckInRecordWrapper(cir));
+                    if (!b) {
+                        TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                        rep.setStatus(Constants.BusinessCode.CODE_ILLEGAL_OPERATION);
+                        rep.setMessage(cir.getAccount().getCode() + ":退房失败！");
+                        return rep;
+                    }
                 }
                 cir.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_CHECK_OUT);
                 modify(cir);
@@ -536,8 +558,9 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
     }
 
     @Override
-    public List<CheckInRecord> checkInByTempName(int humanCount, CheckInRecord cir, GuestRoom gr,
+    public HttpResponse checkInByTempName(int humanCount, CheckInRecord cir, GuestRoom gr,
                                                  DtoResponse<String> response) {//humanCount是单房人数
+        HttpResponse hr = new HttpResponse();
         LocalTime criticalTime = systemConfigService.getCriticalTime(gr.getHotelCode());
         LocalDate startDate = cir.getArriveTime().toLocalDate();
         if (cir.getArriveTime().toLocalTime().isBefore(criticalTime)) {
@@ -622,11 +645,15 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
             ncir = add(ncir);
             data.add(ncir);
             roomRecordService.createRoomRecord(ncir);
-            roomStatisticsService.assignRoom(new CheckInRecordWrapper(ncir));
+            boolean result = roomStatisticsService.assignRoom(new CheckInRecordWrapper(ncir));
+            if(!result){
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                return hr.error("资源不足");
+            }
 //			guestRoomStatausService.checkIn(ncir);
         }
-
-        return data;
+        hr.setData(data);
+        return hr;
     }
 
     @Transactional
@@ -1301,7 +1328,8 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 
     @Override
     @Transactional
-    public List<CheckInRecord> addReserve(List<CheckInRecord> checkInRecords) {
+    public HttpResponse addReserve(List<CheckInRecord> checkInRecords) {
+        HttpResponse hr = new HttpResponse();
         String mainId = null;
         int humanCount = 0;
         for (CheckInRecord cir : checkInRecords) {
@@ -1315,7 +1343,11 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
             }
             cir = addReserve(cir);
             //新增预留占用资源
-            roomStatisticsService.reserve(new CheckInRecordWrapper(cir));
+            boolean result = roomStatisticsService.reserve(new CheckInRecordWrapper(cir));
+            if(!result){
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                return hr.error("资源问题，取消失败");
+            }
             mainId = cir.getMainRecordId();
             humanCount = humanCount + cir.getHumanCount();
         }
@@ -1324,7 +1356,8 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
             main.setHumanCount(main.getHumanCount() + humanCount);
             checkInRecordDao.saveAndFlush(main);
         }
-        return checkInRecords;
+        hr.addData(checkInRecords);
+        return hr;
     }
 
     @Transactional
@@ -1403,7 +1436,11 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
             }
             cir.setDeleted(Constants.DELETED_TRUE);
             // 修改选中的数据状态，排房记录改为删除
-            roomStatisticsService.cancleAssign(new CheckInRecordWrapper(cir));
+            boolean result = roomStatisticsService.cancleAssign(new CheckInRecordWrapper(cir));
+            if(!result){
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                return hr.error("资源问题，取消失败");
+            }
             modify(cir);
             // 取消排房成功，修改房间状态
             // 修改排放记录状态为删除后，查询此房间是否还有其他人在住
@@ -1447,15 +1484,31 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
             }
 //            if ((Constants.Status.CHECKIN_RECORD_STATUS_ASSIGN).equals(cir.getStatus())) {//排房
             if ((Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION).equals(cir.getStatus())) {//预定，没入住就是排房状态
-                roomStatisticsService.cancleAssign(new CheckInRecordWrapper(cir));//取消排房
+                boolean result = roomStatisticsService.cancleAssign(new CheckInRecordWrapper(cir));//取消排房
+                if(!result){
+                    TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                    return hr.error("资源问题，取消失败");
+                }
             }
             if ((Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN).equals(cir.getStatus())) {
-                roomStatisticsService.cancleCheckIn(new CheckInRecordWrapper(cir));//先取消入住
-                roomStatisticsService.cancleAssign(new CheckInRecordWrapper(cir));//再取消排房
+                boolean result = roomStatisticsService.cancleCheckIn(new CheckInRecordWrapper(cir));//先取消入住
+                if(!result){
+                    TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                    return hr.error("资源问题，取消失败");
+                }
+                boolean result2 = roomStatisticsService.cancleAssign(new CheckInRecordWrapper(cir));//再取消排房
+                if(!result2){
+                    TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                    return hr.error("资源问题，取消失败");
+                }
             }
             int together = checkInRecordDao.countTogetherRoom(Constants.DELETED_FALSE, cir.getOrderNum(), cir.getGuestRoom().getId());
             if (together == 1) {//表明房间没有人住，需要释放资源
-                roomStatisticsService.cancleReserve(new CheckInRecordWrapper(cir));
+                boolean result3 = roomStatisticsService.cancleReserve(new CheckInRecordWrapper(cir));
+                if(!result3){
+                    TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                    return hr.error("资源问题，取消失败");
+                }
                 roomCount = roomCount + 1;
             }
             //需要删除roomRecord的记录
@@ -1499,7 +1552,11 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                 cir.setDeleted(Constants.DELETED_TRUE);
                 cir.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_CANCLE_BOOK);
                 modify(cir);
-                roomStatisticsService.cancleReserve(new CheckInRecordWrapper(cir));//取消预
+                boolean result = roomStatisticsService.cancleReserve(new CheckInRecordWrapper(cir));//取消预
+                if(!result){
+                    TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                    return hr.error("资源问题，取消失败");
+                }
             } else if (("C").equals(cir.getType())) {//宾客排房未入住订单的取消
                 boolean b = accountService.accountCheck(cir.getAccount().getId());
                 if (!b) {
@@ -1507,11 +1564,19 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                 }
                 humanCount = 1;
                 if ((Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION).equals(cir.getStatus())) {//预定，没入住就是排房状态
-                    roomStatisticsService.cancleAssign(new CheckInRecordWrapper(cir));//取消排房
+                    boolean result2 = roomStatisticsService.cancleAssign(new CheckInRecordWrapper(cir));//取消排房
+                    if(!result2){
+                        TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                        return hr.error("资源问题，取消失败");
+                    }
                 }
                 int together = checkInRecordDao.countTogetherRoom(Constants.DELETED_FALSE, cir.getOrderNum(), cir.getGuestRoom().getId());
                 if (together == 1) {//表明房间没有人住，需要释放资源
-                    roomStatisticsService.cancleReserve(new CheckInRecordWrapper(cir));
+                    boolean result3 = roomStatisticsService.cancleReserve(new CheckInRecordWrapper(cir));
+                    if(!result3){
+                        TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                        return hr.error("资源问题，取消失败");
+                    }
                     roomCount = roomCount + 1;
                 }
                 //需要删除roomRecord的记录
@@ -1609,7 +1674,11 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
         cir.setDeleted(Constants.DELETED_TRUE);
         cir.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_CANCLE_BOOK);
         modify(cir);
-        roomStatisticsService.cancleReserve(new CheckInRecordWrapper(cir));//取消预
+        boolean result = roomStatisticsService.cancleReserve(new CheckInRecordWrapper(cir));//取消预
+        if(!result){
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            return hr.error("资源问题，取消失败");
+        }
         CheckInRecord mainRecord = checkInRecordDao.getOne(mainRecordId);//获取主单信息
         mainRecord.setRoomCount(mainRecord.getRoomCount() - cir.getRoomCount());
         mainRecord.setHumanCount(mainRecord.getHumanCount() - cir.getHumanCount());
@@ -2228,7 +2297,8 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
     //修改预留
     @Override
     @Transactional
-    public CheckInRecord updateReserve(CheckInRecord cir) {
+    public HttpResponse updateReserve(CheckInRecord cir) {
+        HttpResponse hr = new HttpResponse();
         CheckInRecord oldCir = checkInRecordDao.getOne(cir.getId());
         int oldHumanCount = oldCir.getHumanCount();
         int oldRoomCount = oldCir.getRoomCount();
@@ -2237,18 +2307,27 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
         CheckInRecordWrapper cirw = new CheckInRecordWrapper(oldCir);
         oldCir.setDeleted(Constants.DELETED_TRUE);
         checkInRecordDao.saveAndFlush(oldCir);
-        roomStatisticsService.cancleReserve(cirw);//先取消以前预留
+        boolean result = roomStatisticsService.cancleReserve(cirw);//先取消以前预留
+        if(!result){
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            return hr.error("资源问题，修改失败");
+        }
         CheckInRecord checkInRecord = new CheckInRecord();
         cir.setId(null);
         BeanUtils.copyProperties(cir, checkInRecord);
         checkInRecord.setMainRecord(oldCir.getMainRecord());
         checkInRecord = checkInRecordDao.saveAndFlush(checkInRecord);
-        roomStatisticsService.reserve(new CheckInRecordWrapper(checkInRecord));//重新预留
+        boolean result2 = roomStatisticsService.reserve(new CheckInRecordWrapper(checkInRecord));//重新预留
+        if(!result2){
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            return hr.error("资源不足");
+        }
         CheckInRecord main = oldCir.getMainRecord();
         main.setHumanCount(main.getHumanCount() + (newHumanCount - oldHumanCount));
         main.setRoomCount(main.getRoomCount() + (newRoomCount - oldRoomCount));
         checkInRecordDao.saveAndFlush(main);
-        return checkInRecord;
+        hr.setData(checkInRecord);
+        return hr;
     }
 
     @Override
@@ -2355,7 +2434,13 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
             cir.setActualTimeOfLeave(LocalDateTime.now());
             if (Constants.Type.CHECK_IN_RECORD_CUSTOMER.equals(cir.getType())) {
                 accountService.enterExtFee(cir, extFee);
-                roomStatisticsService.checkOut(new CheckInRecordWrapper(cir));
+                boolean result = roomStatisticsService.checkOut(new CheckInRecordWrapper(cir));
+                if(!result){
+                    TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                    rep.setCode(9999);
+                    rep.setMessage("取消失败");
+                    return rep;
+                }
             }
         }
         cir.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_OUT_UNSETTLED);
