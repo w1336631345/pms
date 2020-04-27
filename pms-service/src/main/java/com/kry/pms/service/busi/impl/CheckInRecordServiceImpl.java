@@ -283,10 +283,11 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
             if (!cir.getArriveTime().isEqual(at) || !cir.getLeaveTime().isEqual(lt)) {
                 updateTime = true;
             }
+            UpdateUtil.copyNullProperties(checkUpdateItemTestBo, cir);
             if (updateTime) {
                 if (cir.getMainRecord() != null) {
                     CheckInRecord main = cir.getMainRecord();
-                    if (cir.getArriveTime().isBefore(main.getArriveTime()) || cir.getLeaveTime().isAfter(main.getLeaveTime())) {
+                    if (at.isBefore(main.getArriveTime()) || lt.isAfter(main.getLeaveTime())) {
                         TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                         return hr.error("成员时间范围不能大于主单");
                     }
@@ -299,26 +300,28 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                 //需要修改天数和roomRecord
                 int days = (int) at.toLocalDate()
                         .until(lt.toLocalDate(), ChronoUnit.DAYS);
-                List<CheckInRecord> together = checkInTogether(cir.getHotelCode(), cir.getOrderNum(), cir.getGuestRoom().getId());
-                for (int t = 0; t < together.size(); t++) {
-                    List<RoomRecord> list = roomRecordService.findByHotelCodeAndCheckInRecord(cir.getHotelCode(), together.get(t).getId());
-                    for (int r = 0; r < list.size(); r++) {
-                        roomRecordService.deleteTrue(list.get(r).getId());
-                    }
-                    together.get(t).setDays(days);
-                    together.get(t).setArriveTime(cir.getArriveTime());
-                    together.get(t).setLeaveTime(cir.getLeaveTime());
-                    checkInRecordDao.saveAndFlush(together.get(t));
-                    roomRecordService.createRoomRecord(together.get(t));
+                List<RoomRecord> list = roomRecordService.findByHotelCodeAndCheckInRecord(cir.getHotelCode(), cir.getId());
+                for (int r = 0; r < list.size(); r++) {
+                    roomRecordService.deleteTrue(list.get(r).getId());
                 }
+                roomRecordService.createRoomRecord(cir);
+                cir.setDays(days);
+                //下面是同住的记录一起修改
+//                List<CheckInRecord> together = checkInTogether(cir.getHotelCode(), cir.getOrderNum(), cir.getGuestRoom().getId());
+//                for (int t = 0; t < together.size(); t++) {
+//                    List<RoomRecord> list = roomRecordService.findByHotelCodeAndCheckInRecord(cir.getHotelCode(), together.get(t).getId());
+//                    for (int r = 0; r < list.size(); r++) {
+//                        roomRecordService.deleteTrue(list.get(r).getId());
+//                    }
+//                    together.get(t).setDays(days);
+//                    together.get(t).setArriveTime(at);
+//                    together.get(t).setLeaveTime(lt);
+//                    checkInRecordDao.saveAndFlush(together.get(t));
+//                    roomRecordService.createRoomRecord(together.get(t));
+//                }
             }
-            UpdateUtil.copyNullProperties(checkUpdateItemTestBo, cir);
             checkInRecordDao.save(cir);
-            boolean result = roomStatisticsService.updateGuestRoomStatus(new CheckInRecordWrapper(cir));
-            if (!result) {
-                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-                return hr.error("资源问题，修改失败");
-            }
+            roomStatisticsService.updateGuestRoomStatus(new CheckInRecordWrapper(cir));
         }
         return hr;
     }
