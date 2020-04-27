@@ -160,6 +160,11 @@ public class CheckInRecordWrapper implements UseInfoAble {
     }
 
     @Override
+    public Object getSource() {
+        return this.checkInRecord;
+    }
+
+    @Override
     public String uniqueId() {
         return this.checkInRecord.getId();
     }

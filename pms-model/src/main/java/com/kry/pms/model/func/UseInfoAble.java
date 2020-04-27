@@ -7,6 +7,8 @@ import com.kry.pms.model.persistence.room.RoomType;
 
 public interface UseInfoAble {
 
+    public Object getSource();
+
     public String uniqueId();
 
     public Integer getRoomCount();

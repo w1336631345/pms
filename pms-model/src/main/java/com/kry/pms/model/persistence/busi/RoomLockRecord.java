@@ -97,6 +97,11 @@ public class RoomLockRecord extends PersistenceModel implements UseInfoAble{
 	}
 
 	@Override
+	public Object getSource() {
+		return this;
+	}
+
+	@Override
 	public String uniqueId() {
 		return getId();
 	}

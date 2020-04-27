@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
+import com.kry.pms.model.persistence.busi.CheckInRecord;
 import com.kry.pms.model.persistence.room.GuestRoom;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -44,16 +45,16 @@ public class RoomStatisticsServiceImpl implements RoomStatisticsService {
 
     @Override
     public boolean assignRoom(UseInfoAble info) {
-       if(roomUsageService.assignRoom(info)){
-           guestRoomStatusService.changeStatus(info);
-           return true;
-       }
-       return false;
+        if (roomUsageService.assignRoom(info)) {
+            guestRoomStatusService.changeStatus(info);
+            return true;
+        }
+        return false;
     }
 
     @Override
     public boolean cancleAssign(UseInfoAble info) {
-        if(roomUsageService.cancleAssignRoom(info)){
+        if (roomUsageService.cancleAssignRoom(info)) {
             guestRoomStatusService.changeStatus(info);
             return true;
         }
@@ -74,7 +75,7 @@ public class RoomStatisticsServiceImpl implements RoomStatisticsService {
     @Override
     public boolean checkIn(UseInfoAble info) {
         if (info.guestRoom() != null) {
-          return   roomUsageService.checkIn(info);
+            return roomUsageService.checkIn(info);
         }
         return false;
     }
@@ -125,7 +126,7 @@ public class RoomStatisticsServiceImpl implements RoomStatisticsService {
 
     @Override
     public boolean updateGuestRoomStatus(UseInfoAble info) {
-        if (Constants.Status.ROOM_STATUS_OCCUPY_CLEAN.equals(info.getRoomStatus()) && info.getStartTime().isBefore(LocalDateTime.now()) && info.getEndTime().isAfter(LocalDateTime.now())) {
+        if (info.guestRoom() != null && Constants.Status.ROOM_STATUS_OCCUPY_CLEAN.equals(info.getRoomStatus()) && info.getStartTime().isBefore(LocalDateTime.now()) && info.getEndTime().isAfter(LocalDateTime.now())) {
             guestRoomStatusService.updateStatus(info);
         }
         return true;
@@ -135,9 +136,9 @@ public class RoomStatisticsServiceImpl implements RoomStatisticsService {
     public boolean changeRoom(UseInfoAble info, GuestRoom newGuestRoom, LocalDateTime changeTime) {
         roomUsageService.changeRoom(info, newGuestRoom, changeTime);
         if (!newGuestRoom.getRoomType().getId().equals(info.roomType().getId())) {
-            roomTypeQuantityService.changeRoom(info.roomType(), newGuestRoom.getRoomType(), info.getRoomStatus(), info.getStartTime(), info.getEndTime(), changeTime);
+            roomTypeQuantityService.changeRoom(info.roomType(), newGuestRoom.getRoomType(), ((CheckInRecord) info.getSource()).getStatus(), info.getStartTime(), info.getEndTime(), changeTime);
         }
-        guestRoomStatusService.changeRoom(info.guestRoom(),newGuestRoom,changeTime);
+        guestRoomStatusService.changeRoom(info.guestRoom(), newGuestRoom, changeTime);
         return false;
     }
 
@@ -156,6 +157,6 @@ public class RoomStatisticsServiceImpl implements RoomStatisticsService {
     public boolean cancleLock(UseInfoAble info, LocalDateTime cancleDateTime) {
         return roomUsageService.unLock(info, cancleDateTime);
     }
-    
+
 
 }

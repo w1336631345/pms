@@ -227,11 +227,11 @@ public class RoomTypeQuantityServiceImpl implements RoomTypeQuantityService {
             rtq = findByRoomTypeAndQuantityDateForUpdate(roomType, currentDate);
             plusQuantity(rtq, oldUsageStatus, newUsageStatus, quantity);
             if (i == 0) {
-                if (Constants.Status.ROOM_USAGE_ASSIGN.equals(newUsageStatus) && Constants.Status.ROOM_USAGE_CHECK_IN.equals(oldUsageStatus)) {
+                if (Constants.Status.ROOM_USAGE_ASSIGN.equals(newUsageStatus) && (Constants.Status.ROOM_USAGE_CHECK_IN.equals(oldUsageStatus) || Constants.Status.ROOM_USAGE_FREE.equals(oldUsageStatus))) {
                     rtq.setWillArriveTotal(rtq.getWillArriveTotal() + quantity);
                 } else if (Constants.Status.ROOM_USAGE_PREDICTABLE.equals(newUsageStatus) && (Constants.Status.ROOM_USAGE_ASSIGN.equals(oldUsageStatus) || Constants.Status.ROOM_USAGE_RESERVATION.equals(oldUsageStatus))) {
                     rtq.setWillArriveTotal(rtq.getWillArriveTotal() - quantity);
-                } else if (Constants.Status.ROOM_USAGE_CHECK_IN.equals(newUsageStatus)) {
+                } else if (Constants.Status.ROOM_USAGE_CHECK_IN.equals(newUsageStatus) || (Constants.Status.ROOM_USAGE_FREE.equals(newUsageStatus) && Constants.Status.ROOM_USAGE_ASSIGN.equals(oldUsageStatus))) {
                     rtq.setWillArriveTotal(rtq.getWillArriveTotal() - quantity);
                 }
             }
@@ -608,19 +608,22 @@ public class RoomTypeQuantityServiceImpl implements RoomTypeQuantityService {
     }
 
     @Override
-    public boolean changeRoom(RoomType roomType, RoomType newRoomType,String status, LocalDateTime startTime, LocalDateTime endTime, LocalDateTime changeTime) {
-        changeRoomTypeQuantity(roomType,changeTime.toLocalDate(),endTime.toLocalDate(),status,Constants.Status.ROOM_USAGE_FREE,1);
-        changeRoomTypeQuantity(newRoomType,changeTime.toLocalDate(),endTime.toLocalDate(),Constants.Status.ROOM_USAGE_FREE,status,1);
+    public boolean changeRoom(RoomType roomType, RoomType newRoomType, String status, LocalDateTime startTime, LocalDateTime endTime, LocalDateTime changeTime) {
+        if (status.equals(Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION)) {
+            status = Constants.Status.ROOM_USAGE_ASSIGN;
+        }
+        changeRoomTypeQuantity(roomType, changeTime.toLocalDate(), endTime.toLocalDate(), status, Constants.Status.ROOM_USAGE_FREE, 1);
+        changeRoomTypeQuantity(newRoomType, changeTime.toLocalDate(), endTime.toLocalDate(), Constants.Status.ROOM_USAGE_FREE, status, 1);
         return true;
     }
 
     @Override
     public boolean extendTime(RoomType roomType, String roomStatus, LocalDateTime startTime, LocalDateTime endTime, LocalDateTime newStartTime, LocalDateTime newEndTime) {
-        if(newStartTime!=null){
-            changeRoomTypeQuantity(roomType,newStartTime.toLocalDate(),startTime.toLocalDate(),Constants.Status.ROOM_USAGE_FREE,roomStatus,1);
+        if (newStartTime != null) {
+            changeRoomTypeQuantity(roomType, newStartTime.toLocalDate(), startTime.toLocalDate(), Constants.Status.ROOM_USAGE_FREE, roomStatus, 1);
         }
-        if(newEndTime!=null){
-            changeRoomTypeQuantity(roomType,endTime.toLocalDate(),newEndTime.toLocalDate(),Constants.Status.ROOM_USAGE_FREE,roomStatus,1);
+        if (newEndTime != null) {
+            changeRoomTypeQuantity(roomType, endTime.toLocalDate(), newEndTime.toLocalDate(), Constants.Status.ROOM_USAGE_FREE, roomStatus, 1);
         }
 
         return true;
