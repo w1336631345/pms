@@ -88,4 +88,6 @@ public interface BillService extends BaseService<Bill> {
 	Bill createArSettleBill(Account targetAccount, double total, double cost, double pay, Employee operationEmployee, String shiftCode);
 
 	Bill createToArBill(Account account, double processTotal, double pay, Employee operationEmployee, String shiftCode,String recordNum,String remark);
+
+    List<Map<String, Object>> getStatusTotal(String hotelCode, String accountId);
 }

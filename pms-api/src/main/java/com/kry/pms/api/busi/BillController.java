@@ -112,4 +112,19 @@ public class BillController extends BaseController<Bill> {
 		BeanUtils.copyProperties(response, rep);
 		return rep;
 	}
+
+	/**
+	 * 功能描述: <br>根据账号id 查询已结账和未结账统计
+	 * 〈〉
+	 * @Param: [accountId]
+	 * @Return: com.kry.pms.base.HttpResponse<java.util.List<java.util.Map<java.lang.String,java.lang.Object>>>
+	 * @Author: huanghaibin
+	 * @Date: 2020/4/28 11:48
+	 */
+	@GetMapping(path="/getStatusTotal")
+	public HttpResponse<List<Map<String, Object>>> getStatusTotal(String accountId){
+		HttpResponse<List<Map<String, Object>>> rep = new HttpResponse<List<Map<String, Object>>>();
+		rep.addData(billService.getStatusTotal(getCurrentHotleCode(), accountId));
+		return rep;
+	}
 }

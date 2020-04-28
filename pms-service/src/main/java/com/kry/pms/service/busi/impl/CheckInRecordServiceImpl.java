@@ -1957,6 +1957,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
             checkInRecord.setTogetherCode(cir.getTogetherCode());
         }
         checkInRecordDao.save(checkInRecord);
+        roomRecordService.createRoomRecord(checkInRecord);
         List<CheckInRecord> main = checkInRecordDao.findByOrderNumAndTypeAndDeleted(orderNum, Constants.Type.CHECK_IN_RECORD_GROUP, Constants.DELETED_FALSE);
         if (main != null && !main.isEmpty()) {
             CheckInRecord cm = main.get(0);

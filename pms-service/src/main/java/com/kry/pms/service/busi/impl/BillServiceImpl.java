@@ -590,4 +590,13 @@ public class BillServiceImpl implements BillService {
         bill.setHotelCode(operationEmployee.getHotelCode());
         return add(bill);
     }
+
+    @Override
+    public List<Map<String, Object>> getStatusTotal(String hotelCode, String accountId){
+        List<String> statusList = new ArrayList<>();
+        statusList.add(Constants.Status.BILL_SETTLED);
+        statusList.add(Constants.Status.BILL_NEED_SETTLED);
+        List<Map<String, Object>> list = billDao.getStatusTotal(hotelCode, accountId, statusList);
+        return list;
+    }
 }
