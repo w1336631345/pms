@@ -5,6 +5,7 @@ import com.kry.pms.base.DtoResponse;
 import com.kry.pms.base.HttpResponse;
 import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
+import com.kry.pms.model.annotation.OperationLog;
 import com.kry.pms.model.http.request.busi.CheckInRecordListBo;
 import com.kry.pms.model.http.request.busi.CheckUpdateItemTestBo;
 import com.kry.pms.model.http.request.busi.TogetherBo;
@@ -48,6 +49,7 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
      * @Date: 2020/1/2 14:48
      */
     @PutMapping(path = "/modifyInfo")
+    @OperationLog(remark = "主单修改操作")
     public HttpResponse<CheckInRecord> modifyInfo(@RequestBody CheckInRecord checkInRecord) {
         HttpResponse hr = checkInRecordService.modifyInfo(checkInRecord);
         return hr;
@@ -64,6 +66,7 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
      * @Date: 2020/1/13 15:21
      */
     @PostMapping(path = "/book")
+    @OperationLog(remark = "团队/多人预订")
     public HttpResponse<CheckInRecord> book(@RequestBody CheckInRecord checkInRecord) {
         checkInRecord.setHotelCode(getCurrentHotleCode());
         HttpResponse hr = checkInRecordService.book(checkInRecord);
@@ -80,6 +83,7 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
      * @Date: 2020/1/8 10:45
      */
     @PostMapping(path = "/bookByRoom")
+    @OperationLog(remark = "房态图直接预订或入住")
     public HttpResponse<CheckInRecord> bookByRoom(@RequestBody CheckInRecord checkInRecord) {
         HttpResponse hr = new HttpResponse();
         User user = getUser();
@@ -98,6 +102,7 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
      * @Date: 2020/2/26 14:26
      */
     @PostMapping(path = "/bookOne")
+    @OperationLog(remark = "散客单房预订")
     public HttpResponse<CheckInRecord> bookOne(@RequestBody CheckInRecord checkInRecord) {
         User user = getUser();
         checkInRecord.setHotelCode(user.getHotelCode());
@@ -194,6 +199,7 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
      * @Date: 2019/12/11 15:44
      */
     @PostMapping(path = "/updateItem")
+    @OperationLog(remark = "批量修改保存")
     public HttpResponse updateItem(@RequestBody CheckUpdateItemTestBo checkUpdateItemTestBo) {
         HttpResponse hr = new HttpResponse();
         User user = getUser();
@@ -214,6 +220,7 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
      * @Date: 2019/12/12 18:15
      */
     @PostMapping(path = "/cancelIn")
+    @OperationLog(remark = "批量取消入住")
     public HttpResponse cancelIn(@RequestBody String[] ids) {
         HttpResponse hr = new HttpResponse();
         User user = getUser();
@@ -234,6 +241,7 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
      * @Date: 2019/12/16 11:09
      */
     @PostMapping(path = "/callOffAssignRoom")
+    @OperationLog(remark = "批量取消排房")
     public HttpResponse callOffAssignRoom(@RequestBody String[] ids) {
         HttpResponse rep = new HttpResponse();
         rep = checkInRecordService.callOffAssignRoom(ids);
@@ -250,6 +258,7 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
      * @Date: 2019/12/17 11:59
      */
     @PostMapping(path = "/callOffReserve")
+    @OperationLog(remark = "批量取消预订")
     public HttpResponse callOffReserve(@RequestBody String[] ids) {
         HttpResponse rep = new HttpResponse();
         rep = checkInRecordService.callOffReserve(ids);
@@ -264,6 +273,7 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
      * @Date: 2020/3/27 15:43
      */
     @PostMapping(path = "/callOffReserveAudit")
+    @OperationLog(remark = "夜审中的取消预订")
     public HttpResponse callOffReserveAudit(@RequestBody String[] ids) {
         HttpResponse rep = new HttpResponse();
         rep = checkInRecordService.callOffReserveAudit(ids);
@@ -278,6 +288,7 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
      * @Date: 2020/3/31 19:14
      */
     @GetMapping(path = "/callOffG")
+    @OperationLog(remark = "主单的取消预订")
     public HttpResponse callOffG(String id) {
         HttpResponse rep = new HttpResponse();
         rep = checkInRecordService.callOffG(id);
@@ -292,6 +303,7 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
      * @Date: 2020/3/31 19:48
      */
     @GetMapping(path = "/recovery")
+    @OperationLog(remark = "主单恢复")
     public HttpResponse recovery(String id) {
         HttpResponse rep = new HttpResponse();
         rep = checkInRecordService.recovery(id);
@@ -305,6 +317,7 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
      * @return
      */
     @GetMapping(path = "/offReserve")
+    @OperationLog(remark = "修改预留的删除（其实就是取消预留）")
     public HttpResponse offReserve(String id) {
         HttpResponse rep = new HttpResponse();
         rep = checkInRecordService.offReserve(id);
@@ -321,6 +334,7 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
      * @Date: 2020/1/9 10:22
      */
     @PostMapping(path = "/bookByRoomList")
+    @OperationLog(remark = "房态图批量操作的，快速入住")
     public HttpResponse bookByRoomList(@RequestBody CheckInRecordListBo checkInRecordListBo) {
         HttpResponse hr = new HttpResponse();
         List<CheckInRecord> list = checkInRecordService.bookByRoomList(checkInRecordListBo, getCurrentHotleCode());
@@ -452,6 +466,7 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
      * @Date: 2019/12/23 17:38
      */
     @GetMapping(value = "/addTogether")
+    @OperationLog(remark = "添加同住")
     public HttpResponse addTogether(String orderNum, String customerId, String status, String guestRoomId) {
         HttpResponse hr = new HttpResponse();
         User user = getUser();
@@ -469,6 +484,7 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
      * @Date: 2019/12/24 17:40
      */
     @GetMapping(value = "/roomPriceAllocation")
+    @OperationLog(remark = "独担房价")
     public HttpResponse roomPriceAllocation(String orderNum, String checkInRecordId, String guestRoomId) {
         HttpResponse hr = new HttpResponse();
         User user = getUser();
@@ -486,6 +502,7 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
      * @Date: 2019/12/24 17:40
      */
     @GetMapping(value = "/roomPriceAvg")
+    @OperationLog(remark = "平均房价")
     public HttpResponse roomPriceAvg(String orderNum, String guestRoomId) {
         HttpResponse hr = new HttpResponse();
         User user = getUser();
@@ -537,6 +554,7 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
      * @Date: 2020/1/9 17:50
      */
     @GetMapping(value = "/outGroup")
+    @OperationLog(remark = "出团")
     public HttpResponse outGroup(String[] cir, String cirG, Boolean isFollowGroup, String roomPriceId) {
         HttpResponse hr = new HttpResponse();
         hr = checkInRecordService.outGroup(cir, cirG, isFollowGroup, roomPriceId);
@@ -553,6 +571,7 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
      * @Date: 2020/1/10 17:09
      */
     @GetMapping(value = "/updateGroup")
+    @OperationLog(remark = "转团")
     public HttpResponse updateGroup(String[] cir, String cirG, String cirU, Boolean isFollowGroup) {
         HttpResponse hr = new HttpResponse();
         hr = checkInRecordService.updateGroup(cir, cirG, cirU, isFollowGroup);
@@ -568,6 +587,7 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
      * @Date: 2020/3/27 20:34
      */
     @PostMapping(path = "/reserve")
+    @OperationLog(remark = "新增预留")
     public HttpResponse<List<CheckInRecord>> addReserve(@RequestBody List<CheckInRecord> checkInRecords) {
         HttpResponse<List<CheckInRecord>> rep = new HttpResponse<List<CheckInRecord>>();
         rep = checkInRecordService.addReserve(checkInRecords);
@@ -584,6 +604,7 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
      * @Date: 2020/1/14 11:28
      */
     @PostMapping(path = "/updateReserve")
+    @OperationLog(remark = "修改预留")
     public HttpResponse updateReserve(@RequestBody CheckInRecord checkInRecord) {
         HttpResponse hr = new HttpResponse();
         hr = checkInRecordService.updateReserve(checkInRecord);

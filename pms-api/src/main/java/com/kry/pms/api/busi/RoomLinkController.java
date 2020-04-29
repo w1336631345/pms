@@ -4,6 +4,7 @@ import com.kry.pms.api.BaseController;
 import com.kry.pms.base.Constants;
 import com.kry.pms.base.HttpResponse;
 import com.kry.pms.base.PageResponse;
+import com.kry.pms.model.annotation.OperationLog;
 import com.kry.pms.model.http.request.busi.RoomLinkBo;
 import com.kry.pms.model.persistence.busi.CheckInRecord;
 import com.kry.pms.model.persistence.busi.RoomLink;
@@ -41,6 +42,7 @@ public class RoomLinkController extends BaseController<RoomLink> {
      * @Date: 2019/12/19 16:02
      */
     @PostMapping(value = "/addRoomLink")
+    @OperationLog(remark = "添加联房")
     public HttpResponse addRoomLink(@RequestBody RoomLinkBo roomLinkBo){
         HttpResponse hr = roomLinkService.addRoomLink(roomLinkBo);
         return hr;

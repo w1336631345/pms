@@ -4,6 +4,7 @@ import com.kry.pms.api.BaseController;
 import com.kry.pms.base.HttpResponse;
 import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
+import com.kry.pms.model.annotation.OperationLog;
 import com.kry.pms.model.persistence.busi.RoomChangeRecord;
 import com.kry.pms.model.persistence.busi.RoomRecord;
 import com.kry.pms.model.persistence.sys.User;
@@ -29,6 +30,7 @@ public class RoomChangeRecordController extends BaseController<RoomChangeRecord>
 	 * @Date: 2020/3/16 15:48
 	 */
 	@PostMapping
+	@OperationLog(remark = "换房")
 	public HttpResponse<RoomChangeRecord> add(@RequestBody  RoomChangeRecord roomChangeRecord) {
 		HttpResponse hr = new HttpResponse();
 		User user = getUser();

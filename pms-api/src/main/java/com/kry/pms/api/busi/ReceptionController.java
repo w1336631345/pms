@@ -3,6 +3,7 @@ package com.kry.pms.api.busi;
 import com.kry.pms.api.BaseController;
 import com.kry.pms.base.DtoResponse;
 import com.kry.pms.base.HttpResponse;
+import com.kry.pms.model.annotation.OperationLog;
 import com.kry.pms.model.http.request.busi.*;
 import com.kry.pms.model.http.response.busi.AccountSummaryVo;
 import com.kry.pms.model.persistence.busi.BookingRecord;
@@ -70,6 +71,7 @@ public class ReceptionController extends BaseController<String> {
 	 * @Date: 2019/12/17 15:52
 	 */
 	@PostMapping(path = "/checkInAll")
+	@OperationLog(remark = "批量入住")
 	public HttpResponse checkIn(@RequestBody String[] ids) {
 		HttpResponse<String> rep = new HttpResponse<String>();
 		BeanUtils.copyProperties(receptionService.checkInAll(ids,getCurrentHotleCode()), rep);
@@ -84,6 +86,7 @@ public class ReceptionController extends BaseController<String> {
 	 * @Date: 2020/2/28 10:42
 	 */
 	@GetMapping(path = "/checkIn/{id}")
+	@OperationLog(remark = "入住")
 	public HttpResponse<String> checkIn(@PathVariable String id) {
 		HttpResponse<String> rep = new HttpResponse<String>();
 		BeanUtils.copyProperties(receptionService.checkInM(id), rep);
@@ -103,6 +106,7 @@ public class ReceptionController extends BaseController<String> {
 	 * @return
 	 */
 	@GetMapping(path="/bill/check/confirm/group/{id}")
+	@OperationLog(remark = "结账确认")
 	public HttpResponse<List<AccountSummaryVo>> groupCheckBillConfirm(@PathVariable String id){
 		HttpResponse<List<AccountSummaryVo>> rep = new HttpResponse<List<AccountSummaryVo>>();
 		DtoResponse<List<AccountSummaryVo>> data = receptionService.groupCheckBillConfirm(id);
@@ -115,6 +119,7 @@ public class ReceptionController extends BaseController<String> {
 	 * @return
 	 */
 	@GetMapping(path="/bill/check/group/{id}")
+	@OperationLog(remark = "团队结账")
 	public HttpResponse<String> groupCheckBill(){
 		HttpResponse<String> rep = new HttpResponse<String>();
 		return rep;
@@ -125,6 +130,7 @@ public class ReceptionController extends BaseController<String> {
 	 * @return
 	 */
 	@PostMapping(path="/bill/check")
+	@OperationLog(remark = "宾客结账")
 	public HttpResponse<AccountSummaryVo> customerCheckBill(@RequestBody BillCheckBo	billCheckBo){
 		billCheckBo.setHotelCode(getCurrentHotleCode());
 		billCheckBo.setShiftCode(getShiftCode());
@@ -145,6 +151,7 @@ public class ReceptionController extends BaseController<String> {
 	 * @return
 	 */
 	@PostMapping(path = "/assign")
+	@OperationLog(remark = "排房")
 	public HttpResponse<String> assignRoom(@RequestBody @Valid RoomAssignBo roomAssignBo) {
 		HttpResponse<String> rep = new HttpResponse<String>();
 		BeanUtils.copyProperties(receptionService.assignRoom(roomAssignBo), rep);
