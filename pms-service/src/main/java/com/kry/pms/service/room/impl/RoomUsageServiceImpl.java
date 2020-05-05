@@ -469,8 +469,8 @@ public class RoomUsageServiceImpl implements RoomUsageService {
                         ru.getUniqueIds().remove(info.uniqueId());
                     }
                     if (ru.getUniqueIds().isEmpty()) {
-                        roomTypeQuantityService.changeRoomTypeQuantity(info.roomType(), info.getEndTime().toLocalDate(),
-                                ru.getEndDateTime().toLocalDate(), ru.getUsageStatus(), Constants.Status.ROOM_USAGE_BOOK, 1);
+                        roomTypeQuantityService.changeRoomTypeQuantity(info.roomType(), ru.getStartDateTime().toLocalDate(),
+                                ru.getEndDateTime().toLocalDate(), ru.getUsageStatus(), Constants.Status.ROOM_USAGE_RESERVATION, 1);
 
 
                         unUse(ru);
