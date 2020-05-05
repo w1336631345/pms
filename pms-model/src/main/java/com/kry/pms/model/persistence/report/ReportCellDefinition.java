@@ -17,5 +17,7 @@ public class ReportCellDefinition extends PersistenceModel {
     private String type;
     @Column(name = "value_")
     private String value;
+    @Column
+    private Integer sortNum;
 
 }

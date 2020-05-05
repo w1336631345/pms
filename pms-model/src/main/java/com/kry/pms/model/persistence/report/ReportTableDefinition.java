@@ -3,10 +3,7 @@ package com.kry.pms.model.persistence.report;
 import com.kry.pms.model.persistence.PersistenceModel;
 import lombok.Data;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.ManyToMany;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.util.List;
 
 @Entity
@@ -42,6 +39,7 @@ public class ReportTableDefinition extends PersistenceModel {
     @Column
     private String baseTemplete;
     @ManyToMany
+    @OrderBy("sortNum")
     private List<ReportRowDefinition> rows;
     @Column
     private String params;//参数 &
