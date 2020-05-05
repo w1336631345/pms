@@ -5,8 +5,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.kry.pms.dao.busi.CheckInRecordDao;
+import com.kry.pms.dao.sys.AccountDao;
 import com.kry.pms.model.persistence.busi.CheckInRecord;
 import com.kry.pms.model.persistence.marketing.RoomPriceScheme;
+import com.kry.pms.model.persistence.sys.Account;
 import com.kry.pms.model.persistence.sys.SqlTemplate;
 import com.kry.pms.service.sys.BusinessSeqService;
 import com.kry.pms.service.sys.SqlTemplateService;
@@ -42,6 +45,10 @@ public class CustomerServiceImpl implements CustomerService {
 	BusinessSeqService businessSeqService;
 	@Autowired
 	SqlTemplateService sqlTemplateService;
+	@Autowired
+	CheckInRecordDao checkInRecordDao;
+	@Autowired
+	AccountDao accountDao;
 
 	@Override
 	public Customer add(Customer customer) {
@@ -69,13 +76,15 @@ public class CustomerServiceImpl implements CustomerService {
 
 	@Override
 	public Customer modify(Customer customer) {
-//		if(customer.getIdCardNum()!=null) {
-//			Customer dbc = customerDao.findByHotelCodeAndIdCardNum(customer.getHotelCode(),customer.getIdCardNum());
-//			if(dbc!=null) {
-//				return dbc;
+		Customer cust = customerDao.saveAndFlush(customer);
+//		CheckInRecord cir = checkInRecordDao.findByCustomer(customer);
+//		if(cir != null){
+//			if(!customer.getName().equals(cir.getName())){
+//				cir.setName(customer.getName());
+//				checkInRecordDao.saveAndFlush(cir);
 //			}
 //		}
-		return customerDao.saveAndFlush(customer);
+		return cust;
 	}
 
 	@Override

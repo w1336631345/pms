@@ -952,7 +952,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                 TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                 return hr.error("资源不足");
             }
-            roomRecordService.createRoomRecord(cir);
+//            roomRecordService.createRoomRecord(cir);//没有房间生成的纯预留不能创建roomRecord
             hr.setData(cir);
             return hr;
         }
@@ -1124,7 +1124,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
     public PageResponse<Map<String, Object>> accountEntryListMap(int pageIndex, int pageSize, User user) {
         Pageable page = org.springframework.data.domain.PageRequest.of(pageIndex - 1, pageSize);
         LocalDate businessDate = businessSeqService.getBuinessDate(user.getHotelCode());
-        Page<Map<String, Object>> p = checkInRecordDao.accountEntryListMap(page, user.getHotelCode(), businessDate, Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN);
+        Page<Map<String, Object>> p = checkInRecordDao.accountEntryListMap(page, user.getHotelCode(), businessDate, null);
         PageResponse<Map<String, Object>> pr = new PageResponse<>();
         pr.setPageSize(p.getNumberOfElements());
         pr.setPageCount(p.getTotalPages());

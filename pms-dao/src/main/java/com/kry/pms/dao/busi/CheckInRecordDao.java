@@ -3,6 +3,7 @@ package com.kry.pms.dao.busi;
 import com.kry.pms.dao.BaseDao;
 import com.kry.pms.model.http.response.busi.AccountSummaryVo;
 import com.kry.pms.model.persistence.busi.CheckInRecord;
+import com.kry.pms.model.persistence.guest.Customer;
 import com.kry.pms.model.persistence.room.GuestRoom;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -84,7 +85,7 @@ public interface CheckInRecordDao extends BaseDao<CheckInRecord> {
             " where 1=1 \n" +
             " and tcr.hotel_code = :hotelCode \n" +
             " and trr.record_date = :businessDate " +
-			" and tcr.`status` = :status ",
+			" and if(:status is not null && :status != '', tcr.`status`=:status, 1=1 ) ",
 			countQuery = " select count(trr.id) " +
                     " from t_room_record trr \n" +
                     "   left join t_checkin_record tcr on trr.check_in_record_id = tcr.id\n" +
@@ -98,7 +99,7 @@ public interface CheckInRecordDao extends BaseDao<CheckInRecord> {
                     " where 1=1 \n" +
                     " and tcr.hotel_code = :hotelCode \n" +
                     " and trr.record_date = :businessDate " +
-					" and tcr.`status` = :status ")
+					" and if(:status is not null && :status != '', tcr.`status`=:status, 1=1 ) ")
 	Page<Map<String, Object>> accountEntryListMap(Pageable page, @Param("hotelCode") String hotelCode,
                                                   @Param("businessDate") LocalDate businessDate, @Param("status") String status);
 
@@ -375,5 +376,7 @@ public interface CheckInRecordDao extends BaseDao<CheckInRecord> {
 			" left join t_employee te on tu.id = te.user_id\n" +
 			" where tcr.id = :checkInRecordId ")
 	Map<String, Object> printing(@Param("checkInRecordId") String checkInRecordId);
+
+	CheckInRecord findByCustomer(Customer customer);
 
 }

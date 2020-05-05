@@ -168,4 +168,11 @@ public class CustomerController extends BaseController<Customer> {
 		return rep.addData(i);
 	}
 
+	@GetMapping(path = "/getById")
+	public HttpResponse getById(String id){
+		HttpResponse rep = new HttpResponse();
+		Customer customer = customerService.findById(id);
+		return rep.addData(customer);
+	}
+
 }
