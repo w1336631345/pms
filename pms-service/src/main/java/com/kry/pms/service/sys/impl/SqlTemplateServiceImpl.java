@@ -118,6 +118,7 @@ public class SqlTemplateServiceImpl implements SqlTemplateService {
         Template template = new Template(templateName, templateValue, configuration);
         template.process(root, stringWriter);
         String data = stringWriter.toString();
+        stringWriter.close();
         return data;
     }
 
@@ -146,6 +147,7 @@ public class SqlTemplateServiceImpl implements SqlTemplateService {
         Query query = entityManager.createNativeQuery(data);
         query.unwrap(NativeQueryImpl.class)
                 .setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
+        stringWriter.close();
         return query.getResultList();
     }
 
@@ -155,11 +157,12 @@ public class SqlTemplateServiceImpl implements SqlTemplateService {
         SqlTemplate st = sqlTemplateDao.findByCode(code);
         if (st != null) {
             String templateValue = st.getSql();
-            StringWriter stringWriter = new StringWriter();
             parmrs.put("hotelCode",hotelCode);
+            StringWriter stringWriter = new StringWriter();
             Template template = new Template(hotelCode, templateValue, configuration);
             template.process(parmrs, stringWriter);
             String data = stringWriter.toString();
+            stringWriter.close();
             Query query = entityManager.createNativeQuery(data);
             query.unwrap(NativeQueryImpl.class)
                     .setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
@@ -180,6 +183,7 @@ public class SqlTemplateServiceImpl implements SqlTemplateService {
             pageRequest.getExb().put("hotelCode",hotelCode);
             template.process(pageRequest.getExb(), stringWriter);
             String data = stringWriter.toString();
+            stringWriter.close();
             String countSql = SqlUtil.getCountSQL(data);
             Query countQuery = entityManager.createNativeQuery(countSql);
             int count = Integer.parseInt(countQuery.getSingleResult().toString());

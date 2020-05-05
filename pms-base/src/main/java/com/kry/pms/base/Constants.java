@@ -99,6 +99,10 @@ public class Constants {
 
 	public interface Type {
 
+
+		public static final String REPORT_TABLE_DEF_TEMPLATE = "TEMPLATE";
+		public static final String REPORT_TABLE_DEF_TABLE = "TABLE";
+
 		public static final String CONFIG_USER = "U";
 		public static final String CONFIG_OPERATION = "O";
 		public static final String CONFIG_SYSTEM = "S";
