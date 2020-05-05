@@ -14,7 +14,7 @@ public class ReportRowDefinition extends PersistenceModel {
     private String name;
     @Column
     private Integer sortNum;
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @OrderBy("sortNum")
     private List<ReportCellDefinition> cells;
 }

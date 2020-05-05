@@ -40,6 +40,14 @@ public class ReportTableDefinitionController extends BaseController<ReportTableD
 		return rep;
 	}
 
+
+	@GetMapping("/build")
+	public HttpResponse<String> build(String id) {
+		HttpResponse<String> rep = new HttpResponse<>();
+		reportTableDefinitionService.buildTemplate(id);
+		return rep;
+	}
+
 	@GetMapping
 	public HttpResponse<PageResponse<ReportTableDefinition>> query(HttpServletRequest request) throws InstantiationException, IllegalAccessException{
 		HttpResponse<PageResponse<ReportTableDefinition>> rep = new HttpResponse<PageResponse<ReportTableDefinition>>();

@@ -50,17 +50,18 @@ public class CommomReportServiceImpl implements CommomReportService {
 
     private CommomReportTableData fetchTemplate(ReportTableDefinition rd, Map<String, String[]> params) throws IOException, TemplateException {
         CommomReportTableData rep = new CommomReportTableData();
+        rep.setType(rd.getType());
         List<Map<String, Object>> data = sqlTemplateService.processTemplateQuery(rd.getGroupKey() + rd.getCode(), rd.getDataValue(), params);
         Map<String, Object> webData = new HashMap<>();
         if (data != null && !data.isEmpty()) {
             for (Map<String, Object> item : data) {
-                webData.put(item.get("key").toString(), item.get("value"));
+                webData.put(item.get("key").toString(), item.get("value_").toString());
             }
         }
         Template template = null;
-        template = new Template(rd.getHotelCode(), rd.getBaseTemplete(), configuration);
+        template = new Template(rd.getHotelCode(), rd.getWebTemplate(), configuration);
         StringWriter stringWriter = new StringWriter();
-        template.process(rd, stringWriter);
+        template.process(webData, stringWriter);
         String html = stringWriter.toString();
         stringWriter.close();
         rep.setHtml(html);

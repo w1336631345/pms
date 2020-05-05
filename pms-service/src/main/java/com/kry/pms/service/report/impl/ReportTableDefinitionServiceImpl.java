@@ -95,7 +95,6 @@ public class ReportTableDefinitionServiceImpl implements ReportTableDefinitionSe
             }
         }
         return null;
-
     }
 
     @Override

@@ -5,6 +5,7 @@ import lombok.Data;
 
 import javax.persistence.*;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Data
@@ -38,9 +39,9 @@ public class ReportTableDefinition extends PersistenceModel {
     private String baseTempleteType;
     @Column
     private String baseTemplete;
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @OrderBy("sortNum")
-    private List<ReportRowDefinition> rows;
+    private Set<ReportRowDefinition> rows;
     @Column
     private String params;//参数 &
 }
