@@ -218,25 +218,25 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                 int days = (int) checkInRecord.getArriveTime().toLocalDate()
                         .until(checkInRecord.getLeaveTime().toLocalDate(), ChronoUnit.DAYS);
                 //不同时更改同住数据
-                List<RoomRecord> list = roomRecordService.findByHotelCodeAndCheckInRecord(checkInRecord.getHotelCode(), checkInRecord.getId());
-                for (int r = 0; r < list.size(); r++) {
-                    roomRecordService.deleteTrue(list.get(r).getId());
-                }
-                checkInRecord.setDays(days);
-                roomRecordService.createRoomRecord(checkInRecord);
-                //下面是操作同住数据，同时变更
-//                List<CheckInRecord> together = checkInTogether(checkInRecord.getHotelCode(), checkInRecord.getOrderNum(), checkInRecord.getGuestRoom().getId());
-//                for (int t = 0; t < together.size(); t++) {
-//                    List<RoomRecord> list = roomRecordService.findByHotelCodeAndCheckInRecord(checkInRecord.getHotelCode(), together.get(t).getId());
-//                    for (int r = 0; r < list.size(); r++) {
-//                        roomRecordService.deleteTrue(list.get(r).getId());
-//                    }
-//                    together.get(t).setDays(days);
-//                    together.get(t).setArriveTime(checkInRecord.getArriveTime());
-//                    together.get(t).setLeaveTime(checkInRecord.getLeaveTime());
-//                    checkInRecordDao.saveAndFlush(together.get(t));
-//                    roomRecordService.createRoomRecord(together.get(t));
+//                List<RoomRecord> list = roomRecordService.findByHotelCodeAndCheckInRecord(checkInRecord.getHotelCode(), checkInRecord.getId());
+//                for (int r = 0; r < list.size(); r++) {
+//                    roomRecordService.deleteTrue(list.get(r).getId());
 //                }
+//                checkInRecord.setDays(days);
+//                roomRecordService.createRoomRecord(checkInRecord);
+                //下面是操作同住数据，同时变更
+                List<CheckInRecord> together = checkInTogether(checkInRecord.getHotelCode(), checkInRecord.getOrderNum(), checkInRecord.getGuestRoom().getId());
+                for (int t = 0; t < together.size(); t++) {
+                    List<RoomRecord> list = roomRecordService.findByHotelCodeAndCheckInRecord(checkInRecord.getHotelCode(), together.get(t).getId());
+                    for (int r = 0; r < list.size(); r++) {
+                        roomRecordService.deleteTrue(list.get(r).getId());
+                    }
+                    together.get(t).setDays(days);
+                    together.get(t).setArriveTime(checkInRecord.getArriveTime());
+                    together.get(t).setLeaveTime(checkInRecord.getLeaveTime());
+                    checkInRecordDao.saveAndFlush(together.get(t));
+                    roomRecordService.createRoomRecord(together.get(t));
+                }
             }
         }
         hr.addData(checkInRecordDao.saveAndFlush(checkInRecord));
@@ -952,7 +952,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                 TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                 return hr.error("资源不足");
             }
-            roomRecordService.createRoomRecord(cir);
+//            roomRecordService.createRoomRecord(cir);//没有房间生成的纯预留不能创建roomRecord
             hr.setData(cir);
             return hr;
         }
@@ -1124,7 +1124,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
     public PageResponse<Map<String, Object>> accountEntryListMap(int pageIndex, int pageSize, User user) {
         Pageable page = org.springframework.data.domain.PageRequest.of(pageIndex - 1, pageSize);
         LocalDate businessDate = businessSeqService.getBuinessDate(user.getHotelCode());
-        Page<Map<String, Object>> p = checkInRecordDao.accountEntryListMap(page, user.getHotelCode(), businessDate, Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN);
+        Page<Map<String, Object>> p = checkInRecordDao.accountEntryListMap(page, user.getHotelCode(), businessDate, null);
         PageResponse<Map<String, Object>> pr = new PageResponse<>();
         pr.setPageSize(p.getNumberOfElements());
         pr.setPageCount(p.getTotalPages());

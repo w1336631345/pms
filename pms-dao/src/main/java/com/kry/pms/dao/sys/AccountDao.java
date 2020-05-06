@@ -24,4 +24,6 @@ public interface AccountDao extends BaseDao<Account> {
 	@Query(nativeQuery = true,value = "select count(id) from t_account a,t_checkin_record b where a.id = b.account_id and b.order_num = ?1 and b.status=?2")
 	int queryAccounCountByOrderNumAndStatus(String orderNum,String status);
 
+
+
 }
