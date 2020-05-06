@@ -297,18 +297,19 @@ public class BillServiceImpl implements BillService {
             if (sm != null) {
                 if (sm.getProduct() != null) {//如果有包价，就一笔整的包价价格账，一笔负的价格账，正负得0
                     Product product = sm.getProduct();//入账项目
-                    addAudit(product, sm.getTotal(), sm.getAccount(), cir.getHotelCode(), emp, shiftCode, null, "M");
-                    addAudit(product, -sm.getTotal(), sm.getAccount(), cir.getHotelCode(), emp, shiftCode, null, "M");
+                    addAudit(product, sm.getTotal(), sm.getAccount(), cir.getHotelCode(), emp, shiftCode, null, "M", businessDate);
+                    addAudit(product, -sm.getTotal(), sm.getAccount(), cir.getHotelCode(), emp, shiftCode, null, "M", businessDate);
                 }
             }
-            addAudit(p, rr.getCost(), cir.getAccount(), cir.getHotelCode(), emp, shiftCode, rr.getId(), "M");
+            addAudit(p, rr.getCost(), cir.getAccount(), cir.getHotelCode(), emp, shiftCode, rr.getId(), "M", businessDate);
             rr.setIsAccountEntry("PAY");// 入账成功后roomRecord里面入账状态改为pay
             roomRecordService.modify(rr);
         }
     }
     // 夜审手动入账(优化)
     @Override
-    public void putAcountMap(List<Map<String, Object>> list, LocalDate businessDate, Employee emp, String shiftCode) {
+    public void putAcountMap(List<Map<String, Object>> list, LocalDate businessDate, Employee emp, String shiftCode, String hotelCode) {
+        Product p = productDao.findByHotelCodeAndCode(hotelCode, "1000");//这里必须改修改，不能写死，要找到夜间稽核类型（在product中加）
         for (int i = 0; i < list.size(); i++) {
             Map<String, Object> map = list.get(i);
             String id = MapUtils.getString(map, "id");
@@ -322,26 +323,25 @@ public class BillServiceImpl implements BillService {
             Account cirAccount = new Account();
             cirAccount.setId(cirAccountId);
             Double cost = MapUtils.getDouble(map, "cost");
-            String hotelCode = MapUtils.getString(map, "hotelCode");
             Double setMealCost = MapUtils.getDouble(map, "setMealCost");
-            Product p = productDao.findByHotelCodeAndCode(hotelCode, "1000");//这里必须改修改，不能写死，要找到夜间稽核类型（在product中加）
+
             if (setMealId != null && !"".equals(setMealId)) {
                 if (productId != null && !"".equals(productId)) {//如果有包价，就一笔整的包价价格账，一笔负的价格账，正负得0
                     Product product = new Product();//入账项目
                     product.setId(productId);
-                    addAudit(product, setMealCost, setMealAccount, hotelCode, emp, shiftCode, null, "M");
-                    addAudit(product, -setMealCost, setMealAccount, hotelCode, emp, shiftCode, null, "M");
+                    addAudit(product, setMealCost, setMealAccount, hotelCode, emp, shiftCode, null, "M", businessDate);
+                    addAudit(product, -setMealCost, setMealAccount, hotelCode, emp, shiftCode, null, "M", businessDate);
                 }
             }
-            addAudit(p, cost, cirAccount, hotelCode, emp, shiftCode, id, "M");
+            addAudit(p, cost, cirAccount, hotelCode, emp, shiftCode, id, "M", businessDate);
             // 入账成功后roomRecord里面入账状态改为pay
             roomRecordDao.updateIsAccountEntry("PAY", id);
         }
     }
 
-    public void addAudit(Product product, Double cost, Account account, String hotelCode, Employee emp, String shiftCode, String roomRecordId, String type) {
-        //入账只入当前营业日期的账
-        LocalDate businessDate = businessSeqService.getBuinessDate(hotelCode);
+    public void addAudit(Product product, Double cost, Account account, String hotelCode, Employee emp, String shiftCode, String roomRecordId, String type, LocalDate businessDate) {
+//        //入账只入当前营业日期的账
+//        LocalDate businessDate = businessSeqService.getBuinessDate(hotelCode);
         Bill bill = new Bill();
         bill.setProduct(product);
         bill.setTotal(cost);
@@ -374,11 +374,11 @@ public class BillServiceImpl implements BillService {
             if (sm != null) {
                 if (sm.getProduct() != null) {//如果有包价，就一笔整的包价价格账，一笔负的价格账，正负得0
                     Product product = sm.getProduct();//入账项目
-                    addAudit(product, sm.getTotal(), sm.getAccount(), cir.getHotelCode(), null, null, null, "A");
-                    addAudit(product, -sm.getTotal(), sm.getAccount(), cir.getHotelCode(), null, null, null, "A");
+                    addAudit(product, sm.getTotal(), sm.getAccount(), cir.getHotelCode(), null, null, null, "A", businessDate);
+                    addAudit(product, -sm.getTotal(), sm.getAccount(), cir.getHotelCode(), null, null, null, "A", businessDate);
                 }
             }
-            addAudit(p, rr.getCost(), cir.getAccount(), cir.getHotelCode(), null, null, rr.getId(), "A");
+            addAudit(p, rr.getCost(), cir.getAccount(), cir.getHotelCode(), null, null, rr.getId(), "A", businessDate);
             rr.setIsAccountEntry("PAY");// 入账成功后roomRecord里面入账状态改为pay
             roomRecordService.modify(rr);
         }

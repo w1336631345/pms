@@ -1257,6 +1257,11 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
     }
 
     @Override
+    public PageResponse<Map<String, Object>> resverListHis(String hotelCode, PageRequest pageRequest) throws IOException, TemplateException {
+        return sqlTemplateService.queryForPage(hotelCode, "resverListHis", pageRequest);
+    }
+
+    @Override
     public List<Map<String, Object>> querySummaryListToBySqlTotal(String hotelCode, Map<String, Object> params) throws IOException, TemplateException {
         List<Map<String, Object>> list = sqlTemplateService.processByCode(hotelCode, "resverListTotal", params);
         Map<String, Object> map = new HashMap<>();

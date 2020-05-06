@@ -67,7 +67,7 @@ public class RoomChangeRecordServiceImpl implements RoomChangeRecordService {
 		CheckInRecord cir = checkInRecordService.findById(entity.getCheckInRecordId());
 		GuestRoom newgr = guestRoomDao.getOne(entity.getNewGuestRoom().getId());
 		//资源调整
-		roomStatisticsService.changeRoom(new CheckInRecordWrapper(cir), newgr, LocalDateTime.now());
+		boolean cresult = roomStatisticsService.changeRoom(new CheckInRecordWrapper(cir), newgr, LocalDateTime.now());
 		if(!Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN.equals(cir.getStatus()) && !Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION.equals(cir.getStatus())){
 			return hr.error("退房/结账等房间不能换房");
 		}
