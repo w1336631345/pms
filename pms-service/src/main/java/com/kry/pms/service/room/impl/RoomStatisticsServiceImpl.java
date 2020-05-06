@@ -106,7 +106,7 @@ public class RoomStatisticsServiceImpl implements RoomStatisticsService {
 
     @Override
     public boolean extendTime(UseInfoAble info, LocalDateTime newStartTime, LocalDateTime newEndTime) {
-        roomTypeQuantityService.extendTime(info.roomType(), info.getRoomStatus(), info.getStartTime(), info.getEndTime(), newStartTime, newEndTime);
+        roomTypeQuantityService.extendTime(info.roomType(), ((CheckInRecord) info.getSource()).getStatus(), info.getStartTime(), info.getEndTime(), newStartTime, newEndTime);
         if (newStartTime != null) {
             newStartTime = LocalDateTime.of(newStartTime.toLocalDate(), LocalTime.NOON);
         }

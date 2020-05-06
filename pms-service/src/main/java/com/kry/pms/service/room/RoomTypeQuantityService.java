@@ -56,7 +56,7 @@ public interface RoomTypeQuantityService extends BaseService<RoomTypeQuantity> {
 
     List<Map<String, Object>> getByTimeAndRoomType2(String hotelCode, String startTimes, String[] buildIds, String[] roomTypeIds);
 
-    boolean changeRoom(RoomType roomType, RoomType newRoomType,String status, LocalDateTime startTime, LocalDateTime endTime, LocalDateTime changeTime);
+    boolean changeRoom(RoomType roomType, RoomType newRoomType, String status, LocalDateTime startTime, LocalDateTime endTime, LocalDateTime changeTime);
 
     boolean extendTime(RoomType roomType, String roomStatus, LocalDateTime startTime, LocalDateTime endTime, LocalDateTime newStartTime, LocalDateTime newEndTime);
 }

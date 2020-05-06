@@ -22,6 +22,7 @@ import com.kry.pms.service.sys.BusinessSeqService;
 import org.apache.commons.collections4.MapUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cglib.core.Local;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
@@ -220,13 +221,18 @@ public class RoomTypeQuantityServiceImpl implements RoomTypeQuantityService {
     @Override
     public void changeRoomTypeQuantity(RoomType roomType, LocalDate startDate, LocalDate endDate, String oldUsageStatus,
                                        String newUsageStatus, int quantity) {
+        changeRoomTypeQuantity(roomType, startDate, endDate, oldUsageStatus, newUsageStatus, quantity, true);
+    }
+
+    private void changeRoomTypeQuantity(RoomType roomType, LocalDate startDate, LocalDate endDate, String oldUsageStatus,
+                                        String newUsageStatus, int quantity, boolean arriveCheck) {
         RoomTypeQuantity rtq = null;
         LocalDate currentDate = startDate;
         int i = 0;
         while (currentDate.isBefore(endDate)) {
             rtq = findByRoomTypeAndQuantityDateForUpdate(roomType, currentDate);
             plusQuantity(rtq, oldUsageStatus, newUsageStatus, quantity);
-            if (i == 0) {
+            if (arriveCheck && i == 0) {
                 if (Constants.Status.ROOM_USAGE_ASSIGN.equals(newUsageStatus) && (Constants.Status.ROOM_USAGE_CHECK_IN.equals(oldUsageStatus) || Constants.Status.ROOM_USAGE_FREE.equals(oldUsageStatus))) {
                     rtq.setWillArriveTotal(rtq.getWillArriveTotal() + quantity);
                 } else if (Constants.Status.ROOM_USAGE_PREDICTABLE.equals(newUsageStatus) && (Constants.Status.ROOM_USAGE_ASSIGN.equals(oldUsageStatus) || Constants.Status.ROOM_USAGE_RESERVATION.equals(oldUsageStatus))) {
@@ -619,13 +625,20 @@ public class RoomTypeQuantityServiceImpl implements RoomTypeQuantityService {
 
     @Override
     public boolean extendTime(RoomType roomType, String roomStatus, LocalDateTime startTime, LocalDateTime endTime, LocalDateTime newStartTime, LocalDateTime newEndTime) {
-        if (newStartTime != null) {
-            changeRoomTypeQuantity(roomType, newStartTime.toLocalDate(), startTime.toLocalDate(), Constants.Status.ROOM_USAGE_FREE, roomStatus, 1);
+        changeRoomTypeQuantity(roomType, startTime.toLocalDate(), endTime.toLocalDate(), roomStatus, Constants.Status.ROOM_USAGE_FREE, 1);
+        LocalDate newStartDate = null;
+        LocalDate newEndDate = null;
+        if(newStartTime!=null){
+            newStartDate = newStartTime.toLocalDate();
+        }else{
+            newStartDate = startTime.toLocalDate();
         }
-        if (newEndTime != null) {
-            changeRoomTypeQuantity(roomType, endTime.toLocalDate(), newEndTime.toLocalDate(), Constants.Status.ROOM_USAGE_FREE, roomStatus, 1);
+        if(newEndTime!=null){
+            newEndDate = newEndTime.toLocalDate();
+        }else{
+            newEndDate = endTime.toLocalDate();
         }
-
+        changeRoomTypeQuantity(roomType, newStartDate, newEndDate, Constants.Status.ROOM_USAGE_FREE, roomStatus, 1);
         return true;
     }
 
