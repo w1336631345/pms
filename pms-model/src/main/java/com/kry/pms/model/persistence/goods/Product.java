@@ -1,3 +1,4 @@
+
 package com.kry.pms.model.persistence.goods;
 
 import com.kry.pms.model.persistence.PersistenceModel;

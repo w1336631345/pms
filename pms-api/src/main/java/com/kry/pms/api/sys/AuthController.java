@@ -152,15 +152,19 @@ public class AuthController {
         User cuser = userService.findByOpenId(user.getOpenId());
         String shift = (String) request.getAttribute("state");
         Map<String, String> data = new HashMap<>();
+        String urlHotelCode = getUrlHotleCode();
         if (cuser == null) {
             data.put("status", "1");
             data.put("avatar", user.getHeadImgUrl());
             data.put("openId", user.getOpenId());
             data.put("nickName", user.getNickname());
-        } else {
+        } else if(urlHotelCode==null||cuser.getHotelCode().equals(urlHotelCode)){
             String sessionId = login(cuser, shift);
             data.put("status", "0");
             data.put("token", sessionId);
+        }else{
+            data.put("status", "2");
+            data.put("msg","该微信绑定了其他酒店的账号，请确认！");
         }
         ModelAndView mv = new ModelAndView("/wx_login_result",data);
         return mv;
@@ -170,12 +174,7 @@ public class AuthController {
     public HttpResponse<String> bindWx(String username, String password, String hotelCode,String openId, String shift) {
         HttpResponse<String> response = new HttpResponse<>();
         if(hotelCode==null){
-            ServletRequestAttributes servletRequestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-            HttpServletRequest request = servletRequestAttributes.getRequest();
-            String serverName = request.getServerName();
-            if(serverName!=null&&serverName.endsWith(".pms.rooibook.com")){
-                hotelCode = serverName.substring(0,serverName.indexOf("."));
-            }
+            hotelCode = getUrlHotleCode();
         }
         password = MD5Utils.encrypt(username, hotelCode, password);
         UsernamePasswordToken token = new UsernamePasswordToken(username, password);
@@ -191,6 +190,16 @@ public class AuthController {
             return response.ok("登录成功");
         } catch (AuthenticationException e) {
             return response.error(1000, "用户或密码错误");
+        }
+    }
+    public String getUrlHotleCode() {
+        ServletRequestAttributes servletRequestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        HttpServletRequest request = servletRequestAttributes.getRequest();
+        String serverName = request.getServerName();
+        if(serverName!=null&&serverName.endsWith(".pms.rooibook.com")){
+            return  serverName.substring(0,serverName.indexOf("."));
+        }else{
+            return null;
         }
     }
 }
