@@ -5,6 +5,7 @@ import lombok.Data;
 
 import javax.persistence.*;
 import java.util.List;
+import java.util.Set;
 
 @Data
 @Table(name = "t_report_row_def")
@@ -16,5 +17,5 @@ public class ReportRowDefinition extends PersistenceModel {
     private Integer sortNum;
     @ManyToMany(fetch = FetchType.EAGER)
     @OrderBy("sortNum")
-    private List<ReportCellDefinition> cells;
+    private Set<ReportCellDefinition> cells;
 }
