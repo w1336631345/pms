@@ -100,7 +100,7 @@ public class NightAuditServiceImpl implements NightAuditService {
         HttpResponse hr = new HttpResponse();
         //入账只入当前营业日期的账
         LocalDate businessDate = businessSeqService.getBuinessDate(loginUser.getHotelCode());
-        List<Map<String, Object>> listCount = checkInRecordDao.getStatistics(loginUser.getHotelCode());
+        List<Map<String, Object>> listCount = checkInRecordDao.getStatistics(loginUser.getHotelCode(), businessDate);
         int s = 0, n = 0, i = 0, x = 0, r=0;
         for(int l=0; l<listCount.size(); l++){
             Map<String, Object> map = listCount.get(l);

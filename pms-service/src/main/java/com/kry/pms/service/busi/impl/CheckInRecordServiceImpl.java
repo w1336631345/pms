@@ -1136,12 +1136,13 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 
     @Override
     public PageResponse<Map<String, Object>> unreturnedGuests(int pageIndex, int pageSize, String mainNum, String status, User user) {
+        LocalDate businessDate = businessSeqService.getBuinessDate(user.getHotelCode());
         Pageable page = org.springframework.data.domain.PageRequest.of(pageIndex - 1, pageSize);
         String hotelCode = null;
         if (user != null) {
             hotelCode = user.getHotelCode();
         }
-        Page<Map<String, Object>> p = checkInRecordDao.unreturnedGuests(page, mainNum, status, hotelCode);
+        Page<Map<String, Object>> p = checkInRecordDao.unreturnedGuests(page, mainNum, status, hotelCode, businessDate);
         PageResponse<Map<String, Object>> pr = new PageResponse<>();
         pr.setPageSize(p.getNumberOfElements());
         pr.setPageCount(p.getTotalPages());
@@ -1153,11 +1154,12 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 
     @Override
     public List<Map<String, Object>> getStatistics(User user) {
+        LocalDate businessDate = businessSeqService.getBuinessDate(user.getHotelCode());
         String hotelCode = null;
         if (user != null) {
             hotelCode = user.getHotelCode();
         }
-        List<Map<String, Object>> list = checkInRecordDao.getStatistics(hotelCode);
+        List<Map<String, Object>> list = checkInRecordDao.getStatistics(hotelCode, businessDate);
         return list;
     }
 
@@ -1961,6 +1963,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
             checkInRecord.setTogetherCode(cir.getTogetherCode());
         }
         checkInRecordDao.save(checkInRecord);
+        roomStatisticsService.addTogether(new CheckInRecordWrapper(checkInRecord));
         roomRecordService.createRoomRecord(checkInRecord);
         List<CheckInRecord> main = checkInRecordDao.findByOrderNumAndTypeAndDeleted(orderNum, Constants.Type.CHECK_IN_RECORD_GROUP, Constants.DELETED_FALSE);
         if (main != null && !main.isEmpty()) {
