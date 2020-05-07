@@ -136,7 +136,7 @@ public class NightAuditServiceImpl implements NightAuditService {
         List<Map<String, Object>> list = roomRecordService.accountEntryListAllMap(businessDate, loginUser.getHotelCode(), "NO");
         Employee emp = employeeService.findByUser(loginUser);
 //        billService.putAcount(list, businessDate, emp, shiftCode);
-        billService.putAcountMap(list, businessDate, emp, shiftCode);
+        billService.putAcountMap(list, businessDate, emp, shiftCode, loginUser.getHotelCode());
         //入账完成，记录入账记录
         DailyVerify dv = new DailyVerify();
         dv.setOperationEmployee(emp);

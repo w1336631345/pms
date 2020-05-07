@@ -39,7 +39,7 @@ public interface BillService extends BaseService<Bill> {
 	void putAcount(List<RoomRecord> ids, LocalDate businessDate, Employee emp, String shiftCode);
 
     // 夜审手动入账(优化)
-    void putAcountMap(List<Map<String, Object>> list, LocalDate businessDate, Employee emp, String shiftCode);
+    void putAcountMap(List<Map<String, Object>> list, LocalDate businessDate, Employee emp, String shiftCode, String hotelCode);
 
     //夜审自动入账
 	void putAcountAUTO(List<RoomRecord> ids, LocalDate businessDate);

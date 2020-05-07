@@ -407,6 +407,19 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
         return rep.addData(checkInRecordService.querySummaryListToBySql(getCurrentHotleCode(), parse2CommonPageRequest(request)));
     }
     /**
+     * 功能描述: <br>历史住客
+     * 〈〉
+     * @Param: [request]
+     * @Return: com.kry.pms.base.HttpResponse<com.kry.pms.base.PageResponse<java.util.Map<java.lang.String,java.lang.Object>>>
+     * @Author: huanghaibin
+     * @Date: 2020/5/6 16:59
+     */
+    @GetMapping(path = "/summaryToHis")
+    public HttpResponse<PageResponse<Map<String, Object>>> resverListHis(HttpServletRequest request) throws IOException, TemplateException, IllegalAccessException, InstantiationException {
+        HttpResponse<PageResponse<Map<String, Object>>> rep = new HttpResponse<PageResponse<Map<String, Object>>>();
+        return rep.addData(checkInRecordService.resverListHis(getCurrentHotleCode(), parse2CommonPageRequest(request)));
+    }
+    /**
      * 功能描述: <br>预订列表的合计
      * 〈〉
      * @Param: [request]

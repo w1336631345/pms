@@ -82,7 +82,9 @@ public interface CheckInRecordService extends BaseService<CheckInRecord> {
 
     PageResponse<Map<String, Object>> querySummaryListToBySql(String hotelCode, PageRequest pageRequest) throws IOException, TemplateException;
 
-	List<Map<String, Object>> querySummaryListToBySqlTotal(String hotelCode, Map<String, Object> params) throws IOException, TemplateException;
+    PageResponse<Map<String, Object>> resverListHis(String hotelCode, PageRequest pageRequest) throws IOException, TemplateException;
+
+    List<Map<String, Object>> querySummaryListToBySqlTotal(String hotelCode, Map<String, Object> params) throws IOException, TemplateException;
 
 	public List<CheckInRecord> findByOrderNum(String orderNum);
 
