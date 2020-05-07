@@ -106,21 +106,33 @@ public class RoomStatisticsServiceImpl implements RoomStatisticsService {
 
     @Override
     public boolean extendTime(UseInfoAble info, LocalDateTime newStartTime, LocalDateTime newEndTime) {
-        roomTypeQuantityService.extendTime(info.roomType(), ((CheckInRecord) info.getSource()).getStatus(), info.getStartTime(), info.getEndTime(), newStartTime, newEndTime);
-        if (newStartTime != null) {
-            newStartTime = LocalDateTime.of(newStartTime.toLocalDate(), LocalTime.NOON);
-        }
-        if (newEndTime != null) {
-            newEndTime = LocalDateTime.of(newEndTime.toLocalDate(), LocalTime.NOON);
-        }
-        if (newStartTime == null || newStartTime.isEqual(info.getStartTime())) {
-            if (newEndTime == null || (newEndTime != null && newEndTime.isEqual(info.getEndTime()))) {
-                return true;
-            } else {
-                return extendTime(info, newEndTime.toLocalDate());
+        if (!info.useType().equals(Constants.Type.CHECK_IN_RECORD_RESERVE)) {
+            CheckInRecord cir = (CheckInRecord) info.getSource();
+            String roomUseStatus = null;
+            if(cir.getStatus().equals(Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION)){
+                roomUseStatus = Constants.Status.ROOM_USAGE_ASSIGN;
+            }else{
+                roomUseStatus = cir.getStatus();
             }
-        } else {
-            return roomUsageService.extendTime(info, newStartTime, newEndTime);
+            roomTypeQuantityService.extendTime(info.roomType(), roomUseStatus, info.getStartTime(), info.getEndTime(), newStartTime, newEndTime);
+            if (newStartTime != null) {
+                newStartTime = LocalDateTime.of(newStartTime.toLocalDate(), LocalTime.NOON);
+            }
+            if (newEndTime != null) {
+                newEndTime = LocalDateTime.of(newEndTime.toLocalDate(), LocalTime.NOON);
+            }
+            if (newStartTime == null || newStartTime.isEqual(info.getStartTime())) {
+                if (newEndTime == null || (newEndTime != null && newEndTime.isEqual(info.getEndTime()))) {
+                    return true;
+                } else {
+                    return extendTime(info, newEndTime.toLocalDate());
+                }
+            } else {
+                return roomUsageService.extendTime(info, newStartTime, newEndTime);
+            }
+        }else{
+            roomTypeQuantityService.extendTime(info.roomType(), ((CheckInRecord) info.getSource()).getStatus(), info.getStartTime(), info.getEndTime(), newStartTime, newEndTime);
+            return true;
         }
     }
 

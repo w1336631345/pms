@@ -116,7 +116,7 @@ public class CheckInRecordWrapper implements UseInfoAble {
 
     @Override
     public String useType() {
-        return null;
+        return this.checkInRecord.getType();
     }
 
     @Override
