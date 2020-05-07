@@ -668,6 +668,18 @@ public class RoomUsageServiceImpl implements RoomUsageService {
         return false;
     }
 
+    @Override
+    public boolean addTogether(UseInfoAble info) {
+        RoomUsage ru = roomUsageDao.findByGuestRoomIdAndBusinesskey(info.guestRoom().getId(), info.getBusinessKey());
+        if(ru!=null){
+            ru.getUniqueIds().add(info.uniqueId());
+            modify(ru);
+            return true;
+        }else{
+            return false;
+        }
+    }
+
     private boolean use(GuestRoom gr,String status, LocalDateTime startTime, LocalDateTime endTime,
                         String businesskey, String businessInfo,String uniqueId){
         RoomUsage ru = roomUsageDao.queryGuestRoomUsable(gr.getId(), startTime, endTime);

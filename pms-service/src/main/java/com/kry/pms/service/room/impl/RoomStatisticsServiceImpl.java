@@ -142,6 +142,11 @@ public class RoomStatisticsServiceImpl implements RoomStatisticsService {
         return false;
     }
 
+    @Override
+    public boolean addTogether(UseInfoAble useInfoAble) {
+        return roomUsageService.addTogether(useInfoAble);
+    }
+
 
     @Override
     public boolean cancelCheckOut(UseInfoAble info) {

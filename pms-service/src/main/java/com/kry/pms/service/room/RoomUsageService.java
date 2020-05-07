@@ -115,4 +115,6 @@ public interface RoomUsageService extends BaseService<RoomUsage> {
     boolean extendTime(UseInfoAble info, LocalDateTime newStartTime, LocalDateTime newEndTime);
 
     boolean changeRoom(UseInfoAble info, GuestRoom newGuestRoom, LocalDateTime changeTime);
+
+    boolean addTogether(UseInfoAble useInfoAble);
 }
