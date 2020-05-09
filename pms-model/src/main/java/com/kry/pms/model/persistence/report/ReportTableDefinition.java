@@ -27,7 +27,7 @@ public class ReportTableDefinition extends PersistenceModel {
     private String dataType;//数据类型
     @Column
     private String dataValue;//数据值
-    @Column(columnDefinition = "varchar(6000)")
+    @Column
     private String webTemplateType;
     @Column
     private String webTemplate;
@@ -35,7 +35,7 @@ public class ReportTableDefinition extends PersistenceModel {
     private String exportTemplete;
     @Column
     private String exportTempleteType;
-    @Column(columnDefinition = "varchar(2000)")
+    @Column
     private String baseTempleteType;
     @Column
     private String baseTemplete;
