@@ -175,12 +175,20 @@ public class SqlTemplateServiceImpl implements SqlTemplateService {
     public PageResponse<Map<String, Object>> queryForPage(String hotelCode, String code, PageRequest<Map<String, Object>> pageRequest) throws IOException, TemplateException {
 //        SqlTemplate st = sqlTemplateDao.findByHotelCodeAndCode(hotelCode, code);
         SqlTemplate st = sqlTemplateDao.findByCode(code);
-        PageResponse<Map<String, Object>> rep = new PageResponse<>();
+        pageRequest.getExb().put("hotelCode",hotelCode);
         if (st != null) {
-            String templateValue = st.getSql();
+           return queryForPage(st.getSql(),pageRequest);
+        }
+        return null;
+    }
+
+    @Override
+    public PageResponse<Map<String, Object>> queryForPage(String sql, PageRequest<Map<String, Object>> pageRequest) throws IOException, TemplateException {
+        PageResponse<Map<String, Object>> rep = new PageResponse<>();
+        if (sql != null) {
+            String templateValue = sql;
             StringWriter stringWriter = new StringWriter();
-            Template template = new Template(hotelCode, templateValue, configuration);
-            pageRequest.getExb().put("hotelCode",hotelCode);
+            Template template = new Template("temp", templateValue, configuration);
             template.process(pageRequest.getExb(), stringWriter);
             String data = stringWriter.toString();
             stringWriter.close();

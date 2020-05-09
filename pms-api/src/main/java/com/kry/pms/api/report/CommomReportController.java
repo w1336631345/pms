@@ -1,5 +1,6 @@
 package com.kry.pms.api.report;
 
+import com.kry.pms.api.BaseController;
 import com.kry.pms.base.HttpResponse;
 import com.kry.pms.model.http.response.report.CommomReportTableData;
 import com.kry.pms.service.report.CommomReportService;
@@ -15,13 +16,13 @@ import java.io.IOException;
 
 @RestController
 @RequestMapping(path = "/api/v1/report/commomReport")
-public class CommomReportController {
+public class CommomReportController extends BaseController {
     @Autowired
     CommomReportService commomReportService;
     @GetMapping("/{id}")
     public HttpResponse<CommomReportTableData> fetchData(@PathVariable("id") String id, HttpServletRequest request) throws IOException, TemplateException {
         HttpResponse<CommomReportTableData> rep = new HttpResponse<>();
-        rep.setData(commomReportService.fetchCommonReport(id, request.getParameterMap()));
+        rep.setData(commomReportService.fetchCommonReport(id,parse2Map(request)));
         return rep;
     }
 

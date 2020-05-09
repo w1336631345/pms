@@ -1,7 +1,9 @@
 package com.kry.pms.base;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 
@@ -15,6 +17,7 @@ public class PageRequest<T> {
 	private int pageNum = 0;
 	private List<String> orderBy;
 	private boolean isAsc = true;
+
 
 	public T getExb() {
 		return exb;
@@ -69,5 +72,20 @@ public class PageRequest<T> {
 		}
 		this.orderBy.add(order);
 	}
-
+	public static PageRequest<Map<String,Object>> parseFormMap(Map<String,Object> data){
+		PageRequest<Map<String, Object>> pr = new PageRequest<>();
+		if (data.containsKey(Constants.KEY_PAGE_SIZE)) {
+			pr.setPageSize(Integer.valueOf(data.get(Constants.KEY_PAGE_SIZE).toString()));
+		}
+		if (data.containsKey(Constants.KEY_PAGE_NUM)) {
+			pr.setPageNum(Integer.valueOf(data.get(Constants.KEY_PAGE_NUM).toString()) - 1);
+		}
+//		if (data.containsKey(Constants.KEY_ORDER)) {
+//			pr.setOrderBy(Arrays.asList(data.get(Constants.KEY_ORDER)));
+//		}
+		if (data.containsKey(Constants.KEY_SHORT_ASC)) {
+			pr.setAsc(Boolean.valueOf(data.get(Constants.KEY_SHORT_ASC).toString()));
+		}
+		return pr;
+	}
 }

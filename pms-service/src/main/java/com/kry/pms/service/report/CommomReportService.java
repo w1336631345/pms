@@ -7,5 +7,5 @@ import java.io.IOException;
 import java.util.Map;
 
 public interface CommomReportService {
-    public CommomReportTableData fetchCommonReport(String id,Map<String, String[]> params) throws IOException, TemplateException;
+    public CommomReportTableData fetchCommonReport(String id,Map<String, Object> params) throws IOException, TemplateException;
 }

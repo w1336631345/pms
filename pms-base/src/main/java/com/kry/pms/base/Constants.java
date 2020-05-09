@@ -102,6 +102,7 @@ public class Constants {
 
 		public static final String REPORT_TABLE_DEF_TEMPLATE = "TEMPLATE";
 		public static final String REPORT_TABLE_DEF_TABLE = "TABLE";
+		public static final String REPORT_TABLE_DEF_PAGE = "PAGE";
 
 		public static final String CONFIG_USER = "U";
 		public static final String CONFIG_OPERATION = "O";

@@ -21,9 +21,11 @@ public interface SqlTemplateService extends BaseService<SqlTemplate> {
 
     public List processTemplateQuery(String hotelCode, String templateName, String templateValue, Object object, Class resultClass);
 
-    List<Map<String, Object>> processTemplateQuery(String templateName, String templateValue, Map<String, String[]> parmrs) throws IOException, TemplateException;
+    List<Map<String, Object>> processTemplateQuery(String templateName, String templateValue, Map<String, Object> parmrs) throws IOException, TemplateException;
 
     List<Map<String, Object>> processByCode(String hotelCode, String code, Map<String, Object> parmrs) throws IOException, TemplateException;
 
     PageResponse<Map<String, Object>> queryForPage(String hotelCode, String code, PageRequest<Map<String, Object>> pageRequest) throws IOException, TemplateException;
+
+    PageResponse<Map<String, Object>> queryForPage(String sql, PageRequest<Map<String, Object>> pageRequest) throws IOException, TemplateException;
 }

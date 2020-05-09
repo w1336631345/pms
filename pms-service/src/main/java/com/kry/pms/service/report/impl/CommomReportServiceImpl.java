@@ -3,6 +3,8 @@ package com.kry.pms.service.report.impl;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.kry.pms.base.Constants;
+import com.kry.pms.base.PageRequest;
+import com.kry.pms.base.PageResponse;
 import com.kry.pms.model.http.response.report.CommomReportTableData;
 import com.kry.pms.model.http.response.report.ReportTableColumn;
 import com.kry.pms.model.persistence.report.ReportTableDefinition;
@@ -32,23 +34,25 @@ public class CommomReportServiceImpl implements CommomReportService {
     Configuration configuration;
 
     @Override
-    public CommomReportTableData fetchCommonReport(String id, Map<String, String[]> params) throws IOException, TemplateException {
+    public CommomReportTableData fetchCommonReport(String id, Map<String, Object> params) throws IOException, TemplateException {
         ReportTableDefinition rd = reportTableDefinitionService.findById(id);
         CommomReportTableData data = new CommomReportTableData();
         if (rd != null) {
             data.setType(rd.getType());
-            if(rd.getType().equals(Constants.Type.REPORT_TABLE_DEF_TABLE)){
+            if (rd.getType().equals(Constants.Type.REPORT_TABLE_DEF_TABLE)) {
                 data.setColumns(createColumns(rd));
                 data.setData(sqlTemplateService.processTemplateQuery(rd.getGroupKey() + rd.getCode(), rd.getDataValue(), params));
                 data.setName(rd.getName());
-            }else if(rd.getType().equals(Constants.Type.REPORT_TABLE_DEF_TEMPLATE)){
-                data = fetchTemplate(rd,params);
+            } else if (rd.getType().equals(Constants.Type.REPORT_TABLE_DEF_TEMPLATE)) {
+                data = fetchTemplate(rd, params);
+            } else if (rd.getType().equals(Constants.Type.REPORT_TABLE_DEF_PAGE)) {
+                data.setPage(sqlTemplateService.queryForPage(rd.getDataValue(), PageRequest.parseFormMap(params)));
             }
         }
         return data;
     }
 
-    private CommomReportTableData fetchTemplate(ReportTableDefinition rd, Map<String, String[]> params) throws IOException, TemplateException {
+    private CommomReportTableData fetchTemplate(ReportTableDefinition rd, Map<String, Object> params) throws IOException, TemplateException {
         CommomReportTableData rep = new CommomReportTableData();
         rep.setType(rd.getType());
         List<Map<String, Object>> data = sqlTemplateService.processTemplateQuery(rd.getGroupKey() + rd.getCode(), rd.getDataValue(), params);
