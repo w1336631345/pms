@@ -1,6 +1,7 @@
 package com.kry.pms.service.report;
 
 import com.kry.pms.base.DtoResponse;
+import com.kry.pms.model.http.response.report.ReportTableDefinitionListVo;
 import com.kry.pms.model.persistence.report.ReportTableDefinition;
 import com.kry.pms.service.BaseService;
 
@@ -13,4 +14,5 @@ public interface ReportTableDefinitionService extends BaseService<ReportTableDef
 
     public DtoResponse<List<Map<String, Object>>> fetchData(String id, LocalDate quantityDate, String hotelCode);
 
+    List<ReportTableDefinitionListVo> groupKey(String groupKey);
 }

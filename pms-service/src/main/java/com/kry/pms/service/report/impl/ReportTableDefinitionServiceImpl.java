@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.kry.pms.base.DtoResponse;
+import com.kry.pms.model.http.response.report.ReportTableDefinitionListVo;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
@@ -100,5 +101,10 @@ public class ReportTableDefinitionServiceImpl implements ReportTableDefinitionSe
     @Override
     public DtoResponse<List<Map<String, Object>>> fetchData(String id, LocalDate quantityDate, String hotelCode) {
         return null;
+    }
+
+    @Override
+    public List<ReportTableDefinitionListVo> groupKey(String groupKey) {
+        return reportTableDefinitionDao.groupKey(groupKey);
     }
 }
