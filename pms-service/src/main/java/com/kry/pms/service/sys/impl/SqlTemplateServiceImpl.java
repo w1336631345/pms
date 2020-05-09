@@ -139,7 +139,7 @@ public class SqlTemplateServiceImpl implements SqlTemplateService {
     }
 
     @Override
-    public List<Map<String, Object>> processTemplateQuery(String templateName, String templateValue, Map<String, String[]> parmrs) throws IOException, TemplateException {
+    public List<Map<String, Object>> processTemplateQuery(String templateName, String templateValue, Map<String, Object> parmrs) throws IOException, TemplateException {
         StringWriter stringWriter = new StringWriter();
         Template template = new Template(templateName, templateValue, configuration);
         template.process(parmrs, stringWriter);

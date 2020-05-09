@@ -41,12 +41,17 @@ public class CommomReportServiceImpl implements CommomReportService {
             data.setType(rd.getType());
             if (rd.getType().equals(Constants.Type.REPORT_TABLE_DEF_TABLE)) {
                 data.setColumns(createColumns(rd));
-                data.setData(sqlTemplateService.processTemplateQuery(rd.getGroupKey() + rd.getCode(), rd.getDataValue(), params));
+                if(rd.getDataValue()!=null){
+                    data.setData(sqlTemplateService.processTemplateQuery(rd.getGroupKey() + rd.getCode(), rd.getDataValue(), params));
+                }
                 data.setName(rd.getName());
             } else if (rd.getType().equals(Constants.Type.REPORT_TABLE_DEF_TEMPLATE)) {
                 data = fetchTemplate(rd, params);
             } else if (rd.getType().equals(Constants.Type.REPORT_TABLE_DEF_PAGE)) {
-                data.setPage(sqlTemplateService.queryForPage(rd.getDataValue(), PageRequest.parseFormMap(params)));
+                data.setColumns(createColumns(rd));
+                if(rd.getDataValue()!=null){
+                    data.setPage(sqlTemplateService.queryForPage(rd.getDataValue(), PageRequest.parseFormMap(params)));
+                }
             }
         }
         return data;
