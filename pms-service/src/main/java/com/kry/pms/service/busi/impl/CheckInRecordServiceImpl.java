@@ -4,6 +4,7 @@ import com.kry.pms.base.*;
 import com.kry.pms.dao.busi.CheckInRecordDao;
 import com.kry.pms.dao.busi.RoomLinkDao;
 import com.kry.pms.dao.marketing.RoomPriceSchemeDao;
+import com.kry.pms.model.annotation.UpdateAnnotation;
 import com.kry.pms.model.http.request.busi.*;
 import com.kry.pms.model.http.response.busi.AccountSummaryVo;
 import com.kry.pms.model.http.response.busi.CheckInRecordListVo;
@@ -21,14 +22,17 @@ import com.kry.pms.model.persistence.sys.User;
 import com.kry.pms.service.busi.CheckInRecordService;
 import com.kry.pms.service.busi.RoomRecordService;
 import com.kry.pms.service.guest.CustomerService;
+import com.kry.pms.service.log.UpdateLogService;
 import com.kry.pms.service.room.*;
 import com.kry.pms.service.sys.AccountService;
 import com.kry.pms.service.sys.BusinessSeqService;
 import com.kry.pms.service.sys.SqlTemplateService;
 import com.kry.pms.service.sys.SystemConfigService;
+import com.kry.pms.service.util.BeanChangeUtil;
 import com.kry.pms.service.util.UpdateUtil;
 import freemarker.template.TemplateException;
 import org.apache.commons.collections4.MapUtils;
+import org.springframework.aop.framework.AopContext;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
@@ -44,6 +48,7 @@ import javax.persistence.criteria.*;
 import javax.transaction.Transactional;
 import java.io.IOException;
 import java.lang.reflect.Array;
+import java.lang.reflect.InvocationTargetException;
 import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -82,6 +87,10 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
     RoomPriceSchemeDao roomPriceSchemeDao;
     @Autowired
     GuestRoomStatusService guestRoomStatusService;
+    @Autowired
+    BeanChangeUtil beanChangeUtil;
+    @Autowired
+    UpdateLogService updateLogService;
 
     @Override
     public CheckInRecord add(CheckInRecord checkInRecord) {
@@ -113,9 +122,12 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 
     @Override
     @Transactional
+    @UpdateAnnotation(name = "订单号", value = "orderNum")
     public HttpResponse modifyInfo(CheckInRecord checkInRecord) {
         HttpResponse hr = new HttpResponse();
         CheckInRecord dbCir = checkInRecordDao.getOne(checkInRecord.getId());
+//        CheckInRecord oldCir = new CheckInRecord();
+//        BeanUtils.copyProperties(dbCir, oldCir);
         boolean updateRoomPriceS = false;
         boolean updateName = false;
         boolean updateTime = false;
@@ -154,7 +166,9 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                     }
                     //修改所有主单下数据的房价码
                     cir.setRoomPriceScheme(checkInRecord.getRoomPriceScheme());
-                    cir.setPersonalPrice(price * cir.getPersonalPercentage());
+                    if(!Constants.Type.CHECK_IN_RECORD_RESERVE.equals(cir.getType())){
+                        cir.setPersonalPrice(price * cir.getPersonalPercentage());
+                    }
                     String setMealId = MapUtils.getString(map, "setMealId");
                     if (setMealId != null) {
                         SetMeal sm = new SetMeal();
@@ -239,6 +253,12 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                 }
             }
         }
+//        String str = beanChangeUtil.contrastObj(oldCir, checkInRecord);
+//        if (str.equals("")) {
+//            System.out.println("未有改变");
+//        } else {
+//            System.out.println(str);
+//        }
         hr.addData(checkInRecordDao.saveAndFlush(checkInRecord));
         boolean b = roomStatisticsService.updateGuestRoomStatus(new CheckInRecordWrapper(checkInRecord));
         if (!b) {
@@ -278,6 +298,15 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                     newRemark = oldRemark;
                 }
             }
+            //以下是记录日志代码
+            CheckInRecord cirLog = new CheckInRecord();
+            BeanUtils.copyProperties(checkUpdateItemTestBo, cirLog);
+            cirLog.setId(ids[i]);
+            cirLog.setRemark(newRemark);
+            cirLog.setOrderNum(cir.getOrderNum());
+            cirLog.setHotelCode(cir.getHotelCode());
+            updateLogService.updateCirAllLog(cirLog);
+            //以上是记录日志代码
             cir.setRemark(newRemark);
             boolean updateTime = false;
             LocalDateTime at = checkUpdateItemTestBo.getArriveTime();
@@ -331,6 +360,14 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
             checkInRecordDao.save(cir);
             roomStatisticsService.updateGuestRoomStatus(new CheckInRecordWrapper(cir));
         }
+        return hr;
+    }
+    //仅仅是为了批量操作记录日志，不做任何处理
+    @Override
+    @UpdateAnnotation(name = "订单号", value = "orderNum")
+    public HttpResponse updateAllLog(CheckInRecord checkInRecord){
+        HttpResponse hr = new HttpResponse();
+        hr.addData(checkInRecord);
         return hr;
     }
 
@@ -1124,7 +1161,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
     public PageResponse<Map<String, Object>> accountEntryListMap(int pageIndex, int pageSize, User user) {
         Pageable page = org.springframework.data.domain.PageRequest.of(pageIndex - 1, pageSize);
         LocalDate businessDate = businessSeqService.getBuinessDate(user.getHotelCode());
-        Page<Map<String, Object>> p = checkInRecordDao.accountEntryListMap(page, user.getHotelCode(), businessDate, null);
+        Page<Map<String, Object>> p = checkInRecordDao.accountEntryListMap(page, user.getHotelCode(), businessDate, Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN);
         PageResponse<Map<String, Object>> pr = new PageResponse<>();
         pr.setPageSize(p.getNumberOfElements());
         pr.setPageCount(p.getTotalPages());

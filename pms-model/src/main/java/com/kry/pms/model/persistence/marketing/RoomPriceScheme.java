@@ -7,6 +7,7 @@ import java.util.List;
 
 import javax.persistence.*;
 
+import com.kry.pms.model.annotation.PropertyMsg;
 import com.kry.pms.model.persistence.PersistenceModel;
 
 import com.kry.pms.model.persistence.goods.SetMeal;
@@ -27,6 +28,7 @@ public class RoomPriceScheme extends PersistenceModel {
 	@Column
 	private String code;
 	@Column
+	@PropertyMsg("房价方案名称")
 	private String name;
 	@Column
 	private Boolean isDefault;

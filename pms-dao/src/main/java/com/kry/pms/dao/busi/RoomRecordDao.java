@@ -45,7 +45,8 @@ public interface RoomRecordDao extends BaseDao<RoomRecord>{
 			" from t_room_record trr \n" +
 			"  left join t_checkin_record tcr on trr.check_in_record_id = tcr.id \n" +
 			"  left join t_set_meal tsm on tcr.set_meal_id = tsm.id \n" +
-			" where trr.record_date = ?1 \n" +
+			" where 1=1 and tcr.`status` = 'I' " +
+			"  and trr.record_date = ?1 \n" +
 			"  and trr.hotel_code = ?2 \n" +
 			"  and trr.is_account_entry = ?3 ")
 	List<Map<String, Object>> auditRoomRecord(LocalDate recordDate, String hotelCode, String isAccountEntry);

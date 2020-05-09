@@ -131,7 +131,7 @@ public class NightAuditServiceImpl implements NightAuditService {
         if(dailyVerify != null){
             return hr.error("今日入账完成，请明日再进行入账操作");
         }
-        //默认手动点击入账为当前营业日期的账
+        //默认手动点击入账为当前营业日期的账(入住状态)
 //        List<RoomRecord> list = roomRecordService.accountEntryListAll(loginUser.getHotelCode(), businessDate);
         List<Map<String, Object>> list = roomRecordService.accountEntryListAllMap(businessDate, loginUser.getHotelCode(), "NO");
         Employee emp = employeeService.findByUser(loginUser);
