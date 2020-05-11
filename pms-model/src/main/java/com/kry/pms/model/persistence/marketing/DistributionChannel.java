@@ -4,6 +4,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
+import com.kry.pms.model.annotation.PropertyMsg;
 import com.kry.pms.model.persistence.PersistenceModel;
 
 import lombok.Getter;
@@ -22,6 +23,7 @@ public class DistributionChannel extends PersistenceModel {
 	@Column
 	private String code;
 	@Column
+	@PropertyMsg("渠道名称")
 	private String name;
 	@Column
 	private String description;

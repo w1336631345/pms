@@ -4,6 +4,7 @@ import com.kry.pms.base.DtoResponse;
 import com.kry.pms.base.HttpResponse;
 import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
+import com.kry.pms.model.annotation.UpdateAnnotation;
 import com.kry.pms.model.http.request.busi.CheckInBo;
 import com.kry.pms.model.http.request.busi.CheckInRecordListBo;
 import com.kry.pms.model.http.request.busi.CheckUpdateItemTestBo;
@@ -35,7 +36,11 @@ public interface CheckInRecordService extends BaseService<CheckInRecord> {
 
 	HttpResponse updateAll(CheckUpdateItemTestBo checkUpdateItemTestBo);
 
-	HttpResponse cancelIn(String[] ids, String hotelCode);
+    //仅仅是为了批量操作记录日志，不做任何处理
+    @UpdateAnnotation(name = "订单号", value = "orderNum")
+    HttpResponse updateAllLog(CheckInRecord checkInRecord);
+
+    HttpResponse cancelIn(String[] ids, String hotelCode);
 
 	public void checkIn(CheckInBo checkInBo, DtoResponse<List<CheckInRecord>> rep);
 

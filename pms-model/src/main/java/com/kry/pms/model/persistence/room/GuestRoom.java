@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.persistence.*;
 
+import com.kry.pms.model.annotation.PropertyMsg;
 import com.kry.pms.model.persistence.PersistenceModel;
 
 import lombok.Getter;
@@ -20,6 +21,7 @@ public class GuestRoom extends PersistenceModel {
 	private List<RoomTag> tags;
 	@ManyToOne(fetch = FetchType.LAZY)
 	private Floor floor;
+	@PropertyMsg("房号")
 	@Column(columnDefinition = "varchar(40) default NUll COMMENT '房间号'")
 	private String roomNum;
 	@Column(columnDefinition = "varchar(400) default NUll COMMENT '主图'")

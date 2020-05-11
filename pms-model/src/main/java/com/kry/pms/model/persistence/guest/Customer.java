@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.persistence.*;
 
+import com.kry.pms.model.annotation.PropertyMsg;
 import com.kry.pms.model.persistence.PersistenceModel;
 import com.kry.pms.model.persistence.busi.CheckInRecord;
 import com.kry.pms.model.persistence.marketing.RoomPriceScheme;
@@ -21,6 +22,7 @@ import lombok.Setter;
 @Table(name = "t_customer")
 public class Customer extends PersistenceModel {
 	@Column
+	@PropertyMsg("名称")
 	private String name;
 	@ManyToMany
 	private List<CustomerInvoiceInfo> invoiceInfos;

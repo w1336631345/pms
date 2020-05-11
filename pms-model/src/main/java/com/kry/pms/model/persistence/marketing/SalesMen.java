@@ -10,6 +10,7 @@ import javax.persistence.ManyToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+import com.kry.pms.model.annotation.PropertyMsg;
 import com.kry.pms.model.persistence.PersistenceModel;
 import com.kry.pms.model.persistence.dict.Area;
 import com.kry.pms.model.persistence.org.Employee;
@@ -29,6 +30,7 @@ public class SalesMen extends PersistenceModel{
 	@Column
 	private String sex;// 性别
 	@Column
+	@PropertyMsg("销售员姓名")
 	private String name;// 姓名
 	@Column
 	private LocalDate birthDate;// 生日

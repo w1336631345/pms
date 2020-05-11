@@ -3,6 +3,7 @@ package com.kry.pms.model.persistence.busi;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kry.pms.model.annotation.Log;
+import com.kry.pms.model.annotation.PropertyMsg;
 import com.kry.pms.model.persistence.PersistenceModel;
 import com.kry.pms.model.persistence.goods.SetMeal;
 import com.kry.pms.model.persistence.guest.Customer;
@@ -32,11 +33,14 @@ public class CheckInRecord extends PersistenceModel {
 	@OneToOne(fetch=FetchType.LAZY)
 	private RoomPriceSchemeItem priceSchemeItem;// 房价方案
 	@OneToOne(fetch=FetchType.LAZY)
+	@PropertyMsg("房间")
 	private GuestRoom guestRoom;// 房间
 	@Column(name = "name_")
+	@PropertyMsg("姓名")
 	private String name;// 姓名
 	@OneToOne(fetch=FetchType.LAZY)
 	@JsonIgnoreProperties(value={"hibernateLazyInitializer","handler","fieldHandler"})
+    @PropertyMsg("房价方案")
 	private RoomPriceScheme roomPriceScheme;// 房价方案
 	@OneToOne(fetch=FetchType.LAZY)
 	private RoomType roomType;// 房间类型
@@ -68,10 +72,12 @@ public class CheckInRecord extends PersistenceModel {
 	@Column
 	private Integer childCount;//小孩数量
 	@Column
+	@PropertyMsg("房间数")
 	private Integer roomCount;// 房间数
 	@Column
 	private Integer chrildrenCount;// 子单数
 	@Column
+	@PropertyMsg("到店时间")
 	private LocalDateTime arriveTime;// 到达时间
 	@Column
 	@Log(operationName = "actual_time_of_arrive")
@@ -83,6 +89,7 @@ public class CheckInRecord extends PersistenceModel {
 	@Column
 	private Double originalPrice;//原价
 	@Column
+	@PropertyMsg("定价")
 	private Double purchasePrice;// 成交价格
 	@Column
 	private Double personalPrice;// 个人承担价格
@@ -93,10 +100,12 @@ public class CheckInRecord extends PersistenceModel {
 	@Column
 	private Integer days;// 入住天数
 	@Column
-	private String holdTime;
+	@PropertyMsg("保留时效")
+	private String holdTime;//保留时效
 	@Column
 	private Integer singleRoomCount;// 单房人数
 	@Column
+	@PropertyMsg("离店时间")
 	private LocalDateTime leaveTime;// 离店时间
 	@Column(columnDefinition = "varchar(64) default '0000' COMMENT '入住编号'")
 	private String checkInSn;
@@ -115,24 +124,31 @@ public class CheckInRecord extends PersistenceModel {
 	@Transient
 	private String roomTypeId;// 房间类型id
 	@Column
+	@PropertyMsg("预订人")
 	private String contactName;// 预订人
 	@Column
+	@PropertyMsg("预订人电话")
 	private String contactMobile;// 预订人电话
+	@PropertyMsg("市场")
 	@OneToOne(fetch=FetchType.LAZY)
 	private MarketingSources marketingSources;// 市场来源
 //	@OneToOne
 //	private ProtocolCorpation protocolCorpation;// 协议单位
 	@ManyToOne
+	@PropertyMsg("单位")
 	private Customer corp;//协议单位
 	@OneToOne(fetch=FetchType.LAZY)
 	private Employee operationEmployee;// 操作人
 	@OneToOne(fetch=FetchType.LAZY)
+	@PropertyMsg("渠道")
 	private DistributionChannel distributionChannel;// 市场渠道
 //	@OneToOne
 //	private Employee marketEmployee;// 销售员
 	@OneToOne(fetch=FetchType.LAZY)
+	@PropertyMsg("销售员")
 	private SalesMen salesMen;
 	@Column
+	@PropertyMsg("订单备注")
 	private String remark;
 	@Transient
 	private String mainRecordId;// 主单id
@@ -163,6 +179,7 @@ public class CheckInRecord extends PersistenceModel {
 	@CollectionTable(name="t_room_requirement")
 	private List<String> roomRequirement;//客房要求
 	@Column
+	@PropertyMsg("房价保密")
 	private Boolean isSecrecy;//房价是否保密
 	@Column
 	private String externalOrder;//外部订单号

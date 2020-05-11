@@ -9,7 +9,7 @@ import javax.transaction.Transactional;
 public interface RoomChangeRecordService extends BaseService<RoomChangeRecord> {
 
 
-    HttpResponse save(String hotelCode, RoomChangeRecord entity);
+    HttpResponse save(RoomChangeRecord entity);
 
     @Transactional
     HttpResponse saveOld(String hotelCode, RoomChangeRecord entity);

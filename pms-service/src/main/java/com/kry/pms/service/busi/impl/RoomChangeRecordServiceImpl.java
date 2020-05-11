@@ -8,14 +8,17 @@ import com.kry.pms.dao.busi.CheckInRecordDao;
 import com.kry.pms.dao.busi.RoomChangeRecordDao;
 import com.kry.pms.dao.busi.RoomRecordDao;
 import com.kry.pms.dao.room.GuestRoomDao;
+import com.kry.pms.model.annotation.PropertyMsg;
 import com.kry.pms.model.other.wrapper.CheckInRecordWrapper;
 import com.kry.pms.model.persistence.busi.CheckInRecord;
 import com.kry.pms.model.persistence.busi.RoomChangeRecord;
 import com.kry.pms.model.persistence.busi.RoomRecord;
+import com.kry.pms.model.persistence.log.UpdateLog;
 import com.kry.pms.model.persistence.room.GuestRoom;
 import com.kry.pms.service.busi.CheckInRecordService;
 import com.kry.pms.service.busi.RoomChangeRecordService;
 import com.kry.pms.service.busi.RoomRecordService;
+import com.kry.pms.service.log.UpdateLogService;
 import com.kry.pms.service.room.RoomStatisticsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -45,6 +48,8 @@ public class RoomChangeRecordServiceImpl implements RoomChangeRecordService {
 	RoomRecordDao roomRecordDao;
 	@Autowired
 	GuestRoomDao guestRoomDao;
+	@Autowired
+	UpdateLogService updateLogService;
 
 	@Override
 	public RoomChangeRecord add(RoomChangeRecord entity) {
@@ -53,10 +58,9 @@ public class RoomChangeRecordServiceImpl implements RoomChangeRecordService {
 
 	@Override
 	@Transactional
-	public HttpResponse save(String hotelCode, RoomChangeRecord entity) {
+	public HttpResponse save(RoomChangeRecord entity) {
 		LocalDateTime now = LocalDateTime.now();
 		HttpResponse hr = new HttpResponse();
-		entity.setHotelCode(hotelCode);
 		Double roomPrice = 0.0;
 		//补差价
 		if(Constants.Type.CHANGE_ROOM_PAY_B.equals(entity.getHandleType())){
@@ -116,6 +120,14 @@ public class RoomChangeRecordServiceImpl implements RoomChangeRecordService {
 				cirs.setPersonalPrice(roomPrice);//承担全部房费
 			}
 			cirs = checkInRecordService.update(cirs);
+			UpdateLog updateLog = new UpdateLog();
+			updateLog.setProduct("换房");
+			updateLog.setProductName("订单号");
+			updateLog.setProductValue(cirs.getOrderNum());
+			updateLog.setOldValue(entity.getOldRoomNum());
+			updateLog.setNewValue(entity.getNewRoomNum());
+			updateLog.setHotelCode(entity.getHotelCode());
+			updateLogService.add(updateLog);//记录换房日志
 		}
 		hr.setData(roomChangeRecordDao.save(entity));
 		return hr;
