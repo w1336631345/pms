@@ -37,7 +37,7 @@ public class CommomReportServiceImpl implements CommomReportService {
     public CommomReportTableData fetchCommonReport(String id, Map<String, Object> params) throws IOException, TemplateException {
         ReportTableDefinition rd = reportTableDefinitionService.findById(id);
         CommomReportTableData data = new CommomReportTableData();
-        if (rd != null) {
+        if (rd != null&&rd.getType()!=null) {
             data.setType(rd.getType());
             if (rd.getType().equals(Constants.Type.REPORT_TABLE_DEF_TABLE)) {
                 data.setColumns(createColumns(rd));
