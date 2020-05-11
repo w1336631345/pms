@@ -1,5 +1,6 @@
 package com.kry.pms.model.persistence.room;
 
+import com.kry.pms.model.annotation.PropertyMsg;
 import com.kry.pms.model.persistence.PersistenceModel;
 import com.kry.pms.model.persistence.busi.CheckInRecord;
 import com.kry.pms.model.persistence.busi.RoomLockRecord;
@@ -24,8 +25,11 @@ public class GuestRoomStatus extends PersistenceModel {
 	private Integer humanCount;
 	@Column
 	private String summary;
+
+	@PropertyMsg("客房状态")
 	@Column(columnDefinition = "varchar(64) default 'VC' COMMENT '客房状态'")
 	private String roomStatus;
+
 	@Column(columnDefinition = "varchar(400) default NUll COMMENT '描述'")
 	private String description;
 	@Column(columnDefinition = "bit(1) default NULl COMMENT '锁定'")

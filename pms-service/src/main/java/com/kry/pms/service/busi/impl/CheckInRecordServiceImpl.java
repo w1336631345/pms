@@ -16,6 +16,7 @@ import com.kry.pms.model.persistence.goods.SetMeal;
 import com.kry.pms.model.persistence.guest.Customer;
 import com.kry.pms.model.persistence.marketing.RoomPriceScheme;
 import com.kry.pms.model.persistence.room.GuestRoom;
+import com.kry.pms.model.persistence.room.GuestRoomStatus;
 import com.kry.pms.model.persistence.room.RoomType;
 import com.kry.pms.model.persistence.sys.Account;
 import com.kry.pms.model.persistence.sys.User;
@@ -402,6 +403,11 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
     @Override
     public CheckInRecord findById(String id) {
         return checkInRecordDao.getOne(id);
+    }
+    @Override
+    public CheckInRecord logFindById(String id) {
+        CheckInRecord checkInRecord = checkInRecordDao.logFindById(id);
+        return checkInRecord;
     }
 
     @Override

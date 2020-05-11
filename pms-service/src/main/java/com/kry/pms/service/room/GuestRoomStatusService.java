@@ -25,6 +25,10 @@ public interface GuestRoomStatusService extends BaseService<GuestRoomStatus> {
 
     public void checkOut(String roomId);
 
+    GuestRoomStatus modifyLog(GuestRoomStatus guestRoomStatus);
+
+    GuestRoomStatus logFindById(String id);
+
     GuestRoomStatus initNewGuestRoomStatus(GuestRoom guestRoom);
 
     public RoomStatusTableVo table(String currentHotleCode);

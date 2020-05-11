@@ -8,9 +8,11 @@ import com.kry.pms.dao.log.UpdateLogDao;
 import com.kry.pms.model.persistence.busi.CheckInRecord;
 import com.kry.pms.model.persistence.log.InterfaceUseLog;
 import com.kry.pms.model.persistence.log.UpdateLog;
+import com.kry.pms.model.persistence.room.GuestRoomStatus;
 import com.kry.pms.service.busi.CheckInRecordService;
 import com.kry.pms.service.log.InterfaceUseLogService;
 import com.kry.pms.service.log.UpdateLogService;
+import com.kry.pms.service.room.GuestRoomStatusService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
@@ -26,6 +28,8 @@ public class UpdateLogServiceImpl implements UpdateLogService {
 	UpdateLogDao updateLogDao;
 	@Autowired
 	CheckInRecordService checkInRecordService;
+	@Autowired
+	GuestRoomStatusService guestRoomStatusService;
 	 
 	 @Override
 	public UpdateLog add(UpdateLog updateLog) {
@@ -44,7 +48,12 @@ public class UpdateLogServiceImpl implements UpdateLogService {
 
 	@Override
 	public UpdateLog findById(String id) {
-		return updateLogDao.getOne(id);
+		UpdateLog ul = updateLogDao.getOne(id);
+//		ul.setProductName("测试没调用修改，修改了");
+//		UpdateLog updateLog = new UpdateLog();
+//		updateLog.setProductName("heihei");
+//		updateLogDao.saveAndFlush(updateLog);
+		return ul;
 	}
 
 	@Override
@@ -74,5 +83,9 @@ public class UpdateLogServiceImpl implements UpdateLogService {
 		checkInRecordService.updateAllLog(checkInRecord);
 		return hr.ok();
 	}
-	 
+
+	@Override
+	public GuestRoomStatus guestRoomStatusModify(GuestRoomStatus guestRoomStatus){
+		return guestRoomStatusService.modifyLog(guestRoomStatus);
+	}
 }

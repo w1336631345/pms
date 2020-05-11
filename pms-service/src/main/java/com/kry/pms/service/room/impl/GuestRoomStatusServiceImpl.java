@@ -5,6 +5,7 @@ import com.kry.pms.base.DtoResponse;
 import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
 import com.kry.pms.dao.room.GuestRoomStatusDao;
+import com.kry.pms.model.annotation.UpdateAnnotation;
 import com.kry.pms.model.func.UseInfoAble;
 import com.kry.pms.model.http.response.room.BuildingVo;
 import com.kry.pms.model.http.response.room.FloorVo;
@@ -18,6 +19,7 @@ import com.kry.pms.model.persistence.room.GuestRoom;
 import com.kry.pms.model.persistence.room.GuestRoomStatus;
 import com.kry.pms.service.busi.CheckInRecordService;
 import com.kry.pms.service.busi.RoomLockRecordService;
+import com.kry.pms.service.log.UpdateLogService;
 import com.kry.pms.service.room.*;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,6 +52,8 @@ public class GuestRoomStatusServiceImpl implements GuestRoomStatusService {
     CheckInRecordService checkInRecordService;
     @Autowired
     RoomLockRecordService roomLockRecordService;
+    @Autowired
+    UpdateLogService updateLogService;
 
     @Override
     public GuestRoomStatus add(GuestRoomStatus guestRoomStatus) {
@@ -67,12 +71,27 @@ public class GuestRoomStatusServiceImpl implements GuestRoomStatusService {
 
     @Override
     public GuestRoomStatus modify(GuestRoomStatus guestRoomStatus) {
-        return guestRoomStatusDao.saveAndFlush(guestRoomStatus);
+//        return guestRoomStatusDao.saveAndFlush(guestRoomStatus);
+        return updateLogService.guestRoomStatusModify(guestRoomStatus);
+    }
+
+    @Override
+    @UpdateAnnotation(name = "房号", value = "roomNum")
+    public GuestRoomStatus modifyLog(GuestRoomStatus guestRoomStatus) {
+        GuestRoomStatus grs = findById(guestRoomStatus.getId());
+        GuestRoomStatus gs = guestRoomStatusDao.saveAndFlush(guestRoomStatus);
+        return gs;
     }
 
     @Override
     public GuestRoomStatus findById(String id) {
-        return guestRoomStatusDao.getOne(id);
+        GuestRoomStatus gs = guestRoomStatusDao.getOne(id);
+        return gs;
+    }
+    @Override
+    public GuestRoomStatus logFindById(String id) {
+        GuestRoomStatus gs = guestRoomStatusDao.logFindById(id);
+        return gs;
     }
 
     @Override
