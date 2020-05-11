@@ -37,11 +37,11 @@ public class Product extends PersistenceModel {
     @Column
     private String description;//描述
     @Column
-    private String feeType;//费用类别（业绩归类）
+    private String feeType;//费用类别（业绩归类 徐）
     @Column
-    private String deptCode;//部门编码(余额归类)
+    private String deptCode;//部门编码(余额归类 徐)
     @Column
-    private String sysModel;//系统模块(使用范围)
+    private String sysModel;//系统模块(使用范围 徐)
     @Column
     private String billCode;//账单编码
     @Column

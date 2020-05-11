@@ -24,8 +24,9 @@ public interface BillDao extends BaseDao<Bill> {
 
     @Query(nativeQuery = true, value = "select count(id) from t_bill where account_id = ?1 and status = 'NEED_SETTLED'")
     int countUnSellteBill(String accountId);
+
     @Query(value = "select new com.kry.pms.model.dto.BillStatistics(sum(cost),sum(pay)) from Bill where account =?1 and status =?2")
-    BillStatistics sumNeedSettle(Account account,String status);
+    BillStatistics sumNeedSettle(Account account, String status);
 
     @Query(nativeQuery = true, value = " select \n" +
             " tb.account_id accountId, ta.`code`, ta.`name`, \n" +
@@ -40,4 +41,6 @@ public interface BillDao extends BaseDao<Bill> {
             " and tb.`status` in (:statusList) \n" +
             " group by tb.account_id, tb.`status`,ta.`code`,ta.`name` ")
     List<Map<String, Object>> getStatusTotal(@Param("hotelCode") String hotelCode, @Param("accountId") String accountId, @Param("statusList") List<String> statusList);
+
+
 }
