@@ -86,6 +86,7 @@ public class PageRequest<T> {
 		if (data.containsKey(Constants.KEY_SHORT_ASC)) {
 			pr.setAsc(Boolean.valueOf(data.get(Constants.KEY_SHORT_ASC).toString()));
 		}
+		pr.setExb(data);
 		return pr;
 	}
 }

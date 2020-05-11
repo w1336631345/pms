@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.util.Map;
 
 @RestController
 @RequestMapping(path = "/api/v1/report/commomReport")
@@ -22,7 +23,9 @@ public class CommomReportController extends BaseController {
     @GetMapping("/{id}")
     public HttpResponse<CommomReportTableData> fetchData(@PathVariable("id") String id, HttpServletRequest request) throws IOException, TemplateException {
         HttpResponse<CommomReportTableData> rep = new HttpResponse<>();
-        rep.setData(commomReportService.fetchCommonReport(id,parse2Map(request)));
+        Map<String, Object> parmrs= parse2Map(request);
+        parmrs.put("hotel_code",getCurrentHotleCode());
+        rep.setData(commomReportService.fetchCommonReport(id,parmrs));
         return rep;
     }
 
