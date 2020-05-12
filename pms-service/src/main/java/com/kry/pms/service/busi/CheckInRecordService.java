@@ -42,7 +42,9 @@ public interface CheckInRecordService extends BaseService<CheckInRecord> {
 
     HttpResponse cancelIn(String[] ids, String hotelCode);
 
-	public void checkIn(CheckInBo checkInBo, DtoResponse<List<CheckInRecord>> rep);
+    CheckInRecord logFindById(String id);
+
+    public void checkIn(CheckInBo checkInBo, DtoResponse<List<CheckInRecord>> rep);
 
 	public DtoResponse<List<CheckInRecord>> checkOut(String type,String id,String orderNum);
 

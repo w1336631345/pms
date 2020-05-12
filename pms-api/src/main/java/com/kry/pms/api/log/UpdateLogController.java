@@ -45,5 +45,12 @@ public class UpdateLogController extends BaseController<UpdateLog> {
 		rep.addData(page);
 		return rep;
 	}
+	@GetMapping(value = "/findById")
+	public HttpResponse<UpdateLog> findById(String id) {
+		HttpResponse hr = new HttpResponse();
+		UpdateLog updateLog = updateLogService.findById(id);
+		hr.setData(updateLog);
+		return hr;
+	}
 
 }

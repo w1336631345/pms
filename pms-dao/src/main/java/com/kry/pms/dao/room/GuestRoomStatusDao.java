@@ -1,6 +1,7 @@
 package com.kry.pms.dao.room;
 
 import java.util.List;
+import java.util.Optional;
 
 import com.kry.pms.model.persistence.room.GuestRoom;
 import org.springframework.data.jpa.repository.Modifying;
@@ -9,6 +10,8 @@ import org.springframework.data.jpa.repository.Query;
 import com.kry.pms.dao.BaseDao;
 import com.kry.pms.model.http.response.room.GuestRoomStatusVo;
 import com.kry.pms.model.persistence.room.GuestRoomStatus;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 public interface GuestRoomStatusDao extends BaseDao<GuestRoomStatus> {
 
@@ -31,5 +34,9 @@ public interface GuestRoomStatusDao extends BaseDao<GuestRoomStatus> {
 	GuestRoomStatus findTopByRoomNumAndHotelCode(String num, String hotleCode);
 
 	int deleteByGuestRoom(GuestRoom gr);
+
+	@Transactional(propagation= Propagation.NOT_SUPPORTED)
+	@Query(nativeQuery = true, value = " select * from t_guest_room_status where id = ?1 ")
+	GuestRoomStatus logFindById(String id);
 
 }

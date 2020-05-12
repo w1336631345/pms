@@ -9,6 +9,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -17,6 +19,10 @@ import java.util.Map;
 public interface CheckInRecordDao extends BaseDao<CheckInRecord> {
 	@Query(value = "select a.* from t_checkin_record a where a.booking_record_id=?1", nativeQuery = true)
 	List<CheckInRecord> fingByBookId(String bookId);
+
+	@Transactional(propagation= Propagation.NOT_SUPPORTED)
+	@Query(nativeQuery = true, value = " select * from t_checkin_record where id = ?1 ")
+	CheckInRecord logFindById(String id);
 
 	@Query(nativeQuery = true, value = "select trt.`name` roomtype, tcr.room_count, tgr.room_num, tc.`name`, tc.mobile, DATE_FORMAT(tcr.arrive_time,'%Y-%m-%d %T') arrive_time,  "
 			+ " DATE_FORMAT(tcr.leave_time,'%Y-%m-%d %T') leave_time, tcr.hold_time, tcr.group_name groupname, tcr.`status`, tcr.id, tcr.hotel_code, "
