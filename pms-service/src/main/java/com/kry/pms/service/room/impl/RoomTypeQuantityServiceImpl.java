@@ -460,6 +460,31 @@ public class RoomTypeQuantityServiceImpl implements RoomTypeQuantityService {
     }
 
     @Override
+    public List<RoomTypeQuantityPredictableVo> predictableWchat(String hotelCode, LocalDate startDate, LocalDate endDate) {
+        List<RoomType> types = roomTypeService.getAllByHotelCode(hotelCode, Constants.DELETED_FALSE);
+        List<RoomTypeQuantityPredictableVo> data = new ArrayList<>();
+        RoomTypeQuantityPredictableVo rtpv = null;
+        for (RoomType type : types) {
+            RoomTypeQuantity rtq = roomTypeQuantityDao.queryPredictable(type.getId(), startDate, endDate);
+            if (rtq != null) {
+                List<Map<String, Object>> list = roomPriceSchemeDao.roomTypeAndPriceSchemeList(type.getId());
+                rtpv = new RoomTypeQuantityPredictableVo();
+                rtpv.setRoomCode(type.getCode());
+                rtpv.setPrice(type.getPrice());
+                rtpv.setRoomTypeName(type.getName());
+                rtpv.setRoomTypeId(type.getId());
+                rtpv.setStartDate(startDate);
+                rtpv.setEndDate(endDate);
+                rtpv.setAvailableTotal(rtq.getPredictableTotal());
+                rtpv.setOverReservation(type.getOverReservation());
+                rtpv.setRoomPriceSchemeList(list);
+                data.add(rtpv);
+            }
+        }
+        return data;
+    }
+
+    @Override
     public RoomTypeQuantityPredictableVo queryPredic(String currentHotleCode, String roomTypeId, LocalDate startDate,
                                                      LocalDate endDate) {
         RoomType roomType = roomTypeService.findById(roomTypeId);

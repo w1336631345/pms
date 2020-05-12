@@ -41,6 +41,7 @@ public class UpdateLogAop {
         UpdateAnnotation updateAnnotation = ((MethodSignature) joinPoint.getSignature()).getMethod().getAnnotation(UpdateAnnotation.class);
         String fieldvalue = updateAnnotation.value();
         String fieldName =  updateAnnotation.name();//注释传入的字段说明
+        String fieldType =  updateAnnotation.type();//注释传入的字段说明
         String upperChar = fieldvalue.substring(0,1).toUpperCase();
         String anotherStr = fieldvalue.substring(1);
         String methodName = "get" + upperChar + anotherStr;
@@ -64,7 +65,7 @@ public class UpdateLogAop {
         Field[] fields = clazz.getDeclaredFields();
         // 创建字符串拼接对象
         StringBuilder str = new StringBuilder();
-        String sStr = jdk8Before(fields, oldObj, newObj, str,clazz, fieldName, value, hotelCode.toString());
+        String sStr = jdk8Before(fields, oldObj, newObj, str,clazz, fieldName, value, hotelCode.toString(), fieldType);
         System.out.println(sStr);
         Object proceed = joinPoint.proceed();
         return proceed;
@@ -79,7 +80,7 @@ public class UpdateLogAop {
     }
 
     // jdk8 普通循环方式
-    public String jdk8Before(Field[] fields,Object pojo1,Object pojo2,StringBuilder str,Class clazz, String name, String value, String hotelCode){
+    public String jdk8Before(Field[] fields,Object pojo1,Object pojo2,StringBuilder str,Class clazz, String name, String value, String hotelCode, String type){
         int i = 1;
         try {
             for (Field field : fields) {
@@ -114,6 +115,7 @@ public class UpdateLogAop {
                                         i++;
                                         UpdateLog updateLog = new UpdateLog();
                                         updateLog.setProduct(f.getAnnotation(PropertyMsg.class).value());
+                                        updateLog.setProductType(type);
                                         updateLog.setProductName(name);
                                         updateLog.setProductValue(value);
                                         updateLog.setOldValue(s1.toString());
@@ -130,6 +132,7 @@ public class UpdateLogAop {
                             i++;
                             UpdateLog updateLog = new UpdateLog();
                             updateLog.setProduct(field.getAnnotation(PropertyMsg.class).value());
+                            updateLog.setProductType(type);
                             updateLog.setProductName(name);
                             updateLog.setProductValue(value);
                             updateLog.setOldValue(o1.toString());

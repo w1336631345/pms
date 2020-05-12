@@ -123,7 +123,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 
     @Override
     @Transactional
-    @UpdateAnnotation(name = "订单号", value = "orderNum")
+    @UpdateAnnotation(name = "订单号", value = "orderNum", type = "GO")
     public HttpResponse modifyInfo(CheckInRecord checkInRecord) {
         HttpResponse hr = new HttpResponse();
         CheckInRecord dbCir = checkInRecordDao.getOne(checkInRecord.getId());
@@ -365,7 +365,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
     }
     //仅仅是为了批量操作记录日志，不做任何处理
     @Override
-    @UpdateAnnotation(name = "订单号", value = "orderNum")
+    @UpdateAnnotation(name = "订单号", value = "orderNum", type = "GO")
     public HttpResponse updateAllLog(CheckInRecord checkInRecord){
         HttpResponse hr = new HttpResponse();
         hr.addData(checkInRecord);
@@ -975,24 +975,28 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
             hr.setData(rcir);
             return hr;
         } else {//没有选择房间，生成纯预留
-//            Customer customer = null;
-//            Account account = null;
-//            if (checkInRecord.getCustomer() == null) {
-//                if(checkInRecord.getContactName() != null){
-//                    customer = customerService.createTempCustomer(checkInRecord.getHotelCode(),  checkInRecord.getContactName());
-//                    account = accountService.createAccount(customer, checkInRecord.getContactName());
-//                }else {
-//                    customer = customerService.createTempCustomer(checkInRecord.getHotelCode(),  "No Room");
-//                    account = accountService.createAccount(customer, "No Room");
-//                }
-//            }else{
-//                customer = customerService.findById(checkInRecord.getCustomer().getId());
-//                account = accountService.createAccount(customer, "No Room");
-//            }
+            //************开始分割线*************
+            //下面功能是没有选择房间，但要生存账号：之前是注释掉的
+            Customer customer = null;
+            Account account = null;
+            if (checkInRecord.getCustomer() == null) {
+                if(checkInRecord.getContactName() != null){
+                    customer = customerService.createTempCustomer(checkInRecord.getHotelCode(),  checkInRecord.getContactName());
+                    account = accountService.createAccount(customer, checkInRecord.getContactName());
+                }else {
+                    customer = customerService.createTempCustomer(checkInRecord.getHotelCode(),  "No Room");
+                    account = accountService.createAccount(customer, "No Room");
+                }
+            }else{
+                customer = customerService.findById(checkInRecord.getCustomer().getId());
+                account = accountService.createAccount(customer, "No Room");
+            }
+            checkInRecord.setAccount(account);
+            checkInRecord.setCustomer(customer);
+            checkInRecord.setName(customer.getName());
+            //上面功能是没有选择房间，但要生存账号：之前是注释掉的
+            //************结束分割线*************
             checkInRecord.setCheckInCount(0);
-//            checkInRecord.setAccount(account);
-//            checkInRecord.setCustomer(customer);
-//            checkInRecord.setName(customer.getName());
             checkInRecord.setType(Constants.Type.CHECK_IN_RECORD_RESERVE);
             checkInRecord.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION);
 
@@ -2369,6 +2373,11 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
     public HttpResponse updateReserve(CheckInRecord cir) {
         HttpResponse hr = new HttpResponse();
         CheckInRecord oldCir = checkInRecordDao.getOne(cir.getId());
+        CheckInRecord main = oldCir.getMainRecord();
+        if (cir.getArriveTime().isBefore(main.getArriveTime()) || cir.getLeaveTime().isAfter(main.getLeaveTime())) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            return hr.error("时间范围不能大于主单");
+        }
         int oldHumanCount = oldCir.getHumanCount();
         int oldRoomCount = oldCir.getRoomCount();
         int newHumanCount = cir.getHumanCount();
@@ -2391,7 +2400,6 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             return hr.error("资源不足");
         }
-        CheckInRecord main = oldCir.getMainRecord();
         main.setHumanCount(main.getHumanCount() + (newHumanCount - oldHumanCount));
         main.setRoomCount(main.getRoomCount() + (newRoomCount - oldRoomCount));
         checkInRecordDao.saveAndFlush(main);

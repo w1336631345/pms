@@ -1,6 +1,9 @@
 package com.kry.pms.model.http.response.busi;
 
 import java.time.LocalDate;
+import java.util.List;
+import java.util.Map;
+
 import lombok.Data;
 @Data
 public class RoomTypeQuantityPredictableVo {
@@ -16,5 +19,7 @@ public class RoomTypeQuantityPredictableVo {
 	private String setMealId;
 	private String setMealName;
 	private Double purchasePrice;//定价
+
+	private List<Map<String, Object>> roomPriceSchemeList;//该房型对应的房价码列表
 	
 }

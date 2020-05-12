@@ -37,7 +37,7 @@ public interface CheckInRecordService extends BaseService<CheckInRecord> {
 	HttpResponse updateAll(CheckUpdateItemTestBo checkUpdateItemTestBo);
 
     //仅仅是为了批量操作记录日志，不做任何处理
-    @UpdateAnnotation(name = "订单号", value = "orderNum")
+//    @UpdateAnnotation(name = "订单号", value = "orderNum", type = "GO")
     HttpResponse updateAllLog(CheckInRecord checkInRecord);
 
     HttpResponse cancelIn(String[] ids, String hotelCode);

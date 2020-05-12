@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 @RestController
 @RequestMapping(path = "/api/v1/log/updateLog")
@@ -37,7 +38,6 @@ public class UpdateLogController extends BaseController<UpdateLog> {
 	}
 
 	@GetMapping
-	@OperationLog(remark = "测试卷哦")
 	public HttpResponse<PageResponse<UpdateLog>> query(HttpServletRequest request) throws InstantiationException, IllegalAccessException{
 		HttpResponse<PageResponse<UpdateLog>> rep = new HttpResponse<PageResponse<UpdateLog>>();
 		PageRequest<UpdateLog> req = parse2PageRequest(request);
@@ -50,6 +50,14 @@ public class UpdateLogController extends BaseController<UpdateLog> {
 		HttpResponse hr = new HttpResponse();
 		UpdateLog updateLog = updateLogService.findById(id);
 		hr.setData(updateLog);
+		return hr;
+	}
+
+	@GetMapping(value = "/list")
+	public HttpResponse<List<UpdateLog>> getList(String productType) {
+		HttpResponse hr = new HttpResponse();
+		List<UpdateLog> list = updateLogService.findByHotelCodeAndProductType(getCurrentHotleCode(), productType);
+		hr.setData(list);
 		return hr;
 	}
 

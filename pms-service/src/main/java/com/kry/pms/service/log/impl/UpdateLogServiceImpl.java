@@ -63,6 +63,12 @@ public class UpdateLogServiceImpl implements UpdateLogService {
 	}
 
 	@Override
+	public List<UpdateLog> findByHotelCodeAndProductType(String code, String type) {
+//		return null;//默认不实现
+		return updateLogDao.findByHotelCodeAndProductType(code, type);
+	}
+
+	@Override
 	public PageResponse<UpdateLog> listPage(PageRequest<UpdateLog> prq) {
 		Example<UpdateLog> ex = Example.of(prq.getExb());
 		org.springframework.data.domain.PageRequest req;

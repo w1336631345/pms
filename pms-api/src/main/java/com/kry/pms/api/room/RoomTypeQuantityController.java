@@ -79,6 +79,32 @@ public class RoomTypeQuantityController extends BaseController<RoomTypeQuantity>
 		return response;
 	}
 
+	/**
+	 * 功能描述: <br>微信小程序可预订列表查询
+	 * 〈〉
+	 * @Param: [startDate, endDate]
+	 * @Return: com.kry.pms.base.HttpResponse<java.util.List<com.kry.pms.model.http.response.busi.RoomTypeQuantityPredictableVo>>
+	 * @Author: huanghaibin
+	 * @Date: 2020/5/12 16:04
+	 */
+	@GetMapping(path = "/predictableWchat")
+	public HttpResponse<List<RoomTypeQuantityPredictableVo>> predictableWchat(String startDate, String endDate) {
+		HttpResponse<List<RoomTypeQuantityPredictableVo>> response = new HttpResponse<List<RoomTypeQuantityPredictableVo>>();
+		LocalDate sDate = LocalDate.parse(startDate);
+		LocalDate eDate = LocalDate.parse(endDate);
+		if (sDate.isBefore(LocalDate.now())) {
+			sDate = LocalDate.now();
+		}
+		if (!eDate.isAfter(sDate)) {
+			response.setStatus(Constants.BusinessCode.CODE_PARAMETER_INVALID);
+			response.setMessage("到离店时间错误，请重新选择");
+		} else {
+			List<RoomTypeQuantityPredictableVo> data = roomTypeQuantityService.predictableWchat(getCurrentHotleCode(), sDate, eDate);
+			response.addData(data);
+		}
+		return response;
+	}
+
 	@GetMapping(path = "/predic/{id}")
 	public HttpResponse<RoomTypeQuantityPredictableVo> queryPredic(@PathVariable("id") String roomTypeId,
 			String startDate, String endDate) {
