@@ -320,6 +320,11 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
             }
             if (!cir.getArriveTime().isEqual(at) || !cir.getLeaveTime().isEqual(lt)) {
                 updateTime = true;
+                boolean b = roomStatisticsService.extendTime(new CheckInRecordWrapper(cir), at, lt);
+                if (!b) {
+                    TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                    return hr.error("资源不足");
+                }
             }
             UpdateUtil.copyNullProperties(checkUpdateItemTestBo, cir);
             if (updateTime) {
@@ -330,11 +335,11 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                         return hr.error("成员时间范围不能大于主单");
                     }
                 }
-                boolean b = roomStatisticsService.extendTime(new CheckInRecordWrapper(cir), at, lt);
-                if (!b) {
-                    TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-                    return hr.error("资源不足");
-                }
+//                boolean b = roomStatisticsService.extendTime(new CheckInRecordWrapper(cir), at, lt);
+//                if (!b) {
+//                    TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+//                    return hr.error("资源不足");
+//                }
                 //需要修改天数和roomRecord
                 int days = (int) at.toLocalDate()
                         .until(lt.toLocalDate(), ChronoUnit.DAYS);
