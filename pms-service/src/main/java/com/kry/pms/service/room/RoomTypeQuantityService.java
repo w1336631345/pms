@@ -60,5 +60,5 @@ public interface RoomTypeQuantityService extends BaseService<RoomTypeQuantity> {
 
     boolean changeRoom(RoomType roomType, RoomType newRoomType, String status, LocalDateTime startTime, LocalDateTime endTime, LocalDateTime changeTime);
 
-    boolean extendTime(RoomType roomType, String roomStatus, LocalDateTime startTime, LocalDateTime endTime, LocalDateTime newStartTime, LocalDateTime newEndTime);
+    boolean extendTime(RoomType roomType, String roomStatus, LocalDateTime startTime, LocalDateTime endTime, LocalDateTime newStartTime, LocalDateTime newEndTime,int quantity);
 }

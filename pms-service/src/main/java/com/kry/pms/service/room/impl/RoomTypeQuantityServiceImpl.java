@@ -649,7 +649,7 @@ public class RoomTypeQuantityServiceImpl implements RoomTypeQuantityService {
     }
 
     @Override
-    public boolean extendTime(RoomType roomType, String roomStatus, LocalDateTime startTime, LocalDateTime endTime, LocalDateTime newStartTime, LocalDateTime newEndTime) {
+    public boolean extendTime(RoomType roomType, String roomStatus, LocalDateTime startTime, LocalDateTime endTime, LocalDateTime newStartTime, LocalDateTime newEndTime,int quantity) {
         changeRoomTypeQuantity(roomType, startTime.toLocalDate(), endTime.toLocalDate(), roomStatus, Constants.Status.ROOM_USAGE_FREE, 1);
         LocalDate newStartDate = null;
         LocalDate newEndDate = null;

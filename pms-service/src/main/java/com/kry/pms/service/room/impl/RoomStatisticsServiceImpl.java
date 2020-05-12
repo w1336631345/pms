@@ -106,15 +106,15 @@ public class RoomStatisticsServiceImpl implements RoomStatisticsService {
 
     @Override
     public boolean extendTime(UseInfoAble info, LocalDateTime newStartTime, LocalDateTime newEndTime) {
-        if (!info.useType().equals(Constants.Type.CHECK_IN_RECORD_RESERVE)) {
-            CheckInRecord cir = (CheckInRecord) info.getSource();
+        CheckInRecord cir = (CheckInRecord) info.getSource();
+        if (!info.useType().equals(Constants.Type.CHECK_IN_RECORD_RESERVE)) {//如果不是预留订单 就需要修改房间资源
             String roomUseStatus = null;
             if(cir.getStatus().equals(Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION)){
                 roomUseStatus = Constants.Status.ROOM_USAGE_ASSIGN;
             }else{
                 roomUseStatus = cir.getStatus();
             }
-            roomTypeQuantityService.extendTime(info.roomType(), roomUseStatus, info.getStartTime(), info.getEndTime(), newStartTime, newEndTime);
+            roomTypeQuantityService.extendTime(info.roomType(), roomUseStatus, info.getStartTime(), info.getEndTime(), newStartTime, newEndTime,1);
             if (newStartTime != null) {
                 newStartTime = LocalDateTime.of(newStartTime.toLocalDate(), LocalTime.NOON);
             }
@@ -131,7 +131,7 @@ public class RoomStatisticsServiceImpl implements RoomStatisticsService {
                 return roomUsageService.extendTime(info, newStartTime, newEndTime);
             }
         }else{
-            roomTypeQuantityService.extendTime(info.roomType(), ((CheckInRecord) info.getSource()).getStatus(), info.getStartTime(), info.getEndTime(), newStartTime, newEndTime);
+            roomTypeQuantityService.extendTime(info.roomType(), cir.getStatus(), info.getStartTime(), info.getEndTime(), newStartTime, newEndTime,cir.getRoomCount());
             return true;
         }
     }
