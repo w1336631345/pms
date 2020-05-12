@@ -507,7 +507,11 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
     private DtoResponse<List<CheckInRecord>> checkOutGroup(String id) {
         CheckInRecord cir = queryByAccountId(id);
         checkOut(cir);
-        return checkOut(findByOrderNumC(cir.getOrderNum()));
+        DtoResponse<List<CheckInRecord>>  rep = checkOut(findByOrderNumC(cir.getOrderNum()));
+        if(rep.getStatus()!=0){
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+        }
+        return rep;
     }
 
     private DtoResponse<List<CheckInRecord>> checkOutAccout(String id) {
@@ -542,6 +546,9 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
             } else {
                 data.add(rep.getData());
             }
+        }
+        if(response.getStatus()!=0){
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
         }
         response.setData(data);
         return response;
