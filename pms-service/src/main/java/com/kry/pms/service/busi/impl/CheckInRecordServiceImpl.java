@@ -288,8 +288,17 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
     public HttpResponse updateAll(CheckUpdateItemTestBo checkUpdateItemTestBo) {
         HttpResponse hr = new HttpResponse();
         String[] ids = checkUpdateItemTestBo.getIds();
+        List<String> rooms = new ArrayList<>();
+        boolean roomI = true;
         for (int i = 0; i < ids.length; i++) {
             CheckInRecord cir = findById(ids[i]);
+            GuestRoom gr = cir.getGuestRoom();
+            if(rooms.contains(gr.getRoomNum())){//如果房间号之前就存在，说明勾选的有同住人
+                roomI = false;
+            }else {
+                rooms.add(gr.getRoomNum());
+                roomI = true;
+            }
             String oldRemark = cir.getRemark();
             String newRemark = checkUpdateItemTestBo.getRemark();
             if (oldRemark != null) {
@@ -320,10 +329,12 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
             }
             if (!cir.getArriveTime().isEqual(at) || !cir.getLeaveTime().isEqual(lt)) {
                 updateTime = true;
-                boolean b = roomStatisticsService.extendTime(new CheckInRecordWrapper(cir), at, lt);
-                if (!b) {
-                    TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-                    return hr.error("资源不足");
+                if(roomI){
+                    boolean b = roomStatisticsService.extendTime(new CheckInRecordWrapper(cir), at, lt);
+                    if (!b) {
+                        TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                        return hr.error("资源不足");
+                    }
                 }
             }
             UpdateUtil.copyNullProperties(checkUpdateItemTestBo, cir);
@@ -349,19 +360,24 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                 }
                 roomRecordService.createRoomRecord(cir);
                 cir.setDays(days);
+                //***********分割线************
                 //下面是同住的记录一起修改
-//                List<CheckInRecord> together = checkInTogether(cir.getHotelCode(), cir.getOrderNum(), cir.getGuestRoom().getId());
-//                for (int t = 0; t < together.size(); t++) {
-//                    List<RoomRecord> list = roomRecordService.findByHotelCodeAndCheckInRecord(cir.getHotelCode(), together.get(t).getId());
-//                    for (int r = 0; r < list.size(); r++) {
-//                        roomRecordService.deleteTrue(list.get(r).getId());
-//                    }
-//                    together.get(t).setDays(days);
-//                    together.get(t).setArriveTime(at);
-//                    together.get(t).setLeaveTime(lt);
-//                    checkInRecordDao.saveAndFlush(together.get(t));
-//                    roomRecordService.createRoomRecord(together.get(t));
-//                }
+                if(roomI){
+                    List<CheckInRecord> together = checkInTogether(cir.getHotelCode(), cir.getOrderNum(), cir.getGuestRoom().getId());
+                    for (int t = 0; t < together.size(); t++) {
+                        List<RoomRecord> listT = roomRecordService.findByHotelCodeAndCheckInRecord(cir.getHotelCode(), together.get(t).getId());
+                        for (int r = 0; r < listT.size(); r++) {
+                            roomRecordService.deleteTrue(listT.get(r).getId());
+                        }
+                        together.get(t).setDays(days);
+                        together.get(t).setArriveTime(at);
+                        together.get(t).setLeaveTime(lt);
+                        checkInRecordDao.saveAndFlush(together.get(t));
+                        roomRecordService.createRoomRecord(together.get(t));
+                    }
+                }
+                //上面是同住的记录一起修改
+                //***********分割线************
             }
             checkInRecordDao.save(cir);
             roomStatisticsService.updateGuestRoomStatus(new CheckInRecordWrapper(cir));
