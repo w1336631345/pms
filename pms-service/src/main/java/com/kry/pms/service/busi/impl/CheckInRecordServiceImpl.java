@@ -359,7 +359,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 //                    together.get(t).setDays(days);
 //                    together.get(t).setArriveTime(at);
 //                    together.get(t).setLeaveTime(lt);
-//                    checkInRecordDao.saveAndFlush(together.get(t));
+//                    checkInRecordDao.saveAndFlush(together.get(t));人哦哦
 //                    roomRecordService.createRoomRecord(together.get(t));
 //                }
             }
