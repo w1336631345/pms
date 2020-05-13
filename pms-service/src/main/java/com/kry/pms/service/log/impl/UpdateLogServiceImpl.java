@@ -94,4 +94,9 @@ public class UpdateLogServiceImpl implements UpdateLogService {
 	public GuestRoomStatus guestRoomStatusModify(GuestRoomStatus guestRoomStatus){
 		return guestRoomStatusService.modifyLog(guestRoomStatus);
 	}
+
+	@Override
+	public CheckInRecord checkInRecordUpdateLog(CheckInRecord checkInRecord){
+		return checkInRecordService.updateLog(checkInRecord);
+	}
 }

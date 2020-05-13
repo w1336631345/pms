@@ -10,4 +10,5 @@ public @interface UpdateAnnotation {
     String name() default "";//日志中需要插入的列名称
     String value() default "";//列的值
     String type() default "";//类型（RS：房间房态，GO：主单）
+    String remark() default "";//描述，用与其它字段，或标志性字段，查询用
 }

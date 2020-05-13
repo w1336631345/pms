@@ -16,4 +16,6 @@ public interface UpdateLogService extends BaseService<UpdateLog>{
     HttpResponse updateCirAllLog(CheckInRecord checkInRecord);
 
     GuestRoomStatus guestRoomStatusModify(GuestRoomStatus guestRoomStatus);
+
+    CheckInRecord checkInRecordUpdateLog(CheckInRecord checkInRecord);
 }

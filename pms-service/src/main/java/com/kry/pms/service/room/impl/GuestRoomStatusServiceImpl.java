@@ -78,7 +78,6 @@ public class GuestRoomStatusServiceImpl implements GuestRoomStatusService {
     @Override
     @UpdateAnnotation(name = "房号", value = "roomNum", type = "RS")
     public GuestRoomStatus modifyLog(GuestRoomStatus guestRoomStatus) {
-        GuestRoomStatus grs = findById(guestRoomStatus.getId());
         GuestRoomStatus gs = guestRoomStatusDao.saveAndFlush(guestRoomStatus);
         return gs;
     }
