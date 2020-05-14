@@ -25,5 +25,7 @@ public class UpdateLog extends PersistenceModel {
     private String oldValue;
     @Column
     private String newValue;
+    @Column
+    private String identifier;//标识符（用于查询）
 
 }

@@ -284,6 +284,12 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
     }
 
     @Override
+    @UpdateAnnotation(name = "订单号", value = "orderNum", type = "GO")
+    public CheckInRecord updateLog(CheckInRecord checkInRecord) {
+        return checkInRecordDao.saveAndFlush(checkInRecord);
+    }
+
+    @Override
     @Transactional
     public HttpResponse updateAll(CheckUpdateItemTestBo checkUpdateItemTestBo) {
         HttpResponse hr = new HttpResponse();
@@ -668,7 +674,8 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
             }
             Customer customer = null;
             Account account = null;
-            if (cir.getCustomer() != null) {//这个判断只针对散客单房预订，选择房型并没选择房间，生成账号的情况
+            if (cir.getCustomer() != null && i==1) {//这个判断只针对散客单房预订，选择房型并没选择房间，生成账号的情况
+                //单房如果预订了多个人住，账号只分给第一个人（i==1），其他人新建
                 customer = customerService.findById(cir.getCustomer().getId());
                 if (("No Room").equals(customer.getName())) {
                     customer.setName(tempName + "#" + i);

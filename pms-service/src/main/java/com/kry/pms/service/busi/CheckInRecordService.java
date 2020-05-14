@@ -34,7 +34,9 @@ public interface CheckInRecordService extends BaseService<CheckInRecord> {
 
 	CheckInRecord update(CheckInRecord checkInRecord);
 
-	HttpResponse updateAll(CheckUpdateItemTestBo checkUpdateItemTestBo);
+    CheckInRecord updateLog(CheckInRecord checkInRecord);
+
+    HttpResponse updateAll(CheckUpdateItemTestBo checkUpdateItemTestBo);
 
     //仅仅是为了批量操作记录日志，不做任何处理
 //    @UpdateAnnotation(name = "订单号", value = "orderNum", type = "GO")

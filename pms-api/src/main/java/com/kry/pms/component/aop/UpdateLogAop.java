@@ -42,31 +42,35 @@ public class UpdateLogAop {
         String fieldvalue = updateAnnotation.value();
         String fieldName =  updateAnnotation.name();//注释传入的字段说明
         String fieldType =  updateAnnotation.type();//注释传入的字段说明
-        String upperChar = fieldvalue.substring(0,1).toUpperCase();
-        String anotherStr = fieldvalue.substring(1);
-        String methodName = "get" + upperChar + anotherStr;
 
         Object newObj = joinPoint.getArgs()[0];
         Object oldObj = findOldData(joinPoint.getTarget(), newObj);
         // 通过反射获取类的Class对象
         Class clazz = newObj.getClass();
-
-        Method method = clazz.getMethod(methodName, new Class[]{});
-        Method hotelM = clazz.getMethod("getHotelCode", new Class[]{});
-        method.setAccessible(true);
-        hotelM.setAccessible(true);
-        Object resultValue = method.invoke(newObj);//获取注解想要查询字段的值
-        Object hotelCode = hotelM.invoke(newObj);//获取注解想要查询字段的值
+        Object resultValue = getObjectValue(newObj, clazz, fieldvalue);//获取注解想要查询字段的值
+        Object hotelCode = getObjectValue(newObj,clazz, "hotelCode");
         String value = null;
+        String hCode = null;
+        String code = null;
         if(resultValue != null){
             value = resultValue.toString();
         }
+        if(hotelCode != null){
+            hCode = hotelCode.toString();
+        }
+        if("GO".equals(fieldType)){//主单的记录日志
+            Object account = getObjectValue(newObj, clazz, "account");//获取账号
+            if(account != null){
+                Class clazzAccount = account.getClass();
+                Object accountCode = getObjectValue(account, clazzAccount, "code");
+                if(accountCode != null){
+                    code = accountCode.toString();
+                }
+            }
+        }
         // 获取类型及字段属性
         Field[] fields = clazz.getDeclaredFields();
-        // 创建字符串拼接对象
-        StringBuilder str = new StringBuilder();
-        String sStr = jdk8Before(fields, oldObj, newObj, str,clazz, fieldName, value, hotelCode.toString(), fieldType);
-        System.out.println(sStr);
+        String sStr = jdk8Before(fields, oldObj, newObj, clazz, fieldName, value, hCode, fieldType, code);
         Object proceed = joinPoint.proceed();
         return proceed;
     }
@@ -80,8 +84,7 @@ public class UpdateLogAop {
     }
 
     // jdk8 普通循环方式
-    public String jdk8Before(Field[] fields,Object pojo1,Object pojo2,StringBuilder str,Class clazz, String name, String value, String hotelCode, String type){
-        int i = 1;
+    public String jdk8Before(Field[] fields,Object pojo1,Object pojo2, Class clazz, String name, String value, String hotelCode, String type, String code){
         try {
             for (Field field : fields) {
                 if(field.isAnnotationPresent(PropertyMsg.class)){
@@ -93,7 +96,7 @@ public class UpdateLogAop {
                     if (o1 == null || o2 == null) {
                         continue;
                     }
-                    //判断属性是否是对象类型
+                    //判断属性是否是对象类型，并调用子对象中的关键字段记录
                     if(field.getType().getSuperclass() != null && (PersistenceModel.class).equals(field.getType().getSuperclass())){
                         System.out.println("这个属性是对象类型");
                         // 通过反射获取类的Class对象
@@ -111,8 +114,6 @@ public class UpdateLogAop {
                                     continue;
                                 }else {
                                     if (!s1.toString().equals(s2.toString())) {
-                                        str.append(i + "、" + f.getAnnotation(PropertyMsg.class).value() + ":" + "修改前=>" + s1 + ",修改后=>" + s2 + "\n");
-                                        i++;
                                         UpdateLog updateLog = new UpdateLog();
                                         updateLog.setProduct(f.getAnnotation(PropertyMsg.class).value());
                                         updateLog.setProductType(type);
@@ -121,6 +122,7 @@ public class UpdateLogAop {
                                         updateLog.setOldValue(s1.toString());
                                         updateLog.setNewValue(s2.toString());
                                         updateLog.setHotelCode(hotelCode);
+                                        updateLog.setIdentifier(code);
                                         updateLogService.add(updateLog);
                                     }
                                 }
@@ -128,8 +130,6 @@ public class UpdateLogAop {
                         }
                     }else {
                         if (!o1.toString().equals(o2.toString())) {
-                            str.append(i + "、" + field.getAnnotation(PropertyMsg.class).value() + ":" + "修改前=>" + o1 + ",修改后=>" + o2 + "\n");
-                            i++;
                             UpdateLog updateLog = new UpdateLog();
                             updateLog.setProduct(field.getAnnotation(PropertyMsg.class).value());
                             updateLog.setProductType(type);
@@ -138,6 +138,7 @@ public class UpdateLogAop {
                             updateLog.setOldValue(o1.toString());
                             updateLog.setNewValue(o2.toString());
                             updateLog.setHotelCode(hotelCode);
+                            updateLog.setIdentifier(code);
                             updateLogService.add(updateLog);
                         }
                     }
@@ -146,7 +147,7 @@ public class UpdateLogAop {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return str.toString();
+        return null;
     }
 
     // lambda表达式，表达式内部的变量都是final修饰，需要传入需要传入final类型的数组
@@ -173,5 +174,14 @@ public class UpdateLogAop {
             }
         });
         return str.toString();
+    }
+
+    public Object getObjectValue(Object object,Class clazz, String name) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        String upperChar = name.substring(0,1).toUpperCase();//首字母转换成大写
+        String anotherStr = name.substring(1);
+        String methodName = "get" + upperChar + anotherStr;//转换成方法名称如：getHotelCode
+        Method method = clazz.getMethod(methodName, new Class[]{});
+        Object resultValue = method.invoke(object);
+        return resultValue;
     }
 }
