@@ -1,5 +1,6 @@
 package com.kry.pms.model.persistence.busi;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -22,46 +23,48 @@ import lombok.Setter;
 @Setter
 @Table(name = "t_settle_account_record")
 public class SettleAccountRecord extends PersistenceModel {
-	@Column
-	private String shiftCode;
-	@Column
-	private String settleWay;
-	@Column
-	private String recordNum;
-	@OneToOne
-	private Account account;
-	@OneToOne
-	private Account targetAccount;
-	@Column
-	private String type;
-	@OneToOne
-	private Employee operationEmployee;
-	@Column
-	private LocalDateTime settleTime;
-	@OneToOne
-	private Employee cancleEmployee;
-	@Column
-	private LocalDateTime cancleTime;
-	@Column
-	private String cancleNum;
-	@Column
-	private String cancleShiftCode;
-	@Column
-	private String remark;
-	@Column
-	private Double total;
-	@Column
-	private Integer billCount;
-	@Column
-	private String settleNum;
-	@ManyToMany
-	private List<Bill> bills;
-	@ManyToMany
-	private List<Bill> flatBills;
-	@ManyToMany
-	private List<Bill> extBills;
-	@Column
-	private String parentNum;
-	@Column
-	private Boolean isSubRecord;
+    @Column
+    private String shiftCode;
+    @Column
+    private String settleWay;
+    @Column
+    private String recordNum;
+    @OneToOne
+    private Account account;
+    @OneToOne
+    private Account targetAccount;
+    @Column
+    private String type;
+    @OneToOne
+    private Employee operationEmployee;
+    @Column
+    private LocalDateTime settleTime;
+    @Column
+    private LocalDate businessDate;
+    @OneToOne
+    private Employee cancleEmployee;
+    @Column
+    private LocalDateTime cancleTime;
+    @Column
+    private String cancleNum;
+    @Column
+    private String cancleShiftCode;
+    @Column
+    private String remark;
+    @Column
+    private Double total;
+    @Column
+    private Integer billCount;
+    @Column
+    private String settleNum;
+    @ManyToMany
+    private List<Bill> bills;
+    @ManyToMany
+    private List<Bill> flatBills;
+    @ManyToMany
+    private List<Bill> extBills;
+    @Column
+    private String parentNum;
+    @Column
+    private Boolean isSubRecord;
 }

@@ -98,6 +98,7 @@ public class SettleAccountRecordServiceImpl implements SettleAccountRecordServic
                     Constants.Key.BUSINESS_BUSINESS_SETTLE_SEQ_KEY));
         }
         scr.setShiftCode(billCheckBo.getShiftCode());
+        scr.setBusinessDate(businessSeqService.getBuinessDate(billCheckBo.getHotelCode()));
         scr.setAccount(account);
         scr.setHotelCode(billCheckBo.getHotelCode());
         scr.setOperationEmployee(billCheckBo.getOperationEmployee());
@@ -170,7 +171,6 @@ public class SettleAccountRecordServiceImpl implements SettleAccountRecordServic
                 return cancleSettle(id, shiftCode, operationEmployee);
             }
         }
-
         return null;
     }
 
@@ -194,6 +194,7 @@ public class SettleAccountRecordServiceImpl implements SettleAccountRecordServic
                 Constants.Key.BUSINESS_BUSINESS_SETTLE_SEQ_KEY));
         scr.setShiftCode(billCheckBo.getShiftCode());
         scr.setAccount(account);
+        scr.setBusinessDate(businessSeqService.getBuinessDate(targetAccount.getHotelCode()));
         scr.setTargetAccount(targetAccount);
         scr.setSettleWay(billCheckBo.getCheckWay());
         scr.setHotelCode(account.getHotelCode());
@@ -223,6 +224,7 @@ public class SettleAccountRecordServiceImpl implements SettleAccountRecordServic
         scr.setTargetAccount(targetAccount);
         scr.setHotelCode(employee.getHotelCode());
         scr.setOperationEmployee(employee);
+        scr.setBusinessDate(businessSeqService.getBuinessDate(employee.getHotelCode()));
         scr.setSettleTime(LocalDateTime.now());
         return add(scr);
     }
