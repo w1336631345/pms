@@ -24,25 +24,27 @@ public class CommomReportController extends BaseController {
     CommomReportService commomReportService;
     @Autowired
     BusinessSeqService businessSeqService;
+
     @GetMapping("/{id}")
     public HttpResponse<CommomReportTableData> fetchData(@PathVariable("id") String id, HttpServletRequest request) throws IOException, TemplateException {
         HttpResponse<CommomReportTableData> rep = new HttpResponse<>();
-        Map<String, Object> parmrs= parse2Map(request);
+        Map<String, Object> parmrs = parse2Map(request);
         baseParmrsCheck(parmrs);
-        rep.setData(commomReportService.fetchCommonReport(id,parmrs));
+        rep.setData(commomReportService.fetchCommonReport(id, parmrs));
         return rep;
     }
-    private void baseParmrsCheck(Map<String, Object> parmrs){
+
+    private void baseParmrsCheck(Map<String, Object> parmrs) {
         String hotelCode = getCurrentHotleCode();
-        parmrs.put("hotel_code",hotelCode);
-        if(!parmrs.containsKey("business_date")){
-            parmrs.put("business_date",hotelCode);
+        parmrs.put("hotel_code", hotelCode);
+        if (!parmrs.containsKey("business_date")) {
+            parmrs.put("business_date", businessSeqService.getBuinessDate(hotelCode));
         }
-        if(!parmrs.containsKey("shift")){
-            parmrs.put("shift",getShiftCode());
+        if (!parmrs.containsKey("shift")) {
+            parmrs.put("shift", getShiftCode());
         }
-        if(!parmrs.containsKey("employee_id")){
-            parmrs.put("employee_id",getCurrentEmployee().getId());
+        if (!parmrs.containsKey("employee_id")) {
+            parmrs.put("employee_id", getCurrentEmployee().getId());
         }
     }
 
