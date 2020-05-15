@@ -597,10 +597,10 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                 rep.setStatus(Constants.BusinessCode.CODE_ILLEGAL_OPERATION);
                 rep.setMessage(cir.getAccount().getCode() + ":未完成结帐！");
             } else {
-                cir.setActualTimeOfLeave(LocalDateTime.now());
                 if (Constants.Status.CHECKIN_RECORD_STATUS_OUT_UNSETTLED.equals(cir.getStatus())||Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION.equals(cir.getStatus())) {
                     //S状态 不需要调整房类资源
                 } else {
+                    cir.setActualTimeOfLeave(LocalDateTime.now());
                     boolean b = roomStatisticsService.checkOut(new CheckInRecordWrapper(cir));
                     if (!b) {
                         TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
