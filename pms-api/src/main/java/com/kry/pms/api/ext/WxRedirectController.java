@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 @RequestMapping("/wx/redirect/{appid}")
 public class WxRedirectController {
     private final WxMpService wxService;
-
     @RequestMapping("/greet")
     public String greetUser(@PathVariable String appid, @RequestParam String code,@RequestParam String state, ModelMap map) {
         if (!this.wxService.switchover(appid)) {

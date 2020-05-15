@@ -232,6 +232,7 @@ public class BaseController<T> {
                 data.put(key, val.length > 1 ? Arrays.asList(val) : val[0]);
             }
         }
+        data.put("user_id",getCurrentUserId());
         return data;
     }
 
