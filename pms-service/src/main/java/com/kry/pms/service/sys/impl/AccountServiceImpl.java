@@ -475,7 +475,7 @@ public class AccountServiceImpl implements AccountService {
         DtoResponse<Account> rep = new DtoResponse<Account>();
         String id = billCheckBo.getAccountId();
         CheckInRecord cir = checkInRecordService.queryByAccountId(id);
-        List<CheckInRecord> cirs = checkInRecordService.findByOrderNumC(cir.getOrderNum());
+        List<CheckInRecord> cirs = checkInRecordService.findByOrderNumC(billCheckBo.getHotelCode(),cir.getOrderNum());
         Account targetAccount = cir.getAccount();
         boolean result = transferBill(cirs, targetAccount, billCheckBo);
         if (result) {
@@ -493,7 +493,7 @@ public class AccountServiceImpl implements AccountService {
         DtoResponse<Account> rep = new DtoResponse<Account>();
         String id = billCheckBo.getAccountId();
         CheckInRecord cir = checkInRecordService.queryByAccountId(id);
-        List<CheckInRecord> cirs = checkInRecordService.findByOrderNum(cir.getOrderNum());
+        List<CheckInRecord> cirs = checkInRecordService.findByOrderNum(billCheckBo.getHotelCode(),cir.getOrderNum());
         Account targetAccount = cir.getAccount();
         boolean result = true;
         for (CheckInRecord item : cirs) {
@@ -520,7 +520,7 @@ public class AccountServiceImpl implements AccountService {
         for (CheckInRecord item : cirs) {
             if (Constants.Type.CHECK_IN_RECORD_CUSTOMER.equals(item.getType())) {
                 Account account = item.getAccount();
-                if (!account.getId().equals(targetAccount.getId()) && account.getTotal() != 0.0) {
+                if (!account.getId().equals(targetAccount.getId())) {
                     boolean result = transferBill(account, targetAccount, billCheckBo);
                     if (!result) {
                         // TODO 失败
@@ -731,7 +731,7 @@ public class AccountServiceImpl implements AccountService {
         CheckInRecord cir = checkInRecordService.queryByAccountId(id);
         SettleInfoVo settleInfoVo = null;
         if (cir != null) {
-            List<CheckInRecord> cirs = checkInRecordService.findByOrderNumC(cir.getOrderNum());
+            List<CheckInRecord> cirs = checkInRecordService.findByOrderNumC(hotelCode,cir.getOrderNum());
             if (accountCheck(cirs)) {
                 settleInfoVo = createSettleInfo(cir, Constants.Type.EXT_FEE_NONE, hotelCode);
             } else {
@@ -751,7 +751,7 @@ public class AccountServiceImpl implements AccountService {
         CheckInRecord cir = checkInRecordService.queryByAccountId(id);
         SettleInfoVo settleInfoVo = null;
         if (cir != null) {
-            List<CheckInRecord> cirs = checkInRecordService.findByOrderNumC(cir.getOrderNum());
+            List<CheckInRecord> cirs = checkInRecordService.findByOrderNumC(hotelCode,cir.getOrderNum());
             settleInfoVo = createSettleInfo(cirs, extFee, hotelCode);
         } else {
             return null;

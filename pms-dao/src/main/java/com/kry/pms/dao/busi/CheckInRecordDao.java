@@ -111,8 +111,10 @@ public interface CheckInRecordDao extends BaseDao<CheckInRecord> {
 
 	List<CheckInRecord> findByOrderNumAndTypeAndDeleted(String orderNum, String type, int deletedFalse);
 
-//	@EntityGraph(value = "CheckInRecord.roomPriceScheme", type = EntityGraph.EntityGraphType.FETCH)
-	List<CheckInRecord> findByOrderNumAndDeleted(String orderNum, int deletedFalse);
+	List<CheckInRecord> findByHotelCodeAndOrderNumAndTypeAndDeleted(String hotelCode,String orderNum, String type, int deletedFalse);
+
+
+	List<CheckInRecord> findByHotelCodeAndOrderNumAndDeleted(String hotelCode,String orderNum, int deletedFalse);
 
 	List<CheckInRecord> findByHotelCodeAndOrderNumAndGuestRoomId(String hotelCode, String orderNum, String id);
 

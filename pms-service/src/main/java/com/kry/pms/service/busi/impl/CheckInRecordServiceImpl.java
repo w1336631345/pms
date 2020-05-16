@@ -540,7 +540,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
     private DtoResponse<List<CheckInRecord>> checkOutGroup(String id) {
         CheckInRecord cir = queryByAccountId(id);
         checkOut(cir);
-        DtoResponse<List<CheckInRecord>>  rep = checkOut(findByOrderNumC(cir.getOrderNum()));
+        DtoResponse<List<CheckInRecord>>  rep = checkOut(findByOrderNumC(cir.getHotelCode(),cir.getOrderNum()));
         if(rep.getStatus()!=0){
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
         }
@@ -1245,12 +1245,6 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
         return list;
     }
 
-    @Override
-    public Collection<AccountSummaryVo> getAccountSummaryByOrderNum(String orderNum, String type) {
-        List<CheckInRecord> cirs = checkInRecordDao.findByOrderNumAndTypeAndDeleted(orderNum, type,
-                Constants.DELETED_FALSE);
-        return checkInRecordToAccountSummaryVo(cirs);
-    }
 
     public Collection<AccountSummaryVo> getAccountSummaryByOrderNum2(String orderNum, String type) {
         List<AccountSummaryVo> list = checkInRecordDao.querySummeryByOrderNumAndType(orderNum, type);
@@ -1364,16 +1358,14 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
     }
 
     @Override
-    public List<CheckInRecord> findByOrderNum(String orderNum) {
-        return checkInRecordDao.findByOrderNumAndDeleted(orderNum, Constants.DELETED_FALSE);
+    public List<CheckInRecord> findByOrderNum(String hotelCode,String orderNum) {
+        return checkInRecordDao.findByHotelCodeAndOrderNumAndDeleted(hotelCode,orderNum, Constants.DELETED_FALSE);
     }
 
-    //只查询宾客的数据（不查询主单和预订单）
     @Override
-    public List<CheckInRecord> findByOrderNumC(String orderNum) {
-        return checkInRecordDao.findByOrderNumAndTypeAndDeleted(orderNum, Constants.Type.CHECK_IN_RECORD_CUSTOMER, Constants.DELETED_FALSE);
+    public List<CheckInRecord> findByOrderNumC(String hotelCode,String orderNum) {
+        return checkInRecordDao.findByHotelCodeAndOrderNumAndTypeAndDeleted(hotelCode,orderNum, Constants.Type.CHECK_IN_RECORD_CUSTOMER, Constants.DELETED_FALSE);
     }
-
     @Override
     public List<Map<String, Object>> findByOrderNumC2(String hotelCode, String orderNum) throws IOException, TemplateException {
         Map<String, Object> map = new HashMap<>();
@@ -2390,7 +2382,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
     }
 
     @Override
-    public Collection<AccountSummaryVo> getAccountSummaryByLinkNum(String orderNum, String accountCustomer) {
+    public Collection<AccountSummaryVo> getAccountSummaryByLinkNum(String hotelCode,String orderNum, String accountCustomer) {
         List<CheckInRecord> data = findByLinkId(orderNum);
         return checkInRecordToAccountSummaryVo(data);
     }
@@ -2573,14 +2565,14 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                 cir = queryByAccountId(id);
                 if (cir != null) {
                     hangUp(cir, extFeeType);
-                    hangUp(findByOrderNumC(cir.getOrderNum()), extFeeType);
+                    hangUp(findByOrderNumC(cir.getHotelCode(),cir.getOrderNum()), extFeeType);
                 }
                 break;
             case Constants.Type.SETTLE_TYPE_IGROUP:
                 cir = queryByAccountId(id);
                 if (cir != null) {
                     hangUp(cir, extFeeType);
-                    hangUp(findByOrderNumC(cir.getOrderNum()), extFeeType);
+                    hangUp(findByOrderNumC(cir.getHotelCode(),cir.getOrderNum()), extFeeType);
                 }
                 break;
             case Constants.Type.SETTLE_TYPE_ROOM:

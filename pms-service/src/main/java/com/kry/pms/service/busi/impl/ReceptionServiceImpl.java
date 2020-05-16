@@ -309,7 +309,7 @@ public class ReceptionServiceImpl implements ReceptionService {
 						Constants.Type.CHECK_IN_RECORD_CUSTOMER)));
 			}else if(cir.getRoomLinkId() != null){
 				Collection<AccountSummaryVo> data = checkInRecordService
-						.getAccountSummaryByLinkNum(cir.getRoomLinkId(), Constants.Type.CHECK_IN_RECORD_CUSTOMER);
+						.getAccountSummaryByLinkNum(cir.getHotelCode(),cir.getRoomLinkId(), Constants.Type.CHECK_IN_RECORD_CUSTOMER);
 				asv = new AccountSummaryVo();
 				asv.setName("联房账务");
 				asv.setType("link");

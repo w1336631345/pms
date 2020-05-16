@@ -141,7 +141,7 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
     @GetMapping(path = "/orderNum/{orderNum}")
     public HttpResponse<List<CheckInRecord>> findDetailByOrderNum(@PathVariable("orderNum") String orderNum) {
         HttpResponse<List<CheckInRecord>> rep = new HttpResponse<List<CheckInRecord>>();
-        rep.addData(checkInRecordService.findByOrderNum(orderNum));
+        rep.addData(checkInRecordService.findByOrderNum(getCurrentHotleCode(),orderNum));
         return rep;
     }
 
@@ -154,10 +154,11 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
      * @Author: huanghaibin
      * @Date: 2020/3/9 18:42
      */
+    @Deprecated
     @GetMapping(path = "/orderNumC/{orderNum}")
     public HttpResponse<List<CheckInRecord>> findDetailByOrderNumC(@PathVariable("orderNum") String orderNum) {
         HttpResponse<List<CheckInRecord>> rep = new HttpResponse<List<CheckInRecord>>();
-        rep.addData(checkInRecordService.findByOrderNumC(orderNum));
+        rep.addData(checkInRecordService.findByOrderNumC(getCurrentHotleCode(),orderNum));
         return rep;
     }
 
@@ -356,10 +357,11 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
     }
 
     @GetMapping("/checkOut/{type}/{id}")
-    public HttpResponse<List<CheckInRecord>> checkOut(@PathVariable("type") String type, @PathVariable("id") String id,String orderNum) {
-        HttpResponse<List<CheckInRecord>> rep = new HttpResponse<>();
+    public HttpResponse<String> checkOut(@PathVariable("type") String type, @PathVariable("id") String id,String orderNum) {
+        HttpResponse<String> rep = new HttpResponse<>();
         DtoResponse<List<CheckInRecord>> response = checkInRecordService.checkOut(type, id,orderNum);
         BeanUtils.copyProperties(response, rep);
+        rep.setData(null);
         return rep;
     }
 
