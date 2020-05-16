@@ -261,6 +261,7 @@ public class Constants {
 	public interface Code {
 		public static final String  HALF_DAY_ROOM_FEE = "1002";
 		public static final String  FULL_DAY_ROOM_FEE = "1001";
+		public static final String  NIGHT_TRIAL = "1000";
 		public static final String  TO_AR = "9014";
 	}
 

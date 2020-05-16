@@ -309,7 +309,7 @@ public class BillServiceImpl implements BillService {
     // 夜审手动入账(优化)
     @Override
     public void putAcountMap(List<Map<String, Object>> list, LocalDate businessDate, Employee emp, String shiftCode, String hotelCode) {
-        Product p = productDao.findByHotelCodeAndCode(hotelCode, "1000");//这里必须改修改，不能写死，要找到夜间稽核类型（在product中加）
+        Product p = productDao.findByHotelCodeAndCode(hotelCode, Constants.Code.NIGHT_TRIAL);//这里必须改修改，不能写死，要找到夜间稽核类型（在product中加）
         for (int i = 0; i < list.size(); i++) {
             Map<String, Object> map = list.get(i);
             String id = MapUtils.getString(map, "id");
@@ -330,7 +330,7 @@ public class BillServiceImpl implements BillService {
                     Product product = new Product();//入账项目
                     product.setId(productId);
                     addAudit(product, setMealCost, setMealAccount, hotelCode, emp, shiftCode, null, "M", businessDate);
-                    addAudit(product, -setMealCost, setMealAccount, hotelCode, emp, shiftCode, null, "M", businessDate);
+                    addAudit(p, -setMealCost, setMealAccount, hotelCode, emp, shiftCode, null, "M", businessDate);
                 }
             }
             addAudit(p, cost, cirAccount, hotelCode, emp, shiftCode, id, "M", businessDate);

@@ -9,5 +9,8 @@ public interface UserService extends BaseService<User> {
 
     User findByOpenId(String openId);
 
+    User findByUnionIdAndHotelCode(String unionId, String hotelCode);
+
     boolean bindWx(User user, String openId);
+    boolean bindWxUnionId(User user, String unionId);
 }

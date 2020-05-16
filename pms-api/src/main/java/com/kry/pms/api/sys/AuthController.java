@@ -1,10 +1,14 @@
 package com.kry.pms.api.sys;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.alibaba.fastjson.JSONObject;
 import com.kry.pms.model.persistence.sys.User;
+import com.kry.pms.service.pay.WechatPayService;
+import com.kry.pms.util.WechatLoginUtil;
 import me.chanjar.weixin.mp.bean.result.WxMpUser;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
@@ -15,11 +19,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.kry.pms.base.Constants;
 import com.kry.pms.base.HttpResponse;
@@ -35,6 +35,7 @@ import com.kry.pms.utils.ShiroUtils;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.servlet.ModelAndView;
+import org.weixin4j.WeixinException;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -53,6 +54,8 @@ public class AuthController {
     SessionController sessionController;
     @Autowired
     ShiftService shiftService;
+    @Autowired
+    WechatPayService wechatPayService;
 
     @ResponseBody
     @RequestMapping(path = "/admin/login", method = RequestMethod.POST)
@@ -79,6 +82,95 @@ public class AuthController {
             return response.ok("登录成功");
         } catch (AuthenticationException e) {
             return response.error(1000, "用户或密码错误");
+        }
+    }
+    /**
+     * 功能描述: <br>微信获取openid
+     * 〈〉
+     * @Param: [code, request]
+     * @Return: com.kry.pms.base.HttpResponse
+     * @Author: huanghaibin
+     * @Date: 2020/5/15 17:32
+     */
+    @ResponseBody
+    @RequestMapping("/getOpenid")
+    public HttpResponse getOpenid(String code, HttpServletRequest request) throws IOException, WeixinException {
+        HttpResponse hr = new HttpResponse();
+        hr = wechatPayService.getOpenId(code, request);
+        return hr;
+    }
+    /**
+     * 功能描述: <br>encryptedData解密，获取用户信息（openId, unionId）
+     * 〈〉
+     * @Param: [encryptedData, sessionKey, iv]
+     * @Return: com.kry.pms.base.HttpResponse
+     * @Author: huanghaibin
+     * @Date: 2020/5/16 10:33
+     */
+    @ResponseBody
+    @GetMapping(value = "/encrypte")
+    public HttpResponse login(String encryptedData, String sessionKey, String iv) throws IOException, WeixinException {
+        HttpResponse hr = new HttpResponse();
+        Map<String, Object> map = WechatLoginUtil.getUserInfo(encryptedData, sessionKey, iv);
+        hr.setData(map);
+        return hr;
+    }
+    /**
+     * 功能描述: <br>微信登录
+     * 〈〉
+     * @Param: [encryptedData, sessionKey, iv]
+     * @Return: com.kry.pms.base.HttpResponse
+     * @Author: huanghaibin
+     * @Date: 2020/5/16 10:34
+     */
+    @ResponseBody
+    @GetMapping(value = "/wxLogin")
+    public HttpResponse wxLogin(String unionId, String hotelCode){
+        HttpResponse hr = new HttpResponse();
+        User user = userService.findByUnionIdAndHotelCode(unionId, hotelCode);
+        Map<String, Object> map = new HashMap<>();
+        if (user == null) {//如果用户为空，表示还没有绑定账号
+            hr.setStatus(1);
+            hr.setMessage("未绑定该酒店账号");
+        } else {
+            String sessionId = login(user, "1");
+            map.put("token", sessionId);
+            map.put("userInfo", user);
+            hr.setData(map);
+        }
+        return hr;
+    }
+    /**
+     * 功能描述: <br>小程序登录绑定unionId
+     * 〈〉
+     * @Param: [unionId, username, password, hotelCode]
+     * @Return: com.kry.pms.base.HttpResponse
+     * @Author: huanghaibin
+     * @Date: 2020/5/16 11:17
+     */
+    @ResponseBody
+    @GetMapping(value = "/binding")
+    public HttpResponse binding(String unionId, String username, String password, String hotelCode){
+        HttpResponse hr = new HttpResponse();
+        if(hotelCode == null || "".equals(hotelCode)){
+            return hr.error("请选择酒店编码");
+        }
+        password = MD5Utils.encrypt(username, hotelCode, password);
+        User user = userService.getAuditUser(username,password, hotelCode);
+        UsernamePasswordToken token = new UsernamePasswordToken(username, password);
+        Subject subject = SecurityUtils.getSubject();
+        try {
+            subject.login(token);
+            userService.bindWxUnionId(ShiroUtils.getUser(),unionId);
+            subject.getSession().setAttribute(Constants.Key.SESSION_ATTR_SHIFT_CODE, "1");
+            String id = (String) subject.getSession().getId();
+            Map<String, Object> map = new HashMap<>();
+            map.put("token", id);
+            map.put("userInfo", user);
+            hr.addData(id);
+            return hr.ok("登录成功");
+        } catch (AuthenticationException e) {
+            return hr.error(1000, "用户或密码错误");
         }
     }
 

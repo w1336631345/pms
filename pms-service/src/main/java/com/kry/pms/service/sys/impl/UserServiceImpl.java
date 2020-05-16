@@ -75,10 +75,23 @@ public class  UserServiceImpl implements  UserService{
 	}
 
 	@Override
+	public User findByUnionIdAndHotelCode(String openId, String hotelCode) {
+		return userDao.findByUnionIdAndHotelCode(openId,hotelCode);
+	}
+
+	@Override
 	public boolean bindWx(User user, String openId) {
 	 	user = findById(user.getId());
 	 	user.setOpenId(openId);
 	 	modify(user);
+		return true;
+	}
+
+	@Override
+	public boolean bindWxUnionId(User user, String unionId) {
+		user = findById(user.getId());
+		user.setUnionId(unionId);
+		modify(user);
 		return true;
 	}
 
