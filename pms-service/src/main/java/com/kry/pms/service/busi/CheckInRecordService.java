@@ -25,7 +25,7 @@ import java.util.Map;
 
 public interface CheckInRecordService extends BaseService<CheckInRecord> {
 
-    Collection<AccountSummaryVo> getAccountSummaryByOrderNum2(String orderNum, String type);
+    Collection<AccountSummaryVo> getAccountSummaryByOrderNum2(String hotelCode,String orderNum, String type);
 
     public PageResponse<CheckInRecordListVo> querySummaryList(PageRequest<CheckInRecord> req);
 

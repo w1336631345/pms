@@ -514,7 +514,7 @@ public class AccountServiceImpl implements AccountService {
             billCheckBo.setCheckType(Constants.Type.SETTLE_TYPE_ACCOUNT);
             return checkAccountBill(billCheckBo);
         }
-    }
+    } 
 
     private boolean transferBill(List<CheckInRecord> cirs, Account targetAccount, BillCheckBo billCheckBo) {
         for (CheckInRecord item : cirs) {

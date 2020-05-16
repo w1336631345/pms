@@ -1246,8 +1246,8 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
     }
 
 
-    public Collection<AccountSummaryVo> getAccountSummaryByOrderNum2(String orderNum, String type) {
-        List<AccountSummaryVo> list = checkInRecordDao.querySummeryByOrderNumAndType(orderNum, type);
+    public Collection<AccountSummaryVo> getAccountSummaryByOrderNum2(String hotelCode,String orderNum, String type) {
+        List<AccountSummaryVo> list = checkInRecordDao.querySummeryByOrderNumAndType(hotelCode,orderNum, type);
         return accountListToTree(list);
     }
 

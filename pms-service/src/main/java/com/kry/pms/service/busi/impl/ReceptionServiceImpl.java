@@ -305,7 +305,7 @@ public class ReceptionServiceImpl implements ReceptionService {
 					group.setSettleType(Constants.Type.SETTLE_TYPE_IGROUP);
 				}
 				asv.getChildren().add(group);
-				asv.getChildren().addAll((checkInRecordService.getAccountSummaryByOrderNum2(cir.getOrderNum(),
+				asv.getChildren().addAll((checkInRecordService.getAccountSummaryByOrderNum2(cir.getHotelCode(),cir.getOrderNum(),
 						Constants.Type.CHECK_IN_RECORD_CUSTOMER)));
 			}else if(cir.getRoomLinkId() != null){
 				Collection<AccountSummaryVo> data = checkInRecordService
@@ -318,7 +318,7 @@ public class ReceptionServiceImpl implements ReceptionService {
 				asv.setChildren(data);
 			}else{
 				Collection<AccountSummaryVo> data = checkInRecordService
-						.getAccountSummaryByOrderNum2(cir.getOrderNum(), Constants.Type.CHECK_IN_RECORD_CUSTOMER);
+						.getAccountSummaryByOrderNum2(cir.getHotelCode(),cir.getOrderNum(), Constants.Type.CHECK_IN_RECORD_CUSTOMER);
 				if (data != null && !data.isEmpty()) {
 					asv = (AccountSummaryVo) data.toArray()[0];
 				}
