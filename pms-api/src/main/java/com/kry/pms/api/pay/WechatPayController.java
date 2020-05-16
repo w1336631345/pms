@@ -41,8 +41,7 @@ public class WechatPayController extends BaseController {
     @RequestMapping("/login")
     public HttpResponse login(String code, HttpServletRequest request) throws IOException, WeixinException {
         HttpResponse hr = new HttpResponse();
-        Map<String, Object> map = wechatPayService.login(code, request);
-        hr.addData(map);
+        hr = wechatPayService.getOpenId(code, request);
         return hr;
     }
 

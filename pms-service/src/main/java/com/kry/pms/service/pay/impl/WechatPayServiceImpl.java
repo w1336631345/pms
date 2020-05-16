@@ -60,8 +60,8 @@ public class WechatPayServiceImpl extends WeixinSupport implements WechatPayServ
 
 	private Logger logger = LoggerFactory.getLogger(getClass());
 
-	private static final String appid = "wxb16fd80662516230";	    //微信公众号appid
-	private static final String secret = "cf497d0e32888c9bbcaaf8699f44d423";	//微信公众号密钥
+	private static final String appid = "wx09adf502d19bf421";	    //微小程序appid
+	private static final String secret = "3d1449aedc049746173103927f711e4b";	//微信小程序密钥
 	private static final String grant_type = "authorization_code";
 
 	@Override
@@ -171,11 +171,11 @@ public class WechatPayServiceImpl extends WeixinSupport implements WechatPayServ
 		return json;
 	}
 	@Override
-    public Map<String, Object> login(String code, HttpServletRequest request) throws WeixinException, IOException {
+    public HttpResponse getOpenId(String code, HttpServletRequest request) throws WeixinException, IOException {
+		HttpResponse hr = new HttpResponse();
         if (code == null || code.equals("")) {
             throw new WeixinException("invalid null, code is null.");
         }
-        Map<String, Object> ret = new HashMap<String, Object>();
         //拼接参数
         String param = "?grant_type=" + grant_type + "&appid=" + appid + "&secret=" + secret + "&js_code=" + code;
         //创建请求对象
@@ -188,14 +188,13 @@ public class WechatPayServiceImpl extends WeixinSupport implements WechatPayServ
             Object errcode = jsonObj.get("errcode");
             if (errcode != null) {
                 //返回异常信息
-                throw new WeixinException(getCause(Integer.parseInt(errcode.toString())));
+                return hr.error(9999,jsonObj.get("errmsg").toString());
             }
             ObjectMapper mapper = new ObjectMapper();
             OAuthJsToken oauthJsToken = mapper.readValue(jsonObj.toJSONString(),OAuthJsToken.class);
-            logger.info("openid=" + oauthJsToken.getOpenid());
-            ret.put("openid", oauthJsToken.getOpenid());
+			hr.setData(oauthJsToken);
         }
-        return ret;
+        return hr;
     }
 	@Override
 	public void wxNotify(HttpServletRequest request, HttpServletResponse response) throws Exception{

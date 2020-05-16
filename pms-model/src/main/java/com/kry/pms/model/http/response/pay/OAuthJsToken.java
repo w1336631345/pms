@@ -7,6 +7,7 @@ package com.kry.pms.model.http.response.pay;
  */
 public class OAuthJsToken {
     private String openid;              //用户唯一标识
+    private String unionid;             //用户在开放平台的唯一标识符，在满足 UnionID 下发条件的情况下会返回
     private int expires_in = 7200;      //凭证有效时间，单位：秒
     private String session_key;         //会话密匙
     private long exprexpiredTime;           //过期时间
@@ -44,5 +45,13 @@ public class OAuthJsToken {
      */
     public boolean isExprexpired() {
         return System.currentTimeMillis() >= this.exprexpiredTime;
+    }
+
+    public String getUnionid() {
+        return unionid;
+    }
+
+    public void setUnionid(String unionid) {
+        this.unionid = unionid;
     }
 }

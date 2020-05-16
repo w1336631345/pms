@@ -28,6 +28,8 @@ public class User extends PersistenceModel {
 	@Column
 	private String openId;
 	@Column
+	private String unionId;//同一主体下的程序的唯一标识符（和openid比较）
+	@Column
 	@JsonIgnore
 	private String password;
 	@Column(name = "type_")
@@ -38,4 +40,5 @@ public class User extends PersistenceModel {
 	private String avatar;
 	@Column(columnDefinition = "varchar(32) default 'normal' COMMENT '是否允许登录（normal：正常可登录状态，audit：夜审不可登录）'")
 	private String allowLogin;
+
 }

@@ -63,6 +63,12 @@ public class  ProductServiceImpl implements  ProductService{
 		return productDao.findByHotelCodeAndCode(hotelCode,Constants.Code.FULL_DAY_ROOM_FEE);
 	}
 
+	//夜审稽核项目
+	@Override
+	public Product findNightTrial(String hotelCode) {
+		return productDao.findByHotelCodeAndCode(hotelCode,Constants.Code.NIGHT_TRIAL);
+	}
+
 	@Override
 	public List<Product> getAllByHotelCode(String code) {
 		return null;//默认不实现

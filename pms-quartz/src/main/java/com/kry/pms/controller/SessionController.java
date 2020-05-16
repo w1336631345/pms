@@ -53,6 +53,8 @@ public class SessionController {
                 user = (User) principalCollection.getPrimaryPrincipal();
                 if(loginUser.getHotelCode().equals(user.getHotelCode())){
                     isHotelUser = true;
+                }else {
+                    isHotelUser = false;
                 }
                 if(isHotelUser){
                     if(loginUser.getId().equals(user.getId())){

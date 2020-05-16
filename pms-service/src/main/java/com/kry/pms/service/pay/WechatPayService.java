@@ -13,7 +13,7 @@ public interface WechatPayService {
 
     Json wxPay(String openid, HttpServletRequest request);
 
-    Map<String, Object> login(String code, HttpServletRequest request) throws WeixinException, IOException;
+    HttpResponse getOpenId(String code, HttpServletRequest request) throws WeixinException, IOException;
 
     HttpResponse sweepPay(Integer total_fee, String body, String auth_code, HttpServletRequest request, String hotelCode) throws Exception;
 
