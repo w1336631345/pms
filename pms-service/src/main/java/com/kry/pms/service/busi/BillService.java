@@ -18,7 +18,9 @@ import com.kry.pms.service.BaseService;
 
 public interface BillService extends BaseService<Bill> {
 
-	public boolean billEntry(RoomRecord rr, LocalDate recordDate);
+    List<Bill> addAll(List<Bill> bills);
+
+    public boolean billEntry(RoomRecord rr, LocalDate recordDate);
 
 	/**
 	 * 检查并支付账单

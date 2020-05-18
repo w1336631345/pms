@@ -35,6 +35,7 @@ public interface RoomRecordDao extends BaseDao<RoomRecord>{
 	@Query(nativeQuery = true, value = " select \n" +
 			" trr.id, \n" +
 			" tcr.id cirId, \n" +
+			" main.account_id mainAccountId, \n" +
 			" tsm.id setMealId, \n" +
 			" tsm.product_id productId, \n" +
 			" tsm.account_id setMealAccountId, \n" +
@@ -45,6 +46,7 @@ public interface RoomRecordDao extends BaseDao<RoomRecord>{
 			" from t_room_record trr \n" +
 			"  left join t_checkin_record tcr on trr.check_in_record_id = tcr.id \n" +
 			"  left join t_set_meal tsm on tcr.set_meal_id = tsm.id \n" +
+			"  left join t_checkin_record main on tcr.main_record_id = main.id \n" +
 			" where 1=1 and tcr.`status` = 'I' " +
 			"  and trr.record_date = ?1 \n" +
 			"  and trr.hotel_code = ?2 \n" +

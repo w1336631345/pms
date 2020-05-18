@@ -269,6 +269,12 @@ public class AuthController {
             shift = state;
         }
         Map<String, String> data = new HashMap<>();
+        if(user.getUnionId() != null){
+            User u = userService.findByUnionIdAndHotelCode(user.getUnionId(), urlHotelCode);
+            if(u != null){
+                data.put("unionId", user.getUnionId());
+            }
+        }
         if (cuser == null) {
             data.put("status", "1");
             data.put("avatar", user.getHeadImgUrl());

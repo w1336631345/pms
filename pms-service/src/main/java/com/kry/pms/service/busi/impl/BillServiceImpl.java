@@ -17,6 +17,8 @@ import com.kry.pms.dao.goods.ProductDao;
 import com.kry.pms.dao.goods.SetMealDao;
 import com.kry.pms.model.dto.BillStatistics;
 import com.kry.pms.model.persistence.goods.SetMeal;
+import com.kry.pms.model.persistence.sys.BookkeepingSet;
+import com.kry.pms.service.sys.BookkeepingSetService;
 import com.kry.pms.service.sys.SqlTemplateService;
 import org.apache.commons.collections4.MapUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,6 +81,8 @@ public class BillServiceImpl implements BillService {
     ProductDao productDao;
     @Autowired
     RoomRecordDao roomRecordDao;
+    @Autowired
+    BookkeepingSetService bookkeepingSetService;
 
     @Transient
     @Override
@@ -106,6 +110,11 @@ public class BillServiceImpl implements BillService {
         bill.setBillSeq(account.getCurrentBillSeq());
         bill.setAccount(account);
         return billDao.saveAndFlush(bill);
+    }
+    @Override
+    public List<Bill> addAll(List<Bill> bills) {
+        bills = billDao.saveAll(bills);
+        return bills;
     }
 
     @Override
@@ -315,6 +324,7 @@ public class BillServiceImpl implements BillService {
             String id = MapUtils.getString(map, "id");
             String cirId = MapUtils.getString(map, "cirId");
             String setMealId = MapUtils.getString(map, "setMealId");
+            String mainAccountId = MapUtils.getString(map, "mainAccountId");
             String productId = MapUtils.getString(map, "productId");
             String setMealAccountId = MapUtils.getString(map, "setMealAccountId");//这个是包价入账的账号
             String cirAccountId = MapUtils.getString(map, "cirAccountId");//这个是包价入账的账号
@@ -324,7 +334,6 @@ public class BillServiceImpl implements BillService {
             cirAccount.setId(cirAccountId);
             Double cost = MapUtils.getDouble(map, "cost");
             Double setMealCost = MapUtils.getDouble(map, "setMealCost");
-
             if (setMealId != null && !"".equals(setMealId)) {
                 if (productId != null && !"".equals(productId)) {//如果有包价，就一笔整的包价价格账，一笔负的价格账，正负得0
                     Product product = new Product();//入账项目
@@ -332,6 +341,11 @@ public class BillServiceImpl implements BillService {
                     addAudit(product, setMealCost, setMealAccount, hotelCode, emp, shiftCode, null, "M", businessDate);
                     addAudit(p, -setMealCost, setMealAccount, hotelCode, emp, shiftCode, null, "M", businessDate);
                 }
+            }
+            BookkeepingSet bs = bookkeepingSetService.isExist(hotelCode, mainAccountId, p.getId());
+            //如果设置了团付设置，入账到主账号
+            if(bs != null){
+                cirAccount.setId(mainAccountId);
             }
             addAudit(p, cost, cirAccount, hotelCode, emp, shiftCode, id, "M", businessDate);
             // 入账成功后roomRecord里面入账状态改为pay
