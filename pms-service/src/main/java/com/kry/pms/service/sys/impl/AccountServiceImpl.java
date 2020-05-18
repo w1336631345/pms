@@ -636,7 +636,6 @@ public class AccountServiceImpl implements AccountService {
                 siv = getSingleAccountSettleInfo(id, extFee);
                 break;
             case Constants.Type.SETTLE_TYPE_PART:
-
                 break;
             case Constants.Type.SETTLE_TYPE_GROUP:
                 siv = getGroupAccountSettleInfo(id, extFee, hotelCode);
