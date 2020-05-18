@@ -49,7 +49,7 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
      * @Date: 2020/1/2 14:48
      */
     @PutMapping(path = "/modifyInfo")
-    @OperationLog(remark = "主单修改操作")
+//    @OperationLog(remark = "主单修改操作")
     public HttpResponse<CheckInRecord> modifyInfo(@RequestBody CheckInRecord checkInRecord) {
         HttpResponse hr = checkInRecordService.modifyInfo(checkInRecord);
         return hr;

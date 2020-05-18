@@ -19,6 +19,7 @@ public interface ProductDao extends BaseDao<Product>{
             " from t_dict_data tdd, t_product tp \n" +
             " where tdd.`code` = tp.achievement_type \n" +
             " and tdd.dict_type_code = 'AchievementType' \n" +
+            " and tdd.hotel_code = :hotelCode " +
             " and tp.direction = 1 \n" +
             " and tp.hotel_code = :hotelCode " +
             " order by tp.achievement_type desc ")
