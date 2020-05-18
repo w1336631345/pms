@@ -141,6 +141,22 @@ public class AuthController {
         return hr;
     }
     /**
+     * 功能描述: <br>根据unionId查询用户绑定的酒店列表
+     * 〈〉
+     * @Param: [unionId]
+     * @Return: com.kry.pms.base.HttpResponse
+     * @Author: huanghaibin
+     * @Date: 2020/5/18 10:10
+     */
+    @ResponseBody
+    @GetMapping(value = "/getHotelList")
+    public HttpResponse getHotelList(String unionId){
+        HttpResponse hr = new HttpResponse();
+        List<Map<String, Object>> list = hotelService.getByUnionId(unionId);
+        hr.setData(list);
+        return hr;
+    }
+    /**
      * 功能描述: <br>小程序登录绑定unionId
      * 〈〉
      * @Param: [unionId, username, password, hotelCode]

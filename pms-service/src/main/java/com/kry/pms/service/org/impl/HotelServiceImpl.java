@@ -1,6 +1,7 @@
 package com.kry.pms.service.org.impl;
 
 import java.util.List;
+import java.util.Map;
 
 import com.kry.pms.service.dict.DictDataService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -108,5 +109,10 @@ public class HotelServiceImpl implements HotelService {
 		hv.setPromotionalPictures(hotel.getPromotionalPictures());
 		return hv;
 	}
-	
+
+	@Override
+	public List<Map<String, Object>> getByUnionId(String unionId) {
+		List<Map<String, Object>> list = hotelDao.getByUnionId(unionId);
+		 return list;
+	}
 }
