@@ -34,7 +34,7 @@ public interface CheckInRecordDao extends BaseDao<CheckInRecord> {
 			+ " where tcr.type_ != 'G' "
 			+ " and if(:mainNum = 'N', :businessDate > tcr.arrive_time, 1=1 ) "
 			+ " and if(:mainNum = 'A', :businessDate > tcr.leave_time, 1=1 ) "
-			+ " and if(:status = 'X', tcr.deleted = 1 and DATE_FORMAT(tcr.update_date,'%Y-%m-%d') = :businessDate, tcr.deleted = 0 ) "
+			+ " and if(:status = 'X', tcr.deleted = 1 and DATE_FORMAT(tcr.arrive_time,'%Y-%m-%d') = :businessDate, tcr.deleted = 0 ) "
 			+ " and if(:status is not null && :status != '', tcr.`status`=:status, 1=1 ) "
 			+ " and if(:hotelCode is not null && :hotelCode != '', tcr.hotel_code=:hotelCode, 1=1 ) ",
 			countQuery = "select count(*) "
@@ -45,7 +45,7 @@ public interface CheckInRecordDao extends BaseDao<CheckInRecord> {
 					+ " where tcr.type_ != 'G' "
 					+ " and if(:mainNum = 'N', :businessDate > tcr.arrive_time, 1=1 ) "
 					+ " and if(:mainNum = 'A', :businessDate > tcr.leave_time, 1=1 ) "
-					+ " and if(:status = 'X', tcr.deleted = 1 and DATE_FORMAT(tcr.update_date,'%Y-%m-%d') = :businessDate, tcr.deleted = 0 ) "
+					+ " and if(:status = 'X', tcr.deleted = 1 and DATE_FORMAT(tcr.arrive_time,'%Y-%m-%d') = :businessDate, tcr.deleted = 0 ) "
 					+ " and if(:status is not null && :status != '', tcr.`status`=:status, 1=1 ) "
 					+ " and if(:hotelCode is not null && :hotelCode != '', tcr.hotel_code=:hotelCode, 1=1 ) ")
 	Page<Map<String, Object>> unreturnedGuests(Pageable page, @Param("mainNum") String mainNum,
@@ -70,7 +70,7 @@ public interface CheckInRecordDao extends BaseDao<CheckInRecord> {
 			+ " where type_ != 'G' "
 			+ " and id not in (select id from t_checkin_record where `status`='I' and leave_time > :businessDate) "
 			+ " and id not in (select id from t_checkin_record where (`status`='R' and arrive_time > :businessDate and deleted = 0) or (`status`='R' and deleted = 1)) "
-			+ " and id not in (select id from t_checkin_record where `status`='X' and deleted = 1 and DATE_FORMAT(update_date,'%Y-%m-%d') != :businessDate)"
+			+ " and id not in (select id from t_checkin_record where `status`='X' and deleted = 1 and DATE_FORMAT(arrive_time,'%Y-%m-%d') != :businessDate)"
 			+ " and if(:hotelCode is not null && :hotelCode != '', hotel_code=:hotelCode, 1=1 ) "
 			+ " GROUP BY status ", nativeQuery = true)
 	List<Map<String, Object>> getStatistics(@Param("hotelCode") String hotelCode, @Param("businessDate") LocalDate businessDate);
