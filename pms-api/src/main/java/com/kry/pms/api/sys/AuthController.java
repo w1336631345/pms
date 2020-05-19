@@ -271,25 +271,19 @@ public class AuthController {
             shift = state;
         }
         Map<String, String> data = new HashMap<>();
-        System.out.println("************************分割线1*****************");
-        System.out.println(user.toString());
-        System.out.println("************************分割线1*****************");
-        System.out.println("************************22222*****************");
-        System.out.println(accessToken.toString());
-        System.out.println("************************22222*****************");
+        String unionId = null;
         if(user.getUnionId() != null){
+            unionId = user.getUnionId();
             data.put("unionId", user.getUnionId());
-            User u = userService.findByUnionIdAndHotelCode(user.getUnionId(), urlHotelCode);
         }else if(accessToken.getUnionId() != null) {
+            unionId = accessToken.getUnionId();
             data.put("unionId", accessToken.getUnionId());
         } else {
-//            data.put("unionId", "userAndAccessToken undefind unionId");
-            String unionId = wechatPayService.getUnionId(user.getOpenId(), accessToken.getAccessToken());
-            System.out.println("+++++++++++================= 分割线 ++======================");
-            System.out.println("获取的unionId："+ unionId);
+            unionId = wechatPayService.getUnionId(user.getOpenId(), accessToken.getAccessToken());
             data.put("unionId", unionId);
         }
-        if (cuser == null) {
+        User u = userService.findByUnionIdAndHotelCode(user.getUnionId(), urlHotelCode);
+        if (u == null) {
             data.put("status", "1");
             data.put("avatar", user.getHeadImgUrl());
             data.put("openId", user.getOpenId());
@@ -307,7 +301,7 @@ public class AuthController {
     }
     @ResponseBody
     @RequestMapping(path = "/admin/bind_wx", method = RequestMethod.POST)
-    public HttpResponse<String> bindWx(String username, String password, String hotelCode,String openId, String shift) {
+    public HttpResponse<String> bindWx(String username, String password, String hotelCode,String openId,String unionId, String shift) {
         HttpResponse<String> response = new HttpResponse<>();
         if(hotelCode==null){
             hotelCode = getUrlHotleCode();
@@ -318,7 +312,8 @@ public class AuthController {
         try {
             subject.login(token);
             String hotelCodet = ShiroUtils.getUser().getHotelCode();
-            userService.bindWx(ShiroUtils.getUser(),openId);
+//            userService.bindWx(ShiroUtils.getUser(),openId);
+            userService.bindWxUnionId(ShiroUtils.getUser(), unionId);
             Shift newShift = shiftService.createOrUpdate(shift, ShiroUtils.getUser());
             subject.getSession().setAttribute(Constants.Key.SESSION_ATTR_SHIFT_CODE, newShift.getShiftCode());
             String id = (String) subject.getSession().getId();

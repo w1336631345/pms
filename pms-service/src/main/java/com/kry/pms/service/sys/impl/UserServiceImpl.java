@@ -86,6 +86,13 @@ public class  UserServiceImpl implements  UserService{
 	 	modify(user);
 		return true;
 	}
+	@Override
+	public boolean bindWxUnoinId(User user, String unionId) {
+		user = findById(user.getId());
+		user.setUnionId(unionId);
+		modify(user);
+		return true;
+	}
 
 	@Override
 	public boolean bindWxUnionId(User user, String unionId) {
