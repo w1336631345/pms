@@ -119,6 +119,10 @@ public class Constants {
 		public static final String PRODUCT_TYPE_COST = "cost";
 		public static final String PRODUCT_TYPE_PAY = "pay";
 
+		public static final String BILL_TYPE_COST = "cost";
+		public static final String BILL_TYPE_PAY = "pay";
+		public static final String BILL_TYPE_PACKAGE = "package";
+
 		public static final String BOOK_GROUP = "GROUP";
 
 		public static final String CHECK_IN_RECORD_GROUP_TYPE_NO = "N";

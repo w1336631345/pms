@@ -121,7 +121,11 @@ public class BillServiceImpl implements BillService {
         if (bill.getStatus() == null || Constants.Status.NORMAL.equals(bill.getStatus())) {
             bill.setStatus(Constants.Status.BILL_NEED_SETTLED);
         }
+        bill.setType(Constants.Type.BILL_TYPE_PACKAGE);
+        bill.setShowName("前台转入");
+        bill.setBusinessDate(businessSeqService.getBuinessDate(bill.getHotelCode()));
         Account account = accountService.billEntry(bill);
+        bill.setBillSeq(account.getCurrentBillSeq());
         bill.setAccount(account);
         return billDao.saveAndFlush(bill);
     }
@@ -563,7 +567,7 @@ public class BillServiceImpl implements BillService {
     }
 
     @Override
-    public Bill createArSettleBill(Account targetAccount, double total, double cost, double pay, Employee operationEmployee, String shiftCode) {
+    public Bill createArSettleBill(Account targetAccount, double total, double cost, double pay, Employee operationEmployee, String shiftCode,String recordNum) {
         Bill bill = new Bill();
         bill.setCost(cost);
         bill.setPay(pay);
@@ -572,6 +576,7 @@ public class BillServiceImpl implements BillService {
         bill.setAccount(targetAccount);
         bill.setHotelCode(targetAccount.getHotelCode());
         bill.setTotal(total);
+        bill.setReceiptNum(recordNum);
         return addArBill(bill);
     }
 

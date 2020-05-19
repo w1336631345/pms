@@ -85,7 +85,7 @@ public interface BillService extends BaseService<Bill> {
 
 	BillStatistics sumNeedSettle(Account account);
 
-	Bill createArSettleBill(Account targetAccount, double total, double cost, double pay, Employee operationEmployee, String shiftCode);
+	Bill createArSettleBill(Account targetAccount, double total, double cost, double pay, Employee operationEmployee, String shiftCode,String recordNum);
 
 	Bill createToArBill(Account account, double processTotal, double pay, Employee operationEmployee, String shiftCode,String recordNum,String remark);
 

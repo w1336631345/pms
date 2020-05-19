@@ -58,11 +58,11 @@ public class SettleAccountRecord extends PersistenceModel {
     @Column
     private String settleNum;
     @ManyToMany
-    private List<Bill> bills;
+    private List<Bill> bills;//被结帐的帐务
     @ManyToMany
-    private List<Bill> flatBills;
+    private List<Bill> flatBills;//结帐
     @ManyToMany
-    private List<Bill> extBills;
+    private List<Bill> extBills;//加收费用
     @Column
     private String parentNum;
     @Column

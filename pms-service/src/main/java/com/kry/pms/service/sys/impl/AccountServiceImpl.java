@@ -140,13 +140,7 @@ public class AccountServiceImpl implements AccountService {
         Account account = findById(bill.getAccount().getId());
         double oldTotal = account.getTotal();
         double newTotal = 0.0;
-        CheckInRecord cir = checkInRecordService.queryByAccountId(account.getId());
         if (account != null) {
-            if (bill.getGuestRoom() == null) {
-                if (cir != null && cir.getGuestRoom() != null) {
-                    bill.setRoomNum(cir.getGuestRoom().getRoomNum());
-                }
-            }
             if (bill.getCost() != null) {
                 account.setCost(BigDecimalUtil.add(account.getCost(), bill.getCost()));
             }
@@ -155,17 +149,25 @@ public class AccountServiceImpl implements AccountService {
             }
 
             account.setTotal(BigDecimalUtil.sub(account.getCost(), account.getPay()));
-        }
-        account.setCurrentBillSeq(account.getCurrentBillSeq() + 1);
-        account.setStatus(Constants.Status.ACCOUNT_IN);
-        if (Constants.Status.BILL_NEED_SETTLED.equals(bill.getStatus())) {
+            account.setCurrentBillSeq(account.getCurrentBillSeq() + 1);
+            account.setStatus(Constants.Status.ACCOUNT_IN);
+            if (Constants.Status.BILL_NEED_SETTLED.equals(bill.getStatus())) {
 
-        }
-        newTotal = account.getTotal();
-        if ((oldTotal > 0 && newTotal < 0) || (oldTotal < 0 && newTotal >= 0)) {
-            if (cir != null && cir.getGuestRoom() != null) {
-                guestRoomStatusService.changeOverdued(cir.getGuestRoom(), newTotal > 0);
             }
+            if (!account.getType().equals(Constants.Type.ACCOUNT_AR)&&bill.getGuestRoom() == null) {
+                CheckInRecord cir = checkInRecordService.queryByAccountId(account.getId());
+                if (cir != null && cir.getGuestRoom() != null) {
+                    bill.setRoomNum(cir.getGuestRoom().getRoomNum());
+                }
+                newTotal = account.getTotal();
+                if ((oldTotal > 0 && newTotal < 0) || (oldTotal < 0 && newTotal >= 0)) {
+                    if (cir != null && cir.getGuestRoom() != null) {
+                        guestRoomStatusService.changeOverdued(cir.getGuestRoom(), newTotal > 0);
+                    }
+                }
+            }
+        }else{
+            return null;
         }
         return modify(account);
     }
@@ -341,7 +343,7 @@ public class AccountServiceImpl implements AccountService {
                 if (processTotal == billCheckBo.getTotal()) {
                     if (targetAccount != null) {
                         Bill payBill = billService.createToArBill(account, processTotal, pay, billCheckBo.getOperationEmployee(), billCheckBo.getShiftCode(), settleAccountRecord.getRecordNum(), "To:" + targetAccount.getCode());
-                        Bill costBill = billService.createArSettleBill(targetAccount, billCheckBo.getTotal(), cost, pay, billCheckBo.getOperationEmployee(), billCheckBo.getShiftCode());
+                        Bill costBill = billService.createArSettleBill(targetAccount, billCheckBo.getTotal(), cost, pay, billCheckBo.getOperationEmployee(), billCheckBo.getShiftCode(),settleAccountRecord.getRecordNum());
                         List<Bill> flatBills = new ArrayList<>();
                         flatBills.add(payBill);
                         flatBills.add(costBill);

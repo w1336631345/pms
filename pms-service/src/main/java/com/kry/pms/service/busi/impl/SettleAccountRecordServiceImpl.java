@@ -191,7 +191,7 @@ public class SettleAccountRecordServiceImpl implements SettleAccountRecordServic
     public SettleAccountRecord createToAr(BillCheckBo billCheckBo, Account account, Account targetAccount){
         SettleAccountRecord scr = new SettleAccountRecord();
         scr.setRecordNum(businessSeqService.fetchNextSeqNum(targetAccount.getHotelCode(),
-                Constants.Key.BUSINESS_BUSINESS_SETTLE_SEQ_KEY));
+                Constants.Key.BUSINESS_BUSINESS_TRANSFER_SEQ_KEY));
         scr.setShiftCode(billCheckBo.getShiftCode());
         scr.setAccount(account);
         scr.setBusinessDate(businessSeqService.getBuinessDate(targetAccount.getHotelCode()));
