@@ -9,6 +9,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.kry.pms.model.persistence.sys.User;
 import com.kry.pms.service.pay.WechatPayService;
 import com.kry.pms.util.WechatLoginUtil;
+import me.chanjar.weixin.mp.bean.result.WxMpOAuth2AccessToken;
 import me.chanjar.weixin.mp.bean.result.WxMpUser;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
@@ -256,6 +257,7 @@ public class AuthController {
 
     @RequestMapping("/login_wechat_page")
     public ModelAndView loginWxForPage(HttpServletRequest request) throws JSONException {
+        WxMpOAuth2AccessToken accessToken = (WxMpOAuth2AccessToken) request.getAttribute("accessToken");
         WxMpUser user = (WxMpUser) request.getAttribute("user");
         User cuser = userService.findByOpenId(user.getOpenId());
         String state = (String) request.getAttribute("state");
@@ -274,6 +276,10 @@ public class AuthController {
             if(u != null){
                 data.put("unionId", user.getUnionId());
             }
+        }else if(accessToken.getUnionId() != null) {
+            data.put("unionId", accessToken.getUnionId());
+        } else {
+            data.put("unionId", "userAndAccessToken undefind unionId");
         }
         if (cuser == null) {
             data.put("status", "1");
