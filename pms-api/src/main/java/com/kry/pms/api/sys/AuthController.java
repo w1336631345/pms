@@ -9,6 +9,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.kry.pms.model.persistence.sys.User;
 import com.kry.pms.service.pay.WechatPayService;
 import com.kry.pms.util.WechatLoginUtil;
+import me.chanjar.weixin.mp.bean.result.WxMpOAuth2AccessToken;
 import me.chanjar.weixin.mp.bean.result.WxMpUser;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
@@ -255,7 +256,8 @@ public class AuthController {
     }
 
     @RequestMapping("/login_wechat_page")
-    public ModelAndView loginWxForPage(HttpServletRequest request) throws JSONException {
+    public ModelAndView loginWxForPage(HttpServletRequest request) throws JSONException, WeixinException {
+        WxMpOAuth2AccessToken accessToken = (WxMpOAuth2AccessToken) request.getAttribute("accessToken");
         WxMpUser user = (WxMpUser) request.getAttribute("user");
         User cuser = userService.findByOpenId(user.getOpenId());
         String state = (String) request.getAttribute("state");
@@ -269,7 +271,19 @@ public class AuthController {
             shift = state;
         }
         Map<String, String> data = new HashMap<>();
-        if (cuser == null) {
+        String unionId = null;
+        if(user.getUnionId() != null){
+            unionId = user.getUnionId();
+            data.put("unionId", user.getUnionId());
+        }else if(accessToken.getUnionId() != null) {
+            unionId = accessToken.getUnionId();
+            data.put("unionId", accessToken.getUnionId());
+        } else {
+            unionId = wechatPayService.getUnionId(user.getOpenId(), accessToken.getAccessToken());
+            data.put("unionId", unionId);
+        }
+        User u = userService.findByUnionIdAndHotelCode(user.getUnionId(), urlHotelCode);
+        if (u == null) {
             data.put("status", "1");
             data.put("avatar", user.getHeadImgUrl());
             data.put("openId", user.getOpenId());
@@ -287,7 +301,7 @@ public class AuthController {
     }
     @ResponseBody
     @RequestMapping(path = "/admin/bind_wx", method = RequestMethod.POST)
-    public HttpResponse<String> bindWx(String username, String password, String hotelCode,String openId, String shift) {
+    public HttpResponse<String> bindWx(String username, String password, String hotelCode,String openId,String unionId, String shift) {
         HttpResponse<String> response = new HttpResponse<>();
         if(hotelCode==null){
             hotelCode = getUrlHotleCode();
@@ -298,7 +312,8 @@ public class AuthController {
         try {
             subject.login(token);
             String hotelCodet = ShiroUtils.getUser().getHotelCode();
-            userService.bindWx(ShiroUtils.getUser(),openId);
+//            userService.bindWx(ShiroUtils.getUser(),openId);
+            userService.bindWxUnionId(ShiroUtils.getUser(), unionId);
             Shift newShift = shiftService.createOrUpdate(shift, ShiroUtils.getUser());
             subject.getSession().setAttribute(Constants.Key.SESSION_ATTR_SHIFT_CODE, newShift.getShiftCode());
             String id = (String) subject.getSession().getId();

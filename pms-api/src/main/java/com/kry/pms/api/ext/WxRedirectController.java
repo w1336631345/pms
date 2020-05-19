@@ -29,6 +29,7 @@ public class WxRedirectController {
             WxMpUser user = wxService.oauth2getUserInfo(accessToken, null);
             map.put("user", user);
             map.put("state",state);
+            map.put("accessToken", accessToken);
         } catch (WxErrorException e) {
             e.printStackTrace();
         }
