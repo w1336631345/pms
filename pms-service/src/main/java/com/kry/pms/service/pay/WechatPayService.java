@@ -7,7 +7,6 @@ import org.weixin4j.WeixinException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Map;
 
 public interface WechatPayService {
 
@@ -16,6 +15,8 @@ public interface WechatPayService {
     HttpResponse getOpenId(String code, HttpServletRequest request) throws WeixinException, IOException;
 
     HttpResponse sweepPay(Integer total_fee, String body, String auth_code, HttpServletRequest request, String hotelCode) throws Exception;
+
+    String getUnionId(String access_token, String openId) throws WeixinException;
 
     void wxNotify(HttpServletRequest request, HttpServletResponse response) throws Exception;
 

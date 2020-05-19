@@ -256,7 +256,7 @@ public class AuthController {
     }
 
     @RequestMapping("/login_wechat_page")
-    public ModelAndView loginWxForPage(HttpServletRequest request) throws JSONException {
+    public ModelAndView loginWxForPage(HttpServletRequest request) throws JSONException, WeixinException {
         WxMpOAuth2AccessToken accessToken = (WxMpOAuth2AccessToken) request.getAttribute("accessToken");
         WxMpUser user = (WxMpUser) request.getAttribute("user");
         User cuser = userService.findByOpenId(user.getOpenId());
@@ -271,6 +271,9 @@ public class AuthController {
             shift = state;
         }
         Map<String, String> data = new HashMap<>();
+        System.out.println("************************分割线1*****************");
+        System.out.println(user.toString());
+        System.out.println("************************分割线1*****************");
         if(user.getUnionId() != null){
             User u = userService.findByUnionIdAndHotelCode(user.getUnionId(), urlHotelCode);
             if(u != null){
@@ -279,7 +282,11 @@ public class AuthController {
         }else if(accessToken.getUnionId() != null) {
             data.put("unionId", accessToken.getUnionId());
         } else {
-            data.put("unionId", "userAndAccessToken undefind unionId");
+//            data.put("unionId", "userAndAccessToken undefind unionId");
+            String unionId = wechatPayService.getUnionId(user.getOpenId(), accessToken.getAccessToken());
+            System.out.println("+++++++++++================= 分割线 ++======================");
+            System.out.println("获取的unionId："+ unionId);
+            data.put("unionId", unionId);
         }
         if (cuser == null) {
             data.put("status", "1");

@@ -197,6 +197,28 @@ public class WechatPayServiceImpl extends WeixinSupport implements WechatPayServ
         return hr;
     }
 	@Override
+	public String getUnionId(String access_token, String openId) throws WeixinException {
+		HttpResponse hr = new HttpResponse();
+		if (access_token == null || access_token.equals("")) {
+			System.out.println("+++++++++++++++++++");
+			System.out.println("access_token 是空的的！！！！！！！！！！！！！！！！！！！");
+		}
+		//拼接参数
+		String param = "?access_token=" + access_token + "&openid=" + openId;
+		//创建请求对象
+		HttpsClient http = new HttpsClient();
+		//调用获取access_token接口
+		Response res = http.get("https://api.weixin.qq.com/sns/userinfo" + param);
+		//根据请求结果判定，是否验证成功
+		JSONObject jsonObj = res.asJSONObject();
+		if (jsonObj != null) {
+			Object obj = jsonObj.get("unionid");
+			return obj.toString();
+		}else {
+			return null;
+		}
+	}
+	@Override
 	public void wxNotify(HttpServletRequest request, HttpServletResponse response) throws Exception{
 		BufferedReader br = new BufferedReader(new InputStreamReader((ServletInputStream)request.getInputStream()));
 		String line = null;
