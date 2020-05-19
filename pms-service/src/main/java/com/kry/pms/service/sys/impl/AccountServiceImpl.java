@@ -154,7 +154,7 @@ public class AccountServiceImpl implements AccountService {
             if (Constants.Status.BILL_NEED_SETTLED.equals(bill.getStatus())) {
 
             }
-            if (!account.getType().equals(Constants.Type.ACCOUNT_AR)&&bill.getGuestRoom() == null) {
+            if (!account.getType().equals(Constants.Type.ACCOUNT_AR) && bill.getGuestRoom() == null) {
                 CheckInRecord cir = checkInRecordService.queryByAccountId(account.getId());
                 if (cir != null && cir.getGuestRoom() != null) {
                     bill.setRoomNum(cir.getGuestRoom().getRoomNum());
@@ -166,7 +166,7 @@ public class AccountServiceImpl implements AccountService {
                     }
                 }
             }
-        }else{
+        } else {
             return null;
         }
         return modify(account);
@@ -343,7 +343,7 @@ public class AccountServiceImpl implements AccountService {
                 if (processTotal == billCheckBo.getTotal()) {
                     if (targetAccount != null) {
                         Bill payBill = billService.createToArBill(account, processTotal, pay, billCheckBo.getOperationEmployee(), billCheckBo.getShiftCode(), settleAccountRecord.getRecordNum(), "To:" + targetAccount.getCode());
-                        Bill costBill = billService.createArSettleBill(targetAccount, billCheckBo.getTotal(), cost, pay, billCheckBo.getOperationEmployee(), billCheckBo.getShiftCode(),settleAccountRecord.getRecordNum());
+                        Bill costBill = billService.createArSettleBill(targetAccount, billCheckBo.getTotal(), cost, pay, billCheckBo.getOperationEmployee(), billCheckBo.getShiftCode(), settleAccountRecord.getRecordNum());
                         List<Bill> flatBills = new ArrayList<>();
                         flatBills.add(payBill);
                         flatBills.add(costBill);
@@ -353,13 +353,17 @@ public class AccountServiceImpl implements AccountService {
                         settleAccountRecordService.modify(settleAccountRecord);
                     } else {
                         rep.error(Constants.BusinessCode.CODE_PARAMETER_INVALID, "转账目标AR账户无法找到");
+                        TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                     }
                 } else {
                     rep.error(Constants.BusinessCode.CODE_PARAMETER_INVALID, "入账金额:" + billCheckBo.getTotal() + "待结帐 消费：" + cost + "付款：" + pay + "合计：" + processTotal);
+                    TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                 }
             }
         } else {
             rep.error(Constants.BusinessCode.CODE_PARAMETER_INVALID, "结帐账户无法找到");
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+
         }
         return rep;
     }
@@ -477,7 +481,7 @@ public class AccountServiceImpl implements AccountService {
         DtoResponse<Account> rep = new DtoResponse<Account>();
         String id = billCheckBo.getAccountId();
         CheckInRecord cir = checkInRecordService.queryByAccountId(id);
-        List<CheckInRecord> cirs = checkInRecordService.findByOrderNumC(billCheckBo.getHotelCode(),cir.getOrderNum());
+        List<CheckInRecord> cirs = checkInRecordService.findByOrderNumC(billCheckBo.getHotelCode(), cir.getOrderNum());
         Account targetAccount = cir.getAccount();
         boolean result = transferBill(cirs, targetAccount, billCheckBo);
         if (result) {
@@ -495,7 +499,7 @@ public class AccountServiceImpl implements AccountService {
         DtoResponse<Account> rep = new DtoResponse<Account>();
         String id = billCheckBo.getAccountId();
         CheckInRecord cir = checkInRecordService.queryByAccountId(id);
-        List<CheckInRecord> cirs = checkInRecordService.findByOrderNum(billCheckBo.getHotelCode(),cir.getOrderNum());
+        List<CheckInRecord> cirs = checkInRecordService.findByOrderNum(billCheckBo.getHotelCode(), cir.getOrderNum());
         Account targetAccount = cir.getAccount();
         boolean result = true;
         for (CheckInRecord item : cirs) {
@@ -516,7 +520,7 @@ public class AccountServiceImpl implements AccountService {
             billCheckBo.setCheckType(Constants.Type.SETTLE_TYPE_ACCOUNT);
             return checkAccountBill(billCheckBo);
         }
-    } 
+    }
 
     private boolean transferBill(List<CheckInRecord> cirs, Account targetAccount, BillCheckBo billCheckBo) {
         for (CheckInRecord item : cirs) {
@@ -732,7 +736,7 @@ public class AccountServiceImpl implements AccountService {
         CheckInRecord cir = checkInRecordService.queryByAccountId(id);
         SettleInfoVo settleInfoVo = null;
         if (cir != null) {
-            List<CheckInRecord> cirs = checkInRecordService.findByOrderNumC(hotelCode,cir.getOrderNum());
+            List<CheckInRecord> cirs = checkInRecordService.findByOrderNumC(hotelCode, cir.getOrderNum());
             if (accountCheck(cirs)) {
                 settleInfoVo = createSettleInfo(cir, Constants.Type.EXT_FEE_NONE, hotelCode);
             } else {
@@ -752,7 +756,7 @@ public class AccountServiceImpl implements AccountService {
         CheckInRecord cir = checkInRecordService.queryByAccountId(id);
         SettleInfoVo settleInfoVo = null;
         if (cir != null) {
-            List<CheckInRecord> cirs = checkInRecordService.findByOrderNumC(hotelCode,cir.getOrderNum());
+            List<CheckInRecord> cirs = checkInRecordService.findByOrderNumC(hotelCode, cir.getOrderNum());
             settleInfoVo = createSettleInfo(cirs, extFee, hotelCode);
         } else {
             return null;
