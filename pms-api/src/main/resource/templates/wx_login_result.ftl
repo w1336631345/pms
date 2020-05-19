@@ -3,7 +3,6 @@
     <script language="javascript" type="text/javascript">
         window.onload =function() {
             var data = {};
-            data.test = 'wfsd';
             data.status='${status}';
             <#if token??> data.token = '${token}'; </#if>
             <#if openId??> data.openId = '${openId}'; </#if>

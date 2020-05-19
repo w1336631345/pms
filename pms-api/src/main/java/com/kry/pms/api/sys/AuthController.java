@@ -275,7 +275,11 @@ public class AuthController {
         System.out.println(user.toString());
         System.out.println("************************分割线1*****************");
         if(user.getUnionId() != null){
+            data.put("unionId", user.getUnionId());
             User u = userService.findByUnionIdAndHotelCode(user.getUnionId(), urlHotelCode);
+            System.out.println("************************11111*****************");
+            System.out.println(u.toString());
+            System.out.println("************************11111*****************");
             if(u != null){
                 data.put("unionId", user.getUnionId());
             }
