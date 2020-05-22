@@ -18,6 +18,8 @@ public class ReportTableDefinition extends PersistenceModel {
     @Column(name = "type_")
     private String type;//类型
     @Column
+    private String queryParams;
+    @Column
     private String groupKey;//分组
     @Column
     private String headerType;//头部类型
