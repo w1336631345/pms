@@ -119,7 +119,7 @@ public interface CheckInRecordDao extends BaseDao<CheckInRecord> {
 
 	List<CheckInRecord> findByHotelCodeAndOrderNumAndGuestRoomId(String hotelCode, String orderNum, String id);
 
-	CheckInRecord findByAccountId(String id);
+	CheckInRecord findByAccountIdAndDeleted(String id,int deleted);
 
 	List<CheckInRecord> findByOrderNumAndGuestRoomAndDeleted(String orderNum, GuestRoom guestRoom, int delete);
 

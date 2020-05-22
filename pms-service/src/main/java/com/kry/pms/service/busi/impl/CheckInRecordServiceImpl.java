@@ -2050,7 +2050,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 
     @Override
     public CheckInRecord queryByAccountId(String id) {
-        return checkInRecordDao.findByAccountId(id);
+        return checkInRecordDao.findByAccountIdAndDeleted(id,Constants.DELETED_FALSE);
     }
 
     // 独单房价

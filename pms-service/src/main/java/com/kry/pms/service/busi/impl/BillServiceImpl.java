@@ -101,6 +101,8 @@ public class BillServiceImpl implements BillService {
                 if (bill.getStatus() == null || Constants.Status.NORMAL.equals(bill.getStatus())) {
                     bill.setStatus(Constants.Status.BILL_NEED_SETTLED);
                 }
+            }else{
+                return null;
             }
         } else {
             return null;
