@@ -87,7 +87,7 @@ public class AuditNightStepServiceImpl implements AuditNightStepService {
 				auditNightStepDao.saveAndFlush(ans);
 				try {
 					Random random = new Random();
-					int s = random.nextInt(3000)%(3000-2000+1) + 2000;
+					int s = random.nextInt(5000)%(5000-1000+1) + 1000;
 					//线程睡眠一会儿，用来模拟后面生成报表步骤是的耗时
 					Thread.sleep(s);
 				} catch (InterruptedException e) {
