@@ -1,8 +1,7 @@
 package com.kry.pms.dao.audit;
 
 import com.kry.pms.dao.BaseDao;
-import com.kry.pms.model.persistence.pay.WechatMerchants;
-import com.kry.pms.model.persistence.report.AuditNightStep;
+import com.kry.pms.model.persistence.audit.AuditNightStep;
 
 import java.time.LocalDate;
 import java.util.List;

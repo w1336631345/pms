@@ -4,12 +4,8 @@ import com.kry.pms.api.BaseController;
 import com.kry.pms.base.HttpResponse;
 import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
-import com.kry.pms.model.persistence.busi.Arrangement;
-import com.kry.pms.model.persistence.goods.Goods;
-import com.kry.pms.model.persistence.report.AuditNightStep;
-import com.kry.pms.model.persistence.sys.User;
+import com.kry.pms.model.persistence.audit.AuditNightStep;
 import com.kry.pms.service.audit.AuditNightStepService;
-import com.kry.pms.service.busi.ArrangementService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,6 +20,7 @@ public class AuditNightStepController extends BaseController<AuditNightStep> {
 
 	@PostMapping
 	public HttpResponse<AuditNightStep> add(@RequestBody AuditNightStep auditNightStep) {
+		auditNightStep.setHotelCode(getCurrentHotleCode());
 		return getDefaultResponse().addData(auditNightStepService.add(auditNightStep));
 	}
 

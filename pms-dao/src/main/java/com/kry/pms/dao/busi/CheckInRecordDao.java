@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -48,8 +49,8 @@ public interface CheckInRecordDao extends BaseDao<CheckInRecord> {
 					+ " and if(:status = 'X', tcr.deleted = 1 and DATE_FORMAT(tcr.arrive_time,'%Y-%m-%d') = :businessDate, tcr.deleted = 0 ) "
 					+ " and if(:status is not null && :status != '', tcr.`status`=:status, 1=1 ) "
 					+ " and if(:hotelCode is not null && :hotelCode != '', tcr.hotel_code=:hotelCode, 1=1 ) ")
-	Page<Map<String, Object>> unreturnedGuests(Pageable page, @Param("mainNum") String mainNum,
-											   @Param("status") String status, @Param("hotelCode") String hotelCode, @Param("businessDate") LocalDate businessDate);
+	Page<Map<String, Object>> unreturnedGuests(Pageable page, @Param("mainNum") String mainNum, @Param("status") String status,
+											   @Param("hotelCode") String hotelCode, @Param("businessDate") LocalDateTime businessDate);
 	@Query(nativeQuery = true, value = "select trt.`name` roomtype, tcr.room_count, tgr.room_num, tc.`name`, tc.mobile, DATE_FORMAT(tcr.arrive_time,'%Y-%m-%d %T') arrive_time,  "
 			+ " DATE_FORMAT(tcr.leave_time,'%Y-%m-%d %T') leave_time, tcr.hold_time, tcr.group_name groupname, tcr.`status`, tcr.id, tcr.hotel_code, "
 			+ " ta.cost, ta.total, ta.pay, ta.id accountId, tcr.group_type, tcr.order_num "
@@ -73,7 +74,7 @@ public interface CheckInRecordDao extends BaseDao<CheckInRecord> {
 			+ " and id not in (select id from t_checkin_record where `status`='X' and deleted = 1 and DATE_FORMAT(arrive_time,'%Y-%m-%d') != :businessDate)"
 			+ " and if(:hotelCode is not null && :hotelCode != '', hotel_code=:hotelCode, 1=1 ) "
 			+ " GROUP BY status ", nativeQuery = true)
-	List<Map<String, Object>> getStatistics(@Param("hotelCode") String hotelCode, @Param("businessDate") LocalDate businessDate);
+	List<Map<String, Object>> getStatistics(@Param("hotelCode") String hotelCode, @Param("businessDate") LocalDateTime businessDate);
 
 	@Query(nativeQuery = true, value = " select ta.`code`, trt.`name` roomtype, tcr.room_count, tgr.room_num, tc.`name`,tcr.human_count, \n" +
             "   DATE_FORMAT(tcr.arrive_time,'%Y-%m-%d') arrive_time, DATE_FORMAT(tcr.leave_time,'%Y-%m-%d') leave_time, \n" +

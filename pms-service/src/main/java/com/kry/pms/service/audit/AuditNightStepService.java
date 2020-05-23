@@ -1,6 +1,6 @@
 package com.kry.pms.service.audit;
 
-import com.kry.pms.model.persistence.report.AuditNightStep;
+import com.kry.pms.model.persistence.audit.AuditNightStep;
 import com.kry.pms.service.BaseService;
 
 import java.util.List;

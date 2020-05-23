@@ -1,4 +1,4 @@
-package com.kry.pms.model.persistence.report;
+package com.kry.pms.model.persistence.audit;
 
 import com.kry.pms.model.persistence.PersistenceModel;
 import lombok.Data;
@@ -11,18 +11,17 @@ import java.time.LocalDateTime;
 
 @Data
 @Entity
-@Table(name = "t_audit_night_step")
-public class AuditNightStep extends PersistenceModel {
+@Table(name = "t_audit_night_step_his")
+public class AuditNightStepHis extends PersistenceModel {
 
-    @Column
-    private String stepName;
     @Column
     private LocalDateTime startTime;
     @Column
     private LocalDateTime endTime;
     @Column
-    private String duration;
+    private String duration;//耗时
     @Column
     private LocalDate businessDate;
+
 
 }

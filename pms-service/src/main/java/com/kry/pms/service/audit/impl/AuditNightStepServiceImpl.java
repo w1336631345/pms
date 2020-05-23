@@ -3,20 +3,19 @@ package com.kry.pms.service.audit.impl;
 import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
 import com.kry.pms.dao.audit.AuditNightStepDao;
-import com.kry.pms.dao.busi.ArrangementDao;
-import com.kry.pms.model.persistence.busi.Arrangement;
-import com.kry.pms.model.persistence.report.AuditNightStep;
+import com.kry.pms.model.persistence.audit.AuditNightStep;
+import com.kry.pms.model.persistence.audit.AuditNightStepParam;
+import com.kry.pms.service.audit.AuditNightStepHisService;
+import com.kry.pms.service.audit.AuditNightStepParamService;
 import com.kry.pms.service.audit.AuditNightStepService;
-import com.kry.pms.service.busi.ArrangementService;
 import com.kry.pms.service.sys.BusinessSeqService;
+import com.kry.pms.service.sys.SqlTemplateService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 @Service
 public class AuditNightStepServiceImpl implements AuditNightStepService {
@@ -24,11 +23,20 @@ public class AuditNightStepServiceImpl implements AuditNightStepService {
 	AuditNightStepDao auditNightStepDao;
 	@Autowired
 	BusinessSeqService businessSeqService;
+	@Autowired
+	SqlTemplateService sqlTemplateService;
+	@Autowired
+	AuditNightStepHisService auditNightStepHisService;
+	@Autowired
+	AuditNightStepParamService auditNightStepParamService;
 
 
 	@Override
 	public AuditNightStep add(AuditNightStep entity) {
-		return null;
+		LocalDate businessDate = businessSeqService.getBuinessDate(entity.getHotelCode());
+		entity.setBusinessDate(businessDate);
+		AuditNightStep ans = auditNightStepDao.save(entity);
+		return ans;
 	}
 
 	@Override
@@ -38,7 +46,8 @@ public class AuditNightStepServiceImpl implements AuditNightStepService {
 
 	@Override
 	public AuditNightStep modify(AuditNightStep auditNightStep) {
-		return null;
+		AuditNightStep ans = auditNightStepDao.saveAndFlush(auditNightStep);
+		return ans;
 	}
 
 	@Override
@@ -60,7 +69,14 @@ public class AuditNightStepServiceImpl implements AuditNightStepService {
 	@Override
 	public List<AuditNightStep> findByHotelCodeAndBusinessDate(String code) {
 		LocalDate businessDate = businessSeqService.getBuinessDate(code);
+
 		List<AuditNightStep> list = auditNightStepDao.findByHotelCodeAndBusinessDate(code, businessDate);
+		for(int i=0; i<list.size(); i++){
+			AuditNightStep ans = list.get(i);
+			List<AuditNightStepParam> params = ans.getParams();
+			Map<String, Object> map = auditNightStepParamService.toMapParams(params);
+			List<Map<String, Object>> rl = sqlTemplateService.storedProcedure(code, ans.getProcessName(), map);
+		}
 		return list;
 	}
 

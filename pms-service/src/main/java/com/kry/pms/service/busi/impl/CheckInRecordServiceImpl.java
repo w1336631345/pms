@@ -1219,12 +1219,13 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
     @Override
     public PageResponse<Map<String, Object>> unreturnedGuests(int pageIndex, int pageSize, String mainNum, String status, User user) {
         LocalDate businessDate = businessSeqService.getBuinessDate(user.getHotelCode());
+        LocalDateTime time = LocalDateTime.of(businessDate, LocalTime.now().withNano(0));
         Pageable page = org.springframework.data.domain.PageRequest.of(pageIndex - 1, pageSize);
         String hotelCode = null;
         if (user != null) {
             hotelCode = user.getHotelCode();
         }
-        Page<Map<String, Object>> p = checkInRecordDao.unreturnedGuests(page, mainNum, status, hotelCode, businessDate);
+        Page<Map<String, Object>> p = checkInRecordDao.unreturnedGuests(page, mainNum, status, hotelCode, time);
         PageResponse<Map<String, Object>> pr = new PageResponse<>();
         pr.setPageSize(p.getNumberOfElements());
         pr.setPageCount(p.getTotalPages());
@@ -1237,11 +1238,12 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
     @Override
     public List<Map<String, Object>> getStatistics(User user) {
         LocalDate businessDate = businessSeqService.getBuinessDate(user.getHotelCode());
+        LocalDateTime time = LocalDateTime.of(businessDate, LocalTime.now().withNano(0));
         String hotelCode = null;
         if (user != null) {
             hotelCode = user.getHotelCode();
         }
-        List<Map<String, Object>> list = checkInRecordDao.getStatistics(hotelCode, businessDate);
+        List<Map<String, Object>> list = checkInRecordDao.getStatistics(hotelCode, time);
         return list;
     }
 
