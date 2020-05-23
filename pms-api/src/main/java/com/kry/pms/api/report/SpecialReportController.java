@@ -32,7 +32,7 @@ public class SpecialReportController extends BaseController {
     }
 
     @GetMapping
-    @RequestMapping("/shift/pay")
+    @RequestMapping("/pay")
     public HttpResponse<List<Map<String, Object>>> pay(@RequestParam(required = true) String employee_id, @RequestParam(required = true) String business_date, @RequestParam(required = true) String shift) throws IOException, TemplateException {
         HttpResponse<List<Map<String, Object>>> rep = new HttpResponse<>();
         LocalDate localDate = LocalDate.parse(business_date);
