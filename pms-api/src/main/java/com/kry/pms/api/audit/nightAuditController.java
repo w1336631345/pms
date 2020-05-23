@@ -165,7 +165,6 @@ public class nightAuditController extends BaseController {
         return rep;
     }
 
-
     /**
      * 功能描述: <br>手动夜审入账
      * 〈〉
@@ -228,6 +227,37 @@ public class nightAuditController extends BaseController {
             return rep.error(403, "未登录");
         }
         rep = nightAuditService.addReportAll(loginUser);
+        return rep;
+    }
+
+    /**
+     * 功能描述: <br>调用存储过程
+     * 〈〉
+     * @Param: [id]
+     * @Return: com.kry.pms.base.HttpResponse
+     * @Author: huanghaibin
+     * @Date: 2020/5/21 15:49
+     */
+    @GetMapping("/storedProcedure")
+    public HttpResponse storedProcedure(String id) {
+        HttpResponse hr = new HttpResponse<>();
+        User user = getUser();
+        hr = nightAuditService.storedProcedure(user.getHotelCode(), id);
+        return hr;
+    }
+
+    /**
+     * 功能描述: <br>将D状态存入历史表，将O变成D
+     * 〈〉
+     * @Param: []
+     * @Return: com.kry.pms.base.HttpResponse
+     * @Author: huanghaibin
+     * @Date: 2020/5/21 11:05
+     */
+    @GetMapping("/otherStep")
+    public HttpResponse otherStep() {
+        HttpResponse<List<Map<String, Object>>> rep = new HttpResponse<>();
+        User user = getUser();
         return rep;
     }
 

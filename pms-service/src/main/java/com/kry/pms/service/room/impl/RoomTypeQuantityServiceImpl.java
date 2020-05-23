@@ -467,7 +467,7 @@ public class RoomTypeQuantityServiceImpl implements RoomTypeQuantityService {
         for (RoomType type : types) {
             RoomTypeQuantity rtq = roomTypeQuantityDao.queryPredictable(type.getId(), startDate, endDate);
             if (rtq != null) {
-                List<Map<String, Object>> list = roomPriceSchemeDao.roomTypeAndPriceSchemeList(type.getId());
+                List<Map<String, Object>> list = roomPriceSchemeDao.roomTypeAndPriceSchemeList(hotelCode, type.getId());
                 rtpv = new RoomTypeQuantityPredictableVo();
                 rtpv.setRoomCode(type.getCode());
                 rtpv.setPrice(type.getPrice());

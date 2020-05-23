@@ -5,6 +5,7 @@ import com.kry.pms.base.HttpResponse;
 import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
 import com.kry.pms.dao.busi.CheckInRecordDao;
+import com.kry.pms.model.persistence.busi.CheckInRecord;
 import com.kry.pms.model.persistence.busi.DailyVerify;
 import com.kry.pms.model.persistence.busi.RoomRecord;
 import com.kry.pms.model.persistence.org.Employee;
@@ -17,6 +18,7 @@ import com.kry.pms.service.busi.RoomRecordService;
 import com.kry.pms.service.org.EmployeeService;
 import com.kry.pms.service.report.*;
 import com.kry.pms.service.sys.BusinessSeqService;
+import com.kry.pms.service.sys.SqlTemplateService;
 import org.apache.commons.collections4.MapUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -55,6 +58,8 @@ public class NightAuditServiceImpl implements NightAuditService {
     FrontReceiveReportService frontReceiveReportService;
     @Autowired
     CheckInRecordDao checkInRecordDao;
+    @Autowired
+    SqlTemplateService sqlTemplateService;
 
     @Override
     public RoomRecord add(RoomRecord entity) {
@@ -233,5 +238,27 @@ public class NightAuditServiceImpl implements NightAuditService {
             generateReportsLogService.add(grl);
         }
         return hr.ok("报表导入成功");
+    }
+
+    @Override
+    @Transactional
+    public HttpResponse storedProcedure(String hotelCode, String id){
+        HttpResponse hr = new HttpResponse();
+        Map<String, Object> map = new HashMap<>();
+//        map.put("cId", id);
+        List<Map<String, Object>> list = sqlTemplateService.storedProcedure(hotelCode, "CheckInRecordHis", map);
+        List<CheckInRecord> cirs = checkInRecordDao.findByHotelCodeAndStatus(hotelCode, Constants.Status.CHECKIN_RECORD_STATUS_CHECK_OUT);
+        for(int i=0; i<cirs.size(); i++){
+            CheckInRecord cir = cirs.get(i);
+            String orderNum = cir.getOrderNum();
+            int nO = checkInRecordDao.isNotCheckOut(orderNum, hotelCode);
+            if(nO > 0){
+                return hr.error("该订单下还有非O状态数据");
+            }
+            cir.setStatus("D");
+            checkInRecordDao.save(cir);
+        }
+        hr.setData(list);
+        return hr;
     }
 }

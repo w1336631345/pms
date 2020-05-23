@@ -388,4 +388,10 @@ public interface CheckInRecordDao extends BaseDao<CheckInRecord> {
 
 	CheckInRecord findByCustomer(Customer customer);
 
+	List<CheckInRecord> findByHotelCodeAndStatus(String hotelCode, String status);
+
+	@Query(nativeQuery = true, value = " select count(id) from t_checkin_record \n" +
+			"where order_num = ?1 and hotel_code = ?2 and `status` != 'O' and deleted =0 ")
+	int isNotCheckOut(String orderNum, String hotelCode);
+
 }

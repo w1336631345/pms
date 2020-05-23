@@ -282,7 +282,7 @@ public class AuthController {
             unionId = wechatPayService.getUnionId(user.getOpenId(), accessToken.getAccessToken());
             data.put("unionId", unionId);
         }
-        User u = userService.findByUnionIdAndHotelCode(user.getUnionId(), urlHotelCode);
+        User u = userService.findByUnionIdAndHotelCode(unionId, urlHotelCode);
         if (u == null) {
             data.put("status", "1");
             data.put("avatar", user.getHeadImgUrl());

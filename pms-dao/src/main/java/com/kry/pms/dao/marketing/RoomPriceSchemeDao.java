@@ -67,14 +67,15 @@ public interface RoomPriceSchemeDao extends BaseDao<RoomPriceScheme>{
             " and if(:roomTypeId is not null && :roomTypeId != '', trpt.room_type_id=:roomTypeId, 1=1 ) " +
             " and if(:roomPriceSchemeId is not null && :roomPriceSchemeId != '', trpts.room_price_scheme_id=:roomPriceSchemeId, 1=1 ) ")
     Map<String, Object> roomTypeAndPriceScheme(@Param("roomTypeId")String roomTypeId, @Param("roomPriceSchemeId")String roomPriceSchemeId);
+
     @Query(nativeQuery = true, value = " select  trp.id, trp.`name`, tsm.id setMealId, tsm.`name` setMealName, trpt.room_type_id, trpt.price  \n" +
             " from t_room_price_scheme trp left join t_room_price_scheme_items trpts on trp.id = trpts.room_price_scheme_id \n" +
             " left join t_room_price_scheme_item trpt on trpt.id = trpts.items_id \n" +
             " left join t_set_meal tsm  on trpt.set_meal_id = tsm.id  \n" +
             " where 1=1 " +
+            " and if(:hotelCode is not null && :hotelCode != '', trp.hotel_code=:hotelCode, 1=1 ) " +
             " and if(:roomTypeId is not null && :roomTypeId != '', trpt.room_type_id=:roomTypeId, 1=1 ) ")
-    List<Map<String, Object>> roomTypeAndPriceSchemeList(@Param("roomTypeId")String roomTypeId);
-
+    List<Map<String, Object>> roomTypeAndPriceSchemeList(@Param("hotelCode")String hotelCode, @Param("roomTypeId")String roomTypeId);
 
     List<RoomPriceScheme> findByHotelCodeAndDeleted(String hotelCode, int deletedFalse);
 
