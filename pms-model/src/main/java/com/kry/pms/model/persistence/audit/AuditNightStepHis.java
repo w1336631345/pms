@@ -15,6 +15,8 @@ import java.time.LocalDateTime;
 public class AuditNightStepHis extends PersistenceModel {
 
     @Column
+    private String stepName;//步骤名称
+    @Column
     private LocalDateTime startTime;
     @Column
     private LocalDateTime endTime;
@@ -22,6 +24,10 @@ public class AuditNightStepHis extends PersistenceModel {
     private String duration;//耗时
     @Column
     private LocalDate businessDate;
+    @Column
+    private String resultCode;//执行结果编码（stop:未执行，loading:执行中，success:成功，error:失败）
+    @Column
+    private String resultMsg;//执行结果信息
 
 
 }

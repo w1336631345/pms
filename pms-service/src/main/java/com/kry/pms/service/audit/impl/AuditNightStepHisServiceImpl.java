@@ -24,11 +24,13 @@ public class AuditNightStepHisServiceImpl implements AuditNightStepHisService {
 	AuditNightStepHisDao auditNightStepHisDao;
 	@Autowired
 	BusinessSeqService businessSeqService;
+	@Autowired
+	AuditNightStepService auditNightStepService;
 
 
 	@Override
 	public AuditNightStepHis add(AuditNightStepHis entity) {
-		return null;
+		return auditNightStepHisDao.saveAndFlush(entity);
 	}
 
 	@Override
@@ -61,11 +63,21 @@ public class AuditNightStepHisServiceImpl implements AuditNightStepHisService {
 	public List<AuditNightStepHis> findByHotelCodeAndBusinessDate(String code) {
 		LocalDate businessDate = businessSeqService.getBuinessDate(code);
 		List<AuditNightStepHis> list = auditNightStepHisDao.findByHotelCodeAndBusinessDate(code, businessDate);
+		if(list == null || list.isEmpty()){
+			List<AuditNightStep> anss = auditNightStepService.getAllByHotelCode(code);
+			for(int i=0 ; i<anss.size(); i++){
+				AuditNightStep ans = anss.get(i);
+				AuditNightStepHis ah = new AuditNightStepHis();
+				ah.setStepName(ans.getStepName());
+				ah.setHotelCode(code);
+				ah.setBusinessDate(businessDate);
+//				ah.setStartTime(LocalDateTime.now());
+				ah.setResultCode("stop");
+				auditNightStepHisDao.saveAndFlush(ah);
+				list.add(ah);
+			}
+		}
 		return list;
 	}
 
-	@Override
-	public List<AuditNightStepHis> stepList(String hotleCode) {
-		return null;
-	}
 }

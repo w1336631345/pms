@@ -10,5 +10,4 @@ public interface AuditNightStepHisService extends BaseService<AuditNightStepHis>
 
     List<AuditNightStepHis> findByHotelCodeAndBusinessDate(String code);
 
-    List<AuditNightStepHis> stepList(String currentHotleCode);
 }

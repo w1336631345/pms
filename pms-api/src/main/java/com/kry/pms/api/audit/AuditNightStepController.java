@@ -43,39 +43,33 @@ public class AuditNightStepController extends BaseController<AuditNightStep> {
 		return rep.addData(auditNightStepService.listPage(req));
 	}
 
+	/**
+	 * 功能描述: <br>查询酒店夜审步骤详情
+	 * 〈〉
+	 * @Param: []
+	 * @Return: com.kry.pms.base.HttpResponse<java.util.List<com.kry.pms.model.persistence.audit.AuditNightStep>>
+	 * @Author: huanghaibin
+	 * @Date: 2020/5/25 14:17
+	 */
 	@GetMapping(path = "/list")
-	public HttpResponse<List<AuditNightStep>> list(HttpServletRequest request){
+	public HttpResponse<List<AuditNightStep>> list() {
 		HttpResponse<List<AuditNightStep>> rep = new HttpResponse<List<AuditNightStep>>();
 		List<AuditNightStep> list = auditNightStepService.getAllByHotelCode(getCurrentHotleCode());
 		return rep.addData(list);
 	}
 
 	/**
-	 * 功能描述: <br>查询步骤
+	 * 功能描述: <br>查询步骤执行过程
 	 * 〈〉
 	 * @Param: [request]
 	 * @Return: com.kry.pms.base.HttpResponse<java.util.List<com.kry.pms.model.persistence.report.AuditNightStep>>
 	 * @Author: huanghaibin
 	 * @Date: 2020/5/22 16:42
 	 */
-	@GetMapping(path = "/stepList")
-	public HttpResponse<List<AuditNightStep>> stepList(HttpServletRequest request) {
-		HttpResponse<List<AuditNightStep>> rep = new HttpResponse<List<AuditNightStep>>();
-		List<AuditNightStep> list = auditNightStepService.findByHotelCodeAndBusinessDate(getCurrentHotleCode());
-		return rep.addData(list);
-	}
-	/**
-	 * 功能描述: <br>开始步骤
-	 * 〈〉
-	 * @Param: [request]
-	 * @Return: com.kry.pms.base.HttpResponse<java.util.List<com.kry.pms.model.persistence.report.AuditNightStep>>
-	 * @Author: huanghaibin
-	 * @Date: 2020/5/22 16:43
-	 */
 	@GetMapping(path = "/stepStart")
 	public HttpResponse<List<AuditNightStep>> stepStart(HttpServletRequest request) {
 		HttpResponse<List<AuditNightStep>> rep = new HttpResponse<List<AuditNightStep>>();
-		List<AuditNightStep> list = auditNightStepService.stepList(getCurrentHotleCode());
+		List<AuditNightStep> list = auditNightStepService.findByHotelCodeAndBusinessDate(getCurrentHotleCode());
 		return rep.addData(list);
 	}
 }

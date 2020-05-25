@@ -52,7 +52,7 @@ public class AuditNightStepHisController extends BaseController<AuditNightStepHi
 	}
 
 	/**
-	 * 功能描述: <br>查询步骤
+	 * 功能描述: <br>查询执行步骤列表
 	 * 〈〉
 	 * @Param: [request]
 	 * @Return: com.kry.pms.base.HttpResponse<java.util.List<com.kry.pms.model.persistence.report.AuditNightStep>>
@@ -65,18 +65,5 @@ public class AuditNightStepHisController extends BaseController<AuditNightStepHi
 		List<AuditNightStepHis> list = auditNightStepHisService.findByHotelCodeAndBusinessDate(getCurrentHotleCode());
 		return rep.addData(list);
 	}
-	/**
-	 * 功能描述: <br>开始步骤
-	 * 〈〉
-	 * @Param: [request]
-	 * @Return: com.kry.pms.base.HttpResponse<java.util.List<com.kry.pms.model.persistence.report.AuditNightStep>>
-	 * @Author: huanghaibin
-	 * @Date: 2020/5/22 16:43
-	 */
-	@GetMapping(path = "/stepStart")
-	public HttpResponse<List<AuditNightStepHis>> stepStart(HttpServletRequest request) {
-		HttpResponse<List<AuditNightStepHis>> rep = new HttpResponse<List<AuditNightStepHis>>();
-		List<AuditNightStepHis> list = auditNightStepHisService.stepList(getCurrentHotleCode());
-		return rep.addData(list);
-	}
+
 }
