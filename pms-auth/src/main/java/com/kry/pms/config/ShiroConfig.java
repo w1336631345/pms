@@ -43,6 +43,7 @@ public class ShiroConfig {
         filterChainDefinitionMap.put("/auth/getOpenid", "anon");
         filterChainDefinitionMap.put("/auth/encrypte", "anon");
         filterChainDefinitionMap.put("/auth/wxLogin", "anon");
+        filterChainDefinitionMap.put("/api/v1/busi/checkInRecord/noRole/orderNum2", "anon");
         filterChainDefinitionMap.put("/auth/binding", "anon");
         filterChainDefinitionMap.put("/auth/getHotelList", "anon");
         filterChainDefinitionMap.put("/wx/redirect/**", "anon");

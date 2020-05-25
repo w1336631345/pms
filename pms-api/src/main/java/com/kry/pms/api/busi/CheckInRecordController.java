@@ -185,6 +185,13 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
         return rep;
     }
 
+    @GetMapping(path = "/noRole/orderNum2")
+    public HttpResponse<List<Map<String, Object>>> noRole(String hotelCode, String orderNum) throws IOException, TemplateException {
+        HttpResponse<List<Map<String, Object>>> rep = new HttpResponse<List<Map<String, Object>>>();
+        rep.addData(checkInRecordService.findByOrderNum2(hotelCode, orderNum));
+        return rep;
+    }
+
     @PostMapping(path = "/together")
     public HttpResponse<CheckInRecord> addCustomerTogether(@RequestBody TogetherBo togetherBo) {
         return getDefaultResponse().addData(checkInRecordService.addTogether(togetherBo));
