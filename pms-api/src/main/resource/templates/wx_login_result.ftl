@@ -3,7 +3,7 @@
     <script language="javascript" type="text/javascript">
         window.onload =function() {
             var data = {};
-            var hotelList = {};
+            var hotelList = [];
             var hotel = {};
             data.status='${status}';
             <#if token??> data.token = '${token}'; </#if>
