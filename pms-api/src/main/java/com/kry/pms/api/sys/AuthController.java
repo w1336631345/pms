@@ -287,18 +287,25 @@ public class AuthController {
         }
         User u = userService.findByUnionIdAndHotelCode(unionId, urlHotelCode);
         if (u == null) {//域名中没有hotelCode，没有查出来绑定用户信息
-            //这是用户输入域名中没有带酒店编码的情况
-            List<User> listUser = userService.findByUnionId(unionId);
-            if(listUser != null && !listUser.isEmpty()){//有绑定信息
-                List<Map<String, Object>> hotelList = hotelService.getByUnionId(unionId);
-                data.put("status", "2");
-                data.put("msg", "请选择要登录的酒店！");
-                data.put("hotelList", hotelList);
-            }else {
+            if(urlHotelCode != null && !"".equals(urlHotelCode)){//客户为null，域名中输入了hotelCode，这是还没绑定
                 data.put("status", "1");
                 data.put("avatar", user.getHeadImgUrl());
                 data.put("openId", user.getOpenId());
                 data.put("nickName", user.getNickname());
+            }else {//客户为null，域名中也没有输入hotelCode
+                //这是用户输入域名中没有带酒店编码的情况
+                List<User> listUser = userService.findByUnionId(unionId);
+                if(listUser != null && !listUser.isEmpty()){//有绑定信息
+                    List<Map<String, Object>> hotelList = hotelService.getByUnionId(unionId);
+                    data.put("status", "2");
+                    data.put("msg", "请选择要登录的酒店！");
+                    data.put("hotelList", hotelList);
+                }else {
+                    data.put("status", "1");
+                    data.put("avatar", user.getHeadImgUrl());
+                    data.put("openId", user.getOpenId());
+                    data.put("nickName", user.getNickname());
+                }
             }
         } else {//这是用户输入域名中带有酒店编码的情况，可直接返回token登录成
             String sessionId = login(u, shift);
