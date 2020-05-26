@@ -4,7 +4,6 @@
         window.onload =function() {
             var data = {};
             var hotelList = [];
-            var hotel = {};
             data.status='${status}';
             <#if token??> data.token = '${token}'; </#if>
             <#if openId??> data.openId = '${openId}'; </#if>
@@ -12,6 +11,7 @@
             <#if msg??> data.msg = '${msg}'; </#if>
             <#if hotelList??>
                 <#list hotelList as item>
+                    var hotel = {};
                     hotel.id = '${item.id}';
                     hotel.hotelCode = '${item.hotel_code}';
                     hotel.name = '${item.name}';
