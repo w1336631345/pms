@@ -126,7 +126,7 @@ public class AuthController {
      */
     @ResponseBody
     @GetMapping(value = "/wxLogin")
-    public HttpResponse wxLogin(String unionId, String hotelCode){
+    public HttpResponse wxLogin(String unionId, String hotelCode, String shifCode){
         HttpResponse hr = new HttpResponse();
         User user = userService.findByUnionIdAndHotelCode(unionId, hotelCode);
         Map<String, Object> map = new HashMap<>();
@@ -134,7 +134,10 @@ public class AuthController {
             hr.setStatus(1);
             hr.setMessage("未绑定该酒店账号");
         } else {
-            String sessionId = login(user, "1");
+            if(shifCode == null || "".equals(shifCode)){
+                shifCode = "1";
+            }
+            String sessionId = login(user, shifCode);
             map.put("token", sessionId);
             map.put("userInfo", user);
             hr.setData(map);
@@ -259,7 +262,7 @@ public class AuthController {
     public ModelAndView loginWxForPage(HttpServletRequest request) throws JSONException, WeixinException {
         WxMpOAuth2AccessToken accessToken = (WxMpOAuth2AccessToken) request.getAttribute("accessToken");
         WxMpUser user = (WxMpUser) request.getAttribute("user");
-        User cuser = userService.findByOpenId(user.getOpenId());
+//        User cuser = userService.findByOpenId(user.getOpenId());
         String state = (String) request.getAttribute("state");
         String shift = null;
         String urlHotelCode = null;
@@ -270,7 +273,7 @@ public class AuthController {
         }else{
             shift = state;
         }
-        Map<String, String> data = new HashMap<>();
+        Map<String, Object> data = new HashMap<>();
         String unionId = null;
         if(user.getUnionId() != null){
             unionId = user.getUnionId();
@@ -283,21 +286,24 @@ public class AuthController {
             data.put("unionId", unionId);
         }
         User u = userService.findByUnionIdAndHotelCode(unionId, urlHotelCode);
-        data.put("hotelCode1", "hotelCode没有");
-        data.put("hotelCode", urlHotelCode);
-        if (u == null) {
-            data.put("user", "没哟");
-            data.put("status", "1");
-            data.put("avatar", user.getHeadImgUrl());
-            data.put("openId", user.getOpenId());
-            data.put("nickName", user.getNickname());
-        } else if(urlHotelCode==null||cuser.getHotelCode().equals(urlHotelCode)){
-            String sessionId = login(cuser, shift);
+        if (u == null) {//域名中没有hotelCode，没有查出来绑定用户信息
+            //这是用户输入域名中没有带酒店编码的情况
+            List<User> listUser = userService.findByUnionId(unionId);
+            if(listUser != null && !listUser.isEmpty()){//有绑定信息
+                List<Map<String, Object>> hotelList = hotelService.getByUnionId(unionId);
+                data.put("status", "2");
+                data.put("msg", "请选择要登录的酒店！");
+                data.put("hotelList", hotelList);
+            }else {
+                data.put("status", "1");
+                data.put("avatar", user.getHeadImgUrl());
+                data.put("openId", user.getOpenId());
+                data.put("nickName", user.getNickname());
+            }
+        } else {//这是用户输入域名中带有酒店编码的情况，可直接返回token登录成
+            String sessionId = login(u, shift);
             data.put("status", "0");
             data.put("token", sessionId);
-        }else{
-            data.put("status", "2");
-            data.put("msg","该微信绑定了其他酒店的账号，请确认！");
         }
         ModelAndView mv = new ModelAndView("/wx_login_result",data);
         return mv;

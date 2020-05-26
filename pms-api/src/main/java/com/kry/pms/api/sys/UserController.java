@@ -171,4 +171,12 @@ public class UserController extends BaseController<User> {
 		return hr;
 	}
 
+	@GetMapping(path = "/getTest")
+	public HttpResponse getTest(String unionId) {
+		HttpResponse hr = new HttpResponse();
+		User u = userService.findByUnionIdAndHotelCode(unionId, null);
+		hr.setData(u);
+		return hr;
+	}
+
 }

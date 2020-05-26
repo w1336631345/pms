@@ -86,12 +86,10 @@ public class  UserServiceImpl implements  UserService{
 	 	modify(user);
 		return true;
 	}
+
 	@Override
-	public boolean bindWxUnoinId(User user, String unionId) {
-		user = findById(user.getId());
-		user.setUnionId(unionId);
-		modify(user);
-		return true;
+	public List<User> findByUnionId(String unionId) {
+		return userDao.findByUnionId(unionId);
 	}
 
 	@Override

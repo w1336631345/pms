@@ -3,6 +3,8 @@ package com.kry.pms.service.sys;
 import com.kry.pms.model.persistence.sys.User;
 import com.kry.pms.service.BaseService;
 
+import java.util.List;
+
 public interface UserService extends BaseService<User> {
 
     User getAuditUser(String username, String password, String hotelCode);
@@ -13,7 +15,7 @@ public interface UserService extends BaseService<User> {
 
     boolean bindWx(User user, String openId);
 
-    boolean bindWxUnoinId(User user, String unionId);
+    List<User> findByUnionId(String unionId);
 
     boolean bindWxUnionId(User user, String unionId);
 }
