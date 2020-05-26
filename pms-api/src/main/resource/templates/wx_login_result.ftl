@@ -8,6 +8,7 @@
             <#if openId??> data.openId = '${openId}'; </#if>
             <#if unionId??> data.unionId = '${unionId}'; </#if>
             <#if msg??> data.msg = '${msg}'; </#if>
+            <#if hotelCode??> data.hotelCode = '${hotelCode}'; </#if>
             window.parent.postMessage(data,'*');
         };
     </script>
