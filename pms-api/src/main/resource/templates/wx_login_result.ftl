@@ -9,6 +9,8 @@
             <#if unionId??> data.unionId = '${unionId}'; </#if>
             <#if msg??> data.msg = '${msg}'; </#if>
             <#if hotelCode??> data.hotelCode = '${hotelCode}'; </#if>
+            <#if hotelCode1??> data.hotelCode1 = '${hotelCode1}'; </#if>
+            <#if user??> data.user = '${user}'; </#if>
             window.parent.postMessage(data,'*');
         };
     </script>

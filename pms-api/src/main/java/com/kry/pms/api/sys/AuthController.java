@@ -283,8 +283,10 @@ public class AuthController {
             data.put("unionId", unionId);
         }
         User u = userService.findByUnionIdAndHotelCode(unionId, urlHotelCode);
+        data.put("hotelCode1", "hotelCode没有");
         data.put("hotelCode", urlHotelCode);
         if (u == null) {
+            data.put("user", "没哟");
             data.put("status", "1");
             data.put("avatar", user.getHeadImgUrl());
             data.put("openId", user.getOpenId());
