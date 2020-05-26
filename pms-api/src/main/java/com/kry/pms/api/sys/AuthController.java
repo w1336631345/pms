@@ -314,6 +314,10 @@ public class AuthController {
         HttpResponse<String> response = new HttpResponse<>();
         if(hotelCode==null){
             hotelCode = getUrlHotleCode();
+        }else {
+            if(!hotelCode.equals(getUrlHotleCode())){
+                return response.error("绑定酒店编码不是该酒店");
+            }
         }
         password = MD5Utils.encrypt(username, hotelCode, password);
         UsernamePasswordToken token = new UsernamePasswordToken(username, password);
