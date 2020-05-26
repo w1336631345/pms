@@ -12,7 +12,6 @@
             <#if msg??> data.msg = '${msg}'; </#if>
             <#if hotelList??>
                 <#list hotelList as item>
-                    index:${item_index}  id:${item.id} username:${item.hotel_code};
                     hotel.id = '${item.id}';
                     hotel.hotelCode = '${item.hotel_code}';
                     hotel.name = '${item.name}';
