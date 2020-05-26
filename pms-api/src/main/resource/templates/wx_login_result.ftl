@@ -10,13 +10,14 @@
             <#if openId??> data.openId = '${openId}'; </#if>
             <#if unionId??> data.unionId = '${unionId}'; </#if>
             <#if msg??> data.msg = '${msg}'; </#if>
-            <#if hotelList??> <#list hotelList as item>
-                hotel.id = '${item.id}';
-                hotel.hotelCode = '${item.hotel_code}';
-                hotel.name = '${item.name}';
-                hotelList.push(hotel);
-                <br />
+            <#if hotelList??>
+                <#list hotelList as item>
+                    hotel.id = '${item.id}';
+                    hotel.hotelCode = '${item.hotel_code}';
+                    hotel.name = '${item.name}';
+                    hotelList.push(hotel);
                 </#list>
+                data.hotelList = hotelList;
             </#if>
             window.parent.postMessage(data,'*');
         };
