@@ -26,7 +26,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @Setter
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
-@JsonIgnoreProperties(value = { "hibernateLazyInitializer", "handler","updateDate","createUser","updateUser" })
+@JsonIgnoreProperties(value = { "hibernateLazyInitializer", "handler","updateDate","updateUser" })
 public class PersistenceModel implements Serializable,Cloneable {
 	@Id
 	@GeneratedValue(generator = "uuid")
@@ -37,7 +37,7 @@ public class PersistenceModel implements Serializable,Cloneable {
 	@Column(updatable = false, columnDefinition = "datetime NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间'")
 	protected LocalDateTime createDate;
 	@CreatedBy
-	@Column(columnDefinition = "varchar(255) COMMENT '创建人'")
+	@Column(updatable = false, columnDefinition = "varchar(255) COMMENT '创建人'")
 	protected String createUser;
 	@LastModifiedDate
 	@Column(columnDefinition = "datetime NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间'")
