@@ -140,6 +140,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
         }
         if (!dbCir.getName().equals(checkInRecord.getName())) {//主单修改名称
             updateName = true;
+            checkInRecord.setGroupName(checkInRecord.getName());
         }
         if (!dbCir.getArriveTime().isEqual(checkInRecord.getArriveTime()) || !dbCir.getLeaveTime().isEqual(checkInRecord.getLeaveTime())) {
             updateTime = true;
@@ -759,7 +760,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
         if (checkInRecord.getSubRecords() != null && !checkInRecord.getSubRecords().isEmpty()) {
             checkInRecord.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION);
             checkInRecord.setType(Constants.Type.CHECK_IN_RECORD_GROUP);
-            initGroup(checkInRecord);
+//            initGroup(checkInRecord);
             initGroupAccount(checkInRecord);
             checkInRecord = add(checkInRecord);
             for (CheckInRecord item : checkInRecord.getSubRecords()) {
@@ -1142,6 +1143,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
             account.setType(Constants.Type.ACCOUNT_GROUP_CUSTOMER);
         }
         account.setName(checkInRecord.getName());
+        account.setHotelCode(checkInRecord.getHotelCode());
         checkInRecord.setAccount(account);
     }
 
