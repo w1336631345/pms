@@ -164,15 +164,24 @@ public class RoomTypeQuantityServiceImpl implements RoomTypeQuantityService {
 
     @Transactional
     @Override
-    public void useRoomType(RoomType roomType, LocalDate startDate, LocalDate endDate, String useType) {
-        useRoomType(roomType, startDate, endDate, useType, 1);
+    public boolean useRoomType(RoomType roomType, LocalDate startDate, LocalDate endDate, String useType) {
+        return useRoomType(roomType, startDate, endDate, useType, 1);
 
     }
 
-    public void useRoomType(RoomType roomType, LocalDate startDate, LocalDate endDate, String useType, int quantity) {
+    public boolean useRoomType(RoomType roomType, LocalDate startDate, LocalDate endDate, String useType, int quantity) {
         switch (useType) {
             case Constants.Status.ROOM_USAGE_BOOK:
-                bookRoomType(roomType, startDate, endDate, quantity);
+                RoomTypeQuantityPredictableVo rqpv = queryPredic(roomType.getHotelCode(),roomType.getId(),startDate,endDate);
+                int availableTotal = rqpv.getAvailableTotal();
+                if(roomType.getOverReservation()!=null){
+                    availableTotal+=roomType.getOverReservation();
+                }
+                if(availableTotal>quantity){
+                    bookRoomType(roomType, startDate, endDate, quantity);
+                }else{
+                    return false;
+                }
                 break;
             case Constants.Status.ROOM_USAGE_ASSIGN:
                 assignRoomType(roomType, startDate, endDate, quantity);
@@ -189,6 +198,7 @@ public class RoomTypeQuantityServiceImpl implements RoomTypeQuantityService {
             default:
                 break;
         }
+        return true;
     }
 
     @Override
@@ -520,8 +530,8 @@ public class RoomTypeQuantityServiceImpl implements RoomTypeQuantityService {
     }
 
     @Override
-    public void useRoomType(UseInfoAble info, String userType) {
-        useRoomType(info.roomType(), info.getStartTime().toLocalDate(), info.getEndTime().toLocalDate(), userType,
+    public boolean useRoomType(UseInfoAble info, String userType) {
+       return  useRoomType(info.roomType(), info.getStartTime().toLocalDate(), info.getEndTime().toLocalDate(), userType,
                 info.getRoomCount());
     }
 

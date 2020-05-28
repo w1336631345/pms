@@ -31,8 +31,7 @@ public class RoomStatisticsServiceImpl implements RoomStatisticsService {
 
     @Override
     public boolean reserve(UseInfoAble info) {
-        roomTypeQuantityService.useRoomType(info, Constants.Status.ROOM_USAGE_BOOK);
-        return true;
+       return  roomTypeQuantityService.useRoomType(info, Constants.Status.ROOM_USAGE_BOOK);
     }
 
     @Override

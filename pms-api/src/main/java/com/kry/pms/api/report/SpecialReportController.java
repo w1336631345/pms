@@ -39,4 +39,8 @@ public class SpecialReportController extends BaseController {
         rep.addData(specialReportService.billPayStat(getCurrentHotleCode(), employee_id, shift, localDate));
         return rep;
     }
+    public HttpResponse<List<Map<String, Object>>> dailyReport(@RequestParam(required = true) String business_date){
+        return null;
+    }
+
 }
