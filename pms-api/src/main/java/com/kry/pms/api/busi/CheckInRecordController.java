@@ -110,6 +110,23 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
         return hr;
     }
 
+    /**
+     * 功能描述: <br>房态图批量操作的，快速入住
+     * 〈〉
+     *
+     * @Param: [checkInRecordListBo]
+     * @Return: com.kry.pms.base.HttpResponse63
+     * @Author: huanghaibin
+     * @Date: 2020/1/9 10:22
+     */
+    @PostMapping(path = "/bookByRoomList")
+    public HttpResponse bookByRoomList(@RequestBody CheckInRecordListBo checkInRecordListBo) {
+        HttpResponse hr = new HttpResponse();
+        List<CheckInRecord> list = checkInRecordService.bookByRoomList(checkInRecordListBo, getCurrentHotleCode());
+        hr.addData(list);
+        return hr.ok();
+    }
+
     @DeleteMapping
     public HttpResponse<String> delete(String id) {
         HttpResponse<String> rep = new HttpResponse<>();
@@ -330,24 +347,6 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
         HttpResponse rep = new HttpResponse();
         rep = checkInRecordService.offReserve(id);
         return rep;
-    }
-
-    /**
-     * 功能描述: <br>房态图批量操作的，快速入住
-     * 〈〉
-     *
-     * @Param: [checkInRecordListBo]
-     * @Return: com.kry.pms.base.HttpResponse63
-     * @Author: huanghaibin
-     * @Date: 2020/1/9 10:22
-     */
-    @PostMapping(path = "/bookByRoomList")
-    @OperationLog(remark = "房态图批量操作的，快速入住")
-    public HttpResponse bookByRoomList(@RequestBody CheckInRecordListBo checkInRecordListBo) {
-        HttpResponse hr = new HttpResponse();
-        List<CheckInRecord> list = checkInRecordService.bookByRoomList(checkInRecordListBo, getCurrentHotleCode());
-        hr.addData(list);
-        return hr.ok();
     }
 
     public HttpResponse<PageResponse<CheckInRecordListVo>> queryHistory() {
