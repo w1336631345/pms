@@ -9,6 +9,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
@@ -25,19 +26,19 @@ public class RealTimeReportController extends BaseController {
 
     @GetMapping
     @RequestMapping("/shift/cost")
-    public HttpResponse<List<Map<String, Object>>> realTimeShiftCost() throws IOException, TemplateException {
+    public HttpResponse<List<Map<String, Object>>> realTimeShiftCost(@RequestParam(required = true) String employee_id) throws IOException, TemplateException {
         HttpResponse<List<Map<String, Object>>> rep = new HttpResponse<>();
         String hotelCode = getCurrentHotleCode();
-        rep.addData(realTimeReportService.billCostStat(getCurrentHotleCode(), getCurrentEmployee().getId(), getShiftCode(), businessSeqService.getBuinessDate(hotelCode)));
+        rep.addData(realTimeReportService.billCostStat(getCurrentHotleCode(), employee_id, getShiftCode(), businessSeqService.getBuinessDate(hotelCode)));
         return rep;
     }
 
     @GetMapping
     @RequestMapping("/shift/pay")
-    public HttpResponse<List<Map<String, Object>>> realTimeShiftPay() throws IOException, TemplateException {
+    public HttpResponse<List<Map<String, Object>>> realTimeShiftPay(@RequestParam(required = true) String employee_id) throws IOException, TemplateException {
         HttpResponse<List<Map<String, Object>>> rep = new HttpResponse<>();
         String hotelCode = getCurrentHotleCode();
-        rep.addData(realTimeReportService.billPayStat(getCurrentHotleCode(), getCurrentEmployee().getId(), getShiftCode(), businessSeqService.getBuinessDate(hotelCode)));
+        rep.addData(realTimeReportService.billPayStat(getCurrentHotleCode(), employee_id, getShiftCode(), businessSeqService.getBuinessDate(hotelCode)));
         return rep;
     }
 }
