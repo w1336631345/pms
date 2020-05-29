@@ -122,8 +122,7 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
     @PostMapping(path = "/bookByRoomList")
     public HttpResponse bookByRoomList(@RequestBody CheckInRecordListBo checkInRecordListBo) {
         HttpResponse hr = new HttpResponse();
-        List<CheckInRecord> list = checkInRecordService.bookByRoomList(checkInRecordListBo, getCurrentHotleCode());
-        hr.addData(list);
+        hr = checkInRecordService.bookByRoomList(checkInRecordListBo, getCurrentHotleCode());
         return hr.ok();
     }
 

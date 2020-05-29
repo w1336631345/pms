@@ -4,7 +4,6 @@ import com.kry.pms.base.DtoResponse;
 import com.kry.pms.base.HttpResponse;
 import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
-import com.kry.pms.model.annotation.UpdateAnnotation;
 import com.kry.pms.model.http.request.busi.CheckInBo;
 import com.kry.pms.model.http.request.busi.CheckInRecordListBo;
 import com.kry.pms.model.http.request.busi.CheckUpdateItemTestBo;
@@ -61,7 +60,7 @@ public interface CheckInRecordService extends BaseService<CheckInRecord> {
 
     public HttpResponse book(CheckInRecord checkInRecord);
 
-    List<CheckInRecord> bookByRoomList(CheckInRecordListBo cirlb, String hotelCode);
+    HttpResponse bookByRoomList(CheckInRecordListBo cirlb, String hotelCode);
 
     @Transactional
     HttpResponse bookByRoomTypeTest(CheckInRecord checkInRecord);
