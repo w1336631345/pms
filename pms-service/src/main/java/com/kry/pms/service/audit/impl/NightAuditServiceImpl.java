@@ -245,10 +245,11 @@ public class NightAuditServiceImpl implements NightAuditService {
     @Override
     @Transactional
     public HttpResponse storedProcedure(String hotelCode, String id){
+        LocalDate businessDate = businessSeqService.getBuinessDate(hotelCode);
         HttpResponse hr = new HttpResponse();
         Map<String, Object> map = new HashMap<>();
 //        map.put("cId", id);
-        List<Map<String, Object>> list = sqlTemplateService.storedProcedure(hotelCode, "CheckInRecordHis", map);
+        List<Map<String, Object>> list = sqlTemplateService.storedProcedure(hotelCode, businessDate, "CheckInRecordHis", map);
         List<CheckInRecord> cirs = checkInRecordDao.findByHotelCodeAndStatus(hotelCode, Constants.Status.CHECKIN_RECORD_STATUS_CHECK_OUT);
         for(int i=0; i<cirs.size(); i++){
             CheckInRecord cir = cirs.get(i);
