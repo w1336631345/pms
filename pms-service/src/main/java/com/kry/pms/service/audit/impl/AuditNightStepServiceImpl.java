@@ -94,7 +94,7 @@ public class AuditNightStepServiceImpl implements AuditNightStepService {
 				List<AuditNightStepParam> params = ans.getParams();
 				try {
 					Map<String, Object> map = auditNightStepParamService.toMapParams(params);
-					List<Map<String, Object>> rl = sqlTemplateService.storedProcedure(code, ans.getProcessName(), map);
+					List<Map<String, Object>> rl = sqlTemplateService.storedProcedure(code, businessDate, ans.getProcessName(), map);
 					ansh.setResultCode("success");
 				}catch (Exception e) {
 					ansh.setResultCode("error");
