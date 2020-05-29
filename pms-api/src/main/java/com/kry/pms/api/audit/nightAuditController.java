@@ -239,10 +239,10 @@ public class nightAuditController extends BaseController {
      * @Date: 2020/5/21 15:49
      */
     @GetMapping("/storedProcedure")
-    public HttpResponse storedProcedure(String id) {
+    public HttpResponse storedProcedure() {
         HttpResponse hr = new HttpResponse<>();
         User user = getUser();
-        hr = nightAuditService.storedProcedure(user.getHotelCode(), id);
+        hr = nightAuditService.storedProcedure(user.getHotelCode());
         return hr;
     }
 

@@ -80,7 +80,7 @@ public class AuditNightStepServiceImpl implements AuditNightStepService {
 			ansh.setResultCode("loading");
 			auditNightStepHisService.add(ansh);
 			AuditNightStep ans = list.get(i);
-			if(ans.getProcessName() == null){
+			if(ans.getProcessName() == null || "".equals(ans.getProcessName())){
 				try {
 					Random random = new Random();
 					int s = random.nextInt(5000)%(5000-1000+1) + 1000;

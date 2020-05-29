@@ -244,7 +244,7 @@ public class NightAuditServiceImpl implements NightAuditService {
 
     @Override
     @Transactional
-    public HttpResponse storedProcedure(String hotelCode, String id){
+    public HttpResponse storedProcedure(String hotelCode){
         LocalDate businessDate = businessSeqService.getBuinessDate(hotelCode);
         HttpResponse hr = new HttpResponse();
         Map<String, Object> map = new HashMap<>();
