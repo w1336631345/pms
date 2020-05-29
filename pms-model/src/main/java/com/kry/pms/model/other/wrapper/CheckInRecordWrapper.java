@@ -89,7 +89,7 @@ public class CheckInRecordWrapper implements UseInfoAble {
         if (this.checkInRecord.getActualTimeOfArrive() != null) {
             this.startTime = this.checkInRecord.getActualTimeOfArrive();
         } else {
-            if(this.checkInRecord.getArriveTime().isAfter( LocalDateTime.of(LocalDate.now(), LocalTime.NOON))){
+            if(this.checkInRecord.getArriveTime().toLocalDate().isEqual(LocalDate.now())&&this.checkInRecord.getArriveTime().isAfter( LocalDateTime.of(LocalDate.now(), LocalTime.NOON))){
                 this.startTime = this.checkInRecord.getArriveTime();
             }else{
                 LocalDate localDate = this.checkInRecord.getArriveTime().toLocalDate();
