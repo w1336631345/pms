@@ -965,7 +965,11 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                 Customer customer = null;
                 if (checkInRecord.getHumanCount() == 1) {
                     if (checkInRecord.getCustomer() == null) {
-                        customer = customerService.createTempCustomer(checkInRecord.getHotelCode(), gr.getRoomNum() + "#" + (i + 1));
+                        if(checkInRecord.getName() != null){
+                            customer = customerService.createTempCustomer(checkInRecord.getHotelCode(), checkInRecord.getName());
+                        }else {
+                            customer = customerService.createTempCustomer(checkInRecord.getHotelCode(), gr.getRoomNum() + "#" + (i + 1));
+                        }
                     } else {
                         customer = customerService.findById(checkInRecord.getCustomer().getId());
                     }
@@ -1018,11 +1022,11 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
             Customer customer = null;
             Account account = null;
             if (checkInRecord.getCustomer() == null) {
-                if(checkInRecord.getContactName() != null){
-                    customer = customerService.createTempCustomer(checkInRecord.getHotelCode(),  checkInRecord.getContactName());
-                    account = accountService.createAccount(customer, checkInRecord.getContactName());
+                if(checkInRecord.getName() != null){
+                    customer = customerService.createTempCustomer(checkInRecord.getHotelCode(),  checkInRecord.getName());
+                    account = accountService.createAccount(customer, checkInRecord.getName());
                 }else {
-                    customer = customerService.createTempCustomer(checkInRecord.getHotelCode(),  "No Room");
+                    customer = customerService.createTempCustomer(checkInRecord.getHotelCode(),  "No Name");
                     account = accountService.createAccount(customer, "No Room");
                 }
             }else{
