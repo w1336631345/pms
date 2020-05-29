@@ -1,5 +1,7 @@
 package com.kry.pms.service.report.impl;
 
+import com.kry.pms.dao.report.ReportEmpDailyBillStatDao;
+import com.kry.pms.model.persistence.report.ReportEmpDailyBillStat;
 import com.kry.pms.service.report.SpecialReportService;
 import com.kry.pms.service.sys.SqlTemplateService;
 import freemarker.template.TemplateException;
@@ -8,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,6 +18,8 @@ import java.util.Map;
 public class SpecialReportServiceImpl implements SpecialReportService {
     @Autowired
     SqlTemplateService sqlTemplateService;
+    @Autowired
+    ReportEmpDailyBillStatDao reportEmpDailyBillStatDao;
 
     @Override
     public List<Map<String, Object>> billCostStat(String hotelCode, String employeeId, String shift, LocalDate businessDate) throws IOException, TemplateException {
@@ -37,24 +42,30 @@ public class SpecialReportServiceImpl implements SpecialReportService {
     }
 
     @Override
-    public List<Map<String, Object>> dailyReport(String hotelCode, LocalDate bDate) throws IOException, TemplateException {
+    public Collection<Map<String, Object>> dailyReport(String hotelCode, LocalDate bDate) throws IOException, TemplateException {
         Map<String, Object> parmrs = new HashMap<>();
-        parmrs.put("hotelCode", hotelCode);
-        parmrs.put("business_date", bDate);
-        List<Map<String, Object>> data =  sqlTemplateService.processByCode(hotelCode, "report_pay_stat", parmrs);
-        return null;
+        List<ReportEmpDailyBillStat> data = reportEmpDailyBillStatDao.findByHotelCodeAndQuantityDate(hotelCode,bDate);
+        HashMap<String,Map<String, Object>> rep = new HashMap<>();
+        for(ReportEmpDailyBillStat item:data){
+            if(!rep.containsKey(item.getEmployeeId())){
+                rep.put(item.getEmployeeId(),new HashMap<>());
+            }
+            rep.get(item.getEmployeeId()).put(item.getKey(),item.getValue());
+        }
+        return rep.values();
     }
 
     @Override
-    public List<Map<String, Object>> paySummary(String hotelCode, LocalDate bDate) throws IOException, TemplateException {
+    public Collection<Map<String, Object>> paySummary(String hotelCode, LocalDate bDate) throws IOException, TemplateException {
         Map<String, Object> parmrs = new HashMap<>();
-        parmrs.put("hotelCode", hotelCode);
-        parmrs.put("business_date", bDate);
-        List<Map<String, Object>> data =  sqlTemplateService.processByCode(hotelCode, "report_pay_stat", parmrs);
+        List<ReportEmpDailyBillStat> data = reportEmpDailyBillStatDao.findByHotelCodeAndQuantityDate(hotelCode,bDate);
         HashMap<String,Map<String, Object>> rep = new HashMap<>();
-        for(Map<String,Object> item:data){
-
+        for(ReportEmpDailyBillStat item:data){
+            if(!rep.containsKey(item.getEmployeeId())){
+                rep.put(item.getEmployeeId(),new HashMap<>());
+            }
+            rep.get(item.getEmployeeId()).put(item.getKey(),item.getValue());
         }
-        return null;
+        return rep.values();
     }
 }

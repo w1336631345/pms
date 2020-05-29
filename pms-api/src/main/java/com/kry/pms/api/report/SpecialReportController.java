@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -40,14 +41,18 @@ public class SpecialReportController extends BaseController {
         rep.addData(specialReportService.billPayStat(getCurrentHotleCode(), employee_id, shift, localDate));
         return rep;
     }
-    public HttpResponse<List<Map<String, Object>>> dailyReport(@RequestParam(required = true) String business_date) throws IOException, TemplateException {
-        HttpResponse<List<Map<String, Object>>> rep = new HttpResponse<>();
+    @GetMapping
+    @RequestMapping("/dailyReport")
+    public HttpResponse<Collection<Map<String, Object>>> dailyReport(@RequestParam(required = true) String business_date) throws IOException, TemplateException {
+        HttpResponse<Collection<Map<String, Object>>> rep = new HttpResponse<>();
         LocalDate bDate = LocalDate.parse(business_date);
         rep.addData(specialReportService.dailyReport(getCurrentHotleCode(),bDate));
         return rep;
     }
-    public HttpResponse<List<Map<String, Object>>> paySummary(@RequestParam(required = true) String business_date) throws IOException, TemplateException {
-        HttpResponse<List<Map<String, Object>>> rep = new HttpResponse<>();
+    @GetMapping
+    @RequestMapping("/paySummary")
+    public HttpResponse<Collection<Map<String, Object>>> paySummary(@RequestParam(required = true) String business_date) throws IOException, TemplateException {
+        HttpResponse<Collection<Map<String, Object>>> rep = new HttpResponse<>();
         LocalDate bDate = LocalDate.parse(business_date);
         rep.addData(specialReportService.paySummary(getCurrentHotleCode(),bDate));
         return rep;
