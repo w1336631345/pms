@@ -35,4 +35,26 @@ public class SpecialReportServiceImpl implements SpecialReportService {
         parmrs.put("business_date", businessDate);
         return sqlTemplateService.processByCode(hotelCode, "report_pay_stat", parmrs);
     }
+
+    @Override
+    public List<Map<String, Object>> dailyReport(String hotelCode, LocalDate bDate) throws IOException, TemplateException {
+        Map<String, Object> parmrs = new HashMap<>();
+        parmrs.put("hotelCode", hotelCode);
+        parmrs.put("business_date", bDate);
+        List<Map<String, Object>> data =  sqlTemplateService.processByCode(hotelCode, "report_pay_stat", parmrs);
+        return null;
+    }
+
+    @Override
+    public List<Map<String, Object>> paySummary(String hotelCode, LocalDate bDate) throws IOException, TemplateException {
+        Map<String, Object> parmrs = new HashMap<>();
+        parmrs.put("hotelCode", hotelCode);
+        parmrs.put("business_date", bDate);
+        List<Map<String, Object>> data =  sqlTemplateService.processByCode(hotelCode, "report_pay_stat", parmrs);
+        HashMap<String,Map<String, Object>> rep = new HashMap<>();
+        for(Map<String,Object> item:data){
+
+        }
+        return null;
+    }
 }

@@ -46,6 +46,7 @@ public class FunctionController extends BaseController<Function> {
 	public HttpResponse<PageResponse<Function>> query(HttpServletRequest request) throws InstantiationException, IllegalAccessException{
 		HttpResponse<PageResponse<Function>> rep = new HttpResponse<PageResponse<Function>>();
 		PageRequest<Function> req = parse2PageRequest(request);
+		req.getExb().setHotelCode(null);
 		return rep.addData(functionService.listPage(req));
 	}
 	@GetMapping(path="/all")

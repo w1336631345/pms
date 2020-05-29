@@ -6,6 +6,7 @@ import com.kry.pms.service.report.SpecialReportService;
 import com.kry.pms.service.report.impl.SpecialReportServiceImpl;
 import freemarker.template.TemplateException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cglib.core.Local;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -39,8 +40,17 @@ public class SpecialReportController extends BaseController {
         rep.addData(specialReportService.billPayStat(getCurrentHotleCode(), employee_id, shift, localDate));
         return rep;
     }
-    public HttpResponse<List<Map<String, Object>>> dailyReport(@RequestParam(required = true) String business_date){
-        return null;
+    public HttpResponse<List<Map<String, Object>>> dailyReport(@RequestParam(required = true) String business_date) throws IOException, TemplateException {
+        HttpResponse<List<Map<String, Object>>> rep = new HttpResponse<>();
+        LocalDate bDate = LocalDate.parse(business_date);
+        rep.addData(specialReportService.dailyReport(getCurrentHotleCode(),bDate));
+        return rep;
+    }
+    public HttpResponse<List<Map<String, Object>>> paySummary(@RequestParam(required = true) String business_date) throws IOException, TemplateException {
+        HttpResponse<List<Map<String, Object>>> rep = new HttpResponse<>();
+        LocalDate bDate = LocalDate.parse(business_date);
+        rep.addData(specialReportService.paySummary(getCurrentHotleCode(),bDate));
+        return rep;
     }
 
 }
