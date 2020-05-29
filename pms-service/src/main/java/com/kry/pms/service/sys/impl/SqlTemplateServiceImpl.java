@@ -177,11 +177,13 @@ public class SqlTemplateServiceImpl implements SqlTemplateService {
     }
 
     @Override
-    public List<Map<String, Object>> storedProcedure(String hotelCode, String name, Map<String, Object> params){
+    public List<Map<String, Object>> storedProcedure(String hotelCode, LocalDate businessDate, String name, Map<String, Object> params){
         StringWriter stringWriter = new StringWriter();
         StoredProcedureQuery query = entityManager.createStoredProcedureQuery(name);
         query.registerStoredProcedureParameter("hotelCode", String.class, ParameterMode.IN);
         query.setParameter("hotelCode",hotelCode);
+        query.registerStoredProcedureParameter("businessDate", LocalDate.class, ParameterMode.IN);
+        query.setParameter("businessDate",businessDate);
         for(Map.Entry<String, Object> param : params.entrySet()){
             String mapKey = param.getKey();
             Object mapValue = param.getValue();

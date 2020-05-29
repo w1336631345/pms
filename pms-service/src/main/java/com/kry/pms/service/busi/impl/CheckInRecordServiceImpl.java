@@ -16,7 +16,6 @@ import com.kry.pms.model.persistence.goods.SetMeal;
 import com.kry.pms.model.persistence.guest.Customer;
 import com.kry.pms.model.persistence.marketing.RoomPriceScheme;
 import com.kry.pms.model.persistence.room.GuestRoom;
-import com.kry.pms.model.persistence.room.GuestRoomStatus;
 import com.kry.pms.model.persistence.room.RoomType;
 import com.kry.pms.model.persistence.sys.Account;
 import com.kry.pms.model.persistence.sys.User;
@@ -33,7 +32,6 @@ import com.kry.pms.service.util.BeanChangeUtil;
 import com.kry.pms.service.util.UpdateUtil;
 import freemarker.template.TemplateException;
 import org.apache.commons.collections4.MapUtils;
-import org.springframework.aop.framework.AopContext;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
@@ -48,8 +46,6 @@ import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import javax.persistence.criteria.*;
 import javax.transaction.Transactional;
 import java.io.IOException;
-import java.lang.reflect.Array;
-import java.lang.reflect.InvocationTargetException;
 import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -132,6 +128,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
         boolean updateRoomPriceS = false;
         boolean updateName = false;
         boolean updateTime = false;
+        boolean isSecrecy = false;
         if ((Constants.Type.CHECK_IN_RECORD_RESERVE).equals(dbCir.getType())) {
             return hr.error("预留单请去“修改预留”界面");
         }
@@ -144,6 +141,11 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
         }
         if (!dbCir.getArriveTime().isEqual(checkInRecord.getArriveTime()) || !dbCir.getLeaveTime().isEqual(checkInRecord.getLeaveTime())) {
             updateTime = true;
+        }
+        if(checkInRecord.getIsSecrecy() != null){
+            if(!checkInRecord.getIsSecrecy().equals(dbCir.getIsSecrecy())){
+                isSecrecy = true;
+            }
         }
         // 如果是主单操作，判断是不是修改的时间
         if (("G").equals(dbCir.getType())) {
@@ -189,6 +191,9 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                         TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                         return hr.error("主单时间范围不能小于成员时间范围");
                     }
+                }
+                if(isSecrecy){
+                    cir.setIsSecrecy(checkInRecord.getIsSecrecy());
                 }
                 cir.setCorp(checkInRecord.getCorp());
                 checkInRecordDao.saveAndFlush(cir);
@@ -825,7 +830,8 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 
     @Override
     @Transactional
-    public List<CheckInRecord> bookByRoomList(CheckInRecordListBo cirlb, String hotelCode) {
+    public HttpResponse bookByRoomList(CheckInRecordListBo cirlb, String hotelCode) {
+        HttpResponse hr = new HttpResponse();
         List<CheckInRecord> list = cirlb.getCirs();
         String roomLinkId = null;
         if (cirlb.getIsRoomLink()) {
@@ -839,9 +845,12 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
             list.get(i).setOrderNum(orderNum);
             list.get(i).setRoomLinkId(roomLinkId);
             list.get(i).setHotelCode(hotelCode);
-            bookByRoomTypeTest(list.get(i));
+            hr = bookByRoomTypeTest(list.get(i));
+            if(hr.getStatus() == 9999){
+                return hr;
+            }
         }
-        return list;
+        return hr;
     }
 
     @Override
@@ -956,7 +965,11 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                 Customer customer = null;
                 if (checkInRecord.getHumanCount() == 1) {
                     if (checkInRecord.getCustomer() == null) {
-                        customer = customerService.createTempCustomer(checkInRecord.getHotelCode(), gr.getRoomNum() + "#" + (i + 1));
+                        if(checkInRecord.getName() != null){
+                            customer = customerService.createTempCustomer(checkInRecord.getHotelCode(), checkInRecord.getName());
+                        }else {
+                            customer = customerService.createTempCustomer(checkInRecord.getHotelCode(), gr.getRoomNum() + "#" + (i + 1));
+                        }
                     } else {
                         customer = customerService.findById(checkInRecord.getCustomer().getId());
                     }
@@ -1009,11 +1022,11 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
             Customer customer = null;
             Account account = null;
             if (checkInRecord.getCustomer() == null) {
-                if(checkInRecord.getContactName() != null){
-                    customer = customerService.createTempCustomer(checkInRecord.getHotelCode(),  checkInRecord.getContactName());
-                    account = accountService.createAccount(customer, checkInRecord.getContactName());
+                if(checkInRecord.getName() != null){
+                    customer = customerService.createTempCustomer(checkInRecord.getHotelCode(),  checkInRecord.getName());
+                    account = accountService.createAccount(customer, checkInRecord.getName());
                 }else {
-                    customer = customerService.createTempCustomer(checkInRecord.getHotelCode(),  "No Room");
+                    customer = customerService.createTempCustomer(checkInRecord.getHotelCode(),  "No Name");
                     account = accountService.createAccount(customer, "No Room");
                 }
             }else{

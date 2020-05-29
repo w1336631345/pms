@@ -7,6 +7,7 @@ import com.kry.pms.service.BaseService;
 import freemarker.template.TemplateException;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -25,7 +26,7 @@ public interface SqlTemplateService extends BaseService<SqlTemplate> {
 
     List<Map<String, Object>> processByCode(String hotelCode, String code, Map<String, Object> parmrs) throws IOException, TemplateException;
 
-    List<Map<String, Object>> storedProcedure(String hotelCode, String name, Map<String, Object> params);
+    List<Map<String, Object>> storedProcedure(String hotelCode, LocalDate businessDate, String name, Map<String, Object> params);
 
     PageResponse<Map<String, Object>> queryForPage(String hotelCode, String code, PageRequest<Map<String, Object>> pageRequest) throws IOException, TemplateException;
 
