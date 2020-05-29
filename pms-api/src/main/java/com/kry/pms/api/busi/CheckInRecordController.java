@@ -123,7 +123,7 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
     public HttpResponse bookByRoomList(@RequestBody CheckInRecordListBo checkInRecordListBo) {
         HttpResponse hr = new HttpResponse();
         hr = checkInRecordService.bookByRoomList(checkInRecordListBo, getCurrentHotleCode());
-        return hr.ok();
+        return hr;
     }
 
     @DeleteMapping
