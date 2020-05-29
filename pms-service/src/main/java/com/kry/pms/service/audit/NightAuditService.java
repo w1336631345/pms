@@ -14,5 +14,5 @@ public interface NightAuditService extends BaseService<RoomRecord> {
     //报表导入各个统计-自动
     HttpResponse addReportAllAuto(String hotelCode);
 
-    HttpResponse storedProcedure(String hotelCode, String id);
+    HttpResponse storedProcedure(String hotelCode);
 }
