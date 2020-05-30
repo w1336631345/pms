@@ -342,7 +342,17 @@ public class AccountServiceImpl implements AccountService {
                 double processTotal = BigDecimalUtil.sub(cost, pay);
                 if (processTotal == billCheckBo.getTotal()) {
                     if (targetAccount != null) {
-                        Bill payBill = billService.createToArBill(account, processTotal, pay, billCheckBo.getOperationEmployee(), billCheckBo.getShiftCode(), settleAccountRecord.getRecordNum(), "To:" + targetAccount.getCode());
+                        String remark = null;
+                        if(targetAccount.getName() != null){
+                            remark = "To:" + targetAccount.getCode() + "/" + targetAccount.getName();
+                        }else {
+                            if(targetAccount.getCustomer() != null && targetAccount.getCustomer().getName() != null){
+                                remark = "To:" + targetAccount.getCode() + "/" + targetAccount.getCustomer().getName();
+                            }else {
+                                remark = "To:" + targetAccount.getCode();
+                            }
+                        }
+                        Bill payBill = billService.createToArBill(account, processTotal, pay, billCheckBo.getOperationEmployee(), billCheckBo.getShiftCode(), settleAccountRecord.getRecordNum(), remark);
                         Bill costBill = billService.createArSettleBill(targetAccount, billCheckBo.getTotal(), cost, pay, billCheckBo.getOperationEmployee(), billCheckBo.getShiftCode(), settleAccountRecord.getRecordNum());
                         List<Bill> flatBills = new ArrayList<>();
                         flatBills.add(payBill);
