@@ -108,7 +108,9 @@ public class BillServiceImpl implements BillService {
             return null;
         }
         Account account = accountService.billEntry(bill);
-        bill.setRoomNum(account.getRoomNum());
+        if(account.getRoomNum() != null){
+            bill.setRoomNum(account.getRoomNum());
+        }
         bill.setBillSeq(account.getCurrentBillSeq());
         bill.setAccount(account);
         return billDao.saveAndFlush(bill);
@@ -312,11 +314,11 @@ public class BillServiceImpl implements BillService {
             if (sm != null) {
                 if (sm.getProduct() != null) {//如果有包价，就一笔整的包价价格账，一笔负的价格账，正负得0
                     Product product = sm.getProduct();//入账项目
-                    addAudit(product, sm.getTotal(), sm.getAccount(), cir.getHotelCode(), emp, shiftCode, null, "M", businessDate);
-                    addAudit(product, -sm.getTotal(), sm.getAccount(), cir.getHotelCode(), emp, shiftCode, null, "M", businessDate);
+                    addAudit(product, sm.getTotal(), sm.getAccount(), cir.getHotelCode(), emp, shiftCode, null, "M", businessDate, null);
+                    addAudit(product, -sm.getTotal(), sm.getAccount(), cir.getHotelCode(), emp, shiftCode, null, "M", businessDate, null);
                 }
             }
-            addAudit(p, rr.getCost(), cir.getAccount(), cir.getHotelCode(), emp, shiftCode, rr.getId(), "M", businessDate);
+            addAudit(p, rr.getCost(), cir.getAccount(), cir.getHotelCode(), emp, shiftCode, rr.getId(), "M", businessDate, null);
             rr.setIsAccountEntry("PAY");// 入账成功后roomRecord里面入账状态改为pay
             roomRecordService.modify(rr);
         }
@@ -329,6 +331,7 @@ public class BillServiceImpl implements BillService {
             Map<String, Object> map = list.get(i);
             String id = MapUtils.getString(map, "id");
             String cirId = MapUtils.getString(map, "cirId");
+            String roomNum = MapUtils.getString(map, "roomNum");
             String setMealId = MapUtils.getString(map, "setMealId");
             String mainAccountId = MapUtils.getString(map, "mainAccountId");
             String productId = MapUtils.getString(map, "productId");
@@ -344,8 +347,8 @@ public class BillServiceImpl implements BillService {
                 if (productId != null && !"".equals(productId)) {//如果有包价，就一笔整的包价价格账，一笔负的价格账，正负得0
                     Product product = new Product();//入账项目
                     product.setId(productId);
-                    addAudit(product, setMealCost, setMealAccount, hotelCode, emp, shiftCode, null, "M", businessDate);
-                    addAudit(p, -setMealCost, setMealAccount, hotelCode, emp, shiftCode, null, "M", businessDate);
+                    addAudit(product, setMealCost, setMealAccount, hotelCode, emp, shiftCode, null, "M", businessDate, roomNum);
+                    addAudit(p, -setMealCost, setMealAccount, hotelCode, emp, shiftCode, null, "M", businessDate, roomNum);
                 }
             }
             BookkeepingSet bs = bookkeepingSetService.isExist(hotelCode, mainAccountId, p.getId());
@@ -353,13 +356,13 @@ public class BillServiceImpl implements BillService {
             if(bs != null){
                 cirAccount.setId(mainAccountId);
             }
-            addAudit(p, cost, cirAccount, hotelCode, emp, shiftCode, id, "M", businessDate);
+            addAudit(p, cost, cirAccount, hotelCode, emp, shiftCode, id, "M", businessDate, roomNum);
             // 入账成功后roomRecord里面入账状态改为pay
             roomRecordDao.updateIsAccountEntry("PAY", id);
         }
     }
 
-    public void addAudit(Product product, Double cost, Account account, String hotelCode, Employee emp, String shiftCode, String roomRecordId, String type, LocalDate businessDate) {
+    public void addAudit(Product product, Double cost, Account account, String hotelCode, Employee emp, String shiftCode, String roomRecordId, String type, LocalDate businessDate, String roomNum) {
 //        //入账只入当前营业日期的账
 //        LocalDate businessDate = businessSeqService.getBuinessDate(hotelCode);
         Bill bill = new Bill();
@@ -369,6 +372,8 @@ public class BillServiceImpl implements BillService {
         bill.setQuantity(1);
         bill.setAccount(account);
         bill.setHotelCode(hotelCode);
+        bill.setRemark(roomNum);
+        bill.setRoomNum(roomNum);
         if ("M".equals(type)) {
             bill.setOperationRemark("夜审手动入账");
         }
@@ -394,11 +399,11 @@ public class BillServiceImpl implements BillService {
             if (sm != null) {
                 if (sm.getProduct() != null) {//如果有包价，就一笔整的包价价格账，一笔负的价格账，正负得0
                     Product product = sm.getProduct();//入账项目
-                    addAudit(product, sm.getTotal(), sm.getAccount(), cir.getHotelCode(), null, null, null, "A", businessDate);
-                    addAudit(product, -sm.getTotal(), sm.getAccount(), cir.getHotelCode(), null, null, null, "A", businessDate);
+                    addAudit(product, sm.getTotal(), sm.getAccount(), cir.getHotelCode(), null, null, null, "A", businessDate, rr.getGuestRoom().getRoomNum());
+                    addAudit(product, -sm.getTotal(), sm.getAccount(), cir.getHotelCode(), null, null, null, "A", businessDate, rr.getGuestRoom().getRoomNum());
                 }
             }
-            addAudit(p, rr.getCost(), cir.getAccount(), cir.getHotelCode(), null, null, rr.getId(), "A", businessDate);
+            addAudit(p, rr.getCost(), cir.getAccount(), cir.getHotelCode(), null, null, rr.getId(), "A", businessDate, rr.getGuestRoom().getRoomNum());
             rr.setIsAccountEntry("PAY");// 入账成功后roomRecord里面入账状态改为pay
             roomRecordService.modify(rr);
         }
