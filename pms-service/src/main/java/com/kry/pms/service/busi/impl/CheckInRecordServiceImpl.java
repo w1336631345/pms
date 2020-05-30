@@ -991,7 +991,9 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                 if (j == 0) {
                     cir.setOriginalPrice(gr.getRoomType().getPrice());//原价
                     cir.setPersonalPrice(cir.getPurchasePrice());
-                    cir.setPersonalPercentage(1.0);
+                    if(cir.getPersonalPercentage() == null){
+                        cir.setPersonalPercentage(1.0);
+                    }
                 } else {
                     cir.setOriginalPrice(0.0);
                     cir.setPersonalPrice(0.0);
