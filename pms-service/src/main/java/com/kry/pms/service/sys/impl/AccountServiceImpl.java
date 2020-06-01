@@ -743,6 +743,7 @@ public class AccountServiceImpl implements AccountService {
         GuestRoom guestRoom = new GuestRoom();
         guestRoom.setId(cir.getGuestRoom().getId());
         guestRoom.setRoomNum(cir.getGuestRoom().getRoomNum());
+        bill.setRoomNum(cir.getGuestRoom().getRoomNum());
         bill.setAccount(cir.getAccount());
         bill.setGuestRoom(guestRoom);
         bill.setStatus(Constants.Status.BILL_NEED_SETTLED);
