@@ -21,6 +21,7 @@ public interface ProductDao extends BaseDao<Product>{
             " and tdd.dict_type_code = 'AchievementType' \n" +
             " and tdd.hotel_code = :hotelCode " +
             " and tp.direction = 1 \n" +
+            " and tp.deleted = 0 \n" +
             " and tp.hotel_code = :hotelCode " +
             " order by sort_num ")
     List<Map<String, Object>> getPaySetList(@Param("hotelCode")String hotelCode);
