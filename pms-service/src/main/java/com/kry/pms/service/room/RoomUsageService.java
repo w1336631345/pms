@@ -3,13 +3,11 @@ package com.kry.pms.service.room;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-
-import org.springframework.cglib.core.Local;
+import java.util.Map;
 
 import com.kry.pms.base.DtoResponse;
 import com.kry.pms.model.func.UseInfoAble;
 import com.kry.pms.model.http.response.room.RoomUsageListVo;
-import com.kry.pms.model.http.response.room.RoomUsageVo;
 import com.kry.pms.model.persistence.room.GuestRoom;
 import com.kry.pms.model.persistence.room.RoomUsage;
 import com.kry.pms.service.BaseService;
@@ -93,6 +91,8 @@ public interface RoomUsageService extends BaseService<RoomUsage> {
 	public boolean freeCheck(GuestRoom gr, LocalDateTime startTime, LocalDateTime endDateTime);
 
 	boolean unUse(GuestRoom gr, String businessKey, LocalDateTime endTime, String roomTypeUsage);
+
+    List<Map<String, Object>> queryUsableGuestRoomsByCheckInRecordIdNew(String cid, String floorId, String buildingId);
 
     public boolean checkIn(UseInfoAble info);
 

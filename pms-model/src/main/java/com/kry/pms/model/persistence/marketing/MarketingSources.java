@@ -31,6 +31,8 @@ public class MarketingSources extends PersistenceModel {
 	private RoomPriceScheme roomPriceScheme;
 	@Column
 	private String type;//Y团队，N散客
+	@Column
+	private String groupType;//组别
 	@Column(columnDefinition = "varchar(100) COMMENT '集团编码'")
 	private String clusterCode;
 	@Column(columnDefinition = "varchar(100) COMMENT '是否启用'")

@@ -35,6 +35,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class RoomUsageServiceImpl implements RoomUsageService {
@@ -349,6 +350,20 @@ public class RoomUsageServiceImpl implements RoomUsageService {
                 return queryUsableGuestRooms(roomTypeId, startTime, cir.getLeaveTime());
             }
 
+        }
+        return null;
+    }
+    @Override
+    public List<Map<String, Object>> queryUsableGuestRoomsByCheckInRecordIdNew(String cid, String floorId, String buildingId) {
+        CheckInRecord cir = checkInRecordService.findById(cid);
+        if (cir != null) {
+            LocalDateTime startTime = LocalDateTime.now();
+            if (cir.getArriveTime().isAfter(startTime)) {
+                startTime = cir.getArriveTime();
+            }
+            String roomTypeId = cir.getRoomType().getId();
+            List<Map<String, Object>> list = roomUsageDao.queryUsableRoomTypeGuestRoomsNew(roomTypeId, startTime, cir.getLeaveTime(), floorId, buildingId);
+            return list;
         }
         return null;
     }
