@@ -1366,10 +1366,12 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
             map.put("total", MapUtils.getDouble(list.get(0), "total"));
             map.put("creditLimit", MapUtils.getDouble(list.get(0), "creditLimit"));
             map.put("humanCount", MapUtils.getDouble(list.get(0), "humanCount"));
+            map.put("humanCountTotal", MapUtils.getDouble(list.get(0), "humanCountTotal"));
         }
         List<Map<String, Object>> list2 = sqlTemplateService.processByCode(hotelCode, "resverListTotal2", params);
         if (list2 != null && !list2.isEmpty()) {
             map.put("roomCount", MapUtils.getDouble(list2.get(0), "roomCount"));
+            map.put("roomCountTotal", MapUtils.getDouble(list2.get(0), "roomCountTotal"));
         }
         List<Map<String, Object>> rlist = new ArrayList<>();
         rlist.add(map);

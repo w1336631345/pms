@@ -9,4 +9,5 @@ public interface MarketingSourcesService extends BaseService<MarketingSources>{
 
 	List<MarketingSources> getAllByHotelCode(String currentHotleCode, int deletedFalse);
 
+    List<MarketingSources> getByHotelCodeAndIsUsed(String currentHotleCode, String isUsed, int deleted);
 }

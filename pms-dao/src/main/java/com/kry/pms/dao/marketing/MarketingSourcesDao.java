@@ -11,4 +11,6 @@ public interface MarketingSourcesDao extends BaseDao<MarketingSources>{
 
 	MarketingSources findByHotelCodeAndDeletedAndCode(String hotelCode, int deleted, String code);
 
+	List<MarketingSources> findByHotelCodeAndIsUsedAndDeleted(String hotleCode,String isUsed, int deleted);
+
 }

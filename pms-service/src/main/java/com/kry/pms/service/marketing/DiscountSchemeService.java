@@ -9,4 +9,5 @@ public interface DiscountSchemeService extends BaseService<DiscountScheme>{
 
 	List<DiscountScheme> getAllByHotelCode(String currentHotleCode, int deletedFalse);
 
+    List<DiscountScheme> getByHotelCodeAndIsUsed(String currentHotleCode, String isUsed, int deleted);
 }

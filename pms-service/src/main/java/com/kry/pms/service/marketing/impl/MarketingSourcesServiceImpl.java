@@ -74,5 +74,9 @@ public class  MarketingSourcesServiceImpl implements  MarketingSourcesService{
 	public List<MarketingSources> getAllByHotelCode(String currentHotleCode, int deleted) {
 		return marketingSourcesDao.findByHotelCodeAndDeleted(currentHotleCode,deleted);
 	}
+	@Override
+	public List<MarketingSources> getByHotelCodeAndIsUsed(String currentHotleCode, String isUsed, int deleted) {
+		return marketingSourcesDao.findByHotelCodeAndIsUsedAndDeleted(currentHotleCode,isUsed,deleted);
+	}
 	 
 }
