@@ -78,6 +78,9 @@ public class UpdateLogAop {
     private Object findOldData(Object target, Object object) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
 //        Method method = target.getClass().getMethod(NAME_METHOD_FIND_BY_ID, String.class);
         Method method = target.getClass().getMethod(NAME_METHOD_FIND_BY_ID_LOG, String.class);
+        if(method == null){
+            method = target.getClass().getMethod(NAME_METHOD_FIND_BY_ID, String.class);
+        }
         Method getIdMethod = object.getClass().getMethod(NAME_METHOD_GET_ID);
         String id = getIdMethod.invoke(object).toString();
         return method.invoke(target, id);

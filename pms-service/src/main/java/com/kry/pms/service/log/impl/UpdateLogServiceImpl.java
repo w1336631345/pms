@@ -5,6 +5,7 @@ import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
 import com.kry.pms.dao.log.InterfaceUseLogDao;
 import com.kry.pms.dao.log.UpdateLogDao;
+import com.kry.pms.dao.org.EmployeeDao;
 import com.kry.pms.model.persistence.busi.CheckInRecord;
 import com.kry.pms.model.persistence.log.InterfaceUseLog;
 import com.kry.pms.model.persistence.log.UpdateLog;
@@ -30,6 +31,8 @@ public class UpdateLogServiceImpl implements UpdateLogService {
 	CheckInRecordService checkInRecordService;
 	@Autowired
 	GuestRoomStatusService guestRoomStatusService;
+	@Autowired
+	EmployeeDao employeeDao;
 	 
 	 @Override
 	public UpdateLog add(UpdateLog updateLog) {
@@ -79,6 +82,12 @@ public class UpdateLogServiceImpl implements UpdateLogService {
 			req = org.springframework.data.domain.PageRequest.of(prq.getPageNum(), prq.getPageSize());
 		}
 		Page<UpdateLog> list = updateLogDao.findAll(ex, req);
+		List<UpdateLog> logs = list.getContent();
+		for(int i=0; i<logs.size(); i++){
+			UpdateLog updateLog = logs.get(i);
+			String empName = employeeDao.getName(updateLog.getCreateUser());
+			updateLog.setCreateName(empName);
+		}
 		return convent(list);
 	}
 
