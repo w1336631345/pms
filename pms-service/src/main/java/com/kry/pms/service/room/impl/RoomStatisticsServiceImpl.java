@@ -53,11 +53,7 @@ public class RoomStatisticsServiceImpl implements RoomStatisticsService {
 
     @Override
     public boolean cancleAssign(UseInfoAble info) {
-        if (roomUsageService.cancleAssignRoom(info)) {
-            guestRoomStatusService.changeStatus(info);
-            return true;
-        }
-        return false;
+        return roomUsageService.cancleAssignRoom(info);
     }
 
 //	@Override

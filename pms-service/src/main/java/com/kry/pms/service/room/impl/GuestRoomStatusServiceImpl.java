@@ -537,6 +537,15 @@ public class GuestRoomStatusServiceImpl implements GuestRoomStatusService {
         modify(newStatus);
     }
 
+    @Override
+    public boolean cancelAssignRoom(UseInfoAble info) {
+        GuestRoomStatus status = guestRoomStatusDao.findByGuestRoomId(info.guestRoom().getId());
+        if(status!=null){
+            clearStatus(status);
+        }
+        return true;
+    }
+
     private void copyStatus(GuestRoomStatus src, GuestRoomStatus target) {
         target.setFree(src.getFree());
         target.setGroup(src.getGroup());

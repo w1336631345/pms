@@ -75,4 +75,6 @@ public interface GuestRoomStatusService extends BaseService<GuestRoomStatus> {
     void updateStatus(UseInfoAble info);
 
     void changeRoom(GuestRoom guestRoom, GuestRoom newGuestRoom, LocalDateTime changeTime);
+
+    boolean cancelAssignRoom(UseInfoAble info);
 }
