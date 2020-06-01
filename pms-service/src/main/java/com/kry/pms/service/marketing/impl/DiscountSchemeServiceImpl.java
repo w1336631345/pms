@@ -71,4 +71,8 @@ public class  DiscountSchemeServiceImpl implements  DiscountSchemeService{
 	public List<DiscountScheme> getAllByHotelCode(String currentHotleCode, int deleted) {
 		return discountSchemeDao.findByHotelCodeAndDeleted(currentHotleCode,deleted);
 	}
+	@Override
+	public List<DiscountScheme> getByHotelCodeAndIsUsed(String currentHotleCode, String isUsed, int deleted) {
+		return discountSchemeDao.findByHotelCodeAndIsUsedAndDeleted(currentHotleCode,isUsed,deleted);
+	}
 }

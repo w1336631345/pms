@@ -99,8 +99,8 @@ public class HotelServiceImpl implements HotelService {
 		HotelInfoVo hv = new HotelInfoVo();
 		Hotel hotel = getByHotelCode(currentHotleCode);
 		hv.setRoomTypes(roomTypeService.getAllByHotelCode(currentHotleCode, Constants.DELETED_FALSE));
-		hv.setMarketingSources(marketingSourcesService.getAllByHotelCode(currentHotleCode,Constants.DELETED_FALSE));
-		hv.setDiscountSchemes(discountSchemeService.getAllByHotelCode(currentHotleCode,Constants.DELETED_FALSE));
+		hv.setMarketingSources(marketingSourcesService.getByHotelCodeAndIsUsed(currentHotleCode,"true",Constants.DELETED_FALSE));
+		hv.setDiscountSchemes(discountSchemeService.getByHotelCodeAndIsUsed(currentHotleCode,"true",Constants.DELETED_FALSE));
 		hv.setRoomTags(roomTagService.getAllByHotelCode(currentHotleCode,Constants.DELETED_FALSE));
 		hv.setConfigs(systemConfigService.getWebConfig(currentHotleCode));
 		hv.setDistributionChannels(distributionChannelService.getAllByHotelCode(currentHotleCode,Constants.DELETED_FALSE));
