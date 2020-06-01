@@ -1,5 +1,6 @@
 package com.kry.pms.model.http.request.busi;
 
+import com.kry.pms.model.persistence.goods.Product;
 import com.kry.pms.model.persistence.org.Employee;
 
 import lombok.Data;
@@ -13,4 +14,5 @@ public class BillOperationBo {
 	private Double val1;
 	private Double val2;
 	private String remark;
+	private Product product;
 }

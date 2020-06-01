@@ -432,14 +432,7 @@ public class BillServiceImpl implements BillService {
     }
 
     @Transactional
-    @Override
-    public DtoResponse<Bill> adjust(String id, Double val, boolean shiftCheck, String shiftCode) {
-        return adjust(id, val, shiftCheck, shiftCode, val == null ? BILL_OP_OFFSET : BILL_OP_ADJUST);
-    }
-
-
-    @Transactional
-    public DtoResponse<Bill> adjust(String id, Double val, boolean shiftCheck, String shiftCode, String type) {
+    public DtoResponse<Bill> adjust(String id, Double val, boolean shiftCheck, String shiftCode,Product product) {
         DtoResponse<Bill> rep = new DtoResponse<Bill>();
         Bill bill = findById(id);
         if (bill != null && bill.getStatus().equals(Constants.Status.BILL_NEED_SETTLED)) {
@@ -447,28 +440,19 @@ public class BillServiceImpl implements BillService {
                 Bill offsetBill = null;
                 offsetBill = copyBill(bill);
                 offsetBill.setId(null);
-                offsetBill.setProduct(bill.getProduct());
+                offsetBill.setProduct(product);
                 offsetBill.setAccount(bill.getAccount());
                 offsetBill.setTotal(val != null ? val : -bill.getTotal());
                 offsetBill.setSid(bill.getId());
-                if (val == null) {
-                    offsetBill.setFeeFlag(type);
-                    bill.setFeeFlag(type);
-                    offsetBill.setStatus(Constants.Status.BILL_INVALID);
-                    bill.setStatus(Constants.Status.BILL_INVALID);
-                    modify(bill);
-                } else {
-                    offsetBill.setFeeFlag(type);
-                    bill.setFeeFlag(type);
-                    modify(bill);
-                }
+                offsetBill.setFeeFlag(BILL_OP_ADJUST);
+                bill.setFeeFlag(BILL_OP_ADJUST);
+                modify(bill);
                 offsetBill = add(offsetBill);
                 rep.addData(offsetBill);
             } else {
                 rep.setStatus(Constants.BusinessCode.CODE_PARAMETER_INVALID);
                 rep.setMessage("操作不被允许");
             }
-
         } else {
             rep.setStatus(Constants.BusinessCode.CODE_PARAMETER_INVALID);
             rep.setMessage("找不到对应的未结的账");
@@ -476,7 +460,9 @@ public class BillServiceImpl implements BillService {
         return rep;
     }
 
+
     private boolean adjustShiftCheck(Bill bill, Double val, String shiftCode) {
+        LocalDate businessDate = businessSeqService.getBuinessDate(bill.getHotelCode());
         if (bill.getShiftCode().equals(shiftCode)) {
             return true;
         }
@@ -485,15 +471,54 @@ public class BillServiceImpl implements BillService {
 
     @Transactional
     @Override
-    public DtoResponse<Bill> offset(String id) {
-        return adjust(id, null, true, null);
+    public DtoResponse<Bill> offset(String id, Employee employee, String shiftCode) {
+        return offset(id, employee, shiftCode, true, BILL_OP_OFFSET);
+    }
+
+    public DtoResponse<Bill> offset(String id, Employee employee, String shiftCode, boolean offsetCheck, String billFlag) {
+        DtoResponse<Bill> rep = new DtoResponse<Bill>();
+        Bill bill = findById(id);
+        if (bill != null && bill.getStatus().equals(Constants.Status.BILL_NEED_SETTLED)) {
+            if (!offsetCheck || offsetShiftCheck(bill, employee, shiftCode)) {// 不需要确认班次或者班次确认成功
+                Bill offsetBill = null;
+                offsetBill = copyBill(bill);
+                offsetBill.setId(null);
+                offsetBill.setProduct(bill.getProduct());
+                offsetBill.setAccount(bill.getAccount());
+                offsetBill.setTotal(-bill.getTotal());
+                offsetBill.setSid(bill.getId());
+                offsetBill.setFeeFlag(billFlag);
+                bill.setFeeFlag(billFlag);
+                offsetBill.setStatus(Constants.Status.BILL_INVALID);
+                bill.setStatus(Constants.Status.BILL_INVALID);
+                modify(bill);
+                offsetBill = add(offsetBill);
+                rep.addData(offsetBill);
+            } else {
+                rep.setStatus(Constants.BusinessCode.CODE_PARAMETER_INVALID);
+                rep.setMessage("操作不被允许");
+            }
+        } else {
+            rep.setStatus(Constants.BusinessCode.CODE_PARAMETER_INVALID);
+            rep.setMessage("找不到对应的未结的账");
+        }
+        return rep;
+
+    }
+
+    private boolean offsetShiftCheck(Bill bill, Employee employee, String shiftCode) {
+        LocalDate businessDate = businessSeqService.getBuinessDate(bill.getHotelCode());
+        if (businessDate.isEqual(bill.getBusinessDate()) && bill.getOperationEmployee().getId().equals(employee.getId()) && bill.getShiftCode().equals(shiftCode)) {
+            return true;
+        }
+        return false;
     }
 
     @Transactional
     @Override
     public DtoResponse<Bill> split(String id, Double val1, Double val2) {
         DtoResponse<Bill> rep = new DtoResponse<Bill>();
-        rep = adjust(id, null, false, null,BILL_OP_SPLIT_OFFSET);
+        rep = offset(id, null, null, false, BILL_OP_SPLIT_OFFSET);
         if (rep.getStatus() == 0) {
             Bill bill = findById(id);
             Bill newBill1 = null;
@@ -533,9 +558,9 @@ public class BillServiceImpl implements BillService {
     public DtoResponse<Bill> operation(BillOperationBo bob) {
         switch (bob.getOp()) {
             case BILL_OP_ADJUST:
-                return adjust(bob.getId(), bob.getVal1(), true, bob.getShiftCode());
+                return adjust(bob.getId(), bob.getVal1(), true, bob.getShiftCode(),bob.getProduct());
             case BILL_OP_OFFSET:
-                return offset(bob.getId());
+                return offset(bob.getId(), bob.getOperationEmployee(), bob.getShiftCode());
             case BILL_OP_SPLIT:
                 return split(bob.getId(), bob.getVal1(), bob.getVal2());
             default:
