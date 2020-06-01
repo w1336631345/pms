@@ -57,6 +57,7 @@ public class BillServiceImpl implements BillService {
     private static final String BILL_OP_ADJUST = "adjust";
     private static final String BILL_OP_OFFSET = "offset";
     private static final String BILL_OP_SPLIT = "split";
+    private static final String BILL_OP_SPLIT_OFFSET = "split_offset";
     @Autowired
     EntityManager entityManager;
     @Autowired
@@ -492,7 +493,7 @@ public class BillServiceImpl implements BillService {
     @Override
     public DtoResponse<Bill> split(String id, Double val1, Double val2) {
         DtoResponse<Bill> rep = new DtoResponse<Bill>();
-        rep = adjust(id, null, false, null,BILL_OP_OFFSET);
+        rep = adjust(id, null, false, null,BILL_OP_SPLIT_OFFSET);
         if (rep.getStatus() == 0) {
             Bill bill = findById(id);
             Bill newBill1 = null;
