@@ -101,20 +101,21 @@ public class BillServiceImpl implements BillService {
                 if (bill.getStatus() == null || Constants.Status.NORMAL.equals(bill.getStatus())) {
                     bill.setStatus(Constants.Status.BILL_NEED_SETTLED);
                 }
-            }else{
+            } else {
                 return null;
             }
         } else {
             return null;
         }
         Account account = accountService.billEntry(bill);
-        if(account.getRoomNum() != null){
+        if (account.getRoomNum() != null) {
             bill.setRoomNum(account.getRoomNum());
         }
         bill.setBillSeq(account.getCurrentBillSeq());
         bill.setAccount(account);
         return billDao.saveAndFlush(bill);
     }
+
     @Override
     public List<Bill> addAll(List<Bill> bills) {
         bills = billDao.saveAll(bills);
@@ -323,6 +324,7 @@ public class BillServiceImpl implements BillService {
             roomRecordService.modify(rr);
         }
     }
+
     // 夜审手动入账(优化)
     @Override
     public void putAcountMap(List<Map<String, Object>> list, LocalDate businessDate, Employee emp, String shiftCode, String hotelCode) {
@@ -353,7 +355,7 @@ public class BillServiceImpl implements BillService {
             }
             BookkeepingSet bs = bookkeepingSetService.isExist(hotelCode, mainAccountId, p.getId());
             //如果设置了团付设置，入账到主账号
-            if(bs != null){
+            if (bs != null) {
                 cirAccount.setId(mainAccountId);
             }
             addAudit(p, cost, cirAccount, hotelCode, emp, shiftCode, id, "M", businessDate, roomNum);
@@ -431,6 +433,12 @@ public class BillServiceImpl implements BillService {
     @Transactional
     @Override
     public DtoResponse<Bill> adjust(String id, Double val, boolean shiftCheck, String shiftCode) {
+        return adjust(id, val, shiftCheck, shiftCode, val == null ? BILL_OP_OFFSET : BILL_OP_ADJUST);
+    }
+
+
+    @Transactional
+    public DtoResponse<Bill> adjust(String id, Double val, boolean shiftCheck, String shiftCode, String type) {
         DtoResponse<Bill> rep = new DtoResponse<Bill>();
         Bill bill = findById(id);
         if (bill != null && bill.getStatus().equals(Constants.Status.BILL_NEED_SETTLED)) {
@@ -441,13 +449,23 @@ public class BillServiceImpl implements BillService {
                 offsetBill.setProduct(bill.getProduct());
                 offsetBill.setAccount(bill.getAccount());
                 offsetBill.setTotal(val != null ? val : -bill.getTotal());
+                offsetBill.setSid(bill.getId());
                 if (val == null) {
+                    offsetBill.setFeeFlag(type);
+                    bill.setFeeFlag(type);
                     offsetBill.setStatus(Constants.Status.BILL_INVALID);
                     bill.setStatus(Constants.Status.BILL_INVALID);
+                    modify(bill);
+                } else {
+                    offsetBill.setFeeFlag(type);
+                    bill.setFeeFlag(type);
                     modify(bill);
                 }
                 offsetBill = add(offsetBill);
                 rep.addData(offsetBill);
+            } else {
+                rep.setStatus(Constants.BusinessCode.CODE_PARAMETER_INVALID);
+                rep.setMessage("操作不被允许");
             }
 
         } else {
@@ -458,7 +476,10 @@ public class BillServiceImpl implements BillService {
     }
 
     private boolean adjustShiftCheck(Bill bill, Double val, String shiftCode) {
-        return true;
+        if (bill.getShiftCode().equals(shiftCode)) {
+            return true;
+        }
+        return false;
     }
 
     @Transactional
@@ -471,7 +492,7 @@ public class BillServiceImpl implements BillService {
     @Override
     public DtoResponse<Bill> split(String id, Double val1, Double val2) {
         DtoResponse<Bill> rep = new DtoResponse<Bill>();
-        rep = adjust(id, null, false, null);
+        rep = adjust(id, null, false, null,BILL_OP_OFFSET);
         if (rep.getStatus() == 0) {
             Bill bill = findById(id);
             Bill newBill1 = null;
@@ -480,6 +501,10 @@ public class BillServiceImpl implements BillService {
             newBill2 = copyBill(bill);
             newBill1.setStatus(Constants.Status.BILL_NEED_SETTLED);
             newBill2.setStatus(Constants.Status.BILL_NEED_SETTLED);
+            newBill1.setFeeFlag(BILL_OP_SPLIT);
+            newBill2.setFeeFlag(BILL_OP_SPLIT);
+            newBill1.setSid(bill.getId());
+            newBill2.setSid(bill.getId());
             newBill1.setTotal(val1);
             newBill2.setTotal(val2);
             add(newBill1);
@@ -588,7 +613,7 @@ public class BillServiceImpl implements BillService {
     }
 
     @Override
-    public Bill createArSettleBill(Account targetAccount, double total, double cost, double pay, Employee operationEmployee, String shiftCode,String recordNum) {
+    public Bill createArSettleBill(Account targetAccount, double total, double cost, double pay, Employee operationEmployee, String shiftCode, String recordNum) {
         Bill bill = new Bill();
         bill.setCost(cost);
         bill.setPay(pay);
@@ -602,7 +627,7 @@ public class BillServiceImpl implements BillService {
     }
 
     @Override
-    public Bill createToArBill(Account account, double processTotal, double pay, Employee operationEmployee, String shiftCode,String recordNum,String remark) {
+    public Bill createToArBill(Account account, double processTotal, double pay, Employee operationEmployee, String shiftCode, String recordNum, String remark) {
         Bill bill = new Bill();
         bill.setProduct(productService.findToArProduct(operationEmployee.getHotelCode()));
         bill.setPay(processTotal);
@@ -618,7 +643,7 @@ public class BillServiceImpl implements BillService {
     }
 
     @Override
-    public List<Map<String, Object>> getStatusTotal(String hotelCode, String accountId){
+    public List<Map<String, Object>> getStatusTotal(String hotelCode, String accountId) {
         List<String> statusList = new ArrayList<>();
         statusList.add(Constants.Status.BILL_SETTLED);
         statusList.add(Constants.Status.BILL_NEED_SETTLED);
