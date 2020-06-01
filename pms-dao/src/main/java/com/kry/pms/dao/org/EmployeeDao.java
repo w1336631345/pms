@@ -20,4 +20,8 @@ public interface EmployeeDao extends BaseDao<Employee>{
 	@Query(nativeQuery = true, value = " select id, name, user_id from t_employee tm\n" +
 			"where deleted = 0 and tm.hotel_code = ?1 ")
 	List<Map<String, Object>> getListMap(String hotelCode);
+
+	@Query(nativeQuery = true, value = " select name from t_employee tm\n" +
+			"where deleted = 0 and tm.user_id = ?1 ")
+	String getName(String userId);
 }

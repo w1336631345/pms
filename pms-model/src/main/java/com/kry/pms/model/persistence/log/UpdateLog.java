@@ -7,6 +7,7 @@ import org.springframework.data.annotation.CreatedBy;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 @Data
 @Entity
@@ -27,5 +28,7 @@ public class UpdateLog extends PersistenceModel {
     private String newValue;
     @Column
     private String identifier;//标识符（用于查询）
+    @Transient
+    private String createName;
 
 }
