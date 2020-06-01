@@ -1,6 +1,7 @@
 package com.kry.pms.api.room;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -74,10 +75,32 @@ public class RoomUsageController extends BaseController<RoomUsage> {
 		rep.addData(roomUsageService.queryUsableGuestRoomsByBookItemId(bookItemId));
 		return rep;
 	}
+	/**
+	 * 功能描述: <br>排房的房间查询(old)
+	 * 〈〉
+	 * @Param: [checkInRecordId, roomTypeId, roomNum]
+	 * @Return: com.kry.pms.base.HttpResponse<java.util.List<com.kry.pms.model.http.response.room.RoomUsageListVo>>
+	 * @Author: huanghaibin
+	 * @Date: 2020/6/1 11:00
+	 */
 	@GetMapping(path = "/checkInRecord/{id}")
 	public HttpResponse<List<RoomUsageListVo>> queryUsableGuestRoomsByCheckInRecordId(@PathVariable("id")String checkInRecordId,String roomTypeId,String roomNum) {
 		HttpResponse<List<RoomUsageListVo>> rep = new HttpResponse<List<RoomUsageListVo>>();
 		rep.addData(roomUsageService.queryUsableGuestRoomsByCheckInRecordId(checkInRecordId,roomTypeId,roomNum));
+		return rep;
+	}
+	/**
+	 * 功能描述: <br>排房的房间查询(new)
+	 * 〈〉
+	 * @Param: [checkInRecordId, roomTypeId, roomNum]
+	 * @Return: com.kry.pms.base.HttpResponse<java.util.List<com.kry.pms.model.http.response.room.RoomUsageListVo>>
+	 * @Author: huanghaibin
+	 * @Date: 2020/6/1 11:00
+	 */
+	@GetMapping(path = "/checkInRecordNew/{id}")
+	public HttpResponse<List<Map<String, Object>>> queryUsableGuestRoomsByCheckInRecordIdNew(@PathVariable("id")String checkInRecordId, String floorId, String buildingId) {
+		HttpResponse<List<Map<String, Object>>> rep = new HttpResponse<List<Map<String, Object>>>();
+		rep.addData(roomUsageService.queryUsableGuestRoomsByCheckInRecordIdNew(checkInRecordId,floorId,buildingId));
 		return rep;
 	}
 	
