@@ -323,6 +323,13 @@ public class AccountServiceImpl implements AccountService {
                 bills = billService.findByAccountAndStatus(account, Constants.Status.BILL_NEED_SETTLED);
             } else if (Constants.Type.SETTLE_TYPE_PART.equals(billCheckBo.getCheckType())) {
                 bills = billService.findByIds(billCheckBo.getBillIds());
+                for (Bill bill : bills) {
+                    if(!bill.getStatus().equals(Constants.Status.BILL_NEED_SETTLED)){
+                        rep.error(Constants.BusinessCode.CODE_PARAMETER_INVALID, "所选帐务有异常，请刷新再试");
+                        TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                        return rep;
+                    }
+                }
             }
             if (bills == null || bills.isEmpty()) {
                 rep.error(Constants.BusinessCode.CODE_PARAMETER_INVALID, "没有待转帐务，请核实！");
@@ -343,12 +350,12 @@ public class AccountServiceImpl implements AccountService {
                 if (processTotal == billCheckBo.getTotal()) {
                     if (targetAccount != null) {
                         String remark = null;
-                        if(targetAccount.getName() != null){
+                        if (targetAccount.getName() != null) {
                             remark = "To:" + targetAccount.getCode() + "/" + targetAccount.getName();
-                        }else {
-                            if(targetAccount.getCustomer() != null && targetAccount.getCustomer().getName() != null){
+                        } else {
+                            if (targetAccount.getCustomer() != null && targetAccount.getCustomer().getName() != null) {
                                 remark = "To:" + targetAccount.getCode() + "/" + targetAccount.getCustomer().getName();
-                            }else {
+                            } else {
                                 remark = "To:" + targetAccount.getCode();
                             }
                         }
