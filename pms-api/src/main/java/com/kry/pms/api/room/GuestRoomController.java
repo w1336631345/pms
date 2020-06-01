@@ -5,6 +5,8 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
+import com.kry.pms.model.persistence.room.Building;
+import com.kry.pms.model.persistence.room.Floor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -73,9 +75,22 @@ public class GuestRoomController extends BaseController<GuestRoom> {
 		return rep;
 	}
 	@GetMapping
-	public HttpResponse<PageResponse<GuestRoom>> query(HttpServletRequest request) throws InstantiationException, IllegalAccessException{
+	public HttpResponse<PageResponse<GuestRoom>> query(String building_id,HttpServletRequest request) throws InstantiationException, IllegalAccessException{
 		HttpResponse<PageResponse<GuestRoom>> rep = new HttpResponse<PageResponse<GuestRoom>>();
 		PageRequest<GuestRoom> req = parse2PageRequest(request);
+		if(building_id!=null){
+			GuestRoom exb = req.getExb();
+			if(exb==null){
+				exb = new GuestRoom();
+				exb.setFloor(new Floor());
+			}else if(exb.getFloor()==null){
+				exb.setFloor(new Floor());
+			}
+			Building building = new Building();
+			building.setId(building_id);
+			exb.getFloor().setBuilding(building);
+			req.setExb(exb);
+		}
 		return rep.addData(guestRoomService.listPage(req));
 	}
 
