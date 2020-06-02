@@ -432,7 +432,7 @@ public class BillServiceImpl implements BillService {
     }
 
     @Transactional
-    public DtoResponse<Bill> adjust(String id, Double val, boolean shiftCheck, String shiftCode,Product product) {
+    public DtoResponse<Bill> adjust(String id, Double val, boolean shiftCheck, String shiftCode, Product product) {
         DtoResponse<Bill> rep = new DtoResponse<Bill>();
         Bill bill = findById(id);
         if (bill != null && bill.getStatus().equals(Constants.Status.BILL_NEED_SETTLED)) {
@@ -558,7 +558,7 @@ public class BillServiceImpl implements BillService {
     public DtoResponse<Bill> operation(BillOperationBo bob) {
         switch (bob.getOp()) {
             case BILL_OP_ADJUST:
-                return adjust(bob.getId(), bob.getVal1(), true, bob.getShiftCode(),bob.getProduct());
+                return adjust(bob.getId(), bob.getVal1(), true, bob.getShiftCode(), bob.getProduct());
             case BILL_OP_OFFSET:
                 return offset(bob.getId(), bob.getOperationEmployee(), bob.getShiftCode());
             case BILL_OP_SPLIT:
@@ -579,7 +579,7 @@ public class BillServiceImpl implements BillService {
         offsetBill.setCurrentSettleAccountRecordNum(recordNum);
         offsetBill.setTranferRemark("To " + targetAccount.getCode());
         offsetBill.setStatus(Constants.Status.BILL_SETTLED);
-        bill.setTranferRemark(offsetBill.getTranferRemark());
+        bill.setTranferRemark(bill.getTranferRemark() == null ? offsetBill.getTranferRemark() : bill.getTranferRemark() + ";" + offsetBill.getTranferRemark());
         bill.setStatus(Constants.Status.BILL_SETTLED);
         bill.setCurrentSettleAccountRecordNum(recordNum);
         modify(bill);

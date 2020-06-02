@@ -156,8 +156,10 @@ public class AccountServiceImpl implements AccountService {
             }
             if (!account.getType().equals(Constants.Type.ACCOUNT_AR) && bill.getGuestRoom() == null) {
                 CheckInRecord cir = checkInRecordService.queryByAccountId(account.getId());
-                if (cir != null && cir.getGuestRoom() != null) {
-                    bill.setRoomNum(cir.getGuestRoom().getRoomNum());
+                if(bill.getRoomNum()==null){
+                    if (cir != null && cir.getGuestRoom() != null) {
+                        bill.setRoomNum(cir.getGuestRoom().getRoomNum());
+                    }
                 }
                 newTotal = account.getTotal();
                 if ((oldTotal > 0 && newTotal < 0) || (oldTotal < 0 && newTotal >= 0)) {
