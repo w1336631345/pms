@@ -12,6 +12,6 @@ public interface ReportEmpDailyBillStatDao extends JpaRepository<ReportEmpDailyB
 
     public List<ReportEmpDailyBillStat> findByHotelCodeAndQuantityDate(String hotelCode, LocalDate quantityDate);
 
-    public List<ReportEmpDailyBillStat> findByHotelCodeAndQuantityDateAndEmployeeId(String hotelCode, LocalDate quantityDate, String employeeId);
+    public List<ReportEmpDailyBillStat> findByHotelCodeAndQuantityDateAndEmployeeIdAndShift(String hotelCode, LocalDate quantityDate, String employeeId,String shift);
 
 }

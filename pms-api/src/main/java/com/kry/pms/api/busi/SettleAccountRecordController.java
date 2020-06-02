@@ -59,5 +59,10 @@ public class SettleAccountRecordController extends BaseController<SettleAccountR
 		BeanUtils.copyProperties(settleAccountRecordService.cancle(id, getShiftCode(), getCurrentEmployee()), rep);
 		return rep;
 	}
+	@GetMapping(path = "/account/{id}")
+	public HttpResponse account(){
+		HttpResponse<String> rep = new HttpResponse<String>();
+		return rep;
+	}
 
 }

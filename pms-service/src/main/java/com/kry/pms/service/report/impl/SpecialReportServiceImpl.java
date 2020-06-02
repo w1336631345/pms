@@ -14,6 +14,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 @Service
 public class SpecialReportServiceImpl implements SpecialReportService {
     @Autowired
@@ -43,28 +44,23 @@ public class SpecialReportServiceImpl implements SpecialReportService {
 
     @Override
     public Collection<Map<String, Object>> dailyReport(String hotelCode, LocalDate bDate) throws IOException, TemplateException {
-        Map<String, Object> parmrs = new HashMap<>();
-        List<ReportEmpDailyBillStat> data = reportEmpDailyBillStatDao.findByHotelCodeAndQuantityDate(hotelCode,bDate);
-        HashMap<String,Map<String, Object>> rep = new HashMap<>();
-        for(ReportEmpDailyBillStat item:data){
-            if(!rep.containsKey(item.getEmployeeId())){
-                rep.put(item.getEmployeeId(),new HashMap<>());
-            }
-            rep.get(item.getEmployeeId()).put(item.getKey(),item.getValue());
-        }
-        return rep.values();
+        List<ReportEmpDailyBillStat> data = reportEmpDailyBillStatDao.findByHotelCodeAndQuantityDate(hotelCode, bDate);
+        return rowToCol(data);
     }
 
     @Override
     public Collection<Map<String, Object>> paySummary(String hotelCode, LocalDate bDate) throws IOException, TemplateException {
-        Map<String, Object> parmrs = new HashMap<>();
-        List<ReportEmpDailyBillStat> data = reportEmpDailyBillStatDao.findByHotelCodeAndQuantityDate(hotelCode,bDate);
-        HashMap<String,Map<String, Object>> rep = new HashMap<>();
-        for(ReportEmpDailyBillStat item:data){
-            if(!rep.containsKey(item.getEmployeeId())){
-                rep.put(item.getEmployeeId(),new HashMap<>());
+        List<ReportEmpDailyBillStat> data = reportEmpDailyBillStatDao.findByHotelCodeAndQuantityDate(hotelCode, bDate);
+        return rowToCol(data);
+    }
+
+    private Collection<Map<String, Object>> rowToCol(List<ReportEmpDailyBillStat> data) {
+        HashMap<String, Map<String, Object>> rep = new HashMap<>();
+        for (ReportEmpDailyBillStat item : data) {
+            if (!rep.containsKey(item.getEmployeeId())) {
+                rep.put(item.getEmployeeId(), new HashMap<>());
             }
-            rep.get(item.getEmployeeId()).put(item.getKey(),item.getValue());
+            rep.get(item.getEmployeeId()).put(item.getKey(), item.getValue());
         }
         return rep.values();
     }
