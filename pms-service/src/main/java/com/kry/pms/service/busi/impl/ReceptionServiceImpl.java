@@ -10,6 +10,7 @@ import java.util.List;
 import javax.transaction.Transactional;
 
 import com.kry.pms.base.HttpResponse;
+import com.kry.pms.service.sys.DateTimeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
@@ -77,6 +78,8 @@ public class ReceptionServiceImpl implements ReceptionService {
 	AccountService accountService;
 	@Autowired
 	RoomStatisticsService roomStatisticsService;
+	@Autowired
+	DateTimeService dateTimeService;
 
 	private List<CheckInRecord> createGroupMainCheckInRecord(BookingRecord br) {
 		String tempName = br.getName();
@@ -265,7 +268,8 @@ public class ReceptionServiceImpl implements ReceptionService {
 	@Override
 	public DtoResponse<String> checkIn(CheckInRecord cir) {
 		DtoResponse<String> rep = new DtoResponse<>();
-		LocalDateTime now = LocalDateTime.now();
+//		LocalDateTime now = LocalDateTime.now();
+		LocalDateTime now = dateTimeService.getBusinessDateTime(cir.getHotelCode());
 		cir.setActualTimeOfArrive(now);
 		cir.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN);
 		checkInRecordService.modify(cir);
