@@ -315,7 +315,6 @@ public class AccountServiceImpl implements AccountService {
         DtoResponse<Account> rep = new DtoResponse<Account>();
         Account account = findById(billCheckBo.getAccountId());
         Account targetAccount = findById(billCheckBo.getTargetAccountId());
-        LocalDateTime now = LocalDateTime.now();
         if (account != null) {
             SettleAccountRecord settleAccountRecord = settleAccountRecordService.createToAr(billCheckBo, account, targetAccount);
             List<Bill> bills = null;

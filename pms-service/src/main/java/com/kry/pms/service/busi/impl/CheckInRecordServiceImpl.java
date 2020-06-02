@@ -24,10 +24,7 @@ import com.kry.pms.service.busi.RoomRecordService;
 import com.kry.pms.service.guest.CustomerService;
 import com.kry.pms.service.log.UpdateLogService;
 import com.kry.pms.service.room.*;
-import com.kry.pms.service.sys.AccountService;
-import com.kry.pms.service.sys.BusinessSeqService;
-import com.kry.pms.service.sys.SqlTemplateService;
-import com.kry.pms.service.sys.SystemConfigService;
+import com.kry.pms.service.sys.*;
 import com.kry.pms.service.util.BeanChangeUtil;
 import com.kry.pms.service.util.UpdateUtil;
 import freemarker.template.TemplateException;
@@ -88,6 +85,8 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
     BeanChangeUtil beanChangeUtil;
     @Autowired
     UpdateLogService updateLogService;
+    @Autowired
+    DateTimeService dateTimeService;
 
     @Override
     public CheckInRecord add(CheckInRecord checkInRecord) {
@@ -606,7 +605,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                 if (Constants.Status.CHECKIN_RECORD_STATUS_OUT_UNSETTLED.equals(cir.getStatus())||Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION.equals(cir.getStatus())) {
                     //S状态 不需要调整房类资源
                 } else {
-                    cir.setActualTimeOfLeave(LocalDateTime.now());
+                    cir.setActualTimeOfLeave(dateTimeService.getBusinessDateTime(cir.getHotelCode()));
                     boolean b = roomStatisticsService.checkOut(new CheckInRecordWrapper(cir));
                     if (!b) {
                         TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
