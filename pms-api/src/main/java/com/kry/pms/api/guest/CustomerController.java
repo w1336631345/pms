@@ -125,8 +125,8 @@ public class CustomerController extends BaseController<Customer> {
 		return rep.addData(list);
 	}
 	/**
-	 * 功能描述: <br>查询单位(在用)
-	 * 〈〉
+	 * 功能描述: <br>查询单位(根据客户类型)
+	 * 〈〉查找A：宾客，B：公司，C：旅行社，D：订房中心，E：OTA，F：团队，G：其他
 	 * @Param: [customerType, name, numCode]
 	 * @Return: com.kry.pms.base.HttpResponse<java.util.List<java.util.Map<java.lang.String,java.lang.Object>>>
 	 * @Author: huanghaibin
@@ -136,6 +136,20 @@ public class CustomerController extends BaseController<Customer> {
 	public HttpResponse<List<Map<String, Object>>> getCorpT(String customerType, String name, String numCode){
 		HttpResponse<List<Map<String, Object>>> rep = new HttpResponse<List<Map<String, Object>>>();
 		List<Map<String, Object>> list = customerService.getTypeIsB(getCurrentHotleCode(), customerType, name, numCode);
+		return rep.addData(list);
+	}
+	/**
+	 * 功能描述: <br>查询单位（除了（A）宾客外的所有类型）
+	 * 〈〉
+	 * @Param: [name, numCode]
+	 * @Return: com.kry.pms.base.HttpResponse<java.util.List<java.util.Map<java.lang.String,java.lang.Object>>>
+	 * @Author: huanghaibin
+	 * @Date: 2020/6/2 17:27
+	 */
+	@GetMapping(path = "/getCorpList")
+	public HttpResponse<List<Map<String, Object>>> getCorpList(String name, String numCode){
+		HttpResponse<List<Map<String, Object>>> rep = new HttpResponse<List<Map<String, Object>>>();
+		List<Map<String, Object>> list = customerService.getTypeCorp(getCurrentHotleCode(), name, numCode);
 		return rep.addData(list);
 	}
 

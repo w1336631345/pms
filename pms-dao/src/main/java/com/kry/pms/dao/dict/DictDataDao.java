@@ -12,4 +12,11 @@ public interface DictDataDao extends BaseDao<DictData>{
 
     DictData findByHotelCodeAndCode(String hotelCode, String code);
     DictData findByHotelCodeAndCodeAndDeleted(String hotelCode, String code,int deleted);
+
+    @Query(nativeQuery = true, value = " select \n" +
+            " td.code \n" +
+            "from t_dict_data td \n" +
+            "where td.hotel_code = ?1 \n" +
+            "and td.dict_type_code = ?2 ")
+    List<String> getArchivesType(String hotelCode, String dictTypeCode);
 }
