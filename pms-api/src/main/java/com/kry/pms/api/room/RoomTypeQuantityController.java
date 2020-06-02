@@ -65,9 +65,9 @@ public class RoomTypeQuantityController extends BaseController<RoomTypeQuantity>
 		HttpResponse<List<RoomTypeQuantityPredictableVo>> response = new HttpResponse<List<RoomTypeQuantityPredictableVo>>();
 		LocalDate sDate = LocalDate.parse(startDate);
 		LocalDate eDate = LocalDate.parse(endDate);
-		if (sDate.isBefore(LocalDate.now())) {
-			sDate = LocalDate.now();
-		}
+//		if (sDate.isBefore(LocalDate.now())) {
+//			sDate = LocalDate.now();
+//		}
 		if (!eDate.isAfter(sDate)) {
 			response.setStatus(Constants.BusinessCode.CODE_PARAMETER_INVALID);
 			response.setMessage("到离店时间错误，请重新选择");

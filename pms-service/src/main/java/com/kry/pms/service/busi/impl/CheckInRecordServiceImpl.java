@@ -128,6 +128,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
         boolean updateName = false;
         boolean updateTime = false;
         boolean isSecrecy = false;
+        boolean personalPrice = false;
         if ((Constants.Type.CHECK_IN_RECORD_RESERVE).equals(dbCir.getType())) {
             return hr.error("预留单请去“修改预留”界面");
         }
@@ -203,6 +204,15 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                 }
             }
         } else {//不是主单，是宾客信息
+            if (!dbCir.getPersonalPrice().equals(checkInRecord.getPersonalPrice())) {//修改房价
+                personalPrice = true;
+                List<RoomRecord> list = roomRecordService.findByHotelCodeAndCheckInRecord(checkInRecord.getHotelCode(), checkInRecord.getId());
+                for (int r = 0; r < list.size(); r++) {
+                    RoomRecord rr = list.get(r);
+                    rr.setCost(checkInRecord.getPersonalPrice());
+                    roomRecordService.modify(rr);
+                }
+            }
             checkInRecord.setMainRecord(dbCir.getMainRecord());
             if (checkInRecord.getCustomer() != null) {
                 if (checkInRecord.getCustomer().getId() != null) {
@@ -303,6 +313,16 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
         boolean roomI = true;
         for (int i = 0; i < ids.length; i++) {
             CheckInRecord cir = findById(ids[i]);
+            if(checkUpdateItemTestBo.getPersonalPrice() != null){
+                if(!checkUpdateItemTestBo.getPersonalPrice().equals(cir.getPersonalPrice())){//修改了定价
+                    List<RoomRecord> list = roomRecordService.findByHotelCodeAndCheckInRecord(cir.getHotelCode(), cir.getId());
+                    for (int r = 0; r < list.size(); r++) {
+                        RoomRecord rr = list.get(r);
+                        rr.setCost(checkUpdateItemTestBo.getPersonalPrice());
+                        roomRecordService.modify(rr);
+                    }
+                }
+            }
             GuestRoom gr = cir.getGuestRoom();
             if(rooms.contains(gr.getRoomNum())){//如果房间号之前就存在，说明勾选的有同住人
                 roomI = false;

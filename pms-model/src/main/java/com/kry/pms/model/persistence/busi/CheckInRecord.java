@@ -89,9 +89,10 @@ public class CheckInRecord extends PersistenceModel {
 	@Column
 	private Double originalPrice;//原价
 	@Column
-	@PropertyMsg("定价")
+	@PropertyMsg("房价")
 	private Double purchasePrice;// 成交价格
 	@Column
+	@PropertyMsg("定价")
 	private Double personalPrice;// 个人承担价格
 	@Column
 	private Double personalPercentage;// 个人承担价格占比

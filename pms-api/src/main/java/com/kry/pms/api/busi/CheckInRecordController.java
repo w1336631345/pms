@@ -223,7 +223,7 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
      * @Date: 2019/12/11 15:44
      */
     @PostMapping(path = "/updateItem")
-    @OperationLog(remark = "批量修改保存")
+//    @OperationLog(remark = "批量修改保存")
     public HttpResponse updateItem(@RequestBody CheckUpdateItemTestBo checkUpdateItemTestBo) {
         HttpResponse hr = new HttpResponse();
         User user = getUser();
