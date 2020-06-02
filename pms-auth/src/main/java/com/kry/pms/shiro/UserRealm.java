@@ -34,7 +34,7 @@ public class UserRealm extends AuthorizingRealm {
 		String username = (String) token.getPrincipal();
 		String password = new String((char[]) token.getCredentials());
 		// 查询用户信息
-		List<User>  user = userDao.getByUsernameAndPassword(username, password);
+		List<User>  user = userDao.findByUsernameAndPasswordAndDeleted(username, password,Constants.DELETED_FALSE);
 		// 账号不存在
 		if (user == null || user.isEmpty()|| !Constants.Status.NORMAL.equals(user.get(0).getStatus())) {
 			throw new UnknownAccountException("账号或密码不正确,或者账号不可登录");

@@ -16,6 +16,10 @@ public interface UserDao extends BaseDao<User>{
 
     User findByOpenIdAndStatus(String openId, String normal);
 
+    User findTopByHotelCodeAndUsernameAndDeleted(String hotelCode,String username,int deleted);
+
+    List<User> findByUsernameAndPasswordAndDeleted(String username, String password,int deleted);
+
     User findByUnionIdAndHotelCode(String unionId, String hotelCode);
 
     List<User> findByUnionId(String unionId);

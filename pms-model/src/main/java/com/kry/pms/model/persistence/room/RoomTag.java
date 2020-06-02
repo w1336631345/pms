@@ -24,4 +24,6 @@ public class RoomTag extends PersistenceModel {
 	private String color;
 	@Column
 	private String type;
+	@Column
+	private String sortNum;
 }

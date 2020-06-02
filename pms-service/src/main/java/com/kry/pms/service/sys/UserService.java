@@ -18,4 +18,6 @@ public interface UserService extends BaseService<User> {
     List<User> findByUnionId(String unionId);
 
     boolean bindWxUnionId(User user, String unionId);
+
+    boolean queryExist(String hotelCode, String code);
 }

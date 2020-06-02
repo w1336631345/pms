@@ -49,6 +49,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         Employee employee = employeeDao.findById(id).get();
         if (employee != null) {
             employee.setDeleted(Constants.DELETED_TRUE);
+            userService.delete(employee.getUser().getId());
         }
         employeeDao.saveAndFlush(employee);
     }
@@ -95,25 +96,30 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     public DtoResponse<Employee> createEmployee(Employee employee) {
         DtoResponse<Employee> rep = new DtoResponse<Employee>();
-        User user = new User();
-        user.setUsername(employee.getCode());
-        user.setNickname(employee.getName());
-        user.setMobile(employee.getMobile());
-        user.setHotelCode(employee.getHotelCode());
-        user.setCorporationCode(employee.getCorporationCode());
-        user.setCreateUser(employee.getCreateUser());
-        user.setRole(employee.getRole());
-        user.setPassword(MD5Utils.encrypt(employee.getCode(), employee.getHotelCode(), systemConfigService
-                .getByHotelCodeAndKey(employee.getHotelCode(), Constants.SystemConfig.CODE_DEFAULT_ACCOUNT_PASSWORD)
-                .getValue()));
-        user = userService.add(user);
-        employee.setUser(user);
-        employee.setStatus(Constants.Status.NORMAL);
-        employee = add(employee);
-        if (employee.getIsSalesMen()) {
-            salesMenService.createByEmployee(employee);
+        if (userService.queryExist(employee.getHotelCode(), employee.getCode())) {
+            rep.error(Constants.BusinessCode.CODE_PARAMETER_INVALID, "编码重复");
+            return rep;
+        } else {
+            User user = new User();
+            user.setUsername(employee.getCode());
+            user.setNickname(employee.getName());
+            user.setMobile(employee.getMobile());
+            user.setHotelCode(employee.getHotelCode());
+            user.setCorporationCode(employee.getCorporationCode());
+            user.setCreateUser(employee.getCreateUser());
+            user.setRole(employee.getRole());
+            user.setPassword(MD5Utils.encrypt(employee.getCode(), employee.getHotelCode(), systemConfigService
+                    .getByHotelCodeAndKey(employee.getHotelCode(), Constants.SystemConfig.CODE_DEFAULT_ACCOUNT_PASSWORD)
+                    .getValue()));
+            user = userService.add(user);
+            employee.setUser(user);
+            employee.setStatus(Constants.Status.NORMAL);
+            employee = add(employee);
+            if (employee.getIsSalesMen()) {
+                salesMenService.createByEmployee(employee);
+            }
+            return rep.addData(employee);
         }
-        return rep.addData(employee);
     }
 
     @Override
