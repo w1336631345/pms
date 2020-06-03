@@ -1,8 +1,11 @@
 package com.kry.pms.service.sys.impl;
 
 import java.util.List;
+import java.util.Map;
 
 import com.kry.pms.base.HttpResponse;
+import com.kry.pms.service.goods.ProductService;
+import org.apache.commons.collections4.MapUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Sort;
@@ -20,6 +23,8 @@ import com.kry.pms.service.sys.BookkeepingSetService;
 public class  BookkeepingSetServiceImpl implements  BookkeepingSetService{
 	@Autowired
 	 BookkeepingSetDao bookkeepingSetDao;
+	@Autowired
+	ProductService productService;
 	 
 	 @Override
 	public BookkeepingSet add(BookkeepingSet bookkeepingSet) {
@@ -90,10 +95,41 @@ public class  BookkeepingSetServiceImpl implements  BookkeepingSetService{
 		}
 		return hr.ok();
 	}
+	@Override
+	public HttpResponse addDefault(String hotelCode, String accountId) {
+		HttpResponse hr = new HttpResponse();
+		List<BookkeepingSet> setlist = bookkeepingSetDao.findByHotelCodeAndAccountId(hotelCode, accountId);
+		if(setlist != null && !setlist.isEmpty()){
+			return hr.error("已经设置，不用默认");
+		}
+		List<String> flist = productService.getDictCode(hotelCode);
+		for(int f=0 ;f<flist.size(); f++){
+			String productId = flist.get(f);
+			BookkeepingSet bs = new BookkeepingSet();
+			bs.setHotelCode(hotelCode);
+			bs.setDeleted(Constants.DELETED_FALSE);
+			bs.setAccountId(accountId);
+			bs.setProductId(productId);
+			bookkeepingSetDao.saveAndFlush(bs);
+		}
+		List<Map<String, Object>> list = productService.getPaySetListOtherStatus(hotelCode);
+		for(int i=0; i<list.size(); i++){
+			Map<String, Object> map = list.get(i);
+			BookkeepingSet bs = new BookkeepingSet();
+			bs.setHotelCode(hotelCode);
+			bs.setDeleted(Constants.DELETED_FALSE);
+			bs.setAccountId(accountId);
+			String productId = MapUtils.getString(map, "id");
+			bs.setProductId(productId);
+			bookkeepingSetDao.saveAndFlush(bs);
+		}
+		return hr.ok();
+	}
 
 	@Override
 	public List<BookkeepingSet> findSet(String hotelCode, String accountId){
 	 	List<BookkeepingSet> list = bookkeepingSetDao.findByHotelCodeAndAccountId(hotelCode, accountId);
 	 	return list;
 	}
+
 }

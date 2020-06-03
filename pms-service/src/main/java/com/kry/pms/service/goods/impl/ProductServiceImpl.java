@@ -93,6 +93,16 @@ public class  ProductServiceImpl implements  ProductService{
 	 	List<Map<String, Object>> list = productDao.getPaySetList(hotelCode);
 	 	return list;
 	 }
+	@Override
+	public List<Map<String, Object>> getPaySetListOtherStatus(String hotelCode){
+		List<Map<String, Object>> list = productDao.getPaySetListOtherStatus(hotelCode, "Y");
+		return list;
+	}
+	@Override
+	public List<String> getDictCode(String hotelCode){
+		List<String> list = productDao.getDictCode(hotelCode, "Y");
+		return list;
+	}
 
 	@Override
 	public Product findToArProduct(String hotelCode) {

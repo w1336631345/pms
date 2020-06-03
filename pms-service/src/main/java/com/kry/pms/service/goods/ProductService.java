@@ -18,5 +18,9 @@ public interface ProductService extends BaseService<Product>{
 
     List<Map<String, Object>> getPaySetList(String hotelCode);
 
+    List<Map<String, Object>> getPaySetListOtherStatus(String hotelCode);
+
+    List<String> getDictCode(String hotelCode);
+
     Product findToArProduct(String hotelCode);
 }

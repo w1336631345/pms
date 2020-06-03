@@ -23,6 +23,7 @@ import org.apache.commons.collections4.MapUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -250,12 +251,15 @@ public class NightAuditServiceImpl implements NightAuditService {
         Map<String, Object> map = new HashMap<>();
 //        map.put("cId", id);
         List<Map<String, Object>> list = sqlTemplateService.storedProcedure(hotelCode, businessDate, "CheckInRecordHis", map);
-        List<CheckInRecord> cirs = checkInRecordDao.findByHotelCodeAndStatus(hotelCode, Constants.Status.CHECKIN_RECORD_STATUS_CHECK_OUT);
+//        List<CheckInRecord> cirs = checkInRecordDao.findByHotelCodeAndStatus(hotelCode, Constants.Status.CHECKIN_RECORD_STATUS_CHECK_OUT);
+        List<CheckInRecord> cirs = checkInRecordDao.getObybusinssDate(hotelCode, Constants.Status.CHECKIN_RECORD_STATUS_CHECK_OUT, businessDate);
         for(int i=0; i<cirs.size(); i++){
             CheckInRecord cir = cirs.get(i);
             String orderNum = cir.getOrderNum();
             int nO = checkInRecordDao.isNotCheckOut(orderNum, hotelCode);
             if(nO > 0){
+                //手动开启事务回滚
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                 return hr.error("该订单下还有非O状态数据");
             }
             cir.setStatus("D");
