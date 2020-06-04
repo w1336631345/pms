@@ -886,6 +886,7 @@ public class RoomUsageServiceImpl implements RoomUsageService {
         data.setEndDateTime(ru.getEndDateTime());
         data.setStartDateTime(ru.getStartDateTime());
         data.setBusinesskey(ru.getBusinesskey());
+        data.setUsageStatus(ru.getUsageStatus());
         return data;
     }
 
