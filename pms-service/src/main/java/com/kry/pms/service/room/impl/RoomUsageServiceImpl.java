@@ -883,6 +883,8 @@ public class RoomUsageServiceImpl implements RoomUsageService {
         RoomUsage data = new RoomUsage();
         data.setHotelCode(ru.getHotelCode());
         data.setGuestRoom(ru.getGuestRoom());
+        data.setEndDateTime(ru.getEndDateTime());
+        data.setStartDateTime(ru.getStartDateTime());
         data.setBusinesskey(ru.getBusinesskey());
         return data;
     }
