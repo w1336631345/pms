@@ -725,7 +725,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
             ncir.setRoomRequirement(requirement);
             if (i == 1) {//排房时，一房多人，默认第一个人承担房价，后面人承担0
                 ncir.setOriginalPrice(gr.getRoomType().getPrice());//原价
-                ncir.setPersonalPrice(cir.getPurchasePrice());
+                ncir.setPersonalPrice(cir.getPersonalPrice());
                 ncir.setPersonalPercentage(1.0);
             } else {
                 ncir.setOriginalPrice(0.0);
