@@ -172,7 +172,7 @@ public class RoomTypeQuantityServiceImpl implements RoomTypeQuantityService {
     public boolean useRoomType(RoomType roomType, LocalDate startDate, LocalDate endDate, String useType, int quantity) {
         switch (useType) {
             case Constants.Status.ROOM_USAGE_BOOK:
-                RoomTypeQuantityPredictableVo rqpv = queryPredic(roomType.getHotelCode(),roomType.getId(),startDate,endDate);
+                RoomTypeQuantityPredictableVo rqpv = queryPredic(roomType.getHotelCode(),roomType.getId(),startDate,endDate, null);
                 int availableTotal = rqpv.getAvailableTotal();
                 if(roomType.getOverReservation()!=null){
                     availableTotal+=roomType.getOverReservation();
@@ -496,19 +496,29 @@ public class RoomTypeQuantityServiceImpl implements RoomTypeQuantityService {
 
     @Override
     public RoomTypeQuantityPredictableVo queryPredic(String currentHotleCode, String roomTypeId, LocalDate startDate,
-                                                     LocalDate endDate) {
+                                                     LocalDate endDate, String roomPriceSchemeId) {
         RoomType roomType = roomTypeService.findById(roomTypeId);
         RoomTypeQuantityPredictableVo rtpv = null;
         if (roomType != null) {
             RoomTypeQuantity rtq = roomTypeQuantityDao.queryPredictable(roomTypeId, startDate, endDate);
             if (rtq != null) {
                 rtpv = new RoomTypeQuantityPredictableVo();
+                if (roomPriceSchemeId != null && !"".equals(roomPriceSchemeId)) {
+                    Map<String, Object> map = roomPriceSchemeDao.roomTypeAndPriceScheme(roomType.getId(), roomPriceSchemeId);
+                    String id = MapUtils.getString(map, "id");
+                    rtpv.setRoomPriceSchemeId(id);
+                    rtpv.setSetMealId(MapUtils.getString(map, "setMealId"));
+                    rtpv.setSetMealName(MapUtils.getString(map, "setMealName"));
+                    rtpv.setPurchasePrice(MapUtils.getDouble(map, "price"));
+                }
+                rtpv.setRoomCode(roomType.getCode());
                 rtpv.setPrice(roomType.getPrice());
                 rtpv.setRoomTypeName(roomType.getName());
                 rtpv.setRoomTypeId(roomType.getId());
                 rtpv.setStartDate(startDate);
                 rtpv.setEndDate(endDate);
                 rtpv.setAvailableTotal(rtq.getPredictableTotal());
+                rtpv.setOverReservation(roomType.getOverReservation());
             }
         }
         return rtpv;

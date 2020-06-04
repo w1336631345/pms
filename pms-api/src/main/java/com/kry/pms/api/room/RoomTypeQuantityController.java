@@ -107,7 +107,7 @@ public class RoomTypeQuantityController extends BaseController<RoomTypeQuantity>
 
 	@GetMapping(path = "/predic/{id}")
 	public HttpResponse<RoomTypeQuantityPredictableVo> queryPredic(@PathVariable("id") String roomTypeId,
-			String startDate, String endDate) {
+			String startDate, String endDate, String roomPriceSchemeId) {
 		HttpResponse<RoomTypeQuantityPredictableVo> response = new HttpResponse<RoomTypeQuantityPredictableVo>();
 		LocalDate sDate = LocalDate.parse(startDate);
 		LocalDate eDate = LocalDate.parse(endDate);
@@ -119,7 +119,7 @@ public class RoomTypeQuantityController extends BaseController<RoomTypeQuantity>
 			response.setMessage("到离店时间错误，请重新选择");
 		} else {
 			RoomTypeQuantityPredictableVo data = roomTypeQuantityService.queryPredic(getCurrentHotleCode(), roomTypeId,
-					sDate, eDate);
+					sDate, eDate, roomPriceSchemeId);
 			response.addData(data);
 		}
 		return response;
