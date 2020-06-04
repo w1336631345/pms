@@ -395,7 +395,16 @@ public class AccountServiceImpl implements AccountService {
         List<Bill> bills = null;
         if (account != null) {
             List<Bill> flatBills = new ArrayList<>();
-            SettleAccountRecord settleAccountRecord = settleAccountRecordService.create(billCheckBo, account);
+            SettleAccountRecord settleAccountRecord = null;
+            for (Bill b : billCheckBo.getBills()) {
+                if (b.getTargetAccount() != null) {
+                    settleAccountRecord = settleAccountRecordService.createToAr(billCheckBo, account, b.getTargetAccount());
+                    break;
+                }
+            }
+            if(settleAccountRecord==null){
+                settleAccountRecord = settleAccountRecordService.create(billCheckBo, account);
+            }
             double total = 0.0;
             for (Bill b : billCheckBo.getBills()) {
                 total = BigDecimalUtil.add(total, b.getTotal());
