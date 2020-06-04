@@ -31,7 +31,7 @@ public interface RoomTypeQuantityService extends BaseService<RoomTypeQuantity> {
 
     List<RoomTypeQuantityPredictableVo> predictableWchat(String hotelCode, LocalDate startDate, LocalDate endDate);
 
-    public RoomTypeQuantityPredictableVo queryPredic(String currentHotleCode, String roomTypeId, LocalDate startDate, LocalDate endDate);
+    public RoomTypeQuantityPredictableVo queryPredic(String currentHotleCode, String roomTypeId, LocalDate startDate, LocalDate endDate, String roomPriceSchemeId);
 
     public List<RoomTypeQuantityVo> queryByDay(String currentHotleCode, LocalDate parse, LocalDate parse2);
 

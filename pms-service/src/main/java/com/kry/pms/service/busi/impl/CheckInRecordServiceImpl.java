@@ -793,6 +793,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                     item.setHoldTime(checkInRecord.getHoldTime());
                     item.setArriveTime(checkInRecord.getArriveTime());
                     item.setLeaveTime(checkInRecord.getLeaveTime());
+                    item.setStartDate(checkInRecord.getStartDate());
                     item.setDays(checkInRecord.getDays());
                     item.setContactName(checkInRecord.getContactName());
                     //如果新增房价，没有设置房价码价格，默认定价（成交价）和个人承担价是原价
@@ -1436,7 +1437,9 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
         if (checkInRecord.getMainRecordId() != null) {
             CheckInRecord mainCheckInRecord = findById(checkInRecord.getMainRecordId());
             checkInRecord.setHoldTime(mainCheckInRecord.getHoldTime());
-            checkInRecord.setDays(mainCheckInRecord.getDays());
+            if(checkInRecord.getDays() == null){
+                checkInRecord.setDays(mainCheckInRecord.getDays());
+            }
             checkInRecord.setContactName(mainCheckInRecord.getContactName());
             checkInRecord.setSalesMen(mainCheckInRecord.getSalesMen());
             checkInRecord.setDistributionChannel(mainCheckInRecord.getDistributionChannel());
@@ -1450,6 +1453,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
             checkInRecord.setRoomType(roomTypeService.findById(checkInRecord.getRoomTypeId()));
             checkInRecord.setMainRecord(mainCheckInRecord);
             checkInRecord.setFitType(mainCheckInRecord.getFitType());
+            checkInRecord.setCorp(mainCheckInRecord.getCorp());
             checkInRecord = add(checkInRecord);
             mainCheckInRecord.setRoomCount(mainCheckInRecord.getRoomCount() + checkInRecord.getRoomCount());
 //			mainCheckInRecord.getSubRecords().add(checkInRecord);
