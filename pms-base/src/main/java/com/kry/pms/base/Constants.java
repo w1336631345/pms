@@ -274,4 +274,12 @@ public class Constants {
 		public static final String ALL = "ALL";// 夜审入账方式-手动入账
 		public static final String NORMAL = "NORMAL";// 夜审入账方式-手动入账
 	}
+
+	public interface Flag {
+		public static final String FEE_FTA = "FTA";
+		public static final String FEE_RES = "RES";
+		public static final String FEE_TRANSFER = "TRA";
+		public static final String FEE_OLD_RES = "ORES";
+		public static final String FEE_OFFSET_TO_TRANSFER = "OTRA";
+	}
 }

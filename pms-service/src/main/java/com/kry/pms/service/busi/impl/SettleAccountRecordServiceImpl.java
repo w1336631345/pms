@@ -130,6 +130,7 @@ public class SettleAccountRecordServiceImpl implements SettleAccountRecordServic
                     rebill.setItems(null);
                     rebill.setProduct(fb.getProduct());
                     rebill.setAccount(fb.getAccount());
+                    rebill.setTargetAccount(fb.getTargetAccount());
                     rebill.setCurrentSettleAccountRecordNum(null);
                     rebill.setStatus(Constants.Status.BILL_INVALID);
                     if (fb.getCost() != null) {

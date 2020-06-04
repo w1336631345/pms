@@ -7,7 +7,6 @@ import java.util.Map;
 import com.kry.pms.base.DtoResponse;
 import com.kry.pms.model.dto.BillStatistics;
 import com.kry.pms.model.http.request.busi.BillOperationBo;
-import com.kry.pms.model.http.request.busi.BillQueryBo;
 import com.kry.pms.model.http.request.busi.BillSettleBo;
 import com.kry.pms.model.persistence.busi.Bill;
 import com.kry.pms.model.persistence.busi.CheckInRecord;
@@ -48,7 +47,7 @@ public interface BillService extends BaseService<Bill> {
 
 	Bill addFlatBill(Bill bill, Employee employee, String shiftCode, String orderNum);
 
-	Bill addToArFlatBill(Bill bill, Account sourceAccount, Employee employee, String shiftCode, String orderNum);
+	List<Bill> addToArFlatBill(Bill bill, Employee employee, String shiftCode, String orderNum);
 
 	public List<Bill> checkAccountAllBill(Account account, double total, DtoResponse<Account> rep, String orderNum);
 

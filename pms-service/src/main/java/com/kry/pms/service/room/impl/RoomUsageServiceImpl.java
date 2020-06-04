@@ -12,6 +12,7 @@ import com.kry.pms.model.http.response.room.RoomUsageListVo;
 import com.kry.pms.model.http.response.room.RoomUsageVo;
 import com.kry.pms.model.persistence.busi.BookingRecord;
 import com.kry.pms.model.persistence.busi.CheckInRecord;
+import com.kry.pms.model.persistence.log.RoomSourceUseLog;
 import com.kry.pms.model.persistence.room.GuestRoom;
 import com.kry.pms.model.persistence.room.RoomUsage;
 import com.kry.pms.service.busi.BookingRecordService;
@@ -353,6 +354,7 @@ public class RoomUsageServiceImpl implements RoomUsageService {
         }
         return null;
     }
+
     @Override
     public List<Map<String, Object>> queryUsableGuestRoomsByCheckInRecordIdNew(String cid, String floorId, String buildingId) {
         CheckInRecord cir = checkInRecordService.findById(cid);
@@ -443,7 +445,7 @@ public class RoomUsageServiceImpl implements RoomUsageService {
                     // 使用房类资源
                     roomTypeQuantityService.changeRoomTypeQuantity(info.roomType(), info.getStartTime().toLocalDate(),
                             info.getEndTime().toLocalDate(), Constants.Status.ROOM_USAGE_RESERVATION, Constants.Status.ROOM_USAGE_ASSIGN, 1);
-                }else{
+                } else {
                     return false;
                 }
             } else {// 有预留
@@ -605,7 +607,7 @@ public class RoomUsageServiceImpl implements RoomUsageService {
                     }
                     guestRoomStatusService.clearUseInfo(info);
                 }
-            }else{
+            } else {
                 return true;
             }
         }
@@ -674,10 +676,10 @@ public class RoomUsageServiceImpl implements RoomUsageService {
     @Override
     public boolean changeRoom(UseInfoAble info, GuestRoom newGuestRoom, LocalDateTime changeTime) {
         RoomUsage ru = roomUsageDao.findByGuestRoomIdAndBusinesskey(info.guestRoom().getId(), info.getBusinessKey());
-        if(ru!=null){
-           if( use(newGuestRoom,ru.getUsageStatus(),changeTime,info.getEndTime(),info.getBusinessKey(),info.getSummaryInfo(),info.uniqueId())&&unUse(ru,changeTime)){
-               return true;
-           }
+        if (ru != null) {
+            if (use(newGuestRoom, ru.getUsageStatus(), changeTime, info.getEndTime(), info.getBusinessKey(), info.getSummaryInfo(), info.uniqueId()) && unUse(ru, changeTime)) {
+                return true;
+            }
         }
         return false;
     }
@@ -685,17 +687,17 @@ public class RoomUsageServiceImpl implements RoomUsageService {
     @Override
     public boolean addTogether(UseInfoAble info) {
         RoomUsage ru = roomUsageDao.findByGuestRoomIdAndBusinesskey(info.guestRoom().getId(), info.getBusinessKey());
-        if(ru!=null){
+        if (ru != null) {
             ru.getUniqueIds().add(info.uniqueId());
             modify(ru);
             return true;
-        }else{
+        } else {
             return false;
         }
     }
 
-    private boolean use(GuestRoom gr,String status, LocalDateTime startTime, LocalDateTime endTime,
-                        String businesskey, String businessInfo,String uniqueId){
+    private boolean use(GuestRoom gr, String status, LocalDateTime startTime, LocalDateTime endTime,
+                        String businesskey, String businessInfo, String uniqueId) {
         RoomUsage ru = roomUsageDao.queryGuestRoomUsable(gr.getId(), startTime, endTime);
         RoomUsage data = null;
         if (ru != null) {
@@ -829,11 +831,11 @@ public class RoomUsageServiceImpl implements RoomUsageService {
                     BeanUtils.copyProperties(ru, npur);
                     npur.setUniqueIds(null);
                     ru.setEndDateTime(startTime);
-                    ru.setUsageStatus(status);
                     ru.setBusinessInfo(businessInfo);
                     updateDuration(ru);
                     npur.setStartDateTime(endTime);
                     npur.setId(null);
+                    npur.setUsageStatus(status);
                     npur.setBusinesskey(businesskey);
                     ru = modify(ru);
                     npur.setPreRoomUsage(ru);
@@ -842,33 +844,24 @@ public class RoomUsageServiceImpl implements RoomUsageService {
                     ru.setPostRoomUsage(npur);
                     modify(ru);
                 } else {
-                    RoomUsage cru = new RoomUsage();
-                    RoomUsage pru = new RoomUsage();
-                    BeanUtils.copyProperties(ru, cru);
-                    BeanUtils.copyProperties(ru, pru);
-                    cru.setUniqueIds(null);
-                    pru.setUniqueIds(null);
-                    cru.setId(null);
+                    RoomUsage cru = copyRoomUsage(ru);
+                    RoomUsage pru = copyRoomUsage(ru);
                     cru.setStartDateTime(startTime);
                     cru.setEndDateTime(endTime);
                     cru.setBusinessInfo(businessInfo);
                     cru.setBusinesskey(businesskey);
                     updateDuration(cru);
                     cru.setUsageStatus(status);
-                    ru = modify(ru);
-                    cru.setPreRoomUsage(ru);
                     cru = add(cru);
-
+                    cru.setPreRoomUsage(ru);
                     ru.setEndDateTime(startTime);
                     updateDuration(ru);
                     ru.setPostRoomUsage(cru);
                     modify(ru);
-
-                    pru.setId(null);
                     pru.setStartDateTime(endTime);
                     pru.setPreRoomUsage(cru);
                     updateDuration(pru);
-                    add(pru);
+                    pru = add(pru);
                     cru.setPostRoomUsage(pru);
                     data = modify(cru);
                 }
@@ -884,6 +877,14 @@ public class RoomUsageServiceImpl implements RoomUsageService {
             return false;
         }
         return true;
+    }
+
+    private RoomUsage copyRoomUsage(RoomUsage ru) {
+        RoomUsage data = new RoomUsage();
+        data.setHotelCode(ru.getHotelCode());
+        data.setGuestRoom(ru.getGuestRoom());
+        data.setBusinesskey(ru.getBusinesskey());
+        return data;
     }
 
 

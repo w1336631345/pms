@@ -156,7 +156,7 @@ public class AccountServiceImpl implements AccountService {
             }
             if (!account.getType().equals(Constants.Type.ACCOUNT_AR) && bill.getGuestRoom() == null) {
                 CheckInRecord cir = checkInRecordService.queryByAccountId(account.getId());
-                if(bill.getRoomNum()==null){
+                if (bill.getRoomNum() == null) {
                     if (cir != null && cir.getGuestRoom() != null) {
                         bill.setRoomNum(cir.getGuestRoom().getRoomNum());
                     }
@@ -325,7 +325,7 @@ public class AccountServiceImpl implements AccountService {
             } else if (Constants.Type.SETTLE_TYPE_PART.equals(billCheckBo.getCheckType())) {
                 bills = billService.findByIds(billCheckBo.getBillIds());
                 for (Bill bill : bills) {
-                    if(!bill.getStatus().equals(Constants.Status.BILL_NEED_SETTLED)){
+                    if (!bill.getStatus().equals(Constants.Status.BILL_NEED_SETTLED)) {
                         rep.error(Constants.BusinessCode.CODE_PARAMETER_INVALID, "所选帐务有异常，请刷新再试");
                         TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                         return rep;
@@ -394,16 +394,16 @@ public class AccountServiceImpl implements AccountService {
         Account account = findById(billCheckBo.getAccountId());
         List<Bill> bills = null;
         if (account != null) {
+            List<Bill> flatBills = new ArrayList<>();
             SettleAccountRecord settleAccountRecord = settleAccountRecordService.create(billCheckBo, account);
-            List<Bill> flatBills = billService.addFlatBills(billCheckBo.getBills(), billCheckBo.getOperationEmployee(),
-                    billCheckBo.getShiftCode(), settleAccountRecord.getRecordNum());
             double total = 0.0;
-            for (Bill b : flatBills) {
-                if (b.getCost() != null) {
-                    total = BigDecimalUtil.sub(total, b.getCost());
-                }
-                if (b.getPay() != null) {
-                    total = BigDecimalUtil.add(total, b.getPay());
+            for (Bill b : billCheckBo.getBills()) {
+                total = BigDecimalUtil.add(total, b.getTotal());
+                if (Constants.Code.TO_AR.equals(b.getProduct().getCode())) {
+                    flatBills.addAll(billService.addToArFlatBill(b, billCheckBo.getOperationEmployee(), billCheckBo.getShiftCode(), settleAccountRecord.getRecordNum()));
+                } else {
+                    flatBills.add(billService.addFlatBill(b, billCheckBo.getOperationEmployee(),
+                            billCheckBo.getShiftCode(), settleAccountRecord.getRecordNum()));
                 }
             }
             if (Constants.Type.SETTLE_TYPE_ACCOUNT.equals(billCheckBo.getCheckType())) {
@@ -412,7 +412,6 @@ public class AccountServiceImpl implements AccountService {
                 bills = billService.checkBillIds(billCheckBo.getBillIds(), total, rep,
                         settleAccountRecord.getRecordNum());
             }
-
             if (rep.getStatus() == 0) {
                 settleAccountRecord.setBills(bills);
                 settleAccountRecord.setFlatBills(flatBills);

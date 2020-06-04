@@ -1,6 +1,5 @@
 package com.kry.pms.service.busi.impl;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -34,7 +33,6 @@ import com.kry.pms.base.PageResponse;
 import com.kry.pms.dao.busi.BillDao;
 import com.kry.pms.model.http.request.busi.BillBo;
 import com.kry.pms.model.http.request.busi.BillOperationBo;
-import com.kry.pms.model.http.request.busi.BillQueryBo;
 import com.kry.pms.model.http.request.busi.BillSettleBo;
 import com.kry.pms.model.persistence.busi.Bill;
 import com.kry.pms.model.persistence.busi.BillItem;
@@ -102,10 +100,14 @@ public class BillServiceImpl implements BillService {
                 if (bill.getStatus() == null || Constants.Status.NORMAL.equals(bill.getStatus())) {
                     bill.setStatus(Constants.Status.BILL_NEED_SETTLED);
                 }
+                if (bill.getFeeFlag() == null) {
+                    bill.setFeeFlag(Constants.Flag.FEE_RES);
+                }
             } else {
                 return null;
             }
-        } else {
+        } else if(Constants.Type.BILL_TYPE_PACKAGE.equals(bill.getType())){
+        }else{
             return null;
         }
         Account account = accountService.billEntry(bill);
@@ -137,7 +139,6 @@ public class BillServiceImpl implements BillService {
             bill.setStatus(Constants.Status.BILL_NEED_SETTLED);
         }
         bill.setType(Constants.Type.BILL_TYPE_PACKAGE);
-        bill.setShowName("前台转入");
         bill.setBusinessDate(businessSeqService.getBuinessDate(bill.getHotelCode()));
         Account account = accountService.billEntry(bill);
         bill.setBillSeq(account.getCurrentBillSeq());
@@ -298,15 +299,19 @@ public class BillServiceImpl implements BillService {
         bill = add(bill);
         return bill;
     }
+
     @Override
-    public Bill addToArFlatBill(Bill bill, Account sourceAccount, Employee employee, String shiftCode, String orderNum) {
+    public List<Bill> addToArFlatBill(Bill bill, Employee employee, String shiftCode, String orderNum) {
+        List<Bill> data = new ArrayList<>();
         bill.setStatus(Constants.Status.BILL_SETTLED);
         bill.setOperationEmployee(employee);
         bill.setShiftCode(shiftCode);
         bill.setHotelCode(employee.getHotelCode());
         bill.setCurrentSettleAccountRecordNum(orderNum);
         bill = add(bill);
-        return bill;
+        data.add(bill);
+        data.add(createArSettleBill(bill.getTargetAccount(), bill.getPay(), bill.getPay(), 0, employee, shiftCode, orderNum));
+        return data;
     }
 
     @Override
@@ -460,8 +465,7 @@ public class BillServiceImpl implements BillService {
                 offsetBill.setAccount(bill.getAccount());
                 offsetBill.setTotal(val != null ? val : -bill.getTotal());
                 offsetBill.setSid(bill.getId());
-                offsetBill.setFeeFlag(BILL_OP_ADJUST);
-                bill.setFeeFlag(BILL_OP_ADJUST);
+                offsetBill.setFeeFlag(Constants.Flag.FEE_RES);
                 modify(bill);
                 offsetBill = add(offsetBill);
                 rep.addData(offsetBill);
@@ -504,7 +508,7 @@ public class BillServiceImpl implements BillService {
                 offsetBill.setTotal(-bill.getTotal());
                 offsetBill.setSid(bill.getId());
                 offsetBill.setFeeFlag(billFlag);
-                bill.setFeeFlag(billFlag);
+                bill.setFeeFlag(Constants.Flag.FEE_OLD_RES);
                 offsetBill.setStatus(Constants.Status.BILL_INVALID);
                 bill.setStatus(Constants.Status.BILL_INVALID);
                 modify(bill);
@@ -543,8 +547,8 @@ public class BillServiceImpl implements BillService {
             newBill2 = copyBill(bill);
             newBill1.setStatus(Constants.Status.BILL_NEED_SETTLED);
             newBill2.setStatus(Constants.Status.BILL_NEED_SETTLED);
-            newBill1.setFeeFlag(BILL_OP_SPLIT);
-            newBill2.setFeeFlag(BILL_OP_SPLIT);
+            newBill1.setFeeFlag(Constants.Flag.FEE_RES);
+            newBill2.setFeeFlag(Constants.Flag.FEE_RES);
             newBill1.setSid(bill.getId());
             newBill2.setSid(bill.getId());
             newBill1.setTotal(val1);
@@ -607,6 +611,7 @@ public class BillServiceImpl implements BillService {
         offsetBill.setShiftCode(shiftCode);
         offsetBill.setTranferRemark("To " + targetAccount.getCode());
         offsetBill.setStatus(Constants.Status.BILL_SETTLED);
+        offsetBill.setFeeFlag(Constants.Flag.FEE_OFFSET_TO_TRANSFER);
         bill.setTranferRemark(bill.getTranferRemark() == null ? offsetBill.getTranferRemark() : bill.getTranferRemark() + ";" + offsetBill.getTranferRemark());
         bill.setStatus(Constants.Status.BILL_SETTLED);
         bill.setCurrentSettleAccountRecordNum(recordNum);
@@ -642,6 +647,7 @@ public class BillServiceImpl implements BillService {
         targetBill.setTransferFlag(Constants.FLAG_YES);
         targetBill.setTransferType(targetAccount.getType());
         targetBill.setSourceBill(bill);
+        targetBill.setFeeFlag(Constants.Flag.FEE_TRANSFER);
         targetBill.setTranferRemark("From:" + bill.getAccount().getCode());
         targetBill.setStatus(Constants.Status.BILL_NEED_SETTLED);
         targetBill.setCurrentSettleAccountRecordNum(recordNum);
@@ -676,6 +682,8 @@ public class BillServiceImpl implements BillService {
         bill.setAccount(targetAccount);
         bill.setHotelCode(targetAccount.getHotelCode());
         bill.setTotal(total);
+        bill.setFeeFlag(Constants.Flag.FEE_FTA);
+        bill.setShowName("前台转入");
         bill.setReceiptNum(recordNum);
         return addArBill(bill);
     }
