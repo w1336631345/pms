@@ -607,7 +607,7 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
      * @Date: 2020/3/27 20:34
      */
     @PostMapping(path = "/reserve")
-    @OperationLog(remark = "新增预留")
+//    @OperationLog(remark = "新增预留")
     public HttpResponse<List<CheckInRecord>> addReserve(@RequestBody List<CheckInRecord> checkInRecords) {
         HttpResponse<List<CheckInRecord>> rep = new HttpResponse<List<CheckInRecord>>();
         rep = checkInRecordService.addReserve(checkInRecords);
@@ -624,7 +624,7 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
      * @Date: 2020/1/14 11:28
      */
     @PostMapping(path = "/updateReserve")
-    @OperationLog(remark = "修改预留")
+//    @OperationLog(remark = "修改预留")
     public HttpResponse updateReserve(@RequestBody CheckInRecord checkInRecord) {
         HttpResponse hr = new HttpResponse();
         hr = checkInRecordService.updateReserve(checkInRecord);

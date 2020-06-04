@@ -46,6 +46,20 @@ public class BookkeepingSetController extends BaseController<BookkeepingSet> {
 		hr = bookkeepingSetService.addList(list,accountId, user.getHotelCode());
 		return hr;
 	}
+	/**
+	 * 功能描述: <br>添加默认
+	 * 〈〉
+	 * @Param: [list, accountId]
+	 * @Return: com.kry.pms.base.HttpResponse
+	 * @Author: huanghaibin
+	 * @Date: 2020/6/3 15:13
+	 */
+	@GetMapping(path = "/addDefault")
+	public HttpResponse addDefault(String accountId) {
+		HttpResponse hr = new HttpResponse();
+		hr = bookkeepingSetService.addDefault(getCurrentHotleCode(), accountId);
+		return hr;
+	}
 
 	@PutMapping
 	public HttpResponse<BookkeepingSet> modify(@RequestBody BookkeepingSet bookkeepingSet) {

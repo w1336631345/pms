@@ -15,4 +15,6 @@ public interface BookkeepingSetService extends BaseService<BookkeepingSet>{
     HttpResponse addList(List<BookkeepingSet> list,String accountId, String hotelCode);
 
     List<BookkeepingSet> findSet(String hotelCode, String accountId);
+
+    HttpResponse addDefault(String hotelCdoe, String accountId);
 }

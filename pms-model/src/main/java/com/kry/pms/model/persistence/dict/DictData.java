@@ -34,4 +34,6 @@ public class DictData extends PersistenceModel {
     private String description2;
     @Column
     private String description3;
+    @Column
+    private String otherStatus;
 }

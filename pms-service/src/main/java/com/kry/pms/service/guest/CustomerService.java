@@ -33,6 +33,8 @@ public interface CustomerService extends BaseService<Customer>{
 
     List<Map<String, Object>> getTypeIsB(String hotelCode, String customerType, String name, String numCode);
 
+    List<Map<String, Object>> getTypeCorp(String hotelCode, String name, String numCode);
+
     int updateIsUsed(String isUsed, String id);
 
     int updateDeleted(String deleted, String id);

@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.kry.pms.dao.busi.CheckInRecordDao;
+import com.kry.pms.dao.dict.DictDataDao;
 import com.kry.pms.dao.sys.AccountDao;
 import com.kry.pms.model.persistence.busi.CheckInRecord;
 import com.kry.pms.model.persistence.marketing.RoomPriceScheme;
@@ -49,6 +50,8 @@ public class CustomerServiceImpl implements CustomerService {
 	CheckInRecordDao checkInRecordDao;
 	@Autowired
 	AccountDao accountDao;
+	@Autowired
+	DictDataDao dictDataDao;
 
 	@Override
 	public Customer add(Customer customer) {
@@ -228,6 +231,11 @@ public class CustomerServiceImpl implements CustomerService {
 	@Override
 	public List<Map<String, Object>> getTypeIsB(String hotelCode, String customerType, String name, String numCode) {
 		return customerDao.getTypeIsB(hotelCode, customerType, name, numCode);
+	}
+	@Override
+	public List<Map<String, Object>> getTypeCorp(String hotelCode,  String name, String numCode) {
+		List<Map<String, Object>> list = customerDao.getTypeCorp(hotelCode, name, numCode);
+		return list;
 	}
 
 	@Override

@@ -68,6 +68,20 @@ public interface CustomerDao extends BaseDao<Customer>{
 	List<Map<String, Object>> getTypeIsB(@Param("hotelCode") String hotelCode, @Param("customerType")String customerType,
 										 @Param("name") String name, @Param("numCode") String numCode);
 
+	@Query(nativeQuery = true, value = " select \n" +
+			" tc.id, tc.`name`, tc.num_code numCode, tcm.agreement_type agreementType, \n" +
+			" tc.deleted, tc.effective_date effectiveDate, ta.total, \n" +
+			" ta.credit_limit creditLimit, ta.`code` arCode, ta.id accountId \n" +
+			" from t_customer tc left join t_cust_market tcm on tc.id = tcm.customer_id \n" +
+			" left join (select ta.id, ta.total, ta.`code`, ta.customer_id, ta.credit_limit \n" +
+			"  from t_account ta where ta.type_='AR' limit 1) ta on tc.id = ta.customer_id \n" +
+			" where 1=1 \n" +
+			" and tc.customer_type in ('B','C','D','E','F','G')  \n" +
+			" and if(:hotelCode is not null && :hotelCode != '', tc.hotel_code=:hotelCode, 1=1 )  \n" +
+			" and if(:name is not null && :name != '', tc.`name` like CONCAT('%',:name,'%'), 1=1 ) \n" +
+			" and if(:numCode is not null && :numCode != '', tc.num_code=:numCode, 1=1 ) ")
+	List<Map<String, Object>> getTypeCorp(@Param("hotelCode") String hotelCode, @Param("name") String name, @Param("numCode") String numCode);
+
 	@Modifying
 	@Query(value = " update t_customer set is_used = ?1 where id = ?2 ",nativeQuery = true)
 	int updateIsUsed(String isUsed, String id);
