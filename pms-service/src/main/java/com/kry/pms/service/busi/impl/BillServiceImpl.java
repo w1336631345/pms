@@ -283,14 +283,30 @@ public class BillServiceImpl implements BillService {
     @Override
     public List<Bill> addFlatBills(List<Bill> list, Employee employee, String shiftCode, String orderNum) {
         for (Bill bill : list) {
-            bill.setStatus(Constants.Status.BILL_SETTLED);
-            bill.setOperationEmployee(employee);
-            bill.setShiftCode(shiftCode);
-            bill.setHotelCode(employee.getHotelCode());
-            bill.setCurrentSettleAccountRecordNum(orderNum);
-            bill = add(bill);
+            addFlatBill(bill, employee, shiftCode, orderNum);
         }
         return list;
+    }
+
+    @Override
+    public Bill addFlatBill(Bill bill, Employee employee, String shiftCode, String orderNum) {
+        bill.setStatus(Constants.Status.BILL_SETTLED);
+        bill.setOperationEmployee(employee);
+        bill.setShiftCode(shiftCode);
+        bill.setHotelCode(employee.getHotelCode());
+        bill.setCurrentSettleAccountRecordNum(orderNum);
+        bill = add(bill);
+        return bill;
+    }
+    @Override
+    public Bill addToArFlatBill(Bill bill, Account sourceAccount, Employee employee, String shiftCode, String orderNum) {
+        bill.setStatus(Constants.Status.BILL_SETTLED);
+        bill.setOperationEmployee(employee);
+        bill.setShiftCode(shiftCode);
+        bill.setHotelCode(employee.getHotelCode());
+        bill.setCurrentSettleAccountRecordNum(orderNum);
+        bill = add(bill);
+        return bill;
     }
 
     @Override
@@ -569,6 +585,16 @@ public class BillServiceImpl implements BillService {
         return null;
     }
 
+    /**
+     * 冲掉原始帐务
+     *
+     * @param bill
+     * @param targetAccount
+     * @param shiftCode
+     * @param employee
+     * @param recordNum
+     * @return
+     */
     private Bill strikeBill(Bill bill, Account targetAccount, String shiftCode, Employee employee, String recordNum) {
         Bill offsetBill = null;
         offsetBill = copyBill(bill);
@@ -577,6 +603,8 @@ public class BillServiceImpl implements BillService {
         offsetBill.setAccount(bill.getAccount());
         offsetBill.setTotal(-bill.getTotal());
         offsetBill.setCurrentSettleAccountRecordNum(recordNum);
+        offsetBill.setOperationEmployee(employee);
+        offsetBill.setShiftCode(shiftCode);
         offsetBill.setTranferRemark("To " + targetAccount.getCode());
         offsetBill.setStatus(Constants.Status.BILL_SETTLED);
         bill.setTranferRemark(bill.getTranferRemark() == null ? offsetBill.getTranferRemark() : bill.getTranferRemark() + ";" + offsetBill.getTranferRemark());
