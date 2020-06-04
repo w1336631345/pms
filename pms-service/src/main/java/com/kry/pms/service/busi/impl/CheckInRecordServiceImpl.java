@@ -1781,7 +1781,12 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
             } else {
                 cir.setDeleted(Constants.DELETED_FALSE);
                 cir.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION);
-                update(cir);
+                boolean re = roomStatisticsService.reserve(new CheckInRecordWrapper(cir));
+                if(re){
+                    update(cir);
+                }else {
+                    return hr.error("资源不足");
+                }
             }
         } else {
             return hr.error("主单恢复失败");
