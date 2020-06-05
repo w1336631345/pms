@@ -325,6 +325,7 @@ public class BillServiceImpl implements BillService {
         bill.setHotelCode(res.getHotelCode());
         bill.setTargetAccount(res.getAccount());
         bill.setTotal(res.getPay());
+        bill.setQuantity(1);
         bill.setFeeFlag(Constants.Flag.FEE_FTA);
         bill.setShowName("前台转入");
         bill.setSid(res.getId());

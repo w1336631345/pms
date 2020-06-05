@@ -348,7 +348,7 @@ public class RoomUsageServiceImpl implements RoomUsageService {
                 if (roomTypeId == null) {
                     roomTypeId = cir.getRoomType().getId();
                 }
-                return queryUsableGuestRooms(roomTypeId, startTime, cir.getLeaveTime());
+                return queryUsableGuestRooms(roomTypeId, startTime, LocalDateTime.of(cir.getLeaveTime().toLocalDate(),LocalTime.NOON));
             }
 
         }
@@ -364,7 +364,7 @@ public class RoomUsageServiceImpl implements RoomUsageService {
                 startTime = cir.getArriveTime();
             }
             String roomTypeId = cir.getRoomType().getId();
-            List<Map<String, Object>> list = roomUsageDao.queryUsableRoomTypeGuestRoomsNew(roomTypeId, startTime, cir.getLeaveTime(), floorId, buildingId);
+            List<Map<String, Object>> list = roomUsageDao.queryUsableRoomTypeGuestRoomsNew(roomTypeId, startTime, LocalDateTime.of(cir.getLeaveTime().toLocalDate(),LocalTime.NOON), floorId, buildingId);
             return list;
         }
         return null;
