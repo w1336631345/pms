@@ -106,8 +106,8 @@ public class BillServiceImpl implements BillService {
             } else {
                 return null;
             }
-        } else if(Constants.Type.BILL_TYPE_PACKAGE.equals(bill.getType())){
-        }else{
+        } else if (Constants.Type.BILL_TYPE_PACKAGE.equals(bill.getType())) {
+        } else {
             return null;
         }
         Account account = accountService.billEntry(bill);
@@ -310,9 +310,28 @@ public class BillServiceImpl implements BillService {
         bill.setCurrentSettleAccountRecordNum(orderNum);
         bill = add(bill);
         data.add(bill);
-        data.add(createArSettleBill(bill.getTargetAccount(), bill.getPay(), bill.getPay(), 0, employee, shiftCode, orderNum));
+        data.add(createArSettleBill(bill,employee, shiftCode, orderNum));
         return data;
     }
+
+    private Bill createArSettleBill(Bill res, Employee employee, String shiftCode, String recordNum) {
+        Bill bill = new Bill();
+        bill.setCost(res.getPay());
+        bill.setPay(0.0);
+        bill.setOperationEmployee(employee);
+        bill.setShiftCode(shiftCode);
+        bill.setAccount(res.getTargetAccount());
+        bill.setHotelCode(res.getHotelCode());
+        bill.setTargetAccount(res.getAccount());
+        bill.setTotal(res.getPay());
+        bill.setFeeFlag(Constants.Flag.FEE_FTA);
+        bill.setShowName("前台转入");
+        bill.setSid(res.getId());
+        bill.setRemark("前台转入 " + res.getAccount().getCode());
+        bill.setReceiptNum(recordNum);
+        return addArBill(bill);
+    }
+
 
     @Override
     public List<Bill> checkAccountAllBill(Account account, double total, DtoResponse<Account> rep, String recordNum) {
