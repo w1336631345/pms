@@ -318,6 +318,7 @@ public class BillServiceImpl implements BillService {
         Bill bill = new Bill();
         bill.setCost(res.getPay());
         bill.setPay(0.0);
+        bill.setRoomNum(res.getRoomNum());
         bill.setOperationEmployee(employee);
         bill.setShiftCode(shiftCode);
         bill.setAccount(res.getTargetAccount());
