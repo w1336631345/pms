@@ -417,6 +417,7 @@ public class BillServiceImpl implements BillService {
         bill.setHotelCode(hotelCode);
         bill.setRemark(roomNum);
         bill.setRoomNum(roomNum);
+        bill.setShiftCode("3");
         if ("M".equals(type)) {
             bill.setOperationRemark("夜审手动入账");
         }
