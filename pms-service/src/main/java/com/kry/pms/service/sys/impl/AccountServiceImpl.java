@@ -100,6 +100,10 @@ public class AccountServiceImpl implements AccountService {
         }
         accountDao.saveAndFlush(account);
     }
+    @Override
+    public void deleteTrue(String id) {
+        accountDao.deleteById(id);
+    }
 
     @Override
     public Account modify(Account account) {

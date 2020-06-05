@@ -2444,14 +2444,16 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 
     //修改预留
     @Override
-    @Transactional
+//    @Transactional
     public HttpResponse updateReserve(CheckInRecord cir) {
         HttpResponse hr = new HttpResponse();
         CheckInRecord oldCir = checkInRecordDao.getOne(cir.getId());
         CheckInRecord main = oldCir.getMainRecord();
-        if (cir.getArriveTime().isBefore(main.getArriveTime()) || cir.getLeaveTime().isAfter(main.getLeaveTime())) {
-            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-            return hr.error("时间范围不能大于主单");
+        if(main != null){
+            if (cir.getArriveTime().isBefore(main.getArriveTime()) || cir.getLeaveTime().isAfter(main.getLeaveTime())) {
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                return hr.error("时间范围不能大于主单");
+            }
         }
         int oldHumanCount = oldCir.getHumanCount();
         int oldRoomCount = oldCir.getRoomCount();
@@ -2459,6 +2461,11 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
         int newRoomCount = cir.getRoomCount();
         CheckInRecordWrapper cirw = new CheckInRecordWrapper(oldCir);
         oldCir.setDeleted(Constants.DELETED_TRUE);
+        Account account = null;
+        if(oldCir.getAccount() != null){
+            account = oldCir.getAccount();
+            oldCir.setAccount(null);
+        }
         checkInRecordDao.saveAndFlush(oldCir);
         boolean result = roomStatisticsService.cancleReserve(cirw);//先取消以前预留
         if (!result) {
@@ -2467,7 +2474,15 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
         }
         CheckInRecord checkInRecord = new CheckInRecord();
         cir.setId(null);
+        cir.setAccount(null);
         BeanUtils.copyProperties(cir, checkInRecord);
+        if(account != null){
+            Account a = new Account();
+            BeanUtils.copyProperties(account, a);
+            a.setId(null);
+            checkInRecord.setAccount(a);
+            accountService.deleteTrue(account.getId());
+        }
         checkInRecord.setMainRecord(oldCir.getMainRecord());
         checkInRecord = checkInRecordDao.saveAndFlush(checkInRecord);
         boolean result2 = roomStatisticsService.reserve(new CheckInRecordWrapper(checkInRecord));//重新预留
@@ -2475,10 +2490,12 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             return hr.error("资源不足");
         }
-        main.setHumanCount(main.getHumanCount() + (newHumanCount - oldHumanCount));
-        main.setRoomCount(main.getRoomCount() + (newRoomCount - oldRoomCount));
-        checkInRecordDao.saveAndFlush(main);
-        hr.setData(checkInRecord);
+        if(main != null){
+            main.setHumanCount(main.getHumanCount() + (newHumanCount - oldHumanCount));
+            main.setRoomCount(main.getRoomCount() + (newRoomCount - oldRoomCount));
+            checkInRecordDao.saveAndFlush(main);
+            hr.setData(checkInRecord);
+        }
         return hr;
     }
 
