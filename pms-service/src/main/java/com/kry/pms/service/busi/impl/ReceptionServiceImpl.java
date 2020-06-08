@@ -181,7 +181,7 @@ public class ReceptionServiceImpl implements ReceptionService {
 					for (String roomId : roomAssignBo.getRoomId()) {
 						GuestRoom gr = guestRoomService.findById(roomId);
 						HttpResponse hr = checkInRecordService.checkInByTempName(cir.getSingleRoomCount(), cir, gr, response);
-						if(hr.getCode() == 9999){
+						if(hr.getStatus() == 9999){
 							TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 							response.setStatus(Constants.BusinessCode.CODE_RESOURCE_NOT_ENOUGH);
 							response.setMessage("资源不足");

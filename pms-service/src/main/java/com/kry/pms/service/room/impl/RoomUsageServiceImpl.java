@@ -359,10 +359,11 @@ public class RoomUsageServiceImpl implements RoomUsageService {
     public List<Map<String, Object>> queryUsableGuestRoomsByCheckInRecordIdNew(String cid, String floorId, String buildingId) {
         CheckInRecord cir = checkInRecordService.findById(cid);
         if (cir != null) {
-            LocalDateTime startTime = LocalDateTime.now();
-            if (cir.getArriveTime().isAfter(startTime)) {
-                startTime = cir.getArriveTime();
-            }
+//            LocalDateTime startTime = LocalDateTime.now();
+//            if (cir.getArriveTime().isAfter(startTime)) {
+//                startTime = cir.getArriveTime();
+//            }
+            LocalDateTime startTime = cir.getArriveTime();
             String roomTypeId = cir.getRoomType().getId();
             List<Map<String, Object>> list = roomUsageDao.queryUsableRoomTypeGuestRoomsNew(roomTypeId, startTime, LocalDateTime.of(cir.getLeaveTime().toLocalDate(),LocalTime.NOON), floorId, buildingId);
             return list;
