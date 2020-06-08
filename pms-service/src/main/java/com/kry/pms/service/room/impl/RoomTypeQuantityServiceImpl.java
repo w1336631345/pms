@@ -177,7 +177,7 @@ public class RoomTypeQuantityServiceImpl implements RoomTypeQuantityService {
                 if(roomType.getOverReservation()!=null){
                     availableTotal+=roomType.getOverReservation();
                 }
-                if(availableTotal>quantity){
+                if(availableTotal>=quantity){
                     bookRoomType(roomType, startDate, endDate, quantity);
                 }else{
                     return false;
