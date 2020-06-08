@@ -1825,10 +1825,12 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             return hr.error("资源问题，取消失败");
         }
-        CheckInRecord mainRecord = checkInRecordDao.getOne(mainRecordId);//获取主单信息
-        mainRecord.setRoomCount(mainRecord.getRoomCount() - cir.getRoomCount());
-        mainRecord.setHumanCount(mainRecord.getHumanCount() - cir.getHumanCount());
-        update(mainRecord);//删除了预留，必须修改主单预订房数和人数
+        if(mainRecordId != null){
+            CheckInRecord mainRecord = checkInRecordDao.getOne(mainRecordId);//获取主单信息
+            mainRecord.setRoomCount(mainRecord.getRoomCount() - cir.getRoomCount());
+            mainRecord.setHumanCount(mainRecord.getHumanCount() - cir.getHumanCount());
+            update(mainRecord);//删除了预留，必须修改主单预订房数和人数
+        }
         return hr.ok();
     }
 
@@ -2444,7 +2446,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 
     //修改预留
     @Override
-//    @Transactional
+    @Transactional
     public HttpResponse updateReserve(CheckInRecord cir) {
         HttpResponse hr = new HttpResponse();
         CheckInRecord oldCir = checkInRecordDao.getOne(cir.getId());
