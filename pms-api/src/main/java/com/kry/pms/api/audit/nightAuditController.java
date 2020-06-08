@@ -68,7 +68,7 @@ public class nightAuditController extends BaseController {
     }
 
     /**
-     * 功能描述: <br>应退未退客人（时间过了依旧在住）
+     * 功能描述: <br>夜审所有列表的接口
      * 〈〉
      * @Param: [pageNum, pageSize, status]
      * @Return: com.kry.pms.base.HttpResponse<com.kry.pms.base.PageResponse<java.util.Map<java.lang.String,java.lang.Object>>>
