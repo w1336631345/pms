@@ -27,6 +27,8 @@ public interface RoomRecordService extends BaseService<RoomRecord> {
 
     List<Map<String, Object>> accountEntryListAllMap(LocalDate businessDate, String hotelCode, String isAccountEntry);
 
+    List<Map<String, Object>> checkInAuditRoomRecord(LocalDate businessDate, String checkInId, String hotelCode, String isAccountEntry);
+
     List<RoomRecord> findByHotelCodeAndCheckInRecord(String hotelCode, String checkInRecordId);
 
     Map<String, Object> recordDateAndRoomPrice(String recordDate, String checkInRecordId);

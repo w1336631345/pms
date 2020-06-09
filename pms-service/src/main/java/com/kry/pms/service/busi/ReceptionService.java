@@ -1,5 +1,6 @@
 package com.kry.pms.service.busi;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import javax.validation.Valid;
@@ -16,6 +17,7 @@ import com.kry.pms.model.http.response.busi.CheckOutVo;
 import com.kry.pms.model.persistence.busi.BillItem;
 import com.kry.pms.model.persistence.busi.BookingRecord;
 import com.kry.pms.model.persistence.busi.CheckInRecord;
+import com.kry.pms.model.persistence.sys.User;
 
 public interface ReceptionService {
 
@@ -45,7 +47,7 @@ public interface ReceptionService {
 
 	public DtoResponse<BookingRecord> groupBook(BookingRecord br);
 
-	DtoResponse<String> checkInM(String id);
+	DtoResponse<String> checkInM(String id, User user);
 
 	DtoResponse<String> checkIn(CheckInRecord cir);
 
@@ -53,5 +55,7 @@ public interface ReceptionService {
 
 	public DtoResponse<List<AccountSummaryVo>> groupCheckBillConfirm(String id);
 
-    DtoResponse<String> checkInAll(String[] ids,String hotelCode);
+    DtoResponse<String> checkInAll(String[] ids,User user);
+
+	DtoResponse<String> checkInAuditRoomRecord(CheckInRecord cir, LocalDate businessDate, User user);
 }

@@ -427,7 +427,6 @@ public class BillServiceImpl implements BillService {
             bill.setOperationRemark("自动夜审入账");
         }
         bill.setOperationEmployee(emp);
-        bill.setShiftCode(shiftCode);
         bill.setRoomRecordId(roomRecordId);
         bill.setBusinessDate(businessDate);
         add(bill);

@@ -74,7 +74,7 @@ public class ReceptionController extends BaseController<String> {
 	@OperationLog(remark = "批量入住")
 	public HttpResponse checkIn(@RequestBody String[] ids) {
 		HttpResponse<String> rep = new HttpResponse<String>();
-		BeanUtils.copyProperties(receptionService.checkInAll(ids,getCurrentHotleCode()), rep);
+		BeanUtils.copyProperties(receptionService.checkInAll(ids,getUser()), rep);
 		return rep;
 	}
 	/**
@@ -89,7 +89,7 @@ public class ReceptionController extends BaseController<String> {
 	@OperationLog(remark = "入住")
 	public HttpResponse<String> checkIn(@PathVariable String id) {
 		HttpResponse<String> rep = new HttpResponse<String>();
-		BeanUtils.copyProperties(receptionService.checkInM(id), rep);
+		BeanUtils.copyProperties(receptionService.checkInM(id, getUser()), rep);
 		return rep;
 	}
 
