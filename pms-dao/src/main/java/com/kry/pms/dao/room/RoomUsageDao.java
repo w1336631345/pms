@@ -68,5 +68,12 @@ public interface RoomUsageDao extends BaseDao<RoomUsage> {
 			" order by b.room_num ")
 	List<Map<String, Object>> queryUsableRoomTypeGuestRoomsNew(String roomTypeId, LocalDateTime startTime, LocalDateTime endDateTime,
 															   String floorId, String buildingId);
+
+
+	@Query(value = "select new com.kry.pms.model.http.response.room.RoomUsageListVo(a.id, b.roomNum, a.startDateTime, a.endDateTime," +
+			"d.name, a.usageStatus, a.businesskey, a.businessInfo, a.duration,b.id) " +
+			"from RoomUsage a ,GuestRoom b,RoomType d where a.guestRoom = b and b.roomType = d "
+			+ " and d.id = ?1 and a.startDateTime>=?2 and a.endDateTime<=?3")
+	List<RoomUsageListVo> queryByRoomType(String roomTypeId, LocalDateTime startTime, LocalDateTime endDateTime);
 	
 }
