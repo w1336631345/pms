@@ -1266,7 +1266,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
         if (user != null) {
             hotelCode = user.getHotelCode();
         }
-        Page<Map<String, Object>> p = checkInRecordDao.unreturnedGuests(page, mainNum, status, hotelCode, time);
+        Page<Map<String, Object>> p = checkInRecordDao.unreturnedGuests(page, mainNum, status, hotelCode, time, businessDate);
         PageResponse<Map<String, Object>> pr = new PageResponse<>();
         pr.setPageSize(p.getNumberOfElements());
         pr.setPageCount(p.getTotalPages());
@@ -1284,7 +1284,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
         if (user != null) {
             hotelCode = user.getHotelCode();
         }
-        List<Map<String, Object>> list = checkInRecordDao.getStatistics(hotelCode, time);
+        List<Map<String, Object>> list = checkInRecordDao.getStatistics(hotelCode, time, businessDate);
         return list;
     }
 
@@ -1487,7 +1487,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
             boolean result = roomStatisticsService.reserve(new CheckInRecordWrapper(cir));
             if (!result) {
                 TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-                return hr.error("资源问题，取消失败");
+                return hr.error("资源问题，预留失败");
             }
             mainId = cir.getMainRecordId();
             humanCount = humanCount + cir.getHumanCount();
