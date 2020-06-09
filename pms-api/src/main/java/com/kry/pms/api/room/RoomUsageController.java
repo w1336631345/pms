@@ -54,6 +54,13 @@ public class RoomUsageController extends BaseController<RoomUsage> {
 				DateTimeUtil.parse(endTime)));
 		return rep;
 	}
+	@GetMapping(path="/roomType/all/{id}")
+	public HttpResponse<List<RoomUsageListVo>> queryByRoomType(@PathVariable("id")String roomTypeId, String startTime, String endTime) {
+		HttpResponse<List<RoomUsageListVo>> rep = new HttpResponse<List<RoomUsageListVo>>();
+		rep.addData(roomUsageService.queryByRoomType(roomTypeId, DateTimeUtil.parse(startTime),
+				DateTimeUtil.parse(endTime)));
+		return rep;
+	}
 	/**
 	 * 功能描述: <br>换房：房间空闲查询-与上述方法比较（当前时间-离店时间）
 	 * 〈〉
