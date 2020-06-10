@@ -68,8 +68,8 @@ public class AuditNightStepController extends BaseController<AuditNightStep> {
 	 */
 	@GetMapping(path = "/stepStart")
 	public HttpResponse<List<AuditNightStep>> stepStart(HttpServletRequest request) {
-		HttpResponse<List<AuditNightStep>> rep = new HttpResponse<List<AuditNightStep>>();
-		List<AuditNightStep> list = auditNightStepService.findByHotelCodeAndBusinessDate(getCurrentHotleCode());
-		return rep.addData(list);
+		HttpResponse hr = new HttpResponse();
+		hr = auditNightStepService.findByHotelCodeAndBusinessDate(getCurrentHotleCode());
+		return hr;
 	}
 }

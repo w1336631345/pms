@@ -1,14 +1,17 @@
 package com.kry.pms.service.audit.impl;
 
+import com.kry.pms.base.HttpResponse;
 import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
 import com.kry.pms.dao.audit.AuditNightStepDao;
 import com.kry.pms.model.persistence.audit.AuditNightStep;
 import com.kry.pms.model.persistence.audit.AuditNightStepHis;
 import com.kry.pms.model.persistence.audit.AuditNightStepParam;
+import com.kry.pms.model.persistence.busi.DailyVerify;
 import com.kry.pms.service.audit.AuditNightStepHisService;
 import com.kry.pms.service.audit.AuditNightStepParamService;
 import com.kry.pms.service.audit.AuditNightStepService;
+import com.kry.pms.service.busi.DailyVerifyService;
 import com.kry.pms.service.sys.BusinessSeqService;
 import com.kry.pms.service.sys.SqlTemplateService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +34,8 @@ public class AuditNightStepServiceImpl implements AuditNightStepService {
 	AuditNightStepHisService auditNightStepHisService;
 	@Autowired
 	AuditNightStepParamService auditNightStepParamService;
+	@Autowired
+	DailyVerifyService dailyVerifyService;
 
 
 	@Override
@@ -69,8 +74,14 @@ public class AuditNightStepServiceImpl implements AuditNightStepService {
 	}
 
 	@Override
-	public List<AuditNightStep> findByHotelCodeAndBusinessDate(String code) {
+	public HttpResponse findByHotelCodeAndBusinessDate(String code) {
+		HttpResponse hr = new HttpResponse();
 		LocalDate businessDate = businessSeqService.getBuinessDate(code);
+
+		DailyVerify dailyVerify = dailyVerifyService.findByHotelCodeAndBusinessDate(code, businessDate);
+		if(dailyVerify == null){
+			return hr.error(99999, "请先夜审入账");
+		}
 //		List<AuditNightStep> list = auditNightStepDao.findByHotelCodeAndBusinessDate(code, businessDate);
 		List<AuditNightStep> list = auditNightStepDao.findByHotelCode(code);
 		List<AuditNightStepHis> anss = auditNightStepHisService.findByHotelCodeAndBusinessDate(code);
@@ -107,7 +118,9 @@ public class AuditNightStepServiceImpl implements AuditNightStepService {
 			ansh.setDuration(String.valueOf(duration.toMillis()));
 			auditNightStepHisService.add(ansh);
 		}
-		return list;
+		businessSeqService.plusBuinessDate(code);//营业日期+1
+		hr.addData(list);
+		return hr;
 	}
 
 }
