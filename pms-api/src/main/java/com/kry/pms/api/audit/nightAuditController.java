@@ -212,7 +212,7 @@ public class nightAuditController extends BaseController {
     }
 
     /**
-     * 功能描述: <br>夜审入账后生产报表（下一步）
+     * 功能描述: <br>夜审入账后生产报表（下一步）(老接口，停用)
      * 〈〉
      * @Param: []
      * @Return: com.kry.pms.base.HttpResponse<java.lang.String>
