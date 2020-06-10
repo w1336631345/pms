@@ -19,6 +19,8 @@ import com.kry.pms.service.room.RoomTypeQuantityService;
 import com.kry.pms.service.room.RoomTypeService;
 import com.kry.pms.service.sys.BusinessSeqService;
 
+import com.kry.pms.service.sys.SqlTemplateService;
+import freemarker.template.TemplateException;
 import org.apache.commons.collections4.MapUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +31,7 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -51,6 +54,8 @@ public class RoomTypeQuantityServiceImpl implements RoomTypeQuantityService {
     BusinessSeqService businessSeqService;
     @Autowired
     EntityManager entityManager;
+    @Autowired
+    SqlTemplateService sqlTemplateService;
 
     @Override
     public RoomTypeQuantity add(RoomTypeQuantity roomTypeQuantity) {
@@ -687,7 +692,6 @@ public class RoomTypeQuantityServiceImpl implements RoomTypeQuantityService {
         return true;
     }
 
-
     @Override
     public void initNewType(RoomType roomType) {
         LocalDate planDate = businessSeqService.getPlanDate(roomType.getHotelCode());
@@ -703,5 +707,18 @@ public class RoomTypeQuantityServiceImpl implements RoomTypeQuantityService {
     @Override
     public void addRoomQuantity(RoomType roomType, int quantity) {
         roomTypeQuantityDao.plusRoomTypeQuantity(roomType.getId(), quantity);
+    }
+
+    @Override
+    public List<Map<String, Object>> resourcesInfo(String hotelCode, Map<String, Object> params) throws IOException, TemplateException {
+        List<Map<String, Object>> list = new ArrayList<>();
+        String type = MapUtils.getString(params, "type");
+        if("P".equals(type) || "L".equals(type)){
+            list = sqlTemplateService.processByCode(hotelCode, "resourcesInfo2", params);
+        }else {
+            list = sqlTemplateService.processByCode(hotelCode, "resourcesInfo1", params);
+        }
+
+        return list;
     }
 }

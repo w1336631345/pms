@@ -1,5 +1,6 @@
 package com.kry.pms.service.room;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -13,6 +14,7 @@ import com.kry.pms.model.persistence.room.GuestRoom;
 import com.kry.pms.model.persistence.room.RoomType;
 import com.kry.pms.model.persistence.room.RoomTypeQuantity;
 import com.kry.pms.service.BaseService;
+import freemarker.template.TemplateException;
 
 public interface RoomTypeQuantityService extends BaseService<RoomTypeQuantity> {
     public List<RoomTypeQuantity> findByQuantityDate(RoomType roomType, LocalDate startDate, int days);
@@ -61,4 +63,6 @@ public interface RoomTypeQuantityService extends BaseService<RoomTypeQuantity> {
     boolean changeRoom(RoomType roomType, RoomType newRoomType, String status, LocalDateTime startTime, LocalDateTime endTime, LocalDateTime changeTime);
 
     boolean extendTime(RoomType roomType, String roomStatus, LocalDateTime startTime, LocalDateTime endTime, LocalDateTime newStartTime, LocalDateTime newEndTime,int quantity);
+
+    List<Map<String, Object>> resourcesInfo(String currentHotleCode, Map<String, Object> parse2Map) throws IOException, TemplateException;
 }

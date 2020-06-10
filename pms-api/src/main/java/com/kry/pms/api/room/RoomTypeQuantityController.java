@@ -1,11 +1,13 @@
 package com.kry.pms.api.room;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import freemarker.template.TemplateException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -145,6 +147,20 @@ public class RoomTypeQuantityController extends BaseController<RoomTypeQuantity>
 		HttpResponse<List<Map<String, Object>>> rep = new HttpResponse<>();
 		List<Map<String, Object>> data = roomTypeQuantityService.getByTimeAndRoomType2(getCurrentHotleCode(),startTimes, buildIds, roomTypeIds);
 		return rep.addData(data);
+	}
+
+	/**
+	 * 功能描述: <br>房类资源点击数字的详情列表
+	 * 〈〉
+	 * @Param: [request]
+	 * @Return: com.kry.pms.base.HttpResponse<java.util.List<java.util.Map<java.lang.String,java.lang.Object>>>
+	 * @Author: huanghaibin
+	 * @Date: 2020/6/10 14:58
+	 */
+	@GetMapping(path = "/resourcesInfo")
+	public HttpResponse<List<Map<String, Object>>> resourcesInfo(HttpServletRequest request) throws IOException, TemplateException {
+		HttpResponse<List<Map<String, Object>>> rep = new HttpResponse<List<Map<String, Object>>>();
+		return rep.addData(roomTypeQuantityService.resourcesInfo(getCurrentHotleCode(), parse2Map(request)));
 	}
 
 }
