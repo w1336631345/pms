@@ -16,7 +16,10 @@ public interface RoomRecordService extends BaseService<RoomRecord> {
     void deleteTrue(String id);
 
     void createRoomRecord(CheckInRecord cir);
-	void dailyVerify(String hotelCode, LocalDate recordDate, DailyVerify dv);
+
+    List<RoomRecord> createRoomRecordTo(CheckInRecord cir);
+
+    void dailyVerify(String hotelCode, LocalDate recordDate, DailyVerify dv);
 	void checkOut(List<CheckInRecord> crs);
 
     PageResponse<RoomRecord> accountEntryList(int pageIndex, int pageSize, User user);
@@ -27,7 +30,7 @@ public interface RoomRecordService extends BaseService<RoomRecord> {
 
     List<Map<String, Object>> accountEntryListAllMap(LocalDate businessDate, String hotelCode, String isAccountEntry);
 
-    List<Map<String, Object>> checkInAuditRoomRecord(LocalDate businessDate, String checkInId, String hotelCode, String isAccountEntry);
+    List<Map<String, Object>> checkInAuditRoomRecord(String status, LocalDate businessDate, String checkInId, String hotelCode, String isAccountEntry);
 
     List<RoomRecord> findByHotelCodeAndCheckInRecord(String hotelCode, String checkInRecordId);
 

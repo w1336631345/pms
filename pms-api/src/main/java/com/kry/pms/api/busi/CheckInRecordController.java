@@ -88,7 +88,7 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
         HttpResponse hr = new HttpResponse();
         User user = getUser();
         checkInRecord.setHotelCode(user.getHotelCode());
-        hr = checkInRecordService.bookByRoomTypeTest(checkInRecord);
+        hr = checkInRecordService.bookByRoomTypeTest(checkInRecord, user);
         return hr;
     }
 
@@ -122,7 +122,7 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
     @PostMapping(path = "/bookByRoomList")
     public HttpResponse bookByRoomList(@RequestBody CheckInRecordListBo checkInRecordListBo) {
         HttpResponse hr = new HttpResponse();
-        hr = checkInRecordService.bookByRoomList(checkInRecordListBo, getCurrentHotleCode());
+        hr = checkInRecordService.bookByRoomList(checkInRecordListBo, getUser());
         return hr;
     }
 

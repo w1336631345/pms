@@ -3,6 +3,7 @@ package com.kry.pms.service.busi.impl;
 import com.kry.pms.base.*;
 import com.kry.pms.dao.busi.CheckInRecordDao;
 import com.kry.pms.dao.busi.RoomLinkDao;
+import com.kry.pms.dao.busi.RoomRecordDao;
 import com.kry.pms.dao.marketing.RoomPriceSchemeDao;
 import com.kry.pms.model.annotation.UpdateAnnotation;
 import com.kry.pms.model.http.request.busi.*;
@@ -10,19 +11,21 @@ import com.kry.pms.model.http.response.busi.AccountSummaryVo;
 import com.kry.pms.model.http.response.busi.CheckInRecordListVo;
 import com.kry.pms.model.other.wrapper.CheckInRecordWrapper;
 import com.kry.pms.model.persistence.busi.CheckInRecord;
+import com.kry.pms.model.persistence.busi.DailyVerify;
 import com.kry.pms.model.persistence.busi.RoomLink;
 import com.kry.pms.model.persistence.busi.RoomRecord;
 import com.kry.pms.model.persistence.goods.SetMeal;
 import com.kry.pms.model.persistence.guest.Customer;
 import com.kry.pms.model.persistence.marketing.RoomPriceScheme;
+import com.kry.pms.model.persistence.org.Employee;
 import com.kry.pms.model.persistence.room.GuestRoom;
 import com.kry.pms.model.persistence.room.RoomType;
 import com.kry.pms.model.persistence.sys.Account;
 import com.kry.pms.model.persistence.sys.User;
-import com.kry.pms.service.busi.CheckInRecordService;
-import com.kry.pms.service.busi.RoomRecordService;
+import com.kry.pms.service.busi.*;
 import com.kry.pms.service.guest.CustomerService;
 import com.kry.pms.service.log.UpdateLogService;
+import com.kry.pms.service.org.EmployeeService;
 import com.kry.pms.service.room.*;
 import com.kry.pms.service.sys.*;
 import com.kry.pms.service.util.BeanChangeUtil;
@@ -87,6 +90,16 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
     UpdateLogService updateLogService;
     @Autowired
     DateTimeService dateTimeService;
+    @Autowired
+    EmployeeService employeeService;
+    @Autowired
+    BillService billService;
+    @Autowired
+    DailyVerifyService dailyVerifyService;
+    @Autowired
+    RoomRecordDao roomRecordDao;
+    @Autowired
+    ReceptionService receptionService;
 
     @Override
     public CheckInRecord add(CheckInRecord checkInRecord) {
@@ -854,7 +867,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 
     @Override
     @Transactional
-    public HttpResponse bookByRoomList(CheckInRecordListBo cirlb, String hotelCode) {
+    public HttpResponse bookByRoomList(CheckInRecordListBo cirlb, User user) {
         HttpResponse hr = new HttpResponse();
         List<CheckInRecord> list = cirlb.getCirs();
         String roomLinkId = null;
@@ -864,12 +877,12 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
             roomLinkDao.save(rl);
             roomLinkId = rl.getId();
         }
-        String orderNum = businessSeqService.fetchNextSeqNum(hotelCode, Constants.Key.BUSINESS_ORDER_NUM_SEQ_KEY);
+        String orderNum = businessSeqService.fetchNextSeqNum(user.getHotelCode(), Constants.Key.BUSINESS_ORDER_NUM_SEQ_KEY);
         for (int i = 0; i < list.size(); i++) {
             list.get(i).setOrderNum(orderNum);
             list.get(i).setRoomLinkId(roomLinkId);
-            list.get(i).setHotelCode(hotelCode);
-            hr = bookByRoomTypeTest(list.get(i));
+            list.get(i).setHotelCode(user.getHotelCode());
+            hr = bookByRoomTypeTest(list.get(i), user);
             if (hr.getStatus() == 9999) {
                 return hr;
             }
@@ -879,15 +892,9 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 
     @Override
     @Transactional
-    public HttpResponse bookByRoomTypeTest(CheckInRecord checkInRecord) {
+    public HttpResponse bookByRoomTypeTest(CheckInRecord checkInRecord, User user) {
         HttpResponse hr = new HttpResponse();
-        if (Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN.equals(checkInRecord.getStatus())) {
-            LocalDate businessDate = businessSeqService.getBuinessDate(checkInRecord.getHotelCode());
-            LocalDate aDate = checkInRecord.getArriveTime().toLocalDate();
-            if (!businessDate.isEqual(aDate)) {
-                return hr.error("请核对营业日期与入住日期是否相同");
-            }
-        }
+        LocalDate businessDate = businessSeqService.getBuinessDate(checkInRecord.getHotelCode());
         if (checkInRecord.getOrderNum() == null) {
             String orderNum = businessSeqService.fetchNextSeqNum(checkInRecord.getHotelCode(),
                     Constants.Key.BUSINESS_ORDER_NUM_SEQ_KEY);
@@ -899,7 +906,12 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
         checkInRecord.setType(Constants.Type.CHECK_IN_RECORD_CUSTOMER);
         checkInRecord.setGroupType(Constants.Type.CHECK_IN_RECORD_GROUP_TYPE_NO);
         checkInRecord.setSingleRoomCount(1);
-        checkInRecord.setStartDate(LocalDate.from(checkInRecord.getArriveTime()));
+        LocalTime criticalTime = systemConfigService.getCriticalTime(user.getHotelCode());
+        LocalDate startDate = checkInRecord.getArriveTime().toLocalDate();
+        if (checkInRecord.getArriveTime().toLocalTime().isBefore(criticalTime)) {
+            startDate = startDate.plusDays(-1);
+        }
+        checkInRecord.setStartDate(startDate);
         GuestRoom gr = guestRoomService.findById(checkInRecord.getGuestRoom().getId());
         checkInRecord.setGuestRoom(gr);
         checkInRecord.setHotelCode(gr.getHotelCode());
@@ -925,11 +937,6 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
         checkInRecord.setName(customer.getName());
         Account account = accountService.createAccount(customer, tempName);
         checkInRecord.setAccount(account);
-        if (Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN.equals(checkInRecord.getStatus())) {
-            checkInRecord.setActualTimeOfArrive(LocalDateTime.now());
-        } else {
-            checkInRecord.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION);
-        }
         CheckInRecord cir = add(checkInRecord);
         boolean result = roomStatisticsService.reserve(new CheckInRecordWrapper(cir));//预订
         if (!result) {
@@ -942,14 +949,19 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
             return hr.error("资源不足");
         }
         if ((Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN).equals(checkInRecord.getStatus())) {
+            checkInRecord.setActualTimeOfArrive(LocalDateTime.now());
+            checkInRecordDao.saveAndFlush(checkInRecord);
             boolean result3 = roomStatisticsService.checkIn(new CheckInRecordWrapper(checkInRecord));
             if (!result3) {
                 TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                 return hr.error("资源不足");
             }
         }
-
-        roomRecordService.createRoomRecord(cir);
+//        roomRecordService.createRoomRecord(cir);
+        List<RoomRecord> roomRecordList = roomRecordService.createRoomRecordTo(cir);
+        if ((Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN).equals(checkInRecord.getStatus())) {
+            receptionService.checkInAuditRoomRecord("I",cir, businessDate, user);
+        }
         hr.addData(cir);
         return hr;
     }
@@ -959,6 +971,12 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
     @Transactional
     public HttpResponse singleRoom(CheckInRecord checkInRecord) {
         HttpResponse hr = new HttpResponse();
+        LocalTime criticalTime = systemConfigService.getCriticalTime(checkInRecord.getHotelCode());
+        LocalDate startDate = checkInRecord.getArriveTime().toLocalDate();
+        if (checkInRecord.getArriveTime().toLocalTime().isBefore(criticalTime)) {
+            startDate = startDate.plusDays(-1);
+        }
+        checkInRecord.setStartDate(startDate);
         String orderNum = businessSeqService.fetchNextSeqNum(checkInRecord.getHotelCode(),
                 Constants.Key.BUSINESS_ORDER_NUM_SEQ_KEY);
         checkInRecord.setOrderNum(orderNum);

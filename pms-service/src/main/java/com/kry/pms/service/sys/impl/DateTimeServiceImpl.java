@@ -39,6 +39,12 @@ public class DateTimeServiceImpl implements DateTimeService {
     }
 
     @Override
+    public LocalDateTime getBusinessDateTimeBeforeDawn(String hotelCode) {
+        return LocalDateTime.of(businessSeqService.getBuinessDate(hotelCode), LocalTime.parse("00:00:00"));
+    }
+
+
+    @Override
     public LocalDate getCheckInRecordStartDate(CheckInRecord cir) {
         LocalTime criticalTime = systemConfigService.getCriticalTime(cir.getHotelCode());
         LocalTime time = cir.getArriveTime().toLocalTime();

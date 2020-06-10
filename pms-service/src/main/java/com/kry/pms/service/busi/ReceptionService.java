@@ -57,5 +57,5 @@ public interface ReceptionService {
 
     DtoResponse<String> checkInAll(String[] ids,User user);
 
-	DtoResponse<String> checkInAuditRoomRecord(CheckInRecord cir, LocalDate businessDate, User user);
+	DtoResponse<String> checkInAuditRoomRecord(String status, CheckInRecord cir, LocalDate businessDate, User user);
 }

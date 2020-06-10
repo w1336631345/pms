@@ -32,6 +32,9 @@ import java.time.LocalDate;
 import java.util.*;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
@@ -122,6 +125,24 @@ public class RoomRecordServiceImpl implements RoomRecordService {
 			add(rr);
 		}
 	}
+	@Override
+	public List<RoomRecord> createRoomRecordTo(CheckInRecord cir) {
+		List<RoomRecord> list = new ArrayList<>();
+		RoomRecord rr = null;
+		for (int i = 0; i < cir.getDays(); i++) {
+			rr = new RoomRecord();
+			rr.setCheckInRecord(cir);
+			rr.setHotelCode(cir.getHotelCode());
+			rr.setCustomer(cir.getCustomer());
+			rr.setGuestRoom(cir.getGuestRoom());
+			rr.setCost(cir.getPersonalPrice());
+			rr.setCostRatio(cir.getPersonalPercentage());
+			rr.setRecordDate(cir.getStartDate().plusDays(i));
+			RoomRecord roomRecord = add(rr);
+			list.add(roomRecord);
+		}
+		return list;
+	}
 
 	@Override
 	public void dailyVerify(String hotelCode, LocalDate recordDate, DailyVerify dv) {
@@ -211,8 +232,9 @@ public class RoomRecordServiceImpl implements RoomRecordService {
 	}
 
 	@Override
-	public List<Map<String, Object>> checkInAuditRoomRecord(LocalDate businessDate, String checkInId, String hotelCode, String isAccountEntry) {
-		List<Map<String, Object>> list = roomRecordDao.checkInAuditRoomRecord(businessDate, checkInId, hotelCode, isAccountEntry);
+	@Transactional(propagation= Propagation.NOT_SUPPORTED)
+	public List<Map<String, Object>> checkInAuditRoomRecord(String status, LocalDate businessDate, String checkInId, String hotelCode, String isAccountEntry) {
+		List<Map<String, Object>> list = roomRecordDao.checkInAuditRoomRecord(status, businessDate, checkInId, hotelCode, isAccountEntry);
 		return list;
 	}
 
