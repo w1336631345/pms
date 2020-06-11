@@ -77,6 +77,20 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
     }
 
     /**
+     * 功能描述: <br>小程序修改
+     * 〈〉
+     * @Param: [checkInRecord]
+     * @Return: com.kry.pms.base.HttpResponse<com.kry.pms.model.persistence.busi.CheckInRecord>
+     * @Author: huanghaibin
+     * @Date: 2020/6/12 4:31
+     */
+    @PutMapping(path = "/wechatUpdate")
+    public HttpResponse<CheckInRecord> wechatUpdate(@RequestBody CheckInRecord checkInRecord) {
+        HttpResponse hr = checkInRecordService.wechatUpdate(checkInRecord);
+        return hr;
+    }
+
+    /**
      * hangUp
      * 功能描述: <br>保存-预订
      * 〈〉

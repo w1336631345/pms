@@ -2767,4 +2767,39 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
         return hr.ok();
     }
 
+    @Override
+    public HttpResponse wechatUpdate(CheckInRecord checkInRecord) {
+        HttpResponse hr = new HttpResponse();
+        CheckInRecord cir = new CheckInRecord();
+        BeanUtils.copyProperties(checkInRecord, cir);
+        //上面是浅拷贝，集合不允许被多次引用（会报集合共享引用不允许错误）,作出以下处理
+        List<String> roomLayout = null;
+        if (cir.getRoomLayout() != null && !cir.getRoomLayout().isEmpty()) {
+            roomLayout = new ArrayList<>();
+            roomLayout.addAll(cir.getRoomLayout());
+        }
+        List<String> requirement = null;
+        if (cir.getRoomRequirement() != null && !cir.getRoomRequirement().isEmpty()) {
+            requirement = new ArrayList<>();
+            requirement.addAll(cir.getRoomRequirement());
+        }
+        cir.setRoomLayout(roomLayout);
+        cir.setRoomRequirement(requirement);
+
+        HttpResponse httpResponse =callOffG(checkInRecord.getId());
+        if(httpResponse.getStatus() == 9999){
+            return httpResponse;
+        }
+        if(("Y").equals(cir.getGroupType())){
+            hr = book(cir);
+        }
+        if(("P").equals(cir.getFitType())){
+            hr = singleRoom(cir);
+        }
+        if(("T").equals(cir.getFitType())){
+            hr = book(cir);
+        }
+        return hr;
+    }
+
 }

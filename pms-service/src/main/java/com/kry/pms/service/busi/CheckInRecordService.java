@@ -199,4 +199,6 @@ public interface CheckInRecordService extends BaseService<CheckInRecord> {
     HttpResponse printing(String checkInRecordId);
 
     HttpResponse yesterdayAudit(CheckInRecordAuditBo checkBo, User user);
+
+    HttpResponse wechatUpdate(CheckInRecord checkInRecord);
 }
