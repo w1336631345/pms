@@ -20,6 +20,8 @@ import com.kry.pms.service.busi.RoomChangeRecordService;
 import com.kry.pms.service.busi.RoomRecordService;
 import com.kry.pms.service.log.UpdateLogService;
 import com.kry.pms.service.room.RoomStatisticsService;
+import com.kry.pms.service.sys.BusinessSeqService;
+import com.kry.pms.service.sys.DateTimeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
@@ -28,6 +30,7 @@ import javax.transaction.Transactional;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 
@@ -50,6 +53,8 @@ public class RoomChangeRecordServiceImpl implements RoomChangeRecordService {
 	GuestRoomDao guestRoomDao;
 	@Autowired
 	UpdateLogService updateLogService;
+	@Autowired
+	BusinessSeqService businessSeqService;
 
 	@Override
 	public RoomChangeRecord add(RoomChangeRecord entity) {
@@ -59,6 +64,8 @@ public class RoomChangeRecordServiceImpl implements RoomChangeRecordService {
 	@Override
 	@Transactional
 	public HttpResponse save(RoomChangeRecord entity) {
+		LocalDate businessDate = businessSeqService.getBuinessDate(entity.getHotelCode());
+		LocalDateTime businessDateTime = LocalDateTime.of(businessDate, LocalTime.now());
 		LocalDateTime now = LocalDateTime.now();
 		HttpResponse hr = new HttpResponse();
 		Double roomPrice = 0.0;
@@ -71,11 +78,14 @@ public class RoomChangeRecordServiceImpl implements RoomChangeRecordService {
 		CheckInRecord cir = checkInRecordService.findById(entity.getCheckInRecordId());
 		GuestRoom newgr = guestRoomDao.getOne(entity.getNewGuestRoom().getId());
 		//资源调整
-		boolean cresult = roomStatisticsService.changeRoom(new CheckInRecordWrapper(cir), newgr, LocalDateTime.now());
+		boolean cresult = roomStatisticsService.changeRoom(new CheckInRecordWrapper(cir), newgr, businessDateTime);
+		if(!cresult){
+			return hr.error("资源问题，换房失败");
+		}
 		if(!Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN.equals(cir.getStatus()) && !Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION.equals(cir.getStatus())){
 			return hr.error("退房/结账等房间不能换房");
 		}
-		if(now.isAfter(cir.getLeaveTime())){
+		if(businessDateTime.isAfter(cir.getLeaveTime())){
 			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 			return hr.error("已经过了离店时间，禁止换房操作");
 		}
@@ -94,24 +104,26 @@ public class RoomChangeRecordServiceImpl implements RoomChangeRecordService {
 			LocalDateTime leaveTime = cirs.getLeaveTime();
 
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-			if(now.isBefore(leaveTime)){//当前时间在离店时间之前
-				List<RoomRecord> roomRecords = roomRecordDao.recordDateAndCheckInRecord(LocalDate.now(), cirs.getId());
+			//***********修改roomRecord开始***********
+			if(businessDateTime.isBefore(leaveTime)){//当前时间在离店时间之前
+				List<RoomRecord> roomRecords = roomRecordDao.recordDateAndCheckInRecord(businessDate, cirs.getId());
 				for(int r=0; r<roomRecords.size(); r++){
 					RoomRecord rr = roomRecords.get(r);
 					rr.setGuestRoom(entity.getNewGuestRoom());
 					if(cirs.getPersonalPercentage() != null){
-						rr.setCost(entity.getNewPrice()*cirs.getPersonalPercentage());
+						rr.setCost(roomPrice*cirs.getPersonalPercentage());
 					}else {
-						rr.setCost(entity.getNewPrice());//承担全部房费
+						rr.setCost(roomPrice);//承担全部房费
 					}
 //						rr.setCost(entity.getNewPrice());
 					rr.setCostRatio(null);
 					roomRecordService.modify(rr);
 				}
 			}
-			//修改roomRecord完毕
+			//***********修改roomRecord完毕***********
 			cirs.setGuestRoom(entity.getNewGuestRoom());//修改所有同住人员房间号为新房间
 			cirs.setRoomType(newgr.getRoomType());//修改新房型
+			cirs.setOriginalPrice(newgr.getRoomType().getPrice());
 			cirs.setPurchasePrice(entity.getNewPrice());
 			//同住 承担房费占比*房价=承担房费
 			if(cir.getPersonalPercentage() != null){

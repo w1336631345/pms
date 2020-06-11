@@ -141,12 +141,15 @@ public class RoomStatisticsServiceImpl implements RoomStatisticsService {
 
     @Override
     public boolean changeRoom(UseInfoAble info, GuestRoom newGuestRoom, LocalDateTime changeTime) {
-        roomUsageService.changeRoom(info, newGuestRoom, changeTime);
+        boolean re = roomUsageService.changeRoom(info, newGuestRoom, changeTime);
+        if(!re){
+            return false;
+        }
         if (!newGuestRoom.getRoomType().getId().equals(info.roomType().getId())) {
             roomTypeQuantityService.changeRoom(info.roomType(), newGuestRoom.getRoomType(), ((CheckInRecord) info.getSource()).getStatus(), info.getStartTime(), info.getEndTime(), changeTime);
         }
         guestRoomStatusService.changeRoom(info.guestRoom(), newGuestRoom, changeTime);
-        return false;
+        return true;
     }
 
     @Override
