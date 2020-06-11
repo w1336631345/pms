@@ -45,7 +45,7 @@ public class CheckInRecord extends PersistenceModel {
 	@OneToOne(fetch=FetchType.LAZY)
 	private RoomType roomType;// 房间类型
 	@Column
-	@PropertyMsg("订单类型")
+	@PropertyMsg("预订类型")
 	private String orderType;
 	@ManyToOne(fetch=FetchType.LAZY)
 	@JoinColumn(name = "main_record_id")

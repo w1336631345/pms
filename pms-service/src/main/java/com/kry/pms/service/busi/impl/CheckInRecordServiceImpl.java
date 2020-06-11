@@ -152,8 +152,23 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
             updateName = true;
             checkInRecord.setGroupName(checkInRecord.getName());
         }
+        LocalTime criticalTime = checkInRecord.getArriveTime().toLocalTime();
+        LocalDate startDate = checkInRecord.getArriveTime().toLocalDate();
+        int days = checkInRecord.getDays();
         if (!dbCir.getArriveTime().isEqual(checkInRecord.getArriveTime()) || !dbCir.getLeaveTime().isEqual(checkInRecord.getLeaveTime())) {
             updateTime = true;
+            criticalTime = systemConfigService.getCriticalTime(checkInRecord.getHotelCode());
+            if (checkInRecord.getArriveTime().toLocalTime().isBefore(criticalTime)) {
+                startDate = startDate.plusDays(-1);
+            }
+            checkInRecord.setStartDate(startDate);
+            //需要修改天数和roomRecord
+            days = (int) checkInRecord.getArriveTime().toLocalDate()
+                    .until(checkInRecord.getLeaveTime().toLocalDate(), ChronoUnit.DAYS);
+            if (checkInRecord.getArriveTime().toLocalTime().isBefore(criticalTime)) {
+                days = days + 1;
+            }
+            checkInRecord.setDays(days);
         }
         if (checkInRecord.getIsSecrecy() != null) {
             if (!checkInRecord.getIsSecrecy().equals(dbCir.getIsSecrecy())) {
@@ -257,9 +272,6 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                     TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                     return hr.error("资源不足");
                 }
-                //需要修改天数和roomRecord
-                int days = (int) checkInRecord.getArriveTime().toLocalDate()
-                        .until(checkInRecord.getLeaveTime().toLocalDate(), ChronoUnit.DAYS);
                 //不同时更改同住数据
 //                List<RoomRecord> list = roomRecordService.findByHotelCodeAndCheckInRecord(checkInRecord.getHotelCode(), checkInRecord.getId());
 //                for (int r = 0; r < list.size(); r++) {
@@ -277,6 +289,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                     together.get(t).setDays(days);
                     together.get(t).setArriveTime(checkInRecord.getArriveTime());
                     together.get(t).setLeaveTime(checkInRecord.getLeaveTime());
+                    together.get(t).setStartDate(checkInRecord.getStartDate());
                     checkInRecordDao.saveAndFlush(together.get(t));
                     roomRecordService.createRoomRecord(together.get(t));
                 }
@@ -371,6 +384,8 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
             if (lt == null || "".equals(lt)) {
                 lt = cir.getLeaveTime();
             }
+            LocalDate startDate = cir.getArriveTime().toLocalDate();
+            LocalTime criticalTime = cir.getArriveTime().toLocalTime();
             if (!cir.getArriveTime().isEqual(at) || !cir.getLeaveTime().isEqual(lt)) {
                 updateTime = true;
                 if (roomI) {
@@ -380,6 +395,11 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                         return hr.error("资源不足");
                     }
                 }
+                criticalTime = systemConfigService.getCriticalTime(cir.getHotelCode());
+                if (cir.getArriveTime().toLocalTime().isBefore(criticalTime)) {
+                    startDate = startDate.plusDays(-1);
+                }
+                cir.setStartDate(startDate);
             }
             UpdateUtil.copyNullProperties(checkUpdateItemTestBo, cir);
             if (updateTime) {
@@ -398,6 +418,9 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                 //需要修改天数和roomRecord
                 int days = (int) at.toLocalDate()
                         .until(lt.toLocalDate(), ChronoUnit.DAYS);
+                if (cir.getArriveTime().toLocalTime().isBefore(criticalTime)) {
+                    days = days + 1;
+                }
                 List<RoomRecord> list = roomRecordService.findByHotelCodeAndCheckInRecord(cir.getHotelCode(), cir.getId());
                 for (int r = 0; r < list.size(); r++) {
                     roomRecordService.deleteTrue(list.get(r).getId());
@@ -414,6 +437,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                             roomRecordService.deleteTrue(listT.get(r).getId());
                         }
                         together.get(t).setDays(days);
+                        together.get(t).setStartDate(cir.getStartDate());
                         together.get(t).setArriveTime(at);
                         together.get(t).setLeaveTime(lt);
                         checkInRecordDao.saveAndFlush(together.get(t));
@@ -795,6 +819,12 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
         if (checkInRecord.getName() == null || "".equals(checkInRecord.getName())) {
             checkInRecord.setName("同行主账户" + orderNum);
         }
+        LocalTime criticalTime = systemConfigService.getCriticalTime(checkInRecord.getHotelCode());
+        LocalDate startDate = checkInRecord.getArriveTime().toLocalDate();
+        if (checkInRecord.getArriveTime().toLocalTime().isBefore(criticalTime)) {
+            startDate = startDate.plusDays(-1);
+        }
+        checkInRecord.setStartDate(startDate);
         checkInRecord.setGroupName(checkInRecord.getName());
         checkInRecord.setOrderNum(orderNum);
         checkInRecord.setCheckInCount(0);
