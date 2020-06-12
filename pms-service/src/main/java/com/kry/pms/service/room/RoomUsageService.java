@@ -14,8 +14,7 @@ import java.util.Map;
 
 public interface RoomUsageService extends BaseService<RoomUsage> {
 
-	public RoomUsage use(GuestRoom gr, String status, LocalDateTime startTime, int days, String businesskey,
-			String businessInfo, DtoResponse<String> response);
+
 
     List<RoomUsageListVo> queryByRoomType(String roomTypeId, LocalDateTime startTime,
                                           LocalDateTime endDateTime);
@@ -42,34 +41,9 @@ public interface RoomUsageService extends BaseService<RoomUsage> {
 	List<RoomUsageListVo> queryUsableGuestRoomsTo(String roomTypeId, LocalDateTime startTime,
 												  LocalDateTime endDateTime);
 
-	/**
-	 * 使用资源
-	 * 
-	 * @param gr
-	 * @param status
-	 * @param startTime
-	 * @param endTime
-	 * @param businesskey  业务id，checkInRecordId，roomLockRecordId，roomRepairRecordId
-	 * @param businessInfo
-	 * @return
-	 */
-	public DtoResponse<RoomUsage> use(GuestRoom gr, String status, LocalDateTime startTime, LocalDateTime endTime,
-			String businesskey, String businessInfo);
 
-	/**
-	 * 使用房间资源，是否改变房类资源
-	 * 
-	 * @param gr
-	 * @param status
-	 * @param startTime
-	 * @param endTime
-	 * @param businesskey       业务id，checkInRecordId，roomLockRecordId，roomRepairRecordId
-	 * @param businessInfo
-	 * @param roomTypeOperation
-	 * @return
-	 */
-	public DtoResponse<RoomUsage> use(GuestRoom gr, String status, LocalDateTime startTime, LocalDateTime endTime,
-			String businesskey, String businessInfo, boolean roomTypeOperation);
+
+
 
 	/**
 	 * 改变房间使用状态，

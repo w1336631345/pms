@@ -49,7 +49,7 @@ public interface RoomTypeQuantityService extends BaseService<RoomTypeQuantity> {
 
     public void checkInRoomTypeWithoutBook(RoomType roomType, LocalDate startDate, LocalDate endDate, int quantity);
 
-    void changeRoomTypeQuantity(RoomType roomType, LocalDate startDate, LocalDate endDate, String oldUsageStatus,
+    boolean changeRoomTypeQuantity(RoomType roomType, LocalDateTime startDate, LocalDateTime endDate, String oldUsageStatus,
                                 String newUsageStatus, int quantity);
 
     List<Map<String, Object>> getByTimeAndRoomType(String hotelCode, String times, String roomTypeId);

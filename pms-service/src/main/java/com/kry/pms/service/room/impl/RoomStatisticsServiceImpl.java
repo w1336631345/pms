@@ -31,13 +31,13 @@ public class RoomStatisticsServiceImpl implements RoomStatisticsService {
 
     @Override
     public boolean reserve(UseInfoAble info) {
-       return  roomTypeQuantityService.useRoomType(info, Constants.Status.ROOM_USAGE_BOOK);
+        return roomTypeQuantityService.useRoomType(info, Constants.Status.ROOM_USAGE_BOOK);
     }
 
     @Override
     public boolean cancleReserve(UseInfoAble info) {
-        roomTypeQuantityService.changeRoomTypeQuantity(info.roomType(), info.getStartTime().toLocalDate(),
-                info.getEndTime().toLocalDate(), Constants.Status.ROOM_USAGE_RESERVATION,
+        roomTypeQuantityService.changeRoomTypeQuantity(info.roomType(), info.getStartTime(),
+                info.getEndTime(), Constants.Status.ROOM_USAGE_RESERVATION,
                 Constants.Status.ROOM_USAGE_PREDICTABLE, info.getRoomCount());
         return true;
     }
@@ -104,12 +104,12 @@ public class RoomStatisticsServiceImpl implements RoomStatisticsService {
         CheckInRecord cir = (CheckInRecord) info.getSource();
         if (!info.useType().equals(Constants.Type.CHECK_IN_RECORD_RESERVE)) {//如果不是预留订单 就需要修改房间资源
             String roomUseStatus = null;
-            if(cir.getStatus().equals(Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION)){
+            if (cir.getStatus().equals(Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION)) {
                 roomUseStatus = Constants.Status.ROOM_USAGE_ASSIGN;
-            }else{
+            } else {
                 roomUseStatus = cir.getStatus();
             }
-            roomTypeQuantityService.extendTime(info.roomType(), roomUseStatus, info.getStartTime(), info.getEndTime(), newStartTime, newEndTime,1);
+            roomTypeQuantityService.extendTime(info.roomType(), roomUseStatus, info.getStartTime(), info.getEndTime(), newStartTime, newEndTime, 1);
             if (newStartTime != null) {
                 newStartTime = LocalDateTime.of(newStartTime.toLocalDate(), LocalTime.NOON);
             }
@@ -125,8 +125,8 @@ public class RoomStatisticsServiceImpl implements RoomStatisticsService {
             } else {
                 return roomUsageService.extendTime(info, newStartTime, newEndTime);
             }
-        }else{
-            roomTypeQuantityService.extendTime(info.roomType(), cir.getStatus(), info.getStartTime(), info.getEndTime(), newStartTime, newEndTime,cir.getRoomCount());
+        } else {
+            roomTypeQuantityService.extendTime(info.roomType(), cir.getStatus(), info.getStartTime(), info.getEndTime(), newStartTime, newEndTime, cir.getRoomCount());
             return true;
         }
     }
@@ -142,7 +142,7 @@ public class RoomStatisticsServiceImpl implements RoomStatisticsService {
     @Override
     public boolean changeRoom(UseInfoAble info, GuestRoom newGuestRoom, LocalDateTime changeTime) {
         boolean re = roomUsageService.changeRoom(info, newGuestRoom, changeTime);
-        if(!re){
+        if (!re) {
             return false;
         }
         if (!newGuestRoom.getRoomType().getId().equals(info.roomType().getId())) {

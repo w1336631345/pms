@@ -1,5 +1,6 @@
 package com.kry.pms.model.func;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import com.kry.pms.model.persistence.room.GuestRoom;
@@ -105,6 +106,9 @@ public interface UseInfoAble {
 
     public String useType();
 
+
     public void setStartTime(LocalDateTime startTime);
     public void setEndTime(LocalDateTime endTime);
+
+    String getHotelCode();
 }

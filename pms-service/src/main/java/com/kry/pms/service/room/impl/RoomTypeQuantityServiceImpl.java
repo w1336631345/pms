@@ -9,6 +9,7 @@ import com.kry.pms.dao.room.RoomTypeQuantityDao;
 import com.kry.pms.model.func.UseInfoAble;
 import com.kry.pms.model.http.response.busi.RoomTypeQuantityPredictableVo;
 import com.kry.pms.model.http.response.room.RoomTypeQuantityVo;
+import com.kry.pms.model.persistence.busi.CheckInRecord;
 import com.kry.pms.model.persistence.marketing.RoomPriceScheme;
 import com.kry.pms.model.persistence.org.Employee;
 import com.kry.pms.model.persistence.room.GuestRoom;
@@ -19,7 +20,9 @@ import com.kry.pms.service.room.RoomTypeQuantityService;
 import com.kry.pms.service.room.RoomTypeService;
 import com.kry.pms.service.sys.BusinessSeqService;
 
+import com.kry.pms.service.sys.DateTimeService;
 import com.kry.pms.service.sys.SqlTemplateService;
+import com.kry.pms.service.sys.SystemConfigService;
 import freemarker.template.TemplateException;
 import org.apache.commons.collections4.MapUtils;
 import org.springframework.beans.BeanUtils;
@@ -34,6 +37,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -56,6 +60,8 @@ public class RoomTypeQuantityServiceImpl implements RoomTypeQuantityService {
     EntityManager entityManager;
     @Autowired
     SqlTemplateService sqlTemplateService;
+    @Autowired
+    DateTimeService dateTimeService;
 
     @Override
     public RoomTypeQuantity add(RoomTypeQuantity roomTypeQuantity) {
@@ -130,8 +136,6 @@ public class RoomTypeQuantityServiceImpl implements RoomTypeQuantityService {
     private RoomTypeQuantity initRoomTypeQuantity(RoomType roomType, LocalDate quantityDate) {
         RoomTypeQuantity rtq = new RoomTypeQuantity();
         rtq.setRoomType(roomType);
-//		rtq.setRoomTypeCode(roomType.getCode());
-//		rtq.setRoomTypeName(roomType.getName());
         rtq.setQuantityDate(quantityDate);
         rtq.setUsedTotal(0);
         rtq.setWillArriveTotal(0);
@@ -161,12 +165,6 @@ public class RoomTypeQuantityServiceImpl implements RoomTypeQuantityService {
         }
     }
 
-    public void useRoomType(RoomType roomType, LocalDateTime startTime, LocalDateTime endTime, String useType) {
-        LocalDate startDate = startTime.toLocalDate();
-        LocalDate endDate = endTime.toLocalDate();
-        useRoomType(roomType, startDate, endDate, useType);
-    }
-
     @Transactional
     @Override
     public boolean useRoomType(RoomType roomType, LocalDate startDate, LocalDate endDate, String useType) {
@@ -177,14 +175,14 @@ public class RoomTypeQuantityServiceImpl implements RoomTypeQuantityService {
     public boolean useRoomType(RoomType roomType, LocalDate startDate, LocalDate endDate, String useType, int quantity) {
         switch (useType) {
             case Constants.Status.ROOM_USAGE_BOOK:
-                RoomTypeQuantityPredictableVo rqpv = queryPredic(roomType.getHotelCode(),roomType.getId(),startDate,endDate, null);
+                RoomTypeQuantityPredictableVo rqpv = queryPredic(roomType.getHotelCode(), roomType.getId(), startDate, endDate, null);
                 int availableTotal = rqpv.getAvailableTotal();
-                if(roomType.getOverReservation()!=null){
-                    availableTotal+=roomType.getOverReservation();
+                if (roomType.getOverReservation() != null) {
+                    availableTotal += roomType.getOverReservation();
                 }
-                if(availableTotal>=quantity){
+                if (availableTotal >= quantity) {
                     bookRoomType(roomType, startDate, endDate, quantity);
-                }else{
+                } else {
                     return false;
                 }
                 break;
@@ -234,9 +232,10 @@ public class RoomTypeQuantityServiceImpl implements RoomTypeQuantityService {
     }
 
     @Override
-    public void changeRoomTypeQuantity(RoomType roomType, LocalDate startDate, LocalDate endDate, String oldUsageStatus,
-                                       String newUsageStatus, int quantity) {
-        changeRoomTypeQuantity(roomType, startDate, endDate, oldUsageStatus, newUsageStatus, quantity, true);
+    public boolean changeRoomTypeQuantity(RoomType roomType, LocalDateTime startDateTime, LocalDateTime endDateTime, String oldUsageStatus,
+                                          String newUsageStatus, int quantity) {
+        changeRoomTypeQuantity(roomType, dateTimeService.getStartDate(roomType.getHotelCode(), startDateTime), endDateTime.toLocalDate(), oldUsageStatus, newUsageStatus, quantity, true);
+        return true;
     }
 
     private void changeRoomTypeQuantity(RoomType roomType, LocalDate startDate, LocalDate endDate, String oldUsageStatus,
@@ -546,7 +545,8 @@ public class RoomTypeQuantityServiceImpl implements RoomTypeQuantityService {
 
     @Override
     public boolean useRoomType(UseInfoAble info, String userType) {
-       return  useRoomType(info.roomType(), info.getStartTime().toLocalDate(), info.getEndTime().toLocalDate(), userType,
+        CheckInRecord cir = (CheckInRecord) info.getSource();
+        return useRoomType(info.roomType(), dateTimeService.getCheckInRecordStartDate(cir), info.getEndTime().toLocalDate(), userType,
                 info.getRoomCount());
     }
 
@@ -668,27 +668,27 @@ public class RoomTypeQuantityServiceImpl implements RoomTypeQuantityService {
         if (status.equals(Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION)) {
             status = Constants.Status.ROOM_USAGE_ASSIGN;
         }
-        changeRoomTypeQuantity(roomType, changeTime.toLocalDate(), endTime.toLocalDate(), status, Constants.Status.ROOM_USAGE_FREE, 1);
-        changeRoomTypeQuantity(newRoomType, changeTime.toLocalDate(), endTime.toLocalDate(), Constants.Status.ROOM_USAGE_FREE, status, 1);
+        changeRoomTypeQuantity(roomType, startTime, startTime, status, Constants.Status.ROOM_USAGE_FREE, 1);
+        changeRoomTypeQuantity(newRoomType, startTime, startTime, Constants.Status.ROOM_USAGE_FREE, status, 1);
         return true;
     }
 
     @Override
     public boolean extendTime(RoomType roomType, String roomStatus, LocalDateTime startTime, LocalDateTime endTime, LocalDateTime newStartTime, LocalDateTime newEndTime, int quantity) {
-        changeRoomTypeQuantity(roomType, startTime.toLocalDate(), endTime.toLocalDate(), roomStatus, Constants.Status.ROOM_USAGE_FREE, 1,!roomStatus.equals(Constants.Status.ROOM_USAGE_CHECK_IN));
+        changeRoomTypeQuantity(roomType, dateTimeService.getStartDate(roomType.getHotelCode(), startTime), endTime.toLocalDate(), roomStatus, Constants.Status.ROOM_USAGE_FREE, 1, !roomStatus.equals(Constants.Status.ROOM_USAGE_CHECK_IN));
         LocalDate newStartDate = null;
         LocalDate newEndDate = null;
         if (newStartTime != null) {
-            newStartDate = newStartTime.toLocalDate();
+            newStartDate = dateTimeService.getStartDate(roomType.getHotelCode(), newStartTime);
         } else {
-            newStartDate = startTime.toLocalDate();
+            newStartDate = dateTimeService.getStartDate(roomType.getHotelCode(), startTime);
         }
         if (newEndTime != null) {
             newEndDate = newEndTime.toLocalDate();
         } else {
             newEndDate = endTime.toLocalDate();
         }
-        changeRoomTypeQuantity(roomType, newStartDate, newEndDate, Constants.Status.ROOM_USAGE_FREE, roomStatus, 1,!roomStatus.equals(Constants.Status.ROOM_USAGE_CHECK_IN));
+        changeRoomTypeQuantity(roomType, newStartDate, newEndDate, Constants.Status.ROOM_USAGE_FREE, roomStatus, 1, !roomStatus.equals(Constants.Status.ROOM_USAGE_CHECK_IN));
         return true;
     }
 
@@ -713,9 +713,9 @@ public class RoomTypeQuantityServiceImpl implements RoomTypeQuantityService {
     public List<Map<String, Object>> resourcesInfo(String hotelCode, Map<String, Object> params) throws IOException, TemplateException {
         List<Map<String, Object>> list = new ArrayList<>();
         String type = MapUtils.getString(params, "type");
-        if("P".equals(type) || "L".equals(type)){
+        if ("P".equals(type) || "L".equals(type)) {
             list = sqlTemplateService.processByCode(hotelCode, "resourcesInfo2", params);
-        }else {
+        } else {
             list = sqlTemplateService.processByCode(hotelCode, "resourcesInfo1", params);
         }
 
