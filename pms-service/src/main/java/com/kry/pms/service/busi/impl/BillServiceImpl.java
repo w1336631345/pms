@@ -526,6 +526,12 @@ public class BillServiceImpl implements BillService {
                 offsetBill.setId(null);
                 offsetBill.setProduct(bill.getProduct());
                 offsetBill.setAccount(bill.getAccount());
+                if(bill.getCost()!=null){
+                    offsetBill.setCost(-bill.getCost());
+                }
+                if(bill.getPay()!=null){
+                    offsetBill.setPay(-bill.getPay());
+                }
                 offsetBill.setTotal(-bill.getTotal());
                 offsetBill.setSid(bill.getId());
                 offsetBill.setFeeFlag(billFlag);
