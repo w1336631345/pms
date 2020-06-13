@@ -39,4 +39,6 @@ public interface RoomRecordService extends BaseService<RoomRecord> {
     List<RoomRecord> getByTimeAndCheckId(String recordDate, String checkInRecordId);
 
     public int autoOpenLock();
+
+    void deletedRecordAfter(String checkInRecordId, LocalDate recordDate);
 }

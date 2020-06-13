@@ -2798,4 +2798,10 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
         return hr.ok();
     }
 
+    @Override
+    public List<Map<String, Object>> printDeposit(String hotelCode, String orderNum) {
+        List<Map<String, Object>> list = checkInRecordDao.printDeposit(hotelCode, orderNum);
+        return list;
+    }
+
 }

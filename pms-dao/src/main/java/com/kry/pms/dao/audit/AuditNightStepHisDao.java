@@ -11,6 +11,7 @@ public interface AuditNightStepHisDao extends BaseDao<AuditNightStepHis> {
 
     List<AuditNightStepHis> findByHotelCode(String hotelCode);
 
+
     List<AuditNightStepHis> findByHotelCodeAndBusinessDate(String hotelCode, LocalDate businessDate);
 
 }

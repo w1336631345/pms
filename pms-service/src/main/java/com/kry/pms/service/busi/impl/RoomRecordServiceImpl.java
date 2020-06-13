@@ -284,4 +284,9 @@ public class RoomRecordServiceImpl implements RoomRecordService {
 		return 0;
 	}
 
+	@Override
+	public void deletedRecordAfter(String checkInRecordId, LocalDate recordDate) {
+		roomRecordDao.deletedRecordAfter(checkInRecordId, recordDate);
+	}
+
 }

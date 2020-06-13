@@ -740,4 +740,20 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
         hr = checkInRecordService.printing(checkInRecordId);
         return hr.ok();
     }
+
+    /**
+     * 功能描述: <br>打印押金功能-查询公司，所有房间，人数。房数
+     * 〈〉
+     * @Param: [orderNum]
+     * @Return: com.kry.pms.base.HttpResponse
+     * @Author: huanghaibin
+     * @Date: 2020/6/14 2:52
+     */
+    @GetMapping(value = "/printDeposit")
+    public HttpResponse printDeposit(String orderNum) {
+        HttpResponse hr = new HttpResponse();
+        List<Map<String, Object>> list = checkInRecordService.printDeposit(getCurrentHotleCode(), orderNum);
+        hr.setData(list);
+        return hr;
+    }
 }

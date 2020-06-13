@@ -400,4 +400,19 @@ public interface CheckInRecordDao extends BaseDao<CheckInRecord> {
 			"where order_num = ?1 and hotel_code = ?2 and `status` != 'O' and deleted =0 ")
 	int isNotCheckOut(String orderNum, String hotelCode);
 
+	@Query(nativeQuery = true, value = " select \n" +
+			" tcr.type_,\n" +
+			" tcr.room_count,\n" +
+			" tcr.human_count,\n" +
+			" tgr.room_num,\n" +
+			" tcr.corp_id,\n" +
+			" tc.`name` corp_name\n" +
+			" from t_checkin_record tcr \n" +
+			" left join t_guest_room tgr on tcr.guest_room_id = tgr.id\n" +
+			" left join t_customer tc on tcr.corp_id = tc.id\n" +
+			" where tcr.type_ != 'R' " +
+			" and tcr.hotel_code = ?1 \n" +
+			" and tcr.order_num = ?2 ")
+	List<Map<String, Object>> printDeposit(String hotelCode, String orderNum);
+
 }

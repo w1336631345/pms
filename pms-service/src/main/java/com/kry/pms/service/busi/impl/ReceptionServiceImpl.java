@@ -364,11 +364,21 @@ public class ReceptionServiceImpl implements ReceptionService {
 		LocalDate businessDate = businessSeqService.getBuinessDate(user.getHotelCode());
 		DtoResponse<String> rep = new DtoResponse<>();
 		CheckInRecord checkInRecord = checkInRecordService.findById(ids[0]);
-		if (checkInRecord!=null&&!(Constants.Type.CHECK_IN_RECORD_GROUP).equals(checkInRecord.getType())) {
-			if (checkInRecord.getMainRecord()!=null&&!(Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN).equals(checkInRecord.getMainRecord().getStatus())){
-				rep.setStatus(Constants.BusinessCode.CODE_PARAMETER_INVALID);
-				rep.setMessage("请先做团队主单入住，再做成员入住");
-				return rep;
+//		if (checkInRecord!=null&&!(Constants.Type.CHECK_IN_RECORD_GROUP).equals(checkInRecord.getType())) {
+//			if (checkInRecord.getMainRecord()!=null&&!(Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN).equals(checkInRecord.getMainRecord().getStatus())){
+//				rep.setStatus(Constants.BusinessCode.CODE_PARAMETER_INVALID);
+//				rep.setMessage("请先做团队主单入住，再做成员入住");
+//				return rep;
+//			}
+//		}
+		// 不是主单，只要有人员入住，主单改为入住状态(与上面注释掉的代码相反)
+		if (!(Constants.Type.CHECK_IN_RECORD_GROUP).equals(checkInRecord.getType())) {
+			if(checkInRecord.getMainRecord() != null){
+				String mainRecordId = checkInRecord.getMainRecord().getId();
+				CheckInRecord cirMain = checkInRecordService.findById(mainRecordId);
+				if (!(Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN).equals(cirMain.getStatus())) {
+					rep = checkIn(cirMain);
+				}
 			}
 		}
 		for (int i = 0; i < ids.length; i++) {
@@ -376,11 +386,23 @@ public class ReceptionServiceImpl implements ReceptionService {
 			LocalDateTime now = LocalDateTime.now();
 			if(now.toLocalDate().isBefore(cir.getArriveTime().toLocalDate())){
 				rep.error(Constants.BusinessCode.CODE_PARAMETER_INVALID,"提前入住请修改到达时间，确认房类资源足够");
+				TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 				return rep;
 			}
 			if(now.isAfter(cir.getLeaveTime())){
 				rep.error(Constants.BusinessCode.CODE_PARAMETER_INVALID,"已过离店时间，无法入住");
+				TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 				return rep;
+			}
+			if(now.toLocalDate().isEqual(cir.getArriveTime().toLocalDate())){
+				LocalTime criticalTime = systemConfigService.getCriticalTime(user.getHotelCode());
+				if(cir.getArriveTime().toLocalTime().isAfter(criticalTime)){
+					if(now.toLocalTime().isBefore(criticalTime)){
+						rep.error(Constants.BusinessCode.CODE_PARAMETER_INVALID,"提前到凌晨入住，请修改时间重算资源");
+						TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+						return rep;
+					}
+				}
 			}
 			// 预留单不能入住R
 			if ((Constants.Type.CHECK_IN_RECORD_RESERVE).equals(cir.getType())) {

@@ -61,9 +61,9 @@ public class AuditNightStepHisController extends BaseController<AuditNightStepHi
 	 */
 	@GetMapping(path = "/stepList")
 	public HttpResponse<List<AuditNightStepHis>> stepList(HttpServletRequest request) {
-		HttpResponse<List<AuditNightStepHis>> rep = new HttpResponse<List<AuditNightStepHis>>();
-		List<AuditNightStepHis> list = auditNightStepHisService.findByHotelCodeAndBusinessDate(getCurrentHotleCode());
-		return rep.addData(list);
+		HttpResponse<List<AuditNightStepHis>> hr = new HttpResponse<List<AuditNightStepHis>>();
+		hr = auditNightStepHisService.findByHotelCodeAndBusinessDate(getCurrentHotleCode());
+		return hr;
 	}
 
 }

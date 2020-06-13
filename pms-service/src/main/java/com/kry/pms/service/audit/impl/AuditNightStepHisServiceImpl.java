@@ -1,13 +1,16 @@
 package com.kry.pms.service.audit.impl;
 
+import com.kry.pms.base.HttpResponse;
 import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
 import com.kry.pms.dao.audit.AuditNightStepDao;
 import com.kry.pms.dao.audit.AuditNightStepHisDao;
 import com.kry.pms.model.persistence.audit.AuditNightStep;
 import com.kry.pms.model.persistence.audit.AuditNightStepHis;
+import com.kry.pms.model.persistence.busi.DailyVerify;
 import com.kry.pms.service.audit.AuditNightStepHisService;
 import com.kry.pms.service.audit.AuditNightStepService;
+import com.kry.pms.service.busi.DailyVerifyService;
 import com.kry.pms.service.sys.BusinessSeqService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,6 +29,8 @@ public class AuditNightStepHisServiceImpl implements AuditNightStepHisService {
 	BusinessSeqService businessSeqService;
 	@Autowired
 	AuditNightStepService auditNightStepService;
+	@Autowired
+	DailyVerifyService dailyVerifyService;
 
 
 	@Override
@@ -60,8 +65,15 @@ public class AuditNightStepHisServiceImpl implements AuditNightStepHisService {
 	}
 
 	@Override
-	public List<AuditNightStepHis> findByHotelCodeAndBusinessDate(String code) {
+	public HttpResponse findByHotelCodeAndBusinessDate(String code) {
+		HttpResponse hr = new HttpResponse();
 		LocalDate businessDate = businessSeqService.getBuinessDate(code);
+
+		DailyVerify dailyVerify = dailyVerifyService.findByHotelCodeAndBusinessDate(code, businessDate);
+		if(dailyVerify == null){
+			return hr.error(99999, "请先夜审入账");
+		}
+
 		List<AuditNightStepHis> list = auditNightStepHisDao.findByHotelCodeAndBusinessDate(code, businessDate);
 		if(list == null || list.isEmpty()){
 			List<AuditNightStep> anss = auditNightStepService.getAllByHotelCode(code);
@@ -77,7 +89,8 @@ public class AuditNightStepHisServiceImpl implements AuditNightStepHisService {
 				list.add(ah);
 			}
 		}
-		return list;
+		hr.setData(list);
+		return hr;
 	}
 
 }

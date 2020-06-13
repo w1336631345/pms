@@ -201,4 +201,6 @@ public interface CheckInRecordService extends BaseService<CheckInRecord> {
     HttpResponse yesterdayAudit(CheckInRecordAuditBo checkBo, User user);
 
     HttpResponse wechatUpdate(CheckInRecord checkInRecord);
+
+    List<Map<String, Object>> printDeposit(String hotelCode, String orderNum);
 }

@@ -84,7 +84,8 @@ public class AuditNightStepServiceImpl implements AuditNightStepService {
 		}
 //		List<AuditNightStep> list = auditNightStepDao.findByHotelCodeAndBusinessDate(code, businessDate);
 		List<AuditNightStep> list = auditNightStepDao.findByHotelCode(code);
-		List<AuditNightStepHis> anss = auditNightStepHisService.findByHotelCodeAndBusinessDate(code);
+		HttpResponse httpResponse = auditNightStepHisService.findByHotelCodeAndBusinessDate(code);
+		List<AuditNightStepHis> anss = (List<AuditNightStepHis>) httpResponse.getData();
 		for(int i=0; i<list.size(); i++){
 			AuditNightStepHis ansh = anss.get(i);
 			ansh.setStartTime(LocalDateTime.now());
