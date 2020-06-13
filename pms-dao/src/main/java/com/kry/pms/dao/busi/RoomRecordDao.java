@@ -79,7 +79,7 @@ public interface RoomRecordDao extends BaseDao<RoomRecord>{
 			"  and trr.is_account_entry = ?5 ")
 	List<Map<String, Object>> checkInAuditRoomRecord(String status, LocalDate recordDate, String checkInId, String hotelCode, String isAccountEntry);
 
-	@Query(nativeQuery = true, value = " DELETE from t_room_record trr where trr.check_in_record_id = ?1 and trr.record_date >= ?2 ")
+	@Query(nativeQuery = true, value = " DELETE from t_room_record trr where trr.check_in_record_id = ?1 and trr.record_date >= ?2 and trr.is_account_entry = 'NO' ")
 	void deletedRecordAfter(String checkInRecordId, LocalDate recordDate);
 
 }
