@@ -19,4 +19,6 @@ public interface DateTimeService {
     public LocalDate getCheckInRecordStartDate(CheckInRecord cir);
 
     public LocalDate getStartDate(String hotelCode, LocalDateTime startTime);
+
+    LocalDateTime getBusinessDateTimeBeforeDawn(String hotelCode);
 }

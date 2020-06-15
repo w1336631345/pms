@@ -60,10 +60,10 @@ public interface CheckInRecordService extends BaseService<CheckInRecord> {
 
     public HttpResponse book(CheckInRecord checkInRecord);
 
-    HttpResponse bookByRoomList(CheckInRecordListBo cirlb, String hotelCode);
+    HttpResponse bookByRoomList(CheckInRecordListBo cirlb, User user);
 
     @Transactional
-    HttpResponse bookByRoomTypeTest(CheckInRecord checkInRecord);
+    HttpResponse bookByRoomTypeTest(CheckInRecord checkInRecord, User user);
 
     //单房预订
     HttpResponse singleRoom(CheckInRecord checkInRecord);

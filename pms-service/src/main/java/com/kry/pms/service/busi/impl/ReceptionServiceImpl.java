@@ -12,8 +12,10 @@ import java.util.Map;
 import javax.transaction.Transactional;
 
 import com.kry.pms.base.HttpResponse;
+import com.kry.pms.model.persistence.busi.DailyVerify;
 import com.kry.pms.model.persistence.org.Employee;
 import com.kry.pms.model.persistence.sys.User;
+import com.kry.pms.service.busi.*;
 import com.kry.pms.service.sys.DateTimeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -35,12 +37,6 @@ import com.kry.pms.model.persistence.room.GuestRoom;
 import com.kry.pms.model.persistence.room.GuestRoomStatus;
 import com.kry.pms.model.persistence.sys.Account;
 import com.kry.pms.model.persistence.sys.SystemConfig;
-import com.kry.pms.service.busi.BillService;
-import com.kry.pms.service.busi.BookingItemService;
-import com.kry.pms.service.busi.BookingRecordService;
-import com.kry.pms.service.busi.CheckInRecordService;
-import com.kry.pms.service.busi.ReceptionService;
-import com.kry.pms.service.busi.RoomRecordService;
 import com.kry.pms.service.marketing.RoomPriceSchemeItemService;
 import com.kry.pms.service.org.EmployeeService;
 import com.kry.pms.service.room.GuestRoomService;
@@ -84,6 +80,8 @@ public class ReceptionServiceImpl implements ReceptionService {
 	RoomStatisticsService roomStatisticsService;
 	@Autowired
 	DateTimeService dateTimeService;
+	@Autowired
+	DailyVerifyService dailyVerifyService;
 
 	private List<CheckInRecord> createGroupMainCheckInRecord(BookingRecord br) {
 		String tempName = br.getName();
@@ -230,34 +228,15 @@ public class ReceptionServiceImpl implements ReceptionService {
 	public DtoResponse<String> checkInM(String id, User user) {
 		DtoResponse<String> rep = new DtoResponse<>();
 		CheckInRecord cir = checkInRecordService.findById(id);
-		LocalDate businessDate = businessSeqService.getBuinessDate(cir.getHotelCode());
-		rep = checkInAuditRoomRecord(cir, businessDate, user);
-		if(rep.getStatus() != 0){
+		LocalDateTime now = LocalDateTime.now();
+		if(now.toLocalDate().isBefore(cir.getArriveTime().toLocalDate())){
+			rep.error(Constants.BusinessCode.CODE_PARAMETER_INVALID,"提前入住“>1天”，请修改时间重算资源");
 			return rep;
 		}
-//		LocalDateTime arriveTime = cir.getArriveTime();
-//		LocalDate ar = arriveTime.toLocalDate();
-//		if(businessDate.isAfter(ar)){//营业日期在到达时间之后(说明到达日期的那一天夜审已经过了)
-//			LocalTime t = systemConfigService.getCriticalTime(cir.getHotelCode());//过夜审的临界时间
-//			LocalDate ar1 = ar.plusDays(1);//到达时间加1
-//			LocalDateTime nowBusinessDate = LocalDateTime.of(ar1, LocalTime.now());
-//			LocalDateTime auditBusinessDate = LocalDateTime.of(businessDate, t);
-//			if(nowBusinessDate.isBefore(auditBusinessDate)){//营业日期只比到达日期大一天，并且没有到达第二天凌晨6点，依旧算前一天的房费（入住）
-//				List<Map<String, Object>> list = roomRecordService.checkInAuditRoomRecord(ar, id,  cir.getHotelCode(), "NO");
-//				Employee emp = employeeService.findByUser(user);
-//				billService.putAcountMap(list, ar, emp, "3", cir.getHotelCode());
-//			}else {
-//				rep.setStatus(Constants.BusinessCode.CODE_PARAMETER_INVALID);
-//				rep.setMessage("营业日期已超过夜审临界点，请修改到达日期或重下订单");
-//				return  rep;
-//			}
-//		}
-//		if(businessDate.isBefore(ar)){
-//			rep.setStatus(Constants.BusinessCode.CODE_PARAMETER_INVALID);
-//			rep.setMessage("请核对营业日期与入住日期是否相同");
-//			return  rep;
-//		}
-//		cir.setActualTimeOfArrive(LocalDateTime.now());
+		if(now.isAfter(cir.getLeaveTime())){
+			rep.error(Constants.BusinessCode.CODE_PARAMETER_INVALID,"已过离店时间，无法入住");
+			return rep;
+		}
 		if (cir != null) {
 			// 预留单不能入住
 			if ((Constants.Type.CHECK_IN_RECORD_RESERVE).equals(cir.getType())) {
@@ -272,9 +251,6 @@ public class ReceptionServiceImpl implements ReceptionService {
 					String mainRecordId = cir.getMainRecord().getId();
 					CheckInRecord cirMain = checkInRecordService.findById(mainRecordId);
 					if (!(Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN).equals(cirMain.getStatus())) {
-//						if(cirMain.getActualTimeOfArrive() == null){
-//							cirMain.setActualTimeOfArrive(LocalDateTime.now());
-//						}
 						rep = checkIn(cirMain);
 					}
 				}
@@ -283,6 +259,9 @@ public class ReceptionServiceImpl implements ReceptionService {
 			rep.setStatus(Constants.BusinessCode.CODE_PARAMETER_INVALID);
 			rep.setMessage("没有找到对应的入住记录");
 		}
+		LocalDate businessDate = businessSeqService.getBuinessDate(cir.getHotelCode());
+		//(因为在事务中，所以入住状态还没有commit，是R)
+		checkInAuditRoomRecord("R",cir, businessDate, user);
 		return rep;
 	}
 
@@ -302,8 +281,8 @@ public class ReceptionServiceImpl implements ReceptionService {
 				c.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN);
 				checkInRecordService.modify(c);
 			}
+			roomStatisticsService.checkIn(new CheckInRecordWrapper(cir));
 		}
-		roomStatisticsService.checkIn(new CheckInRecordWrapper(cir));
 		return rep;
 	}
 
@@ -385,34 +364,15 @@ public class ReceptionServiceImpl implements ReceptionService {
 		}
 		for (int i = 0; i < ids.length; i++) {
 			CheckInRecord cir = checkInRecordService.findById(ids[i]);
-			//判断是否是营业日期
-			rep = checkInAuditRoomRecord(cir, businessDate, user);
-			if(rep.getStatus() != 0){
+			LocalDateTime now = LocalDateTime.now();
+			if(now.toLocalDate().isBefore(cir.getArriveTime().toLocalDate())){
+				rep.error(Constants.BusinessCode.CODE_PARAMETER_INVALID,"提前入住请修改到达时间，确认房类资源足够");
 				return rep;
 			}
-//			LocalDateTime arriveTime = cir.getArriveTime();
-//			LocalDate ar = arriveTime.toLocalDate();
-//			if(businessDate.isAfter(ar)){//营业日期在到达时间之后(说明到达日期的那一天夜审已经过了)
-//				LocalTime t = systemConfigService.getCriticalTime(cir.getHotelCode());//过夜审的临界时间
-//				LocalDate ar1 = ar.plusDays(1);//到达时间加1
-//				LocalDateTime nowBusinessDate = LocalDateTime.of(ar1, LocalTime.now());
-//				LocalDateTime auditBusinessDate = LocalDateTime.of(businessDate, t);
-//				if(nowBusinessDate.isBefore(auditBusinessDate)){//营业日期只比到达日期大一天，并且没有到达第二天凌晨6点，依旧算前一天的房费（入住）
-//					List<Map<String, Object>> list = roomRecordService.checkInAuditRoomRecord(ar, ids[i],  cir.getHotelCode(), "NO");
-//					Employee emp = employeeService.findByUser(user);
-//					billService.putAcountMap(list, ar, emp, "3", cir.getHotelCode());
-//				}else {
-//					rep.setStatus(Constants.BusinessCode.CODE_PARAMETER_INVALID);
-//					rep.setMessage("营业日期已超过夜审临界点，请修改到达日期或重下订单");
-//					return  rep;
-//				}
-//			}
-//			if(businessDate.isBefore(ar)){
-//				rep.setStatus(Constants.BusinessCode.CODE_PARAMETER_INVALID);
-//				rep.setMessage("请核对营业日期与入住日期是否相同");
-//				return  rep;
-//			}
-			//
+			if(now.isAfter(cir.getLeaveTime())){
+				rep.error(Constants.BusinessCode.CODE_PARAMETER_INVALID,"已过离店时间，无法入住");
+				return rep;
+			}
 			// 预留单不能入住R
 			if ((Constants.Type.CHECK_IN_RECORD_RESERVE).equals(cir.getType())) {
 				rep.setStatus(Constants.BusinessCode.CODE_PARAMETER_INVALID);
@@ -421,6 +381,8 @@ public class ReceptionServiceImpl implements ReceptionService {
 			}
 			cir.setActualTimeOfArrive(LocalDateTime.now());
 			rep = checkIn(cir);
+			//判断是否需要直接入账(因为在事务中，所以入住状态还没有commit，是R)
+			rep = checkInAuditRoomRecord("R",cir, businessDate, user);
 		}
 		return rep;
 	}
@@ -432,30 +394,23 @@ public class ReceptionServiceImpl implements ReceptionService {
 	}
 
 	@Override
-	public DtoResponse<String> checkInAuditRoomRecord(CheckInRecord cir, LocalDate businessDate, User user) {
+	public DtoResponse<String> checkInAuditRoomRecord(String status, CheckInRecord cir, LocalDate businessDate, User user) {
 		DtoResponse<String> rep = new DtoResponse<>();
-		//判断是否是营业日期
+		LocalDateTime now = LocalDateTime.now();
+
 		LocalDateTime arriveTime = cir.getArriveTime();
 		LocalDate ar = arriveTime.toLocalDate();
-		if(businessDate.isAfter(ar)){//营业日期在到达时间之后(说明到达日期的那一天夜审已经过了)
-			LocalTime t = systemConfigService.getCriticalTime(cir.getHotelCode());//过夜审的临界时间
-			LocalDate ar1 = ar.plusDays(1);//到达时间加1
-			LocalDateTime nowBusinessDate = LocalDateTime.of(ar1, LocalTime.now());
-			LocalDateTime auditBusinessDate = LocalDateTime.of(businessDate, t);
-			if(nowBusinessDate.isBefore(auditBusinessDate)){//营业日期只比到达日期大一天，并且没有到达第二天凌晨6点，依旧算前一天的房费（入住）
-				List<Map<String, Object>> list = roomRecordService.checkInAuditRoomRecord(ar, cir.getId(),  cir.getHotelCode(), "NO");
+
+		LocalTime aTime = arriveTime.toLocalTime();
+		LocalTime t = systemConfigService.getCriticalTime(cir.getHotelCode());//过夜审的临界时间
+		if(aTime.isBefore(t)){//如果到达时间在临界时间之前（06:00:00）,房费要算在前一天
+			//房费要算前一天，查询前一天夜审是否已过
+			DailyVerify dailyVerify = dailyVerifyService.findByHotelCodeAndBusinessDate(user.getHotelCode(), ar.plusDays(-1));
+			if(dailyVerify != null){//到达时间前一天的夜审已经过了，已经过夜审，要自动入账到前一天。到达时间-1，离开时间-1
+				List<Map<String, Object>> list = roomRecordService.checkInAuditRoomRecord(status, ar.plusDays(-1), cir.getId(),  cir.getHotelCode(), "NO");
 				Employee emp = employeeService.findByUser(user);
 				billService.putAcountMap(list, ar, emp, "3", cir.getHotelCode());
-			}else {
-				rep.setStatus(Constants.BusinessCode.CODE_PARAMETER_INVALID);
-				rep.setMessage("营业日期已超过夜审临界点，请修改到达日期或重下订单");
-				return  rep;
 			}
-		}
-		if(businessDate.isBefore(ar)){
-			rep.setStatus(Constants.BusinessCode.CODE_PARAMETER_INVALID);
-			rep.setMessage("请核对营业日期与入住日期是否相同");
-			return  rep;
 		}
 		return rep;
 	}

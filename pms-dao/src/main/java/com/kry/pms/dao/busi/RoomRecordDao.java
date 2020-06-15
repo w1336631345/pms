@@ -72,11 +72,11 @@ public interface RoomRecordDao extends BaseDao<RoomRecord>{
 			"  left join t_set_meal tsm on tcr.set_meal_id = tsm.id \n" +
 			"  left join t_checkin_record main on tcr.main_record_id = main.id \n" +
 			"  left join t_guest_room tgr on trr.guest_room_id = tgr.id \n" +
-			" where 1=1 and tcr.`status` = 'R' " +
-			"  and trr.record_date = ?1 \n" +
-			"  and trr.check_in_record_id = ?2 \n" +
-			"  and trr.hotel_code = ?3 \n" +
-			"  and trr.is_account_entry = ?4 ")
-	List<Map<String, Object>> checkInAuditRoomRecord(LocalDate recordDate, String checkInId, String hotelCode, String isAccountEntry);
+			" where 1=1 and tcr.`status` = ?1 " +
+			"  and trr.record_date = ?2 \n" +
+			"  and trr.check_in_record_id = ?3 \n" +
+			"  and trr.hotel_code = ?4 \n" +
+			"  and trr.is_account_entry = ?5 ")
+	List<Map<String, Object>> checkInAuditRoomRecord(String status, LocalDate recordDate, String checkInId, String hotelCode, String isAccountEntry);
 
 }
