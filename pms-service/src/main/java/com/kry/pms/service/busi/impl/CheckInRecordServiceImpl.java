@@ -869,6 +869,8 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
     @Transactional
     public HttpResponse bookByRoomList(CheckInRecordListBo cirlb, User user) {
         HttpResponse hr = new HttpResponse();
+        Map<String, Object> map = new HashMap<>();
+        List<CheckInRecord> cirs = new ArrayList<>();
         List<CheckInRecord> list = cirlb.getCirs();
         String roomLinkId = null;
         if (cirlb.getIsRoomLink()) {
@@ -878,15 +880,26 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
             roomLinkId = rl.getId();
         }
         String orderNum = businessSeqService.fetchNextSeqNum(user.getHotelCode(), Constants.Key.BUSINESS_ORDER_NUM_SEQ_KEY);
+        boolean nativeUrl = false;
         for (int i = 0; i < list.size(); i++) {
             list.get(i).setOrderNum(orderNum);
             list.get(i).setRoomLinkId(roomLinkId);
             list.get(i).setHotelCode(user.getHotelCode());
-            hr = bookByRoomTypeTest(list.get(i), user);
-            if (hr.getStatus() == 9999) {
-                return hr;
+            HttpResponse hr2 = bookByRoomTypeTest(list.get(i), user);
+            if (hr2.getStatus() == 9999) {
+                return hr2;
+            }
+            Map<String, Object> map2 = (Map<String, Object>) hr2.getData();
+            boolean url = MapUtils.getBoolean(map2, "nativeUrl");
+            if(url){
+                nativeUrl = url;
+                CheckInRecord cir = (CheckInRecord) MapUtils.getObject(map2, "cir");
+                cirs.add(cir);
             }
         }
+        map.put("nativeUrl", nativeUrl);
+        map.put("cir", cirs);
+        hr.setData(map);
         return hr;
     }
 
@@ -894,7 +907,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
     @Transactional
     public HttpResponse bookByRoomTypeTest(CheckInRecord checkInRecord, User user) {
         HttpResponse hr = new HttpResponse();
-        LocalDate businessDate = businessSeqService.getBuinessDate(checkInRecord.getHotelCode());
+//        LocalDate businessDate = businessSeqService.getBuinessDate(checkInRecord.getHotelCode());
         if (checkInRecord.getOrderNum() == null) {
             String orderNum = businessSeqService.fetchNextSeqNum(checkInRecord.getHotelCode(),
                     Constants.Key.BUSINESS_ORDER_NUM_SEQ_KEY);
@@ -908,8 +921,15 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
         checkInRecord.setSingleRoomCount(1);
         LocalTime criticalTime = systemConfigService.getCriticalTime(user.getHotelCode());
         LocalDate startDate = checkInRecord.getArriveTime().toLocalDate();
+        boolean nativeUrl = false;
         if (checkInRecord.getArriveTime().toLocalTime().isBefore(criticalTime)) {
             startDate = startDate.plusDays(-1);
+            DailyVerify dailyVerify = dailyVerifyService.findByHotelCodeAndBusinessDate(user.getHotelCode(), startDate);
+            if(dailyVerify != null){
+                if ((Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN).equals(checkInRecord.getStatus())) {
+                    nativeUrl = true;
+                }
+            }
         }
         checkInRecord.setStartDate(startDate);
         GuestRoom gr = guestRoomService.findById(checkInRecord.getGuestRoom().getId());
@@ -959,10 +979,14 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
         }
 //        roomRecordService.createRoomRecord(cir);
         List<RoomRecord> roomRecordList = roomRecordService.createRoomRecordTo(cir);
-        if ((Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN).equals(checkInRecord.getStatus())) {
-            receptionService.checkInAuditRoomRecord("I",cir, businessDate, user);
-        }
-        hr.addData(cir);
+//        if ((Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN).equals(checkInRecord.getStatus())) {
+//            receptionService.checkInAuditRoomRecord("I",cir, businessDate, user);
+//        }
+//        hr.addData(cir);
+        Map<String, Object> map = new HashMap<>();
+        map.put("nativeUrl", nativeUrl);
+        map.put("cir", cir);
+        hr.setData(map);
         return hr;
     }
 
@@ -2699,6 +2723,18 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
         Map<String, Object> map = checkInRecordDao.printing(checkInRecordId);
         hr.addData(map);
         return hr;
+    }
+
+    @Override
+    public HttpResponse yesterdayAudit(CheckInRecordAuditBo checkBo, User user) {
+        HttpResponse hr = new HttpResponse();
+        LocalDate businessDate = businessSeqService.getBuinessDate(user.getHotelCode());
+        List<CheckInRecord> list = checkBo.getCirs();
+        for(int i=0; i<list.size(); i++){
+            CheckInRecord cir = list.get(i);
+            receptionService.checkInAuditRoomRecord("I", cir, businessDate, user);
+        }
+        return hr.ok();
     }
 
 }

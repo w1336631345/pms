@@ -75,7 +75,7 @@ public interface CustomerDao extends BaseDao<Customer>{
 			" from t_customer tc left join t_cust_market tcm on tc.id = tcm.customer_id \n" +
 			" left join (select ta.id, ta.total, ta.`code`, ta.customer_id, ta.credit_limit \n" +
 			"  from t_account ta where ta.type_='AR' limit 1) ta on tc.id = ta.customer_id \n" +
-			" where 1=1 \n" +
+			" where 1=1 and tc.num_code is not null and tc.num_code != '' \n" +
 			" and tc.customer_type in ('B','C','D','E','F','G')  \n" +
 			" and if(:hotelCode is not null && :hotelCode != '', tc.hotel_code=:hotelCode, 1=1 )  \n" +
 			" and if(:name is not null && :name != '', tc.`name` like CONCAT('%',:name,'%'), 1=1 ) \n" +
