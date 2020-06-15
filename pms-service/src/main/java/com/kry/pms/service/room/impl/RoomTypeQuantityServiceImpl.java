@@ -668,13 +668,19 @@ public class RoomTypeQuantityServiceImpl implements RoomTypeQuantityService {
         if (status.equals(Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION)) {
             status = Constants.Status.ROOM_USAGE_ASSIGN;
         }
-        changeRoomTypeQuantity(roomType, startTime, startTime, status, Constants.Status.ROOM_USAGE_FREE, 1);
-        changeRoomTypeQuantity(newRoomType, startTime, startTime, Constants.Status.ROOM_USAGE_FREE, status, 1);
+        if (changeTime.isBefore(startTime)) {
+            changeRoomTypeQuantity(roomType, startTime, endTime, status, Constants.Status.ROOM_USAGE_FREE, 1);
+            changeRoomTypeQuantity(newRoomType, startTime, endTime, Constants.Status.ROOM_USAGE_FREE, status, 1);
+        } else {
+            changeRoomTypeQuantity(roomType, changeTime, endTime, status, Constants.Status.ROOM_USAGE_FREE, 1);
+            changeRoomTypeQuantity(newRoomType, changeTime, endTime, Constants.Status.ROOM_USAGE_FREE, status, 1);
+        }
         return true;
     }
 
     @Override
-    public boolean extendTime(RoomType roomType, String roomStatus, LocalDateTime startTime, LocalDateTime endTime, LocalDateTime newStartTime, LocalDateTime newEndTime, int quantity) {
+    public boolean extendTime(RoomType roomType, String roomStatus, LocalDateTime startTime, LocalDateTime
+            endTime, LocalDateTime newStartTime, LocalDateTime newEndTime, int quantity) {
         changeRoomTypeQuantity(roomType, dateTimeService.getStartDate(roomType.getHotelCode(), startTime), endTime.toLocalDate(), roomStatus, Constants.Status.ROOM_USAGE_FREE, 1, !roomStatus.equals(Constants.Status.ROOM_USAGE_CHECK_IN));
         LocalDate newStartDate = null;
         LocalDate newEndDate = null;
@@ -710,7 +716,8 @@ public class RoomTypeQuantityServiceImpl implements RoomTypeQuantityService {
     }
 
     @Override
-    public List<Map<String, Object>> resourcesInfo(String hotelCode, Map<String, Object> params) throws IOException, TemplateException {
+    public List<Map<String, Object>> resourcesInfo(String hotelCode, Map<String, Object> params) throws
+            IOException, TemplateException {
         List<Map<String, Object>> list = new ArrayList<>();
         String type = MapUtils.getString(params, "type");
         if ("P".equals(type) || "L".equals(type)) {

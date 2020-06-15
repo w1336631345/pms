@@ -629,7 +629,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                 } else if (Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION.equals(cir.getStatus())) {
                     //S状态 不需要调整房类资源
                 } else {
-                    cir.setActualTimeOfLeave(dateTimeService.getBusinessDateTime(cir.getHotelCode()));
+                    cir.setActualTimeOfLeave(LocalDateTime.now());
                     boolean b = roomStatisticsService.checkOut(new CheckInRecordWrapper(cir));
                     if (!b) {
                         TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();

@@ -27,6 +27,7 @@ import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
+import sun.util.resources.LocaleData;
 
 import java.time.Duration;
 import java.time.LocalDate;
@@ -673,6 +674,9 @@ public class RoomUsageServiceImpl implements RoomUsageService {
     @Override
     public boolean changeRoom(UseInfoAble info, GuestRoom newGuestRoom, LocalDateTime changeTime) {
         RoomUsage ru = roomUsageDao.findByGuestRoomIdAndBusinesskey(info.guestRoom().getId(), info.getBusinessKey());
+        if(changeTime.isBefore(info.getStartTime())){
+            changeTime = info.getStartTime();
+        }
         if (ru != null) {
             if (use(newGuestRoom, ru.getUsageStatus(), changeTime, info.getEndTime(), info.getBusinessKey(), info.getSummaryInfo(), info.uniqueId()) && unUse(ru, changeTime)) {
                 return true;
