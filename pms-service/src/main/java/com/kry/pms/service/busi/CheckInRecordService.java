@@ -4,10 +4,7 @@ import com.kry.pms.base.DtoResponse;
 import com.kry.pms.base.HttpResponse;
 import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
-import com.kry.pms.model.http.request.busi.CheckInBo;
-import com.kry.pms.model.http.request.busi.CheckInRecordListBo;
-import com.kry.pms.model.http.request.busi.CheckUpdateItemTestBo;
-import com.kry.pms.model.http.request.busi.TogetherBo;
+import com.kry.pms.model.http.request.busi.*;
 import com.kry.pms.model.http.response.busi.AccountSummaryVo;
 import com.kry.pms.model.http.response.busi.CheckInRecordListVo;
 import com.kry.pms.model.persistence.busi.CheckInRecord;
@@ -200,4 +197,6 @@ public interface CheckInRecordService extends BaseService<CheckInRecord> {
     CheckInRecord byId(String id);
 
     HttpResponse printing(String checkInRecordId);
+
+    HttpResponse yesterdayAudit(CheckInRecordAuditBo checkBo, User user);
 }

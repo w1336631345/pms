@@ -6,6 +6,7 @@ import com.kry.pms.base.HttpResponse;
 import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
 import com.kry.pms.model.annotation.OperationLog;
+import com.kry.pms.model.http.request.busi.CheckInRecordAuditBo;
 import com.kry.pms.model.http.request.busi.CheckInRecordListBo;
 import com.kry.pms.model.http.request.busi.CheckUpdateItemTestBo;
 import com.kry.pms.model.http.request.busi.TogetherBo;
@@ -74,25 +75,6 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
     }
 
     /**
-     * 功能描述: <br>直接预订或入住
-     * 〈〉
-     *
-     * @Param: [checkInRecord]
-     * @Return: com.kry.pms.base.HttpResponse<com.kry.pms.model.persistence.busi.CheckInRecord>
-     * @Author: huanghaibin
-     * @Date: 2020/1/8 10:45
-     */
-    @PostMapping(path = "/bookByRoom")
-//    @OperationLog(remark = "房态图直接预订或入住")
-    public HttpResponse<CheckInRecord> bookByRoom(@RequestBody CheckInRecord checkInRecord) {
-        HttpResponse hr = new HttpResponse();
-        User user = getUser();
-        checkInRecord.setHotelCode(user.getHotelCode());
-        hr = checkInRecordService.bookByRoomTypeTest(checkInRecord, user);
-        return hr;
-    }
-
-    /**
      * 功能描述: <br>散客的单房预订
      * 〈〉
      *
@@ -111,6 +93,24 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
     }
 
     /**
+     * 功能描述: <br>直接预订或入住
+     * 〈〉
+     *
+     * @Param: [checkInRecord]
+     * @Return: com.kry.pms.base.HttpResponse<com.kry.pms.model.persistence.busi.CheckInRecord>
+     * @Author: huanghaibin
+     * @Date: 2020/1/8 10:45
+     */
+    @PostMapping(path = "/bookByRoom")
+//    @OperationLog(remark = "房态图直接预订或入住")
+    public HttpResponse<CheckInRecord> bookByRoom(@RequestBody CheckInRecord checkInRecord) {
+        HttpResponse hr = new HttpResponse();
+        User user = getUser();
+        checkInRecord.setHotelCode(user.getHotelCode());
+        hr = checkInRecordService.bookByRoomTypeTest(checkInRecord, user);
+        return hr;
+    }
+    /**
      * 功能描述: <br>房态图批量操作的，快速入住
      * 〈〉
      *
@@ -125,6 +125,21 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
         hr = checkInRecordService.bookByRoomList(checkInRecordListBo, getUser());
         return hr;
     }
+    /**
+     * 功能描述: <br>房态上直接入住和批量直接入住，凌晨6点之前算昨天房费，如果已过夜审则手动直接入昨天房费
+     * 〈〉
+     * @Param: [check]
+     * @Return: com.kry.pms.base.HttpResponse
+     * @Author: huanghaibin
+     * @Date: 2020/6/15 11:25
+     */
+    @PostMapping(path = "/yesterdayAudit")
+    public HttpResponse yesterdayAudit(@RequestBody CheckInRecordAuditBo check) {
+        HttpResponse hr = new HttpResponse();
+        hr = checkInRecordService.yesterdayAudit(check, getUser());
+        return hr;
+    }
+
 
     @DeleteMapping
     public HttpResponse<String> delete(String id) {
