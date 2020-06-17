@@ -618,7 +618,7 @@ public class RoomUsageServiceImpl implements RoomUsageService {
     public boolean lock(UseInfoAble info) {
         if (use(info, info.useType())) {
             roomTypeQuantityService.changeRoomTypeQuantity(info.roomType(), info.getStartTime(),
-                    info.getEndTime(), Constants.Status.ROOM_USAGE_FREE, info.useType(), 1);
+                    info.getEndTime(), Constants.Status.ROOM_USAGE_AVAILABLE, info.useType(), 1);
             guestRoomStatusService.lock(info);
             return true;
         } else {
@@ -634,10 +634,10 @@ public class RoomUsageServiceImpl implements RoomUsageService {
             if (unUse(ru, cancleDateTime)) {
                 if (!cancleDateTime.isAfter(info.getStartTime())) {
                     roomTypeQuantityService.changeRoomTypeQuantity(info.roomType(), info.getStartTime(),
-                            info.getEndTime(), ru.getUsageStatus(), Constants.Status.ROOM_USAGE_FREE, 1);
+                            info.getEndTime(), ru.getUsageStatus(), Constants.Status.ROOM_USAGE_AVAILABLE, 1);
                 } else if (!cancleDateTime.isAfter(info.getEndTime())) {
                     roomTypeQuantityService.changeRoomTypeQuantity(info.roomType(), cancleDateTime,
-                            info.getEndTime(), ru.getUsageStatus(), Constants.Status.ROOM_USAGE_FREE, 1);
+                            info.getEndTime(), ru.getUsageStatus(), Constants.Status.ROOM_USAGE_AVAILABLE, 1);
                 }
                 guestRoomStatusService.clearLockInfo(info);
                 return true;

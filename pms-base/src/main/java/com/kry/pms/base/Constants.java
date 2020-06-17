@@ -66,6 +66,8 @@ public class Constants {
 		public static final String ROOM_USAGE_RESERVATION = "R";//预留
 		public static final String ROOM_USAGE_REPARIE = "P";//维修
 		public static final String ROOM_USAGE_PREDICTABLE = "PR";//可预留
+		public static final String ROOM_USAGE_AVAILABLE = "AVA";//可预留
+
 
 		public static final String ACCOUNT_NEW ="N" ;
 		public static final String ACCOUNT_IN = "I";
