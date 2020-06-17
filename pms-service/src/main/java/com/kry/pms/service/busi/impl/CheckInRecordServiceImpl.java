@@ -2770,36 +2770,32 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
     @Override
     public HttpResponse wechatUpdate(CheckInRecord checkInRecord) {
         HttpResponse hr = new HttpResponse();
-        CheckInRecord cir = new CheckInRecord();
-        BeanUtils.copyProperties(checkInRecord, cir);
-        //上面是浅拷贝，集合不允许被多次引用（会报集合共享引用不允许错误）,作出以下处理
-        List<String> roomLayout = null;
-        if (cir.getRoomLayout() != null && !cir.getRoomLayout().isEmpty()) {
-            roomLayout = new ArrayList<>();
-            roomLayout.addAll(cir.getRoomLayout());
+        HttpResponse httpResponse = new HttpResponse();
+        if(Constants.Type.CHECK_IN_RECORD_RESERVE.equals(checkInRecord.getType())){
+            httpResponse = updateReserve(checkInRecord);
+            if(httpResponse.getStatus() == 9999){
+                return httpResponse;
+            }
+        }else {
+            if(("G").equals(checkInRecord.getType())){
+                List<String> list = checkInRecordDao.listIdByType(checkInRecord.getId(), Constants.Type.CHECK_IN_RECORD_CUSTOMER, Constants.DELETED_FALSE);
+                if (list != null && !list.isEmpty()) {
+                    return hr.error("存在排房或入住，禁止修改");
+                } else {//没有成员排房或入住，查出预留单，全部删除
+                    List<String> rList = checkInRecordDao.listIdByType(checkInRecord.getId(), Constants.Type.CHECK_IN_RECORD_RESERVE, Constants.DELETED_FALSE);
+                    for (int i = 0; i < rList.size(); i++) {
+                        hr = offReserve(rList.get(i));//删除预留单（该方法里已经做了主单房数和人数的修改）
+                    }
+                }
+                httpResponse = addReserve(checkInRecord.getSubRecords());//新增预留
+                if(httpResponse.getStatus() == 9999){
+                    return httpResponse;
+                }
+//                hr = book(cir);
+            }
+            checkInRecordDao.saveAndFlush(checkInRecord);
         }
-        List<String> requirement = null;
-        if (cir.getRoomRequirement() != null && !cir.getRoomRequirement().isEmpty()) {
-            requirement = new ArrayList<>();
-            requirement.addAll(cir.getRoomRequirement());
-        }
-        cir.setRoomLayout(roomLayout);
-        cir.setRoomRequirement(requirement);
-
-        HttpResponse httpResponse =callOffG(checkInRecord.getId());
-        if(httpResponse.getStatus() == 9999){
-            return httpResponse;
-        }
-        if(("Y").equals(cir.getGroupType())){
-            hr = book(cir);
-        }
-        if(("P").equals(cir.getFitType())){
-            hr = singleRoom(cir);
-        }
-        if(("T").equals(cir.getFitType())){
-            hr = book(cir);
-        }
-        return hr;
+        return hr.ok();
     }
 
 }

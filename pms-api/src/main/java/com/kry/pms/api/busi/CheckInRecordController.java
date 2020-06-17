@@ -363,7 +363,7 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
     }
 
     /**
-     * 修改预留的删除（其实就是取消预留）
+     * 修改预留功能里的删除按钮（其实就是取消预留）
      *
      * @param id
      * @return
