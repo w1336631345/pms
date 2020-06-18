@@ -23,8 +23,12 @@ public class BosBusinessSite extends PersistenceModel {
     private String type;//类别
     @Column
     private String groupCode;//集团码
+    @Column
+    private String helpCode;//助记码
+    @Column
+    private String remark;
 //    @OneToMany(cascade = CascadeType.PERSIST)
     @Transient
-    private List<BosType> bosTypeList;
+    private List<BosGoodsType> bosTypeList;
 
 }

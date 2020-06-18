@@ -10,8 +10,8 @@ import javax.persistence.Table;
 
 @Data
 @Entity
-@Table(name="t_bos_type")
-public class BosType extends PersistenceModel {
+@Table(name="t_bos_goods_type")
+public class BosGoodsType extends PersistenceModel {
 
     @Column
     private String code;
