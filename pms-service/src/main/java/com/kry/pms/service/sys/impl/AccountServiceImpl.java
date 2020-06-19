@@ -406,7 +406,7 @@ public class AccountServiceImpl implements AccountService {
                     break;
                 }
             }
-            if(settleAccountRecord==null){
+            if (settleAccountRecord == null) {
                 settleAccountRecord = settleAccountRecordService.create(billCheckBo, account);
             }
             double total = 0.0;
@@ -768,14 +768,11 @@ public class AccountServiceImpl implements AccountService {
         SettleInfoVo settleInfoVo = null;
         if (cir != null) {
             List<CheckInRecord> cirs = checkInRecordService.findByOrderNumC(hotelCode, cir.getOrderNum());
-            if (accountCheck(cirs)) {
+            settleInfoVo = accountCheck(cirs);
+            if (settleInfoVo.isSettlEnable()) {
                 settleInfoVo = createSettleInfo(cir, Constants.Type.EXT_FEE_NONE, hotelCode);
             } else {
-                settleInfoVo = new SettleInfoVo();
-
-
-                settleInfoVo.setSettlEnable(false);
-                settleInfoVo.setMessage("请先结清其他帐务");
+                return settleInfoVo;
             }
         } else {
             return null;
@@ -796,15 +793,22 @@ public class AccountServiceImpl implements AccountService {
         return settleInfoVo;
     }
 
-    private boolean accountCheck(List<CheckInRecord> cirs) {
+    private SettleInfoVo accountCheck(List<CheckInRecord> cirs) {
+        SettleInfoVo info = new SettleInfoVo();
         for (CheckInRecord cir : cirs) {
             if (Constants.Type.CHECK_IN_RECORD_CUSTOMER.equals(cir.getType())) {
                 if (!accountCheck(cir.getAccount())) {
-                    return false;
+                    info.setSettlEnable(false);
+                    info.setMessage("请先结清其他帐务");
+                    return info;
+                } else if (Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION.equals(cir.getStatus())) {
+                    info.setSettlEnable(false);
+                    info.setMessage("存在预订状态的订单");
+                    return info;
                 }
             }
         }
-        return true;
+        return info;
     }
 
     private int queryAccountCount(String orderNum, String status) {

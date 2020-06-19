@@ -675,6 +675,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                         return rep;
                     }
                     cir.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_CHECK_OUT);
+                    checkRoomRecord(cir);
                 }
                 modify(cir);
             }
@@ -684,6 +685,13 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
         }
         rep.setData(cir);
         return rep;
+    }
+
+    private void checkRoomRecord(CheckInRecord cir){
+        LocalDate actualLeaveDate = dateTimeService.getStartDate(cir.getHotelCode(), cir.getActualTimeOfLeave());
+        if (cir.getLeaveTime().toLocalDate().isAfter(actualLeaveDate)) {
+            roomRecordService.deletedRecordAfter(cir.getId(), actualLeaveDate);
+        }
     }
 
     @Override
@@ -921,7 +929,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
             }
             Map<String, Object> map2 = (Map<String, Object>) hr2.getData();
             boolean url = MapUtils.getBoolean(map2, "nativeUrl");
-            if(url){
+            if (url) {
                 nativeUrl = url;
                 CheckInRecord cir = (CheckInRecord) MapUtils.getObject(map2, "cir");
                 cirs.add(cir);
@@ -955,7 +963,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
         if (checkInRecord.getArriveTime().toLocalTime().isBefore(criticalTime)) {
             startDate = startDate.plusDays(-1);
             DailyVerify dailyVerify = dailyVerifyService.findByHotelCodeAndBusinessDate(user.getHotelCode(), startDate);
-            if(dailyVerify != null){
+            if (dailyVerify != null) {
                 if ((Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN).equals(checkInRecord.getStatus())) {
                     nativeUrl = true;
                 }
@@ -1897,7 +1905,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             return hr.error("资源问题，取消失败");
         }
-        if(mainRecordId != null){
+        if (mainRecordId != null) {
             CheckInRecord mainRecord = checkInRecordDao.getOne(mainRecordId);//获取主单信息
             mainRecord.setRoomCount(mainRecord.getRoomCount() - cir.getRoomCount());
             mainRecord.setHumanCount(mainRecord.getHumanCount() - cir.getHumanCount());
@@ -2523,7 +2531,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
         HttpResponse hr = new HttpResponse();
         CheckInRecord oldCir = checkInRecordDao.getOne(cir.getId());
         CheckInRecord main = oldCir.getMainRecord();
-        if(main != null){
+        if (main != null) {
             if (cir.getArriveTime().isBefore(main.getArriveTime()) || cir.getLeaveTime().isAfter(main.getLeaveTime())) {
                 TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                 return hr.error("时间范围不能大于主单");
@@ -2536,7 +2544,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
         CheckInRecordWrapper cirw = new CheckInRecordWrapper(oldCir);
         oldCir.setDeleted(Constants.DELETED_TRUE);
         Account account = null;
-        if(oldCir.getAccount() != null){
+        if (oldCir.getAccount() != null) {
             account = oldCir.getAccount();
             oldCir.setAccount(null);
         }
@@ -2550,7 +2558,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
         cir.setId(null);
         cir.setAccount(null);
         BeanUtils.copyProperties(cir, checkInRecord);
-        if(account != null){
+        if (account != null) {
             Account a = new Account();
             BeanUtils.copyProperties(account, a);
             a.setId(null);
@@ -2564,7 +2572,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             return hr.error("资源不足");
         }
-        if(main != null){
+        if (main != null) {
             main.setHumanCount(main.getHumanCount() + (newHumanCount - oldHumanCount));
             main.setRoomCount(main.getRoomCount() + (newRoomCount - oldRoomCount));
             checkInRecordDao.saveAndFlush(main);
@@ -2684,6 +2692,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                     rep.setMessage("取消失败");
                     return rep;
                 }
+                checkRoomRecord(cir);
             }
         }
         cir.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_OUT_UNSETTLED);
@@ -2760,7 +2769,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
         HttpResponse hr = new HttpResponse();
         LocalDate businessDate = businessSeqService.getBuinessDate(user.getHotelCode());
         List<CheckInRecord> list = checkBo.getCirs();
-        for(int i=0; i<list.size(); i++){
+        for (int i = 0; i < list.size(); i++) {
             CheckInRecord cir = list.get(i);
             receptionService.checkInAuditRoomRecord("I", cir, businessDate, user);
         }
@@ -2771,13 +2780,13 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
     public HttpResponse wechatUpdate(CheckInRecord checkInRecord) {
         HttpResponse hr = new HttpResponse();
         HttpResponse httpResponse = new HttpResponse();
-        if(Constants.Type.CHECK_IN_RECORD_RESERVE.equals(checkInRecord.getType())){
+        if (Constants.Type.CHECK_IN_RECORD_RESERVE.equals(checkInRecord.getType())) {
             httpResponse = updateReserve(checkInRecord);
-            if(httpResponse.getStatus() == 9999){
+            if (httpResponse.getStatus() == 9999) {
                 return httpResponse;
             }
-        }else {
-            if(("G").equals(checkInRecord.getType())){
+        } else {
+            if (("G").equals(checkInRecord.getType())) {
                 List<String> list = checkInRecordDao.listIdByType(checkInRecord.getId(), Constants.Type.CHECK_IN_RECORD_CUSTOMER, Constants.DELETED_FALSE);
                 if (list != null && !list.isEmpty()) {
                     return hr.error("存在排房或入住，禁止修改");
@@ -2788,7 +2797,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                     }
                 }
                 httpResponse = addReserve(checkInRecord.getSubRecords());//新增预留
-                if(httpResponse.getStatus() == 9999){
+                if (httpResponse.getStatus() == 9999) {
                     return httpResponse;
                 }
 //                hr = book(cir);
