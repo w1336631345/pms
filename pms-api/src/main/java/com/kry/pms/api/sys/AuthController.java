@@ -11,6 +11,7 @@ import com.kry.pms.service.pay.WechatPayService;
 import com.kry.pms.util.WechatLoginUtil;
 import me.chanjar.weixin.mp.bean.result.WxMpOAuth2AccessToken;
 import me.chanjar.weixin.mp.bean.result.WxMpUser;
+import org.apache.catalina.connector.Request;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.UsernamePasswordToken;
@@ -62,9 +63,9 @@ public class AuthController {
     @RequestMapping(path = "/admin/login", method = RequestMethod.POST)
     public HttpResponse<String> loginTest(String username, String password, String hotelCode, String shift) {
         HttpResponse<String> response = new HttpResponse<>();
+        ServletRequestAttributes servletRequestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        HttpServletRequest request = servletRequestAttributes.getRequest();
         if(hotelCode==null){
-            ServletRequestAttributes servletRequestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-            HttpServletRequest request = servletRequestAttributes.getRequest();
             String serverName = request.getServerName();
             if(serverName!=null&&serverName.endsWith(".pms.rooibook.com")){
                 hotelCode = serverName.substring(0,serverName.indexOf("."));
@@ -78,6 +79,8 @@ public class AuthController {
             String hotelCodet = ShiroUtils.getUser().getHotelCode();
 //            Shift newShift = shiftService.createOrUpdate(shift, ShiroUtils.getUser());
             subject.getSession().setAttribute(Constants.Key.SESSION_ATTR_SHIFT_CODE, shift);
+            String ip = ShiroUtils.getIpAdrress(request);
+            subject.getSession().setAttribute(Constants.Key.SESSION_COMPUTER_IP, ip);
             String id = (String) subject.getSession().getId();
             response.addData(id);
             return response.ok("登录成功");
@@ -137,7 +140,9 @@ public class AuthController {
             if(shifCode == null || "".equals(shifCode)){
                 shifCode = "1";
             }
-            String sessionId = login(user, shifCode);
+            ServletRequestAttributes servletRequestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+            HttpServletRequest request = servletRequestAttributes.getRequest();
+            String sessionId = login(request, user, shifCode);
             map.put("token", sessionId);
             map.put("userInfo", user);
             hr.setData(map);
@@ -194,7 +199,7 @@ public class AuthController {
         }
     }
 
-    private String login(User user, String shift) {
+    private String login(HttpServletRequest request, User user, String shift) {
         UsernamePasswordToken token = new UsernamePasswordToken(user.getUsername(), user.getPassword());
         Subject subject = SecurityUtils.getSubject();
         subject.login(token);
@@ -308,7 +313,7 @@ public class AuthController {
                 }
             }
         } else {//这是用户输入域名中带有酒店编码的情况，可直接返回token登录成
-            String sessionId = login(u, shift);
+            String sessionId = login(request, u, shift);
             data.put("status", "0");
             data.put("token", sessionId);
         }

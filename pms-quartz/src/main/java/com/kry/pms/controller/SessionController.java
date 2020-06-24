@@ -1,5 +1,6 @@
 package com.kry.pms.controller;
 
+import com.kry.pms.base.Constants;
 import com.kry.pms.base.HttpResponse;
 import com.kry.pms.model.http.response.sys.UserOnlineVO;
 import com.kry.pms.model.persistence.org.Hotel;
@@ -68,7 +69,12 @@ public class SessionController {
                 }
             }
             if(isHotelUser){
-                userOnlineVO.setHost(session.getHost());
+                String ip = (String) session.getAttribute(Constants.Key.SESSION_COMPUTER_IP);
+                if("127.0.0.1".equals(session.getHost())){
+                    userOnlineVO.setHost(ip);
+                }else {
+                    userOnlineVO.setHost(session.getHost());
+                }
                 userOnlineVO.setSessionId((String) session.getId());
                 userOnlineVO.setStartAccessTime(session.getStartTimestamp());
                 userOnlineVO.setLastAccessTime(session.getLastAccessTime());
