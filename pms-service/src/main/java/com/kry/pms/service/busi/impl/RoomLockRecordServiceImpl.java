@@ -93,7 +93,9 @@ public class RoomLockRecordServiceImpl implements RoomLockRecordService {
         RoomLockRecord rlr = findById(id);
         if (rlr != null && rlr.getStatus().equals(Constants.Status.NORMAL)) {
             roomStatisticsService.cancleLock(rlr, LocalDateTime.now());
+            rlr.setOpenTime(LocalDateTime.now());
             rlr.setStatus(Constants.Status.CLOSE);
+            rlr.setOpenEmployeeId(operationEmployeeId);
             modify(rlr);
         }
         return rlr;
