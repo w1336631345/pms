@@ -45,10 +45,10 @@ public class HttpResponse<T> {
 		return hr;
 	}
 	public HttpResponse<T> error(String message) {
-		HttpResponse<T> hr = new HttpResponse<T>();
-		hr.setStatus(9999);
-		hr.setMessage(message);
-		return hr;
+//		HttpResponse<T> hr = new HttpResponse<T>();
+		this.setStatus(9999);
+		this.setMessage(message);
+		return this;
 	}
 	
 	public HttpResponse<T> ok(String message) {

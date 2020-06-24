@@ -214,8 +214,7 @@ public class GuestRoomServiceImpl implements GuestRoomService {
         if (!gr.getRoomType().getId().equals(guestRoom.getRoomType().getId())) {
             boolean isUse = roomUsageService.freeCheck(gr, LocalDateTime.now(), null);
             if (isUse) {
-                hr.error("房间" + gr.getRoomNum() + "被占用或被预订");
-                return hr;
+                return hr.error("房间" + gr.getRoomNum() + "被占用或被预订");
             } else {
                 removeRoomRelated(gr.getId());
                 GuestRoom grl = new GuestRoom();
@@ -224,6 +223,7 @@ public class GuestRoomServiceImpl implements GuestRoomService {
                 grl.setTags(guestRoom.getTags());
                 addRoomAndResources(guestRoom);
                 hr.setData(grl);
+                roomTypeService.plusRoomQuantity(guestRoom.getRoomType(), 1);
             }
         } else {
             modify(guestRoom);
