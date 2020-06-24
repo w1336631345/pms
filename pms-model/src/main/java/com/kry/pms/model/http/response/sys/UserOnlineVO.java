@@ -20,6 +20,7 @@ public class UserOnlineVO {
     private String isMyself;
 
     private String host;
+    private String macAddress;
     private String sessionId;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date startAccessTime;

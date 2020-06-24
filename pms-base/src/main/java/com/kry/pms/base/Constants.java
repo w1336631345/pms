@@ -84,6 +84,7 @@ public class Constants {
 		public static final String BUSINESS_SEQ_KEY = "CHECKIN_SN";
 		public static final String SESSION_ATTR_SHIFT_CODE = "SHIFT";
 		public static final String SESSION_COMPUTER_IP = "COMPUTER_IP";
+		public static final String SESSION_COMPUTER_MAC = "COMPUTER_MAC";
 		public static final String BUSINESS_ORDER_NUM_SEQ_KEY = "ORDER_NUM";
 		public static final String BUSINESS_BUSINESS_DATE_SEQ_KEY = "BUINESS_DATE";
 		public static final String BUSINESS_PLAN_DATE_SEQ_KEY = "PLAN_DATE";

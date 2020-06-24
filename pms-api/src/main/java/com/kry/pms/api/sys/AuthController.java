@@ -80,6 +80,12 @@ public class AuthController {
 //            Shift newShift = shiftService.createOrUpdate(shift, ShiroUtils.getUser());
             subject.getSession().setAttribute(Constants.Key.SESSION_ATTR_SHIFT_CODE, shift);
             String ip = ShiroUtils.getIpAdrress(request);
+            try {
+                String mac = ShiroUtils.getMACAddress(ip);
+                subject.getSession().setAttribute(Constants.Key.SESSION_COMPUTER_MAC, mac);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             subject.getSession().setAttribute(Constants.Key.SESSION_COMPUTER_IP, ip);
             String id = (String) subject.getSession().getId();
             response.addData(id);
@@ -206,6 +212,14 @@ public class AuthController {
         String hotelCode = ShiroUtils.getUser().getHotelCode();
 //        Shift newShift = shiftService.createOrUpdate(shift, ShiroUtils.getUser());
         subject.getSession().setAttribute(Constants.Key.SESSION_ATTR_SHIFT_CODE, shift);
+        String ip = ShiroUtils.getIpAdrress(request);
+        try {
+            String mac = ShiroUtils.getMACAddress(ip);
+            subject.getSession().setAttribute(Constants.Key.SESSION_COMPUTER_MAC, mac);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        subject.getSession().setAttribute(Constants.Key.SESSION_COMPUTER_IP, ip);
         return (String) subject.getSession().getId();
 
     }
