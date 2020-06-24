@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -38,6 +39,7 @@ public class BosBusinessSiteServiceImpl implements BosBusinessSiteService {
 	}
 
 	@Override
+	@Transactional
 	public HttpResponse deleteAll(String id, String deleteAll) {
 		HttpResponse hr = new HttpResponse();
 		if(deleteAll != null){
