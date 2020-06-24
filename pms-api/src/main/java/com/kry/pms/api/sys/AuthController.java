@@ -81,7 +81,8 @@ public class AuthController {
             subject.getSession().setAttribute(Constants.Key.SESSION_ATTR_SHIFT_CODE, shift);
             String ip = ShiroUtils.getIpAdrress(request);
             try {
-                String mac = ShiroUtils.getMACAddress(ip);
+                String ipAll = ShiroUtils.getIpAddr(request);
+                String mac = ShiroUtils.getMACAddress(ipAll);
                 subject.getSession().setAttribute(Constants.Key.SESSION_COMPUTER_MAC, mac);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -214,7 +215,8 @@ public class AuthController {
         subject.getSession().setAttribute(Constants.Key.SESSION_ATTR_SHIFT_CODE, shift);
         String ip = ShiroUtils.getIpAdrress(request);
         try {
-            String mac = ShiroUtils.getMACAddress(ip);
+            String ipAll = ShiroUtils.getIpAddr(request);
+            String mac = ShiroUtils.getMACAddress(ipAll);
             subject.getSession().setAttribute(Constants.Key.SESSION_COMPUTER_MAC, mac);
         } catch (Exception e) {
             e.printStackTrace();
