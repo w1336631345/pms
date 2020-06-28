@@ -27,7 +27,7 @@ public class SessionManager extends DefaultWebSessionManager {
     public SessionManager() {
         super();
 //        自定义session时效时间，shiro的session默认失效时间是30分钟 （30 * 2 = 1小时）
-        setGlobalSessionTimeout(DEFAULT_GLOBAL_SESSION_TIMEOUT * 2);
+        setGlobalSessionTimeout(DEFAULT_GLOBAL_SESSION_TIMEOUT * 48);
     }
 
     @Override
