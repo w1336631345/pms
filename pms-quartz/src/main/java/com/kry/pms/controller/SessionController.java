@@ -70,11 +70,13 @@ public class SessionController {
             }
             if(isHotelUser){
                 String ip = (String) session.getAttribute(Constants.Key.SESSION_COMPUTER_IP);
+                String mac = (String) session.getAttribute(Constants.Key.SESSION_COMPUTER_MAC);
                 if("127.0.0.1".equals(session.getHost())){
                     userOnlineVO.setHost(ip);
                 }else {
                     userOnlineVO.setHost(session.getHost());
                 }
+                userOnlineVO.setMacAddress(mac);
                 userOnlineVO.setSessionId((String) session.getId());
                 userOnlineVO.setStartAccessTime(session.getStartTimestamp());
                 userOnlineVO.setLastAccessTime(session.getLastAccessTime());
