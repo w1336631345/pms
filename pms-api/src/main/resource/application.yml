@@ -5,6 +5,10 @@ spring:
     template-loader-path: classpath:/templates/
     suffix: .ftl
     charset: UTF-8
+  activemq:
+    broker-url: tcp://81.68.143.180:61616
+    user: admin
+    password: admin
 qiniu:
   oss:
     access-key: 5azdaObcIs01xmYikeM6dSPB4O32Dy97t5Z4R45K

@@ -22,6 +22,7 @@ import com.kry.pms.model.persistence.room.GuestRoom;
 import com.kry.pms.model.persistence.room.RoomType;
 import com.kry.pms.model.persistence.sys.Account;
 import com.kry.pms.model.persistence.sys.User;
+import com.kry.pms.mq.OrderMqService;
 import com.kry.pms.service.busi.*;
 import com.kry.pms.service.guest.CustomerService;
 import com.kry.pms.service.log.UpdateLogService;
@@ -56,6 +57,8 @@ import java.util.*;
 
 @Service
 public class CheckInRecordServiceImpl implements CheckInRecordService {
+    @Autowired
+    OrderMqService orderMqService;
     @Autowired
     CheckInRecordDao checkInRecordDao;
     @Autowired
@@ -657,7 +660,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
             rep.setStatus(Constants.BusinessCode.CODE_ILLEGAL_OPERATION);
             rep.setMessage("找不到订单");
         } else if (cir.getAccount() != null) {
-            if (!accountService.accountCheck(cir.getAccount().getId())) {
+            if (!accountService.accountCheckAndSettledZeroBill(cir.getAccount())) {
                 rep.setStatus(Constants.BusinessCode.CODE_ILLEGAL_OPERATION);
                 rep.setMessage(cir.getAccount().getCode() + ":未完成结帐！");
             } else {
@@ -1121,6 +1124,9 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
             }
 //            CheckInRecord cir = add(checkInRecord);
             hr.setData(rcir);
+            if(hr.getStatus()==0){
+                orderMqService.sendNewOrder(rcir.getHotelCode(),rcir.getOrderNum());
+            }
             return hr;
         } else {//没有选择房间，生成纯预留
             //************开始分割线*************
@@ -1156,6 +1162,9 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
             }
 //            roomRecordService.createRoomRecord(cir);//没有房间生成的纯预留不能创建roomRecord
             hr.setData(cir);
+            if(hr.getStatus()==0){
+                orderMqService.sendNewOrder(cir.getHotelCode(),cir.getOrderNum());
+            }
             return hr;
         }
 

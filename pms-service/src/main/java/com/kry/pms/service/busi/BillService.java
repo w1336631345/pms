@@ -80,6 +80,8 @@ public interface BillService extends BaseService<Bill> {
 
     int countUnSettleBill(String accountId);
 
+    int countUnSellteNotZeroBill(String accountId);
+
 	BillStatistics sumNeedSettle(Account account);
 
 	Bill createArSettleBill(Account targetAccount, double total, double cost, double pay, Employee operationEmployee, String shiftCode,String recordNum);
@@ -87,4 +89,6 @@ public interface BillService extends BaseService<Bill> {
 	Bill createToArBill(Account account, double processTotal, double pay, Employee operationEmployee, String shiftCode,String recordNum,String remark);
 
     List<Map<String, Object>> getStatusTotal(String hotelCode, String accountId);
+
+	int autoSettleZeroBill(String id);
 }

@@ -695,6 +695,11 @@ public class BillServiceImpl implements BillService {
     }
 
     @Override
+    public int countUnSellteNotZeroBill(String accountId) {
+        return billDao.countUnSellteNotZeroBill(accountId);
+    }
+
+    @Override
     public BillStatistics sumNeedSettle(Account account) {
         return billDao.sumNeedSettle(account, Constants.Status.BILL_NEED_SETTLED);
     }
@@ -738,5 +743,10 @@ public class BillServiceImpl implements BillService {
         statusList.add(Constants.Status.BILL_NEED_SETTLED);
         List<Map<String, Object>> list = billDao.getStatusTotal(hotelCode, accountId, statusList);
         return list;
+    }
+
+    @Override
+    public int autoSettleZeroBill(String id) {
+        return billDao.autoSettleZeroBill(id);
     }
 }

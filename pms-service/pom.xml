@@ -45,6 +45,11 @@
 			<artifactId>pms-model</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
+		<dependency>
+			<groupId>com.kry</groupId>
+			<artifactId>pms-asyn-service</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
         <dependency>
             <groupId>com.kry</groupId>
             <artifactId>pms-util</artifactId>

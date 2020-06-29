@@ -11,6 +11,7 @@ import com.kry.pms.dao.BaseDao;
 import com.kry.pms.model.http.request.busi.BillQueryBo;
 import com.kry.pms.model.persistence.busi.Bill;
 import com.kry.pms.model.persistence.sys.Account;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -24,6 +25,8 @@ public interface BillDao extends BaseDao<Bill> {
 
     @Query(nativeQuery = true, value = "select count(id) from t_bill where account_id = ?1 and status = 'NEED_SETTLED'")
     int countUnSellteBill(String accountId);
+    @Query(nativeQuery = true, value = "select count(id) from t_bill where account_id = ?1 and total!=0 and status = 'NEED_SETTLED'")
+    int countUnSellteNotZeroBill(String accountId);
 
     @Query(value = "select new com.kry.pms.model.dto.BillStatistics(sum(cost),sum(pay)) from Bill where account =?1 and status =?2")
     BillStatistics sumNeedSettle(Account account, String status);
@@ -41,6 +44,7 @@ public interface BillDao extends BaseDao<Bill> {
             " and tb.`status` in (:statusList) \n" +
             " group by tb.account_id, tb.`status`,ta.`code`,ta.`name` ")
     List<Map<String, Object>> getStatusTotal(@Param("hotelCode") String hotelCode, @Param("accountId") String accountId, @Param("statusList") List<String> statusList);
-
-
+    @Modifying
+    @Query(nativeQuery = true, value = "update t_bill set status = 'SETTLED' where account_id = ?1 and total=0")
+    int autoSettleZeroBill(String id);
 }

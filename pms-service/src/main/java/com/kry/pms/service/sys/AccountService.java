@@ -53,5 +53,7 @@ public interface AccountService extends BaseService<Account> {
 
     DtoResponse<List<Bill>> cancleTransfer(List<Bill> flatBills, Double total, Account account, Account targetAccount, String shiftCode, Employee operationEmployee, String cancleNum);
 
-    SettleInfoVo getSettleInfo(String type, String id, String extFee,String hotelCode,String orderNum);
+    boolean accountCheckAndSettledZeroBill(Account account);
+
+    SettleInfoVo getSettleInfo(String type, String id, String extFee, String hotelCode, String orderNum);
 }

@@ -389,7 +389,6 @@ public class AccountServiceImpl implements AccountService {
         }
         return rep;
     }
-
     private DtoResponse<Account> checkAccountBill(BillCheckBo billCheckBo) {
         if (billCheckBo.getCheckWay() != null && billCheckBo.getCheckWay().equals(Constants.Type.BILL_CHECK_WAY_SETTLED_AR)) {
             return checkAccountByAr(billCheckBo);
@@ -652,6 +651,24 @@ public class AccountServiceImpl implements AccountService {
         return accountCheck(account);
     }
 
+    @Override
+    public boolean accountCheckAndSettledZeroBill(Account account){
+        if (account == null) {
+            return false;
+        } else if (account.getTotal() != 0.0) {
+            return false;
+        } else if (billService.countUnSellteNotZeroBill(account.getId()) != 0) {
+            return false;
+        } else {
+            autoSettleZeroBill(account);
+            return true;
+        }
+
+    }
+
+    private int autoSettleZeroBill(Account account){
+        return billService.autoSettleZeroBill(account.getId());
+    }
     private boolean accountCheck(Account account) {
         if (account == null) {
             return false;
