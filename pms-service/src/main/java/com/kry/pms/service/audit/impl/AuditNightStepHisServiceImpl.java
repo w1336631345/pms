@@ -71,10 +71,10 @@ public class AuditNightStepHisServiceImpl implements AuditNightStepHisService {
 
 		List<AuditNightStepHis> list = auditNightStepHisDao.findByHotelCodeAndBusinessDate(code, businessDate);
 		if(list == null || list.isEmpty()){
-			DailyVerify dailyVerify = dailyVerifyService.findByHotelCodeAndBusinessDate(code, businessDate);
-			if(dailyVerify == null){
-				return hr.error(99999, "请先夜审入账");
-			}
+//			DailyVerify dailyVerify = dailyVerifyService.findByHotelCodeAndBusinessDate(code, businessDate);
+//			if(dailyVerify == null){
+//				return hr.error(99999, "请先夜审入账");
+//			}
 			List<AuditNightStep> anss = auditNightStepService.getAllByHotelCode(code);
 			for(int i=0 ; i<anss.size(); i++){
 				AuditNightStep ans = anss.get(i);

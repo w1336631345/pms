@@ -78,10 +78,10 @@ public class AuditNightStepServiceImpl implements AuditNightStepService {
 		HttpResponse hr = new HttpResponse();
 		LocalDate businessDate = businessSeqService.getBuinessDate(code);
 
-		DailyVerify dailyVerify = dailyVerifyService.findByHotelCodeAndBusinessDate(code, businessDate);
-		if(dailyVerify == null){
-			return hr.error(99999, "请先夜审入账");
-		}
+//		DailyVerify dailyVerify = dailyVerifyService.findByHotelCodeAndBusinessDate(code, businessDate);
+//		if(dailyVerify == null){
+//			return hr.error(99999, "请先夜审入账");
+//		}
 //		List<AuditNightStep> list = auditNightStepDao.findByHotelCodeAndBusinessDate(code, businessDate);
 		List<AuditNightStep> list = auditNightStepDao.findByHotelCode(code);
 		HttpResponse httpResponse = auditNightStepHisService.findByHotelCodeAndBusinessDate(code);
@@ -122,6 +122,18 @@ public class AuditNightStepServiceImpl implements AuditNightStepService {
 		businessSeqService.plusBuinessDate(code);//营业日期+1
 		hr.addData(list);
 		return hr;
+	}
+
+	@Override
+	public HttpResponse isAudit(String hotelCode) {
+		HttpResponse hr = new HttpResponse();
+		LocalDate businessDate = businessSeqService.getBuinessDate(hotelCode);
+		DailyVerify dailyVerify = dailyVerifyService.findByHotelCodeAndBusinessDate(hotelCode, businessDate);
+		if(dailyVerify == null){
+			return hr.error(99999, "请先夜审入账");
+		}else {
+			return hr.ok();
+		}
 	}
 
 }

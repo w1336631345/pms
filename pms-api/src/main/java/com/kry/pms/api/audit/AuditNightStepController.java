@@ -72,4 +72,18 @@ public class AuditNightStepController extends BaseController<AuditNightStep> {
 		hr = auditNightStepService.findByHotelCodeAndBusinessDate(getCurrentHotleCode());
 		return hr;
 	}
+	/**
+	 * 功能描述: <br>判断是否已经夜审
+	 * 〈〉
+	 * @Param: [request]
+	 * @Return: com.kry.pms.base.HttpResponse
+	 * @Author: huanghaibin
+	 * @Date: 2020/6/29 9:32
+	 */
+	@GetMapping(path = "/isAudit")
+	public HttpResponse isAudit(HttpServletRequest request) {
+		HttpResponse hr = new HttpResponse();
+		hr = auditNightStepService.isAudit(getCurrentHotleCode());
+		return hr;
+	}
 }
