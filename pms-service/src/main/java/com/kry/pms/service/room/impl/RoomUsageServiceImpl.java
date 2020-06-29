@@ -484,7 +484,7 @@ public class RoomUsageServiceImpl implements RoomUsageService {
                         roomTypeQuantityService.changeRoomTypeQuantity(info.roomType(), ru.getStartDateTime(),
                                 ru.getEndDateTime(), ru.getUsageStatus(), Constants.Status.ROOM_USAGE_RESERVATION, 1);
                         guestRoomStatusService.cancelAssignRoom(info);
-                        unUse(ru);
+                        unUse(ru,LocalDateTime.now());
                     } else {
                         modify(ru);
                     }
@@ -597,7 +597,7 @@ public class RoomUsageServiceImpl implements RoomUsageService {
                         if (info.getEndTime().isBefore(ru.getEndDateTime())) {
                             roomTypeQuantityService.changeRoomTypeQuantity(info.roomType(), info.getEndTime(),
                                     ru.getEndDateTime(), ru.getUsageStatus(), Constants.Status.ROOM_USAGE_PREDICTABLE, 1);
-                            unUse(ru);
+                            unUse(ru,LocalDateTime.now());
                         }
                     }
                     guestRoomStatusService.clearUseInfo(info);
