@@ -571,7 +571,7 @@ public class RoomUsageServiceImpl implements RoomUsageService {
                 return false;
             }
         } else {
-            return false;
+            return true;
         }
         return false;
     }
