@@ -7,12 +7,14 @@ import com.kry.pms.service.sys.BusinessSeqService;
 import freemarker.template.TemplateException;
 import org.apache.http.client.methods.HttpPost;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cglib.core.Local;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -26,7 +28,7 @@ public class RealTimeReportController extends BaseController {
 
     @GetMapping
     @RequestMapping("/shift/cost")
-    public HttpResponse<List<Map<String, Object>>> realTimeShiftCost(@RequestParam(required = true) String employee_id,@RequestParam(required = true)String shift) throws IOException, TemplateException {
+    public HttpResponse<List<Map<String, Object>>> realTimeShiftCost(@RequestParam(required = true) String employee_id, @RequestParam(required = true) String shift) throws IOException, TemplateException {
         HttpResponse<List<Map<String, Object>>> rep = new HttpResponse<>();
         String hotelCode = getCurrentHotleCode();
         rep.addData(realTimeReportService.billCostStat(getCurrentHotleCode(), employee_id, shift, businessSeqService.getBuinessDate(hotelCode)));
@@ -35,10 +37,19 @@ public class RealTimeReportController extends BaseController {
 
     @GetMapping
     @RequestMapping("/shift/pay")
-    public HttpResponse<List<Map<String, Object>>> realTimeShiftPay(@RequestParam(required = true) String employee_id,@RequestParam(required = true) String shift) throws IOException, TemplateException {
+    public HttpResponse<List<Map<String, Object>>> realTimeShiftPay(@RequestParam(required = true) String employee_id, @RequestParam(required = true) String shift) throws IOException, TemplateException {
         HttpResponse<List<Map<String, Object>>> rep = new HttpResponse<>();
         String hotelCode = getCurrentHotleCode();
         rep.addData(realTimeReportService.billPayStat(getCurrentHotleCode(), employee_id, shift, businessSeqService.getBuinessDate(hotelCode)));
+        return rep;
+    }
+
+    @GetMapping
+    @RequestMapping("/section/daily")
+    public HttpResponse<List<Map<String, Object>>> sectionDailyReport(String startDate, String endDate) throws IOException, TemplateException {
+        HttpResponse<List<Map<String, Object>>> rep = new HttpResponse<>();
+        String hotelCode = getCurrentHotleCode();
+        rep.addData(realTimeReportService.sectionDailyReport(hotelCode, LocalDate.parse(startDate), LocalDate.parse(endDate)));
         return rep;
     }
 }
