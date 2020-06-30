@@ -1,5 +1,6 @@
 package com.kry.pms.service.audit.impl;
 
+import com.alibaba.fastjson.JSONObject;
 import com.kry.pms.base.HttpResponse;
 import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
@@ -8,6 +9,7 @@ import com.kry.pms.model.persistence.audit.AuditNightStep;
 import com.kry.pms.model.persistence.audit.AuditNightStepHis;
 import com.kry.pms.model.persistence.audit.AuditNightStepParam;
 import com.kry.pms.model.persistence.busi.DailyVerify;
+import com.kry.pms.mq.OrderMqService;
 import com.kry.pms.service.audit.AuditNightStepHisService;
 import com.kry.pms.service.audit.AuditNightStepParamService;
 import com.kry.pms.service.audit.AuditNightStepService;
@@ -36,6 +38,8 @@ public class AuditNightStepServiceImpl implements AuditNightStepService {
 	AuditNightStepParamService auditNightStepParamService;
 	@Autowired
 	DailyVerifyService dailyVerifyService;
+	@Autowired
+	OrderMqService orderMqService;
 
 
 	@Override
@@ -91,6 +95,13 @@ public class AuditNightStepServiceImpl implements AuditNightStepService {
 			ansh.setStartTime(LocalDateTime.now());
 			ansh.setResultCode("loading");
 			auditNightStepHisService.add(ansh);
+			//**********开始-发送消息**********
+			String topicName = ansh.getHotelCode()+".audit.report";
+			JSONObject json = (JSONObject) JSONObject.toJSON(ansh);
+			String mag = json.toJSONString();
+//			System.out.println(mag);
+			orderMqService.sendAuditStep(topicName,mag);
+			//**********结束-发送消息**********
 			AuditNightStep ans = list.get(i);
 			if(ans.getProcessName() == null || "".equals(ans.getProcessName())){
 				try {
@@ -118,6 +129,11 @@ public class AuditNightStepServiceImpl implements AuditNightStepService {
 			Duration duration = Duration.between(ansh.getStartTime(),ansh.getEndTime());
 			ansh.setDuration(String.valueOf(duration.toMillis()));
 			auditNightStepHisService.add(ansh);
+			//**********开始-发送消息**********
+			JSONObject js = (JSONObject) JSONObject.toJSON(ansh);
+			String mag2 = js.toJSONString();
+			orderMqService.sendAuditStep(topicName,mag2);
+			//**********结束-发送消息**********
 		}
 		businessSeqService.plusBuinessDate(code);//营业日期+1
 		hr.addData(list);
