@@ -1125,7 +1125,8 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 //            CheckInRecord cir = add(checkInRecord);
             hr.setData(rcir);
             if(hr.getStatus()==0){
-                orderMqService.sendNewOrder(rcir.getHotelCode(),rcir.getOrderNum());
+                String topicName = rcir.getHotelCode()+".new.order";
+                orderMqService.sendNewOrder(topicName,rcir.getOrderNum());
             }
             return hr;
         } else {//没有选择房间，生成纯预留
@@ -1163,7 +1164,8 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 //            roomRecordService.createRoomRecord(cir);//没有房间生成的纯预留不能创建roomRecord
             hr.setData(cir);
             if(hr.getStatus()==0){
-                orderMqService.sendNewOrder(cir.getHotelCode(),cir.getOrderNum());
+                String topicName = cir.getHotelCode()+".new.order";
+                orderMqService.sendNewOrder(topicName,cir.getOrderNum());
             }
             return hr;
         }

@@ -83,7 +83,7 @@ public class AuditNightStepServiceImpl implements AuditNightStepService {
 //			return hr.error(99999, "请先夜审入账");
 //		}
 //		List<AuditNightStep> list = auditNightStepDao.findByHotelCodeAndBusinessDate(code, businessDate);
-		List<AuditNightStep> list = auditNightStepDao.findByHotelCode(code);
+		List<AuditNightStep> list = auditNightStepDao.findByHotelCodeOrderBySeqNum(code);
 		HttpResponse httpResponse = auditNightStepHisService.findByHotelCodeAndBusinessDate(code);
 		List<AuditNightStepHis> anss = (List<AuditNightStepHis>) httpResponse.getData();
 		for(int i=0; i<list.size(); i++){

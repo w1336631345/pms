@@ -27,5 +27,7 @@ public class AuditNightStep extends PersistenceModel {
     private String processName;//存储过程名称
     @OneToMany(fetch = FetchType.LAZY , cascade=CascadeType.ALL)
     private List<AuditNightStepParam> params;//参数
+    @Column
+    private String seqNum;
 
 }
