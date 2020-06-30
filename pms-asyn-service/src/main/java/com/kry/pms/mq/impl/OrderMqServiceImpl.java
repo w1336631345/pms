@@ -14,8 +14,8 @@ public class OrderMqServiceImpl implements OrderMqService {
 
     @Override
     public void sendNewOrder(String hotelCode, String msg) {
-//        ActiveMQTopic destination = new ActiveMQTopic(hotelCode+"/new/order");
-//        jmsMessagingTemplate.convertAndSend(destination,msg);
+        ActiveMQTopic destination = new ActiveMQTopic(hotelCode+".new.order");
+        jmsMessagingTemplate.convertAndSend(destination,msg);
     }
 
     @Override
