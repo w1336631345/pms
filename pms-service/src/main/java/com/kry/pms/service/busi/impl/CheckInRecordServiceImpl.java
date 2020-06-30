@@ -368,15 +368,16 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                     newRemark = oldRemark;
                 }
             }
-            //以下是记录日志代码
+            //*************以下是记录日志代码*************
             CheckInRecord cirLog = new CheckInRecord();
             BeanUtils.copyProperties(checkUpdateItemTestBo, cirLog);
             cirLog.setId(ids[i]);
             cirLog.setRemark(newRemark);
             cirLog.setOrderNum(cir.getOrderNum());
             cirLog.setHotelCode(cir.getHotelCode());
+            cirLog.setAccount(cir.getAccount());
             updateLogService.updateCirAllLog(cirLog);
-            //以上是记录日志代码
+            //*************以上是记录日志代码*************
             cir.setRemark(newRemark);
             boolean updateTime = false;
             LocalDateTime at = checkUpdateItemTestBo.getArriveTime();
@@ -387,8 +388,8 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
             if (lt == null || "".equals(lt)) {
                 lt = cir.getLeaveTime();
             }
-            LocalDate startDate = cir.getArriveTime().toLocalDate();
-            LocalTime criticalTime = cir.getArriveTime().toLocalTime();
+            LocalDate startDate = at.toLocalDate();
+            LocalTime criticalTime = systemConfigService.getCriticalTime(cir.getHotelCode());
             if (!cir.getArriveTime().isEqual(at) || !cir.getLeaveTime().isEqual(lt)) {
                 updateTime = true;
                 if (roomI) {
@@ -398,8 +399,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                         return hr.error("资源不足");
                     }
                 }
-                criticalTime = systemConfigService.getCriticalTime(cir.getHotelCode());
-                if (cir.getArriveTime().toLocalTime().isBefore(criticalTime)) {
+                if (at.toLocalTime().isBefore(criticalTime)) {
                     startDate = startDate.plusDays(-1);
                 }
                 cir.setStartDate(startDate);
