@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: prod
+    active: rds
   freemarker:
     template-loader-path: classpath:/templates/
     suffix: .ftl

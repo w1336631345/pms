@@ -26,8 +26,12 @@ public class SpecialReportServiceImpl implements SpecialReportService {
     public List<Map<String, Object>> billCostStat(String hotelCode, String employeeId, String shift, LocalDate businessDate) throws IOException, TemplateException {
         Map<String, Object> parmrs = new HashMap<>();
         parmrs.put("hotelCode", hotelCode);
-        parmrs.put("employee_id", employeeId);
-        parmrs.put("shift", shift);
+        if(employeeId!=null){
+            parmrs.put("employee_id", employeeId);
+        }
+        if(shift!=null){
+            parmrs.put("shift", shift);
+        }
         parmrs.put("business_date", businessDate);
         return sqlTemplateService.processByCode(hotelCode, "report_cost_stat", parmrs);
     }
@@ -36,8 +40,12 @@ public class SpecialReportServiceImpl implements SpecialReportService {
     public List<Map<String, Object>> billPayStat(String hotelCode, String employeeId, String shift, LocalDate businessDate) throws IOException, TemplateException {
         Map<String, Object> parmrs = new HashMap<>();
         parmrs.put("hotelCode", hotelCode);
-        parmrs.put("employee_id", employeeId);
-        parmrs.put("shift", shift);
+        if(employeeId!=null){
+            parmrs.put("employee_id", employeeId);
+        }
+        if(shift!=null){
+            parmrs.put("shift", shift);
+        }
         parmrs.put("business_date", businessDate);
         return sqlTemplateService.processByCode(hotelCode, "report_pay_stat", parmrs);
     }
