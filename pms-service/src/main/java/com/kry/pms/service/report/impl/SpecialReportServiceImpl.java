@@ -23,7 +23,7 @@ public class SpecialReportServiceImpl implements SpecialReportService {
     ReportEmpDailyBillStatDao reportEmpDailyBillStatDao;
 
     @Override
-    public List<Map<String, Object>> billCostStat(String hotelCode, String employeeId, String shift, LocalDate businessDate) throws IOException, TemplateException {
+    public List<Map<String, Object>> billCostStat(String hotelCode, String employeeId, String shift,LocalDate startDate,LocalDate endDate) throws IOException, TemplateException {
         Map<String, Object> parmrs = new HashMap<>();
         parmrs.put("hotelCode", hotelCode);
         if(employeeId!=null){
@@ -32,21 +32,23 @@ public class SpecialReportServiceImpl implements SpecialReportService {
         if(shift!=null){
             parmrs.put("shift", shift);
         }
-        parmrs.put("business_date", businessDate);
+        parmrs.put("startDate", startDate);
+        parmrs.put("endDate", endDate);
         return sqlTemplateService.processByCode(hotelCode, "report_cost_stat", parmrs);
     }
 
     @Override
-    public List<Map<String, Object>> billPayStat(String hotelCode, String employeeId, String shift, LocalDate businessDate) throws IOException, TemplateException {
+    public List<Map<String, Object>> billPayStat(String hotelCode, String employeeId, String shift, LocalDate startDate,LocalDate endDate) throws IOException, TemplateException {
         Map<String, Object> parmrs = new HashMap<>();
         parmrs.put("hotelCode", hotelCode);
+        parmrs.put("startDate", startDate);
+        parmrs.put("endDate", endDate);
         if(employeeId!=null){
             parmrs.put("employee_id", employeeId);
         }
         if(shift!=null){
             parmrs.put("shift", shift);
         }
-        parmrs.put("business_date", businessDate);
         return sqlTemplateService.processByCode(hotelCode, "report_pay_stat", parmrs);
     }
 

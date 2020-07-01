@@ -10,9 +10,9 @@ import java.util.Map;
 
 public interface SpecialReportService {
 
-    List<Map<String, Object>> billCostStat(String hotelCode, String employeeId, String shift, LocalDate businessDate) throws IOException, TemplateException;
+    List<Map<String, Object>> billCostStat(String hotelCode, String employeeId, String shift, LocalDate startDate,LocalDate endDate) throws IOException, TemplateException;
 
-    List<Map<String, Object>> billPayStat(String hotelCode, String employeeId, String shift, LocalDate businessDate) throws IOException, TemplateException;
+    List<Map<String, Object>> billPayStat(String hotelCode, String employeeId, String shift,LocalDate startDate,LocalDate endDate) throws IOException, TemplateException;
 
     Collection<Map<String, Object>> dailyReport(String currentHotleCode, LocalDate bDate) throws IOException, TemplateException;
 

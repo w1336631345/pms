@@ -26,19 +26,17 @@ public class SpecialReportController extends BaseController {
 
     @GetMapping
     @RequestMapping("/cost")
-    public HttpResponse<List<Map<String, Object>>> cost( String employee_id, @RequestParam(required = true) String business_date, String shift) throws IOException, TemplateException {
+    public HttpResponse<List<Map<String, Object>>> cost( String employee_id,  String startDate,String endDate, String shift) throws IOException, TemplateException {
         HttpResponse<List<Map<String, Object>>> rep = new HttpResponse<>();
-        LocalDate localDate = LocalDate.parse(business_date);
-        rep.addData(specialReportService.billCostStat(getCurrentHotleCode(), employee_id, shift, localDate));
+        rep.addData(specialReportService.billCostStat(getCurrentHotleCode(), employee_id, shift, LocalDate.parse(startDate),LocalDate.parse(endDate)));
         return rep;
     }
 
     @GetMapping
     @RequestMapping("/pay")
-    public HttpResponse<List<Map<String, Object>>> pay( String employee_id, @RequestParam(required = true) String business_date, String shift) throws IOException, TemplateException {
+    public HttpResponse<List<Map<String, Object>>> pay( String employee_id,  String startDate,String endDate, String shift) throws IOException, TemplateException {
         HttpResponse<List<Map<String, Object>>> rep = new HttpResponse<>();
-        LocalDate localDate = LocalDate.parse(business_date);
-        rep.addData(specialReportService.billPayStat(getCurrentHotleCode(), employee_id, shift, localDate));
+        rep.addData(specialReportService.billPayStat(getCurrentHotleCode(), employee_id, shift, LocalDate.parse(startDate),LocalDate.parse(endDate)));
         return rep;
     }
     @GetMapping
