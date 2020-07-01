@@ -28,7 +28,7 @@ public class RealTimeReportController extends BaseController {
 
     @GetMapping
     @RequestMapping("/shift/cost")
-    public HttpResponse<List<Map<String, Object>>> realTimeShiftCost(@RequestParam(required = true) String employee_id, @RequestParam(required = true) String shift) throws IOException, TemplateException {
+    public HttpResponse<List<Map<String, Object>>> realTimeShiftCost( String employee_id,  String shift) throws IOException, TemplateException {
         HttpResponse<List<Map<String, Object>>> rep = new HttpResponse<>();
         String hotelCode = getCurrentHotleCode();
         rep.addData(realTimeReportService.billCostStat(getCurrentHotleCode(), employee_id, shift, businessSeqService.getBuinessDate(hotelCode)));
@@ -37,7 +37,7 @@ public class RealTimeReportController extends BaseController {
 
     @GetMapping
     @RequestMapping("/shift/pay")
-    public HttpResponse<List<Map<String, Object>>> realTimeShiftPay(@RequestParam(required = true) String employee_id, @RequestParam(required = true) String shift) throws IOException, TemplateException {
+    public HttpResponse<List<Map<String, Object>>> realTimeShiftPay( String employee_id,  String shift) throws IOException, TemplateException {
         HttpResponse<List<Map<String, Object>>> rep = new HttpResponse<>();
         String hotelCode = getCurrentHotleCode();
         rep.addData(realTimeReportService.billPayStat(getCurrentHotleCode(), employee_id, shift, businessSeqService.getBuinessDate(hotelCode)));
