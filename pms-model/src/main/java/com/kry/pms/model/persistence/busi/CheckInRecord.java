@@ -190,8 +190,12 @@ public class CheckInRecord extends PersistenceModel {
 	private String vipCode;//主单vip
 
 	@Transient
+	private String isSync;//修改时间是否同步子单
+	@Transient
 	private String isGOrU;//预订来至团队（G）还是多人（U）
 
+	public String getIsSync() { return isSync; }
+	public void setIsSync(String isSync) { this.isSync = isSync; }
 	public String getOrderNumOld() { return orderNumOld; }
 	public void setOrderNumOld(String orderNumOld) { this.orderNumOld = orderNumOld; }
 	public String getVipCode() { return vipCode; }
