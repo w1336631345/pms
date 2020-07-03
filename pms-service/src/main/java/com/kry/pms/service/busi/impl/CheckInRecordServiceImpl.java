@@ -218,10 +218,28 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                     cir.setGroupName(checkInRecord.getName());
                 }
                 if (updateTime) {
-                    if (checkInRecord.getArriveTime().isAfter(cir.getArriveTime()) || checkInRecord.getLeaveTime().isBefore(cir.getLeaveTime())) {
-                        TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-                        return hr.error("主单时间范围不能小于成员时间范围");
+//                    if (checkInRecord.getArriveTime().isAfter(cir.getArriveTime()) || checkInRecord.getLeaveTime().isBefore(cir.getLeaveTime())) {
+//                        TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+//                        return hr.error("主单时间范围不能小于成员时间范围");
+//                    }
+                    //如果主单修改时间要求子单同步，在此处写逻辑代码
+                    //下面是逻辑代码...
+                    if("Y".equals(checkInRecord.getIsSync())){
+                        boolean b = roomStatisticsService.extendTime(new CheckInRecordWrapper(cir),
+                                checkInRecord.getArriveTime(), checkInRecord.getLeaveTime());
+                        if (!b) {
+                            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                            return hr.error("资源不足");
+                        }
+                        cir.setArriveTime(checkInRecord.getArriveTime());
+                        cir.setLeaveTime(checkInRecord.getLeaveTime());
+                    }else {
+                        if (checkInRecord.getArriveTime().isAfter(cir.getArriveTime()) || checkInRecord.getLeaveTime().isBefore(cir.getLeaveTime())) {
+                            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                            return hr.error("主单时间范围不能小于成员时间范围");
+                        }
                     }
+                    //上面是逻辑代码...
                 }
                 if (isSecrecy) {
                     cir.setIsSecrecy(checkInRecord.getIsSecrecy());
