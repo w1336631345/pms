@@ -1,5 +1,6 @@
 package com.kry.pms.service.busi.impl;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -159,20 +160,29 @@ public class SettleAccountRecordServiceImpl implements SettleAccountRecordServic
     @Override
     public DtoResponse<String> cancle(String id, String shiftCode, Employee operationEmployee) {
         SettleAccountRecord sar = findById(id);
+        LocalDate businessDate = businessSeqService.getBuinessDate(operationEmployee.getHotelCode());
         if (sar != null) {
-            sar.setCancleNum(businessSeqService.fetchNextSeqNum(sar.getHotelCode(),
-                    Constants.Key.BUSINESS_CANCLE_SETTLE_SEQ_KEY));
-            sar.setCancleEmployee(operationEmployee);
-            sar.setCancleTime(LocalDateTime.now());
-            sar.setCancleShiftCode(shiftCode);
-            sar.setStatus(Constants.Status.SETTLE_ACCOUNT_CANCLE);
-            if (Constants.Type.BILL_CHECK_WAY_TRANSFER.equals(sar.getSettleWay())) {
-                return cancleTransfer(sar, shiftCode, operationEmployee);
+            if (!businessDate.isEqual(sar.getBusinessDate())||!shiftCode.equals(sar.getShiftCode())||!operationEmployee.getId().equals(sar.getOperationEmployee().getId())) {
+                DtoResponse<String> rep = new DtoResponse<>();
+                rep.error(Constants.BusinessCode.CODE_ILLEGAL_OPERATION,"无法处理（只能撤销本人本班次的结帐）");
+                return rep;
             } else {
-                return cancleSettle(id, shiftCode, operationEmployee);
+                sar.setCancleNum(businessSeqService.fetchNextSeqNum(sar.getHotelCode(),
+                        Constants.Key.BUSINESS_CANCLE_SETTLE_SEQ_KEY));
+                sar.setCancleEmployee(operationEmployee);
+                sar.setCancleTime(LocalDateTime.now());
+                sar.setCancleShiftCode(shiftCode);
+                sar.setStatus(Constants.Status.SETTLE_ACCOUNT_CANCLE);
+                if (Constants.Type.BILL_CHECK_WAY_TRANSFER.equals(sar.getSettleWay())) {
+                    return cancleTransfer(sar, shiftCode, operationEmployee);
+                } else {
+                    return cancleSettle(id, shiftCode, operationEmployee);
+                }
             }
         }
-        return null;
+        DtoResponse<String> rep = new DtoResponse<>();
+        rep.error(Constants.BusinessCode.CODE_ILLEGAL_OPERATION,"找不到该结帐信息");
+        return rep;
     }
 
     private DtoResponse<String> cancleTransfer(SettleAccountRecord sar, String shiftCode, Employee operationEmployee) {
@@ -188,8 +198,9 @@ public class SettleAccountRecordServiceImpl implements SettleAccountRecordServic
 //		BeanUtils.copyProperties(crep, rep);
         return rep;
     }
+
     @Override
-    public SettleAccountRecord createToAr(BillCheckBo billCheckBo, Account account, Account targetAccount){
+    public SettleAccountRecord createToAr(BillCheckBo billCheckBo, Account account, Account targetAccount) {
         SettleAccountRecord scr = new SettleAccountRecord();
         scr.setRecordNum(businessSeqService.fetchNextSeqNum(targetAccount.getHotelCode(),
                 Constants.Key.BUSINESS_BUSINESS_TRANSFER_SEQ_KEY));

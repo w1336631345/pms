@@ -35,6 +35,7 @@ public class BillController extends BaseController<Bill> {
 	@PostMapping
 	public HttpResponse<Bill> add(@RequestBody Bill bill) {
 		bill.setShiftCode(getShiftCode());
+		bill.setHotelCode(getCurrentHotleCode());
 		bill.setOperationEmployee(getCurrentEmployee());
 		HttpResponse<Bill> rep = getDefaultResponse();
 		bill = billService.add(bill);
