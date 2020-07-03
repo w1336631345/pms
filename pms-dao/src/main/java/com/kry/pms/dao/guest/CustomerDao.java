@@ -70,7 +70,7 @@ public interface CustomerDao extends BaseDao<Customer>{
 
 	@Query(nativeQuery = true, value = " select \n" +
 			" tc.id, tc.`name`, tc.num_code numCode, tcm.agreement_type agreementType, \n" +
-			" tc.deleted, tc.effective_date effectiveDate, ta.total, \n" +
+			" tc.deleted, tc.effective_date effectiveDate, ta.total, tc.sales_men_id salesMenId, \n" +
 			" ta.credit_limit creditLimit, ta.`code` arCode, ta.id accountId \n" +
 			" from t_customer tc left join t_cust_market tcm on tc.id = tcm.customer_id \n" +
 			" left join (select ta.id, ta.total, ta.`code`, ta.customer_id, ta.credit_limit \n" +
