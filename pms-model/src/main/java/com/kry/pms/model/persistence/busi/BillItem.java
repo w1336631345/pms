@@ -30,7 +30,7 @@ public class BillItem extends PersistenceModel {
 	private String goodsCode;
 	@Column
 	private String goodsName;
-	@OneToMany
+	@Column
 	private String bosGoodsInfoId;
 	@OneToOne
 	private DiscountScheme discountScheme;
