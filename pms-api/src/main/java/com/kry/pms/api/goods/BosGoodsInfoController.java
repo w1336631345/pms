@@ -51,10 +51,33 @@ public class BosGoodsInfoController extends BaseController<BosGoodsInfo> {
 		return rep.addData(list);
 	}
 
+	/**
+	 * 功能描述: <br>根据类型查询
+	 * 〈〉
+	 * @Param: [typeId]
+	 * @Return: com.kry.pms.base.HttpResponse<java.util.List<com.kry.pms.model.persistence.goods.BosGoodsInfo>>
+	 * @Author: huanghaibin
+	 * @Date: 2020/7/6 10:40
+	 */
 	@GetMapping(path = "/list")
 	public HttpResponse<List<BosGoodsInfo>> getByCustomerId(String typeId){
 			HttpResponse<List<BosGoodsInfo>> rep = new HttpResponse<List<BosGoodsInfo>>();
 		List<BosGoodsInfo> list = bosGoodsInfoService.findByBosGoodsTypeId(typeId);
+		return rep.addData(list);
+	}
+
+	/**
+	 * 功能描述: <br>根据营业点查询
+	 * 〈〉
+	 * @Param: [typeId]
+	 * @Return: com.kry.pms.base.HttpResponse<java.util.List<com.kry.pms.model.persistence.goods.BosGoodsInfo>>
+	 * @Author: huanghaibin
+	 * @Date: 2020/7/6 10:41
+	 */
+	@GetMapping(path = "/findByBosSiteId")
+	public HttpResponse<List<BosGoodsInfo>> findByBosSiteId(String siteId){
+		HttpResponse<List<BosGoodsInfo>> rep = new HttpResponse<List<BosGoodsInfo>>();
+		List<BosGoodsInfo> list = bosGoodsInfoService.findByBosSiteId(siteId);
 		return rep.addData(list);
 	}
 

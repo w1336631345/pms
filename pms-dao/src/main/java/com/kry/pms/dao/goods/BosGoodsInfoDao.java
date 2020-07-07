@@ -22,4 +22,9 @@ public interface BosGoodsInfoDao extends BaseDao<BosGoodsInfo>{
     @Query(nativeQuery = true, value = " select * from t_bos_goods_info where bos_goods_type_id = ?1 ")
     List<BosGoodsInfo> findByBosGoodsTypeId(String bosGoodsTypeId);
 
+    @Query(nativeQuery = true, value = " select tbi.* from t_bos_goods_info tbi, t_bos_goods_type tbt, t_bos_business_site tbs \n" +
+            " where tbi.bos_goods_type_id = tbt.id and tbt.bos_business_site_id = tbs.id \n" +
+            " and tbs.id = ?1 ")
+    List<BosGoodsInfo> findByBosSiteId(String bosGoodsTypeId);
+
 }

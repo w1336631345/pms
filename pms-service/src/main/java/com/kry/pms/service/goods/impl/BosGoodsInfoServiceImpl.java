@@ -63,6 +63,11 @@ public class BosGoodsInfoServiceImpl implements BosGoodsInfoService {
 	}
 
 	@Override
+	public List<BosGoodsInfo> findByBosSiteId(String siteId) {
+		return bosGoodsInfoDao.findByBosSiteId(siteId);
+	}
+
+	@Override
 	public PageResponse<BosGoodsInfo> listPage(PageRequest<BosGoodsInfo> prq) {
 		Example<BosGoodsInfo> ex = Example.of(prq.getExb());
 		org.springframework.data.domain.PageRequest req;

@@ -14,6 +14,8 @@ public interface BosGoodsInfoService extends BaseService<BosGoodsInfo>{
 
     List<BosGoodsInfo> findByBosGoodsTypeId(String bosGoodsTypeId);
 
+    List<BosGoodsInfo> findByBosSiteId(String siteId);
+
     List<BosGoodsInfo> getByHotelCode(String hotelCode);
 
 }

@@ -31,4 +31,17 @@ public class WechatPay {
     public static final String refund_url = "https://api.mch.weixin.qq.com/secapi/pay/refund";
     //微信退款申请查询接口地址
     public static final String refundquery_url = "https://api.mch.weixin.qq.com/pay/refundquery";
+
+    //微信支付押金（付款码支付）接口post
+    public static final String deposit_url = "https://api.mch.weixin.qq.com/deposit/micropay";
+    //微信支付押金-订单查询post
+    public static final String deposit_orderquery_url = "https://api.mch.weixin.qq.com/deposit/orderquery";
+    //微信支付押金-撤销查询post(需要证书)
+    public static final String deposit_reverse_url = "https://api.mch.weixin.qq.com/deposit/reverse";
+    //微信支付押金-消费押金post(需要证书)
+    public static final String deposit_consume_url = "https://api.mch.weixin.qq.com/deposit/consume";
+    //微信支付押金-申请退款post(需要证书)
+    public static final String deposit_refund_url = "https://api.mch.weixin.qq.com/deposit/refund";
+    //微信支付押金-查询退款post
+    public static final String deposit_refundquery_url = "https://api.mch.weixin.qq.com/deposit/refundquery";
 }

@@ -233,6 +233,8 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                         }
                         cir.setArriveTime(checkInRecord.getArriveTime());
                         cir.setLeaveTime(checkInRecord.getLeaveTime());
+                        cir.setDays(checkInRecord.getDays());
+                        cir.setStartDate(checkInRecord.getStartDate());
                     }else {
                         if (checkInRecord.getArriveTime().isAfter(cir.getArriveTime()) || checkInRecord.getLeaveTime().isBefore(cir.getLeaveTime())) {
                             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
