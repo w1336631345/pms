@@ -2,14 +2,11 @@ package com.kry.pms.model.persistence.busi;
 
 import java.time.LocalDate;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.kry.pms.model.persistence.PersistenceModel;
+import com.kry.pms.model.persistence.goods.BosGoodsInfo;
 import com.kry.pms.model.persistence.goods.Product;
 import com.kry.pms.model.persistence.marketing.DiscountScheme;
 
@@ -28,9 +25,13 @@ public class BillItem extends PersistenceModel {
 	@OneToOne
 	private RoomRecord roomRecord;
 	@Column
-	private Product product;
-	@Column
 	private LocalDate billDate;
+	@Column
+	private String goodsCode;
+	@Column
+	private String goodsName;
+	@OneToMany
+	private String bosGoodsInfoId;
 	@OneToOne
 	private DiscountScheme discountScheme;
 	@Column
