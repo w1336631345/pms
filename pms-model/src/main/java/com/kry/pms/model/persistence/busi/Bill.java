@@ -79,6 +79,8 @@ public class Bill extends PersistenceModel {
 	private String transferType;
 	@Column
 	private String sid;
+	@Column
+	private String itemType;
 	@OneToOne
 	private Bill sourceBill;
 	@Column
