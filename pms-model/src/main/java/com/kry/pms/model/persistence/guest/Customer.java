@@ -62,7 +62,7 @@ public class Customer extends PersistenceModel {
 	private String language;//语言
 	@Column
 	private LocalDate effectiveDate;//有效日期
-	@OneToOne
+	@ManyToOne
 	private SalesMen salesMen; //销售员
 	@Column
 	private String numCode;//编号
