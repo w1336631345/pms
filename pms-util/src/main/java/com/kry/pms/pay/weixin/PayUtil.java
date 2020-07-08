@@ -6,17 +6,21 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.input.SAXBuilder;
 
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.security.SignatureException;
 import java.util.*;
 
 public class PayUtil {
 	 /**  
-     * 签名字符串  
+     * 签名字符串 (MD5)
      * @param text需要签名的字符串  
      * @param key 密钥  
      * @param input_charset编码格式  
@@ -25,7 +29,51 @@ public class PayUtil {
     public static String sign(String text, String key, String input_charset) {   
         text = text + "&key=" + key;   
         return DigestUtils.md5Hex(getContentBytes(text, input_charset));   
-    }   
+    }
+    /**
+     * 签名字符串 (HMAC-SHA256)
+     * @param text需要签名的字符串
+     * @param key 密钥
+     * @param input_charset编码格式
+     * @return 签名结果
+     */
+    public static String signSha(String text, String key, String input_charset) {
+        text = text + "&key=" + key;
+        return DigestUtils.sha256Hex(getContentBytes(text, input_charset));
+//        return DigestUtils.sha256Hex(text);
+    }
+    public static String signSha2(String text, String key, String input_charset) {
+        text = text + "&key=" + key;
+//        return DigestUtils.sha256Hex(getContentBytes(text, input_charset));
+        return DigestUtils.sha256Hex(text);
+    }
+    /**
+     * sha256_HMAC加密(支付押金用到)
+     * @param message 消息
+     * @param secret  秘钥
+     * @return 加密后字符串
+     */
+    public static String signHMAC_SHA256(String string1, String key) throws UnsupportedEncodingException, NoSuchAlgorithmException, InvalidKeyException {
+        String stringSignTemp = string1 + "&key=" + key;
+        //return DigestUtils.sha256Hex(stringSignTemp).toUpperCase();
+        Mac sha256_HMAC = Mac.getInstance("HmacSHA256");
+        SecretKeySpec secret_key = new SecretKeySpec(key.getBytes(), "HmacSHA256");
+        sha256_HMAC.init(secret_key);
+        //  utf-8 : 解决中文加密不一致问题,必须指定编码格式
+        return byteArrayToHexString(sha256_HMAC.doFinal(stringSignTemp.getBytes("utf-8"))).toUpperCase();
+    }
+
+    public  static String byteArrayToHexString(byte[] b) {
+        StringBuilder hs = new StringBuilder();
+        String stmp;
+        for (int n = 0; b!=null && n < b.length; n++) {
+            stmp = Integer.toHexString(b[n] & 0XFF);
+            if (stmp.length() == 1)
+                hs.append('0');
+            hs.append(stmp);
+        }
+        return hs.toString().toLowerCase();
+    }
     /**  
      * 签名字符串  
      *  @param text需要签名的字符串  
@@ -97,7 +145,21 @@ public class PayUtil {
             result.put(key, value);   
         }   
         return result;   
-    }   
+    }
+    public static Map<String, String> paraFilter2(Map<String, String> sArray) {
+        Map<String, String> result = new HashMap<String, String>();
+        if (sArray == null || sArray.size() <= 0) {
+            return result;
+        }
+        for (String key : sArray.keySet()) {
+            String value = sArray.get(key);
+            if (value == null || value.equals("") || key.equalsIgnoreCase("sign")) {
+                continue;
+            }
+            result.put(key, value);
+        }
+        return result;
+    }
     /**  
      * 把数组所有元素排序，并按照“参数=参数值”的模式用“&”字符拼接成字符串  
      * @param params 需要排序并参与字符拼接的参数组  

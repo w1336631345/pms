@@ -10,7 +10,7 @@ import java.io.IOException;
 
 public interface WechatPayDepositService {
 
-    HttpResponse micropay(String auth_code, Integer total_fee, String hotelCode) throws Exception;
+    HttpResponse micropay(String auth_code, Integer total_fee, String hotelCode, HttpServletRequest request) throws Exception;
 
     HttpResponse orderquery(String transaction_id, String out_trade_no, String hotelCode) throws Exception;
 

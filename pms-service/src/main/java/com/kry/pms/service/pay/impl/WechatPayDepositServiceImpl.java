@@ -3,6 +3,7 @@ package com.kry.pms.service.pay.impl;
 import com.kry.pms.base.HttpResponse;
 import com.kry.pms.dao.pay.WechatMerchantsDao;
 import com.kry.pms.dao.pay.WechatPayRecordDao;
+import com.kry.pms.model.persistence.marketing.SalesMen;
 import com.kry.pms.model.persistence.pay.WechatMerchants;
 import com.kry.pms.model.persistence.pay.WechatPay;
 import com.kry.pms.model.persistence.pay.WechatPayRecord;
@@ -52,7 +53,7 @@ public class WechatPayDepositServiceImpl extends WeixinSupport implements Wechat
 	private Logger logger = LoggerFactory.getLogger(getClass());
 	//支付押金
 	@Override
-	public HttpResponse micropay(String auth_code, Integer total_fee, String hotelCode) throws Exception {
+	public HttpResponse micropay(String auth_code, Integer total_fee, String hotelCode, HttpServletRequest request) throws Exception {
 		HttpResponse hr = new HttpResponse();
 		WechatMerchants wm = wechatMerchantsDao.findByHotelCode(hotelCode);
 		if(wm == null){
@@ -62,37 +63,43 @@ public class WechatPayDepositServiceImpl extends WeixinSupport implements Wechat
 		//生成的随机字符串
 		String nonce_str = StringUtils.getRandomStringByLength(32);
 		//商品描述
-		String body = wm.getHotelName()+"-押金";
+//		String body = wm.getHotelName()+"-押金";
+		String body = "asdf";
 		//获取本机的ip地址
-//		String spbill_create_ip = IpUtils.getIpAddr(request);
-		String spbill_create_ip = "8.8.8.8";
+		String spbill_create_ip = IpUtils.getIpAddr(request);
+//		String spbill_create_ip = "8.8.8.8";
 
 		Date date = new Date();
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmsssss");
 		String orderNo = sdf.format(date);
+		String rd = StringUtils.getRandom1(15);
+		String out_trade_no = rd + orderNo;
 		Integer money = total_fee;//支付金额，单位：分，这边需要转成字符串类型，否则后面的签名会失败
 
 		Map<String, String> packageParams = new HashMap<String, String>();
-		packageParams.put("deposit", "Y");//是否押金支付，Y-是,N-普通付款码支付
 		packageParams.put("appid", wm.getAppid());
-		packageParams.put("mch_id", wm.getMchId());
-		packageParams.put("sub_mch_id", wm.getSubMchId());
-		packageParams.put("nonce_str", nonce_str);
-		packageParams.put("body", body);
-		packageParams.put("out_trade_no", orderNo);//商户订单号
-		packageParams.put("total_fee", money.toString());//支付金额，这边需要转成字符串类型，否则后面的签名会失败
-		packageParams.put("fee_type", "CNY");
-		packageParams.put("spbill_create_ip", spbill_create_ip);
 		packageParams.put("auth_code", auth_code);
+		packageParams.put("body", body);
+		packageParams.put("deposit", "Y");//是否押金支付，Y-是,N-普通付款码支付
+		packageParams.put("fee_type", "CNY");
+		packageParams.put("mch_id", wm.getMchId());
+		packageParams.put("nonce_str", nonce_str);
+//		packageParams.put("nonce_str", "p9vi20tjmwu7wkcp9eazgn84pnaihil8");
+		packageParams.put("out_trade_no", out_trade_no);//商户订单号
+//		packageParams.put("out_trade_no", "87029761740714020200708172700034");//商户订单号
+		packageParams.put("spbill_create_ip", spbill_create_ip);
+		packageParams.put("sub_mch_id", wm.getSubMchId());
+		packageParams.put("total_fee", money.toString());//支付金额，这边需要转成字符串类型，否则后面的签名会失败
+		packageParams.put("sign_type", wm.getDepositSignType());
 
 		// 除去数组中的空值和签名参数
-		packageParams = PayUtil.paraFilter(packageParams);
+		packageParams = PayUtil.paraFilter2(packageParams);
 		String prestr = PayUtil.createLinkString(packageParams); // 把数组所有元素，按照“参数=参数值”的模式用“&”字符拼接成字符串
 		//MD5运算生成签名，这里是第一次签名，用于调用统一下单接口
-		String mysign = PayUtil.sign(prestr, wm.getSecretKey(), "utf-8").toUpperCase();
+		String mysign = PayUtil.signHMAC_SHA256(prestr, wm.getSecretKey());
 		logger.info("=======================第一次签名1：" + mysign + "=====================");
 		packageParams.put("sign", mysign);
-		packageParams.put("sign_type", wm.getDepositSignType());
+
 		//拼接统一下单接口使用的xml数据，要将上一步生成的签名一起拼接进去
 		String xml = XMLBeanUtil.map2XmlString(packageParams);
 		//调用统一下单接口，并接受返回的结果
