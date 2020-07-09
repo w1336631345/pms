@@ -235,6 +235,11 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                         cir.setLeaveTime(checkInRecord.getLeaveTime());
                         cir.setDays(checkInRecord.getDays());
                         cir.setStartDate(checkInRecord.getStartDate());
+                        List<RoomRecord> list = roomRecordService.findByHotelCodeAndCheckInRecord(cir.getHotelCode(), cir.getId());
+                        for (int r = 0; r < list.size(); r++) {
+                            roomRecordService.deleteTrue(list.get(r).getId());
+                        }
+                        roomRecordService.createRoomRecord(cir);
                     }else {
                         if (checkInRecord.getArriveTime().isAfter(cir.getArriveTime()) || checkInRecord.getLeaveTime().isBefore(cir.getLeaveTime())) {
                             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
@@ -444,12 +449,12 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                 if (cir.getArriveTime().toLocalTime().isBefore(criticalTime)) {
                     days = days + 1;
                 }
+                cir.setDays(days);
                 List<RoomRecord> list = roomRecordService.findByHotelCodeAndCheckInRecord(cir.getHotelCode(), cir.getId());
                 for (int r = 0; r < list.size(); r++) {
                     roomRecordService.deleteTrue(list.get(r).getId());
                 }
                 roomRecordService.createRoomRecord(cir);
-                cir.setDays(days);
                 //***********分割线************
                 //下面是同住的记录一起修改
                 if (roomI) {
