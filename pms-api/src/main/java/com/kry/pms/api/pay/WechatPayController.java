@@ -75,7 +75,8 @@ public class WechatPayController extends BaseController {
         if("".equals(auth_code) || auth_code == null){
             return hr.error("未获取到支付条形码");
         }
-        hr = wechatPayService.sweepPay(total_fee,productName, auth_code, request, getCurrentHotleCode());
+//        hr = wechatPayService.sweepPay(total_fee,productName, auth_code, request, getCurrentHotleCode());//普通商户
+        hr = wechatPayService.sweepPayService(total_fee,productName, auth_code, request, getCurrentHotleCode());//服务商
         return hr;
     }
     /**
@@ -92,7 +93,8 @@ public class WechatPayController extends BaseController {
         if("".equals(transaction_id) || transaction_id == null){
             return hr.error("请传入微信订单号");
         }
-        hr = wechatPayService.refund(refund_fee, transaction_id, getCurrentHotleCode());
+//        hr = wechatPayService.refund(refund_fee, transaction_id, getCurrentHotleCode());//普通商户
+        hr = wechatPayService.refundService(refund_fee, transaction_id, getCurrentHotleCode());//服务商
         return hr;
     }
 
@@ -112,7 +114,8 @@ public class WechatPayController extends BaseController {
                 return hr.error("请传入微信订单号");
             }
         }
-        hr = wechatPayService.orderquery(out_trade_no, transaction_id, getCurrentHotleCode());
+//        hr = wechatPayService.orderquery(out_trade_no, transaction_id, getCurrentHotleCode());//普通商户
+        hr = wechatPayService.orderqueryService(out_trade_no, transaction_id, getCurrentHotleCode());//服务商
         return hr;
     }
 
@@ -149,7 +152,8 @@ public class WechatPayController extends BaseController {
         if("".equals(refund_id) || refund_id == null){
             return hr.error("请传入微信订单号");
         }
-        hr = wechatPayService.refundquery(refund_id, getCurrentHotleCode());
+//        hr = wechatPayService.refundquery(refund_id, getCurrentHotleCode());//普通商户
+        hr = wechatPayService.refundqueryService(refund_id, getCurrentHotleCode());//服务商
         return hr;
     }
     /**

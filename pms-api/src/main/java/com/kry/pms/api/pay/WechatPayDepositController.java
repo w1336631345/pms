@@ -60,7 +60,7 @@ public class WechatPayDepositController extends BaseController {
     }
 
     /**
-     * 功能描述: <br>撤销订单
+     * 功能描述: <br>撤销订单（全额退押金）
      * 〈〉
      * @Param: [total_fee, auth_code, request]
      * @Return: com.kry.pms.base.HttpResponse
@@ -68,7 +68,7 @@ public class WechatPayDepositController extends BaseController {
      * @Date: 2020/7/6 15:14
      */
     @RequestMapping("/reverse")
-    public HttpResponse reverse(String transaction_id) {
+    public HttpResponse reverse(String transaction_id) throws Exception {
         HttpResponse hr = new HttpResponse();
         hr = wechatPayDepositService.reverse(transaction_id, getCurrentHotleCode());
         return hr;
@@ -105,7 +105,7 @@ public class WechatPayDepositController extends BaseController {
     }
 
     /**
-     * 功能描述: <br>撤销订单
+     * 功能描述: <br>查询押金退款
      * 〈〉
      * @Param: [total_fee, auth_code, request]
      * @Return: com.kry.pms.base.HttpResponse
