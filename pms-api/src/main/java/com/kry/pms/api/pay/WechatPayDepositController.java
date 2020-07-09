@@ -35,12 +35,12 @@ public class WechatPayDepositController extends BaseController {
      * @Date: 2020/4/10 19:48
      */
     @RequestMapping("/micropay")
-    public HttpResponse micropay(Integer total_fee, String auth_code) throws Exception {
+    public HttpResponse micropay(Integer total_fee, String auth_code,  HttpServletRequest request) throws Exception {
         HttpResponse hr = new HttpResponse();
         if("".equals(auth_code) || auth_code == null){
             return hr.error("未获取到支付条形码");
         }
-        hr = wechatPayDepositService.micropay(auth_code, total_fee, getCurrentHotleCode());
+        hr = wechatPayDepositService.micropay(auth_code, total_fee, getCurrentHotleCode(), request);
         return hr;
     }
 

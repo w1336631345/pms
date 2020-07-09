@@ -178,6 +178,7 @@ public class nightAuditController extends BaseController {
         HttpResponse<String> rep = getDefaultResponse();
         LocalTime lt = LocalTime.now();
         SystemConfig systemConfig = systemConfigService.getByHotelCodeAndKey(getCurrentHotleCode(), "manualAddTime");
+        LocalTime at = systemConfigService.getAuditTime(getCurrentHotleCode());
         if(systemConfig != null && systemConfig.getValue() != null){
             LocalTime localTime = LocalTime.parse(systemConfig.getValue());
             if(lt.isBefore(localTime)){

@@ -406,6 +406,7 @@ public interface CheckInRecordDao extends BaseDao<CheckInRecord> {
 			" tcr.human_count,\n" +
 			" tgr.room_num,\n" +
 			" tcr.corp_id,\n" +
+			" tcr.status,\n" +
 			" tc.`name` corp_name\n" +
 			" from t_checkin_record tcr \n" +
 			" left join t_guest_room tgr on tcr.guest_room_id = tgr.id\n" +
