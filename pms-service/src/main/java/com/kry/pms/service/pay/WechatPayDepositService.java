@@ -14,7 +14,7 @@ public interface WechatPayDepositService {
 
     HttpResponse orderquery(String transaction_id, String out_trade_no, String hotelCode) throws Exception;
 
-    HttpResponse reverse(String transaction_id, String hotelCode);
+    HttpResponse reverse(String transaction_id, String hotelCode) throws Exception;
 
     HttpResponse consume(String transaction_id, Integer consume_fee, String hotelCode) throws Exception;
 

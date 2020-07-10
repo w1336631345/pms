@@ -20,14 +20,27 @@ public interface WechatPayService {
 
     void wxNotify(HttpServletRequest request, HttpServletResponse response) throws Exception;
 
+    //付款码支付(服务商)
+    HttpResponse sweepPayService(Integer total_fee, String body, String auth_code,
+                                 HttpServletRequest request, String hotelCode) throws Exception;
+
     HttpResponse refund(String refund_fee, String transaction_id, String hotelCode) throws Exception;
+
+    //申请退款（服务商）
+    HttpResponse refundService(String refund_fee, String transaction_id, String hotelCode) throws Exception;
 
     String doRefund(String mchId, String url, String data, String path, String hotelCode) throws Exception;
 
     HttpResponse orderquery(String out_trade_no, String transaction_id, String hotelCode) throws Exception;
 
+    //查询订单(服务商)
+    HttpResponse orderqueryService(String out_trade_no, String transaction_id, String hotelCode) throws Exception;
+
     //撤销订单
     HttpResponse reverse(String transaction_id, String hotelCode) throws Exception;
 
     HttpResponse refundquery(String refund_id, String hotelCode) throws Exception;
+
+    //退款查询(服务商)
+    HttpResponse refundqueryService(String refund_id, String hotelCode) throws Exception;
 }
