@@ -15,6 +15,8 @@ public class BosBusinessSite extends PersistenceModel {
     private String code;//项目编码
     @Column
     private String name;//名称描述
+    @ManyToOne
+    private Product product;//项目
     @Column
     private Integer childSize;//小类代码长度
     @Column

@@ -164,6 +164,19 @@ public class WechatPayDepositServiceImpl extends WeixinSupport implements Wechat
 		System.out.println("调试模式_统一下单接口 返回XML数据1：" + result);
 		// 将解析结果存储在HashMap中
 		map = PayUtil.doXMLParse(result);
+		if(out_trade_no != null && !"".equals(out_trade_no)){
+			String trade_state = MapUtils.getString(map, "trade_state");
+			if("SUCCESS".equals(trade_state)){
+				//记录日志
+				WechatPayRecord wpr = wechatPayRecordDao.findByOutTradeNoAndHotelCode(out_trade_no, hotelCode);
+				wpr.setTradeState(trade_state);
+				wpr.setTransactionId(MapUtils.getString(map, "transaction_id"));
+				wpr.setOpenid(MapUtils.getString(map, "openid"));
+				wpr.setResultCode("SUCCESS");
+				wpr.setTradeStateDesc(MapUtils.getString(map, "trade_state_desc"));
+				wechatPayRecordDao.saveAndFlush(wpr);//保存记录
+			}
+		}
 		hr.addData(map);
 		return hr;
 	}
