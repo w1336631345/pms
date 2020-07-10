@@ -37,11 +37,13 @@ public class CreditGrantingRecord extends PersistenceModel{
 	@Column
 	private Double grantingLimit;
 	@Column
-	private String cardNum;
+	private String cardNum;//卡号，微信支付扫码的号码
 	@Column
-	private String receiptNum;
+	private String receiptNum;//收据
 	@Column
-	private String grantCode;
+	private String grantCode;//外系统单号
+	@Column
+	private String  transactionId;//交易号，微信押金交易号，用于押金消费/退款
 	@Column
 	private String remark;
 	
