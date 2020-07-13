@@ -107,6 +107,7 @@ public class BillServiceImpl implements BillService {
                 return null;
             }
         } else if (Constants.Type.BILL_TYPE_PACKAGE.equals(bill.getType())) {
+
         } else {
             return null;
         }
@@ -115,6 +116,11 @@ public class BillServiceImpl implements BillService {
             bill.setRoomNum(account.getRoomNum());
         }
         bill.setBillSeq(account.getCurrentBillSeq());
+        if(bill.getItems()!=null&&!bill.getItems().isEmpty()){
+            bill.getItems().forEach(billItem -> {
+                billItem.setHotelCode(account.getHotelCode());
+            });
+        }
         bill.setAccount(account);
         return billDao.saveAndFlush(bill);
     }
