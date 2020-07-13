@@ -251,7 +251,7 @@ public class RoomTypeQuantityServiceImpl implements RoomTypeQuantityService {
                     rtq.setWillArriveTotal(rtq.getWillArriveTotal() + quantity);
                 } else if (Constants.Status.ROOM_USAGE_PREDICTABLE.equals(newUsageStatus) && (Constants.Status.ROOM_USAGE_ASSIGN.equals(oldUsageStatus) || Constants.Status.ROOM_USAGE_RESERVATION.equals(oldUsageStatus))) {
                     rtq.setWillArriveTotal(rtq.getWillArriveTotal() - quantity);
-                } else if (Constants.Status.ROOM_USAGE_CHECK_IN.equals(newUsageStatus) || (Constants.Status.ROOM_USAGE_FREE.equals(newUsageStatus) && Constants.Status.ROOM_USAGE_ASSIGN.equals(oldUsageStatus))) {
+                } else if (Constants.Status.ROOM_USAGE_CHECK_IN.equals(newUsageStatus) || (Constants.Status.ROOM_USAGE_FREE.equals(newUsageStatus) && (Constants.Status.ROOM_USAGE_ASSIGN.equals(oldUsageStatus))||Constants.Status.ROOM_USAGE_RESERVATION.equals(oldUsageStatus))) {
                     rtq.setWillArriveTotal(rtq.getWillArriveTotal() - quantity);
                 }
             }
@@ -689,7 +689,7 @@ public class RoomTypeQuantityServiceImpl implements RoomTypeQuantityService {
     @Override
     public boolean extendTime(RoomType roomType, String roomStatus, LocalDateTime startTime, LocalDateTime
             endTime, LocalDateTime newStartTime, LocalDateTime newEndTime, int quantity) {
-        changeRoomTypeQuantity(roomType, dateTimeService.getStartDate(roomType.getHotelCode(), startTime), endTime.toLocalDate(), roomStatus, Constants.Status.ROOM_USAGE_FREE, 1, !roomStatus.equals(Constants.Status.ROOM_USAGE_CHECK_IN));
+        changeRoomTypeQuantity(roomType, dateTimeService.getStartDate(roomType.getHotelCode(), startTime), endTime.toLocalDate(), roomStatus, Constants.Status.ROOM_USAGE_FREE, quantity, !roomStatus.equals(Constants.Status.ROOM_USAGE_CHECK_IN));
         LocalDate newStartDate = null;
         LocalDate newEndDate = null;
         if (newStartTime != null) {
@@ -702,7 +702,7 @@ public class RoomTypeQuantityServiceImpl implements RoomTypeQuantityService {
         } else {
             newEndDate = endTime.toLocalDate();
         }
-        changeRoomTypeQuantity(roomType, newStartDate, newEndDate, Constants.Status.ROOM_USAGE_FREE, roomStatus, 1, !roomStatus.equals(Constants.Status.ROOM_USAGE_CHECK_IN));
+        changeRoomTypeQuantity(roomType, newStartDate, newEndDate, Constants.Status.ROOM_USAGE_FREE, roomStatus, quantity, !roomStatus.equals(Constants.Status.ROOM_USAGE_CHECK_IN));
         return true;
     }
 
