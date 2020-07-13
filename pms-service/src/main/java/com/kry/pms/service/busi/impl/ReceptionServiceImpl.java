@@ -233,8 +233,8 @@ public class ReceptionServiceImpl implements ReceptionService {
 			rep.error(Constants.BusinessCode.CODE_PARAMETER_INVALID,"提前入住“>1天”，请修改时间重算资源");
 			return rep;
 		}
+		LocalTime criticalTime = systemConfigService.getCriticalTime(user.getHotelCode());
 		if(now.toLocalDate().isEqual(cir.getArriveTime().toLocalDate())){
-			LocalTime criticalTime = systemConfigService.getCriticalTime(user.getHotelCode());
 			if(cir.getArriveTime().toLocalTime().isAfter(criticalTime)){
 				if(now.toLocalTime().isBefore(criticalTime)){
 					rep.error(Constants.BusinessCode.CODE_PARAMETER_INVALID,"提前到凌晨入住，请修改时间重算资源");
@@ -245,6 +245,12 @@ public class ReceptionServiceImpl implements ReceptionService {
 		if(now.isAfter(cir.getLeaveTime())){
 			rep.error(Constants.BusinessCode.CODE_PARAMETER_INVALID,"已过离店时间，无法入住");
 			return rep;
+		}
+		if(now.toLocalDate().isAfter(cir.getArriveTime().toLocalDate())){
+			if(now.toLocalTime().isAfter(criticalTime)){
+				rep.error(Constants.BusinessCode.CODE_PARAMETER_INVALID,"当前日期已过到店日期，请修改到店日期重算资源");
+				return rep;
+			}
 		}
 		if (cir != null) {
 			// 预留单不能入住
