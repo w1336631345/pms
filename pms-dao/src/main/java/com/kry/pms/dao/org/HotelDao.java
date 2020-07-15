@@ -11,6 +11,8 @@ public interface HotelDao extends BaseDao<Hotel>{
 
     Hotel findByHotelCode(String hotelCode);
 
+    List<Hotel> findByHotelCodeAndDeleted(String hotelCode, int deletede);
+
     @Query(nativeQuery = true, value = " select \n" +
             " th.id, th.hotel_code, th.`name` \n" +
             " from t_hotel th, t_user tu \n" +

@@ -622,6 +622,17 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
+    public Account createMemberAccount(String name, String hotelCode) {
+        Account account = new Account(0, 0);
+        account.setCode(businessSeqService.fetchNextSeqNum(hotelCode,
+                Constants.Key.BUSINESS_BUSINESS_ACCOUNT_SEQ_MEMBER));
+        account.setHotelCode(hotelCode);
+        account.setName(name);
+        account.setType(Constants.Type.ACCOUNT_CUSTOMER);
+        return add(account);
+    }
+
+    @Override
     public DtoResponse<Double> queryRoomPrice(String id) {
         Double result = 0.0;
         DtoResponse<Double> rep = new DtoResponse<Double>();

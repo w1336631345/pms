@@ -1,5 +1,6 @@
 package com.kry.pms.service.org;
 
+import com.kry.pms.base.HttpResponse;
 import com.kry.pms.model.http.response.org.HotelInfoVo;
 import com.kry.pms.model.persistence.org.Hotel;
 import com.kry.pms.service.BaseService;
@@ -14,4 +15,6 @@ public interface HotelService extends BaseService<Hotel>{
 	HotelInfoVo getHotelInfo(String currentHotleCode);
 
     List<Map<String, Object>> getByUnionId(String unionId);
+
+    HttpResponse getByHotelCodeAndDeleted(String currentHotleCode);
 }

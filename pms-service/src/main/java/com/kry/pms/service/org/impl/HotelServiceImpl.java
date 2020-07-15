@@ -3,6 +3,7 @@ package com.kry.pms.service.org.impl;
 import java.util.List;
 import java.util.Map;
 
+import com.kry.pms.base.HttpResponse;
 import com.kry.pms.service.dict.DictDataService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
@@ -74,6 +75,13 @@ public class HotelServiceImpl implements HotelService {
 		return null;// 默认不实现
 		// return hotelDao.findByHotelCode(code);
 	}
+	@Override
+	public HttpResponse getByHotelCodeAndDeleted(String hotleCode) {
+		HttpResponse hr = new HttpResponse();
+		List<Hotel> list = hotelDao.findByHotelCodeAndDeleted(hotleCode, Constants.DELETED_FALSE);
+		hr.setData(list);
+		return hr;
+	}
 
 	@Override
 	public Hotel getByHotelCode(String code) {
@@ -115,4 +123,5 @@ public class HotelServiceImpl implements HotelService {
 		List<Map<String, Object>> list = hotelDao.getByUnionId(unionId);
 		 return list;
 	}
+
 }

@@ -14,6 +14,8 @@ import com.kry.pms.base.HttpResponse;
 import com.kry.pms.model.persistence.org.Hotel;
 import com.kry.pms.service.org.HotelService;
 
+import java.util.List;
+
 @RestController
 @RequestMapping(path = "/api/v1/org/hotel")
 public class HotelController extends BaseController<Hotel> {
@@ -38,6 +40,13 @@ public class HotelController extends BaseController<Hotel> {
 	@GetMapping(path="/my")
 	public HttpResponse<Hotel> my() {
 		return getDefaultResponse().addData(hotelService.getByHotelCode(getCurrentHotleCode()));
+	}
+
+	@GetMapping(path="/list")
+	public HttpResponse<List<Hotel>> getList() {
+		HttpResponse hr = new HttpResponse();
+		hr = hotelService.getByHotelCodeAndDeleted(getCurrentHotleCode());
+		return hr;
 	}
 
 

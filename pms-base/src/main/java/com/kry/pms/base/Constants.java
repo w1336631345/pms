@@ -93,6 +93,7 @@ public class Constants {
 		public static final String BUSINESS_BUSINESS_CUSTOMER_ACCOUNT_SEQ_KEY = "CUSTOMER_ACCOUNT_NUM";
 		public static final String BUSINESS_BUSINESS_GROUP_ACCOUNT_SEQ_KEY = "GROUP_ACCOUNT_NUM";//团队预订账号G开头
 		public static final String BUSINESS_BUSINESS_GROUP_CUSTOMER_ACCOUNT_SEQ_KEY = "GROUP_CUSTOMER_ACCOUNT_NUM";//多人散客预订账号U开头
+		public static final String BUSINESS_BUSINESS_ACCOUNT_SEQ_MEMBER = "ACCOUNT_SEQ_MEMBER";//会员账号
 		public static final String BUSINESS_BUSINESS_ACCOUNT_SEQ="ACCOUNT_SEQ_";
 		public static final String BUSINESS_BUSINESS_SALES_MEN_SEQ="SALES_MEN_SEQ";
 		public static final String TOGETHER_NUM_KEY = "TOGETHER_NUM";
