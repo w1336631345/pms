@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import com.kry.pms.base.DtoResponse;
 import com.kry.pms.model.func.UseInfoAble;
 import com.kry.pms.model.http.response.busi.RoomTypeQuantityPredictableVo;
 import com.kry.pms.model.http.response.room.RoomTypeQuantityVo;
@@ -65,4 +66,6 @@ public interface RoomTypeQuantityService extends BaseService<RoomTypeQuantity> {
     boolean extendTime(RoomType roomType, String roomStatus, LocalDateTime startTime, LocalDateTime endTime, LocalDateTime newStartTime, LocalDateTime newEndTime,int quantity);
 
     List<Map<String, Object>> resourcesInfo(String currentHotleCode, Map<String, Object> parse2Map) throws IOException, TemplateException;
+
+    DtoResponse<String> recount(String currentHotleCode);
 }

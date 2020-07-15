@@ -38,6 +38,15 @@ public class RoomTypeQuantityController extends BaseController<RoomTypeQuantity>
 	public HttpResponse<RoomTypeQuantity> add(@RequestBody RoomTypeQuantity roomTypeQuantity) {
 		return getDefaultResponse().addData(roomTypeQuantityService.add(roomTypeQuantity));
 	}
+	@GetMapping(path = "/recount")
+	public HttpResponse<String> recount(){
+		HttpResponse<String> rep = new HttpResponse<>();
+		roomTypeQuantityService.recount(getCurrentHotleCode());
+		rep.setMessage("房类资源重算完成");
+		return rep;
+	}
+
+
 	@GetMapping(path="/day")
 	public HttpResponse<List<RoomTypeQuantityVo>> query(String startDate,String endDate){
 		HttpResponse<List<RoomTypeQuantityVo>> rep = new HttpResponse<>();
@@ -117,7 +126,12 @@ public class RoomTypeQuantityController extends BaseController<RoomTypeQuantity>
 			sDate = LocalDate.now();
 		}
 		if (!eDate.isAfter(sDate)) {
+
+
 			response.setStatus(Constants.BusinessCode.CODE_PARAMETER_INVALID);
+
+
+
 			response.setMessage("到离店时间错误，请重新选择");
 		} else {
 			RoomTypeQuantityPredictableVo data = roomTypeQuantityService.queryPredic(getCurrentHotleCode(), roomTypeId,

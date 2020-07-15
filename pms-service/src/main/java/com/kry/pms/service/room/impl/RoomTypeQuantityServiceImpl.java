@@ -2,6 +2,7 @@ package com.kry.pms.service.room.impl;
 
 import com.kry.pms.base.Constants;
 import com.kry.pms.base.Constants.BusinessCode;
+import com.kry.pms.base.DtoResponse;
 import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
 import com.kry.pms.dao.marketing.RoomPriceSchemeDao;
@@ -735,5 +736,14 @@ public class RoomTypeQuantityServiceImpl implements RoomTypeQuantityService {
         }
 
         return list;
+    }
+
+    @Override
+    public DtoResponse<String> recount(String currentHotleCode) {
+        DtoResponse<String> rep = new DtoResponse<>();
+        LocalDate businessDate = businessSeqService.getBuinessDate(currentHotleCode);
+        Object[] params = {currentHotleCode,businessDate};
+        sqlTemplateService.callProcedure("recountRoomType",params);
+        return rep;
     }
 }
