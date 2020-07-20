@@ -25,7 +25,7 @@ public class DictDataServiceImpl implements DictDataService {
 
     @Override
     public DictData add(DictData dictData) {
-        DictData exist = dictDataDao.findByHotelCodeAndCodeAndDeleted(dictData.getHotelCode(),dictData.getCode(),Constants.DELETED_FALSE);
+        DictData exist = dictDataDao.findByHotelCodeAndCodeAndDictTypeCodeAndDeleted(dictData.getHotelCode(),dictData.getCode(),dictData.getDictTypeCode(),Constants.DELETED_FALSE);
         if(exist!=null){
             return null;
         }

@@ -19,4 +19,6 @@ public interface DictDataDao extends BaseDao<DictData>{
             "where td.hotel_code = ?1 \n" +
             "and td.dict_type_code = ?2 ")
     List<String> getArchivesType(String hotelCode, String dictTypeCode);
+
+    DictData findByHotelCodeAndCodeAndDictTypeCodeAndDeleted(String hotelCode, String code, String dictTypeCode, int deletedFalse);
 }
