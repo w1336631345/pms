@@ -236,10 +236,32 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                         cir.setDays(checkInRecord.getDays());
                         cir.setStartDate(checkInRecord.getStartDate());
                         List<RoomRecord> list = roomRecordService.findByHotelCodeAndCheckInRecord(cir.getHotelCode(), cir.getId());
-                        for (int r = 0; r < list.size(); r++) {
-                            roomRecordService.deleteTrue(list.get(r).getId());
+                        List<LocalDate> recordDates = new ArrayList<>();
+                        for (int j = 0; j < days; j++) {
+                            recordDates.add(cir.getStartDate().plusDays(j));
                         }
-                        roomRecordService.createRoomRecord(cir);
+                        for (int r = 0; r < list.size(); r++) {
+                            //如果这条记录在新修改的时间范围内，则不删除，否则删除
+                            if(recordDates.contains(list.get(r).getRecordDate())){
+                                //存在就不用修改
+                                recordDates.remove(list.get(r).getRecordDate());
+                            }else {
+                                roomRecordService.deleteTrue(list.get(r).getId());
+                            }
+                        }
+                        for(int m = 0; m<recordDates.size(); m++){
+                            RoomRecord rr = null;
+                            rr = new RoomRecord();
+                            rr.setCheckInRecord(cir);
+                            rr.setHotelCode(cir.getHotelCode());
+                            rr.setCustomer(cir.getCustomer());
+                            rr.setGuestRoom(cir.getGuestRoom());
+                            rr.setCost(cir.getPersonalPrice());
+                            rr.setCostRatio(cir.getPersonalPercentage());
+                            rr.setRecordDate(recordDates.get(m));
+                            roomRecordService.add(rr);
+                        }
+//                        roomRecordService.createRoomRecord(cir);
                     }else {
                         if (checkInRecord.getArriveTime().isAfter(cir.getArriveTime()) || checkInRecord.getLeaveTime().isBefore(cir.getLeaveTime())) {
                             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
@@ -311,15 +333,37 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                 List<CheckInRecord> together = checkInTogether(checkInRecord.getHotelCode(), checkInRecord.getOrderNum(), checkInRecord.getGuestRoom().getId());
                 for (int t = 0; t < together.size(); t++) {
                     List<RoomRecord> list = roomRecordService.findByHotelCodeAndCheckInRecord(checkInRecord.getHotelCode(), together.get(t).getId());
+                    List<LocalDate> recordDates = new ArrayList<>();
+                    for (int j = 0; j < days; j++) {
+                        recordDates.add(checkInRecord.getStartDate().plusDays(j));
+                    }
                     for (int r = 0; r < list.size(); r++) {
-                        roomRecordService.deleteTrue(list.get(r).getId());
+                        //如果这条记录在新修改的时间范围内，则不删除，否则删除
+                        if(recordDates.contains(list.get(r).getRecordDate())){
+                            //存在就不用修改
+                            recordDates.remove(list.get(r).getRecordDate());
+                        }else {
+                            roomRecordService.deleteTrue(list.get(r).getId());
+                        }
                     }
                     together.get(t).setDays(days);
                     together.get(t).setArriveTime(checkInRecord.getArriveTime());
                     together.get(t).setLeaveTime(checkInRecord.getLeaveTime());
                     together.get(t).setStartDate(checkInRecord.getStartDate());
                     checkInRecordDao.saveAndFlush(together.get(t));
-                    roomRecordService.createRoomRecord(together.get(t));
+                    for(int m = 0; m<recordDates.size(); m++){
+                        RoomRecord rr = null;
+                        rr = new RoomRecord();
+                        rr.setCheckInRecord(checkInRecord);
+                        rr.setHotelCode(checkInRecord.getHotelCode());
+                        rr.setCustomer(checkInRecord.getCustomer());
+                        rr.setGuestRoom(checkInRecord.getGuestRoom());
+                        rr.setCost(checkInRecord.getPersonalPrice());
+                        rr.setCostRatio(checkInRecord.getPersonalPercentage());
+                        rr.setRecordDate(recordDates.get(m));
+                        roomRecordService.add(rr);
+                    }
+//                    roomRecordService.createRoomRecord(together.get(t));
                 }
             }
         }
@@ -451,25 +495,70 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                 }
                 cir.setDays(days);
                 List<RoomRecord> list = roomRecordService.findByHotelCodeAndCheckInRecord(cir.getHotelCode(), cir.getId());
-                for (int r = 0; r < list.size(); r++) {
-                    roomRecordService.deleteTrue(list.get(r).getId());
+                List<LocalDate> recordDates = new ArrayList<>();
+                for (int j = 0; j < days; j++) {
+                    recordDates.add(cir.getStartDate().plusDays(j));
                 }
-                roomRecordService.createRoomRecord(cir);
+                for (int r = 0; r < list.size(); r++) {
+                    //如果这条记录在新修改的时间范围内，则不删除，否则删除
+                    if(recordDates.contains(list.get(r).getRecordDate())){
+                        //存在就不用修改
+                        recordDates.remove(list.get(r).getRecordDate());
+                    }else {
+                        roomRecordService.deleteTrue(list.get(r).getId());
+                    }
+                }
+                for(int m = 0; m<recordDates.size(); m++){
+                    RoomRecord rr = null;
+                    rr = new RoomRecord();
+                    rr.setCheckInRecord(cir);
+                    rr.setHotelCode(cir.getHotelCode());
+                    rr.setCustomer(cir.getCustomer());
+                    rr.setGuestRoom(cir.getGuestRoom());
+                    rr.setCost(cir.getPersonalPrice());
+                    rr.setCostRatio(cir.getPersonalPercentage());
+                    rr.setRecordDate(recordDates.get(m));
+                    roomRecordService.add(rr);
+                }
+//                roomRecordService.createRoomRecord(cir);
                 //***********分割线************
                 //下面是同住的记录一起修改
                 if (roomI) {
                     List<CheckInRecord> together = checkInTogether(cir.getHotelCode(), cir.getOrderNum(), cir.getGuestRoom().getId());
                     for (int t = 0; t < together.size(); t++) {
                         List<RoomRecord> listT = roomRecordService.findByHotelCodeAndCheckInRecord(cir.getHotelCode(), together.get(t).getId());
-                        for (int r = 0; r < listT.size(); r++) {
-                            roomRecordService.deleteTrue(listT.get(r).getId());
+                        List<LocalDate> recordDates2 = new ArrayList<>();
+                        for (int j = 0; j < days; j++) {
+                            recordDates2.add(together.get(t).getStartDate().plusDays(j));
                         }
+                        for (int r = 0; r < listT.size(); r++) {
+                            //如果这条记录在新修改的时间范围内，则不删除，否则删除
+                            if(recordDates2.contains(listT.get(r).getRecordDate())){
+                                //存在就不用修改
+                                recordDates2.remove(listT.get(r).getRecordDate());
+                            }else {
+                                roomRecordService.deleteTrue(listT.get(r).getId());
+                            }
+                        }
+
                         together.get(t).setDays(days);
                         together.get(t).setStartDate(cir.getStartDate());
                         together.get(t).setArriveTime(at);
                         together.get(t).setLeaveTime(lt);
                         checkInRecordDao.saveAndFlush(together.get(t));
-                        roomRecordService.createRoomRecord(together.get(t));
+                        for(int m = 0; m<recordDates2.size(); m++){
+                            RoomRecord rr = null;
+                            rr = new RoomRecord();
+                            rr.setCheckInRecord(together.get(t));
+                            rr.setHotelCode(together.get(t).getHotelCode());
+                            rr.setCustomer(together.get(t).getCustomer());
+                            rr.setGuestRoom(together.get(t).getGuestRoom());
+                            rr.setCost(together.get(t).getPersonalPrice());
+                            rr.setCostRatio(together.get(t).getPersonalPercentage());
+                            rr.setRecordDate(recordDates2.get(m));
+                            roomRecordService.add(rr);
+                        }
+//                        roomRecordService.createRoomRecord(together.get(t));
                     }
                 }
                 //上面是同住的记录一起修改

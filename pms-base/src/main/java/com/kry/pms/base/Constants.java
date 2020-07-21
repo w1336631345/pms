@@ -98,6 +98,8 @@ public class Constants {
 		public static final String BUSINESS_BUSINESS_SALES_MEN_SEQ="SALES_MEN_SEQ";
 		public static final String TOGETHER_NUM_KEY = "TOGETHER_NUM";
 		public static final String CUSTOMER_NUM = "CUSTOMER_NUM";// 客户编码
+		public static final String MENBER_NUM = "MENBER_NUM";// 会员卡号
+		public static final String MENBER_INTEGRAL_NO = "MENBER_INTEGRAL_NO";// 会员积分单号
 		public static final String BUSINESS_CANCLE_SETTLE_SEQ_KEY = "CANCLE_SETTLE_NUM";
 		public static final String EXECUTE_TYPE_AFTER_NIGHT_AUDT = "ANA";
     }

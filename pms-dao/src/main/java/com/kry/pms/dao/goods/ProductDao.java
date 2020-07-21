@@ -47,4 +47,6 @@ public interface ProductDao extends BaseDao<Product>{
             "      and tdd.other_status = :otherStatus ")
     List<String> getDictCode(@Param("hotelCode")String hotelCode, @Param("otherStatus")String otherStatus);
 
+    List<Product> findByHotelCodeAndDirectionAndDeleted(String hotelCode, String direction, int deleted);
+
 }

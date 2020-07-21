@@ -6,6 +6,7 @@ import com.kry.pms.model.persistence.marketing.SalesMen;
 import com.kry.pms.model.persistence.org.Hotel;
 import com.kry.pms.model.persistence.sys.Account;
 import lombok.Data;
+import org.springframework.data.annotation.Transient;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -28,8 +29,10 @@ public class MemberInfo extends PersistenceModel {
     private Customer customer;//会员账号
     @Column(columnDefinition = "varchar(100) COMMENT '会员类型'")
     private String type;
-    @Column
-    private String level;//会员等级
+    @Transient
+    private String level;//会员等级(不用了)
+    @ManyToOne
+    private MemberLevel memberLevel;//会员等级(对象)
     @Column(columnDefinition = "varchar(100) COMMENT '代码'")
     private String code_;
     @Column(columnDefinition = "varchar(100) COMMENT '序号'")
@@ -47,9 +50,11 @@ public class MemberInfo extends PersistenceModel {
     @Column(columnDefinition = "varchar(1000) COMMENT '描述'")
     private String remark;
     @Column
-    private Integer integral;//积分
-    @Column
+    private Double integral;//积分
+    @Transient
     private String integralType;//积分模式
+    @ManyToOne
+    private MemberIntegralType memberIntegralType;//积分模式
     @Column
     private String deductionType;//扣费模式
     @ManyToOne

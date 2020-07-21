@@ -9,6 +9,6 @@ public interface MemberInfoDao extends BaseDao<MemberInfo>{
 
 	List<MemberInfo> findByHotelCode(String hotelCode);
 
-
+	MemberInfo findByHotelCodeAndCardNum(String hotelCode, String cardNum);
 
 }
