@@ -37,5 +37,7 @@ public class BosGoodsInfo extends PersistenceModel {
     private String supplierName;
     @ManyToOne
     private BosGoodsType bosGoodsType;
+    @Column
+    private String isChangePrice;
 
 }

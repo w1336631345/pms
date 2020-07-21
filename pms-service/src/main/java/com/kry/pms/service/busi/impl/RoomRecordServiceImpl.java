@@ -240,8 +240,9 @@ public class RoomRecordServiceImpl implements RoomRecordService {
 
 	@Override
 	public List<RoomRecord> findByHotelCodeAndCheckInRecord(String hotelCode, String checkInRecordId){
-		CheckInRecord cir = checkInRecordService.findById(checkInRecordId);
-//		List<RoomRecord> list = roomRecordDao.findByHotelCodeAndCheckInRecord(hotelCode, cir);
+//		CheckInRecord cir = checkInRecordService.findById(checkInRecordId);
+		CheckInRecord cir = new CheckInRecord();
+		cir.setId(checkInRecordId);
 		List<RoomRecord> list = roomRecordDao.findByCheckInRecord(cir);
 		return list;
 	}
