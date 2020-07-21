@@ -107,7 +107,7 @@ public class BillServiceImpl implements BillService {
                 return null;
             }
         } else if (Constants.Type.BILL_TYPE_PACKAGE.equals(bill.getType())) {
-
+            bill.setCost(bill.getTotal());
         } else {
             return null;
         }
