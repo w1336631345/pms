@@ -396,31 +396,31 @@ public class AccountServiceImpl implements AccountService {
     private void processTotal(SettleAccountRecord settleAccountRecord) {
         double pay = 0.0, cost = 0.0;
         if (settleAccountRecord.getBills() != null) {
-            settleAccountRecord.getBills().forEach(item -> {
+            for(Bill item : settleAccountRecord.getBills()){
                 if (item.getCost() != null) {
-                    BigDecimalUtil.add(cost, item.getCost());
+                    cost = BigDecimalUtil.add(cost, item.getCost());
                 } else if (item.getPay() != null) {
-                    BigDecimalUtil.add(pay, item.getPay());
+                    pay = BigDecimalUtil.add(pay, item.getPay());
                 }
-            });
+            }
         }
         if (settleAccountRecord.getExtBills() != null) {
-            settleAccountRecord.getExtBills().forEach(item -> {
+            for(Bill item : settleAccountRecord.getExtBills()){
                 if (item.getCost() != null) {
-                    BigDecimalUtil.add(cost, item.getCost());
+                    cost = BigDecimalUtil.add(cost, item.getCost());
                 } else if (item.getPay() != null) {
-                    BigDecimalUtil.add(pay, item.getPay());
+                    pay = BigDecimalUtil.add(pay, item.getPay());
                 }
-            });
+            }
         }
         if (settleAccountRecord.getFlatBills() != null) {
-            settleAccountRecord.getFlatBills().forEach(item -> {
+            for(Bill item : settleAccountRecord.getFlatBills()){
                 if (item.getCost() != null) {
-                    BigDecimalUtil.add(cost, item.getCost());
+                    cost = BigDecimalUtil.add(cost, item.getCost());
                 } else if (item.getPay() != null) {
-                    BigDecimalUtil.add(pay, item.getPay());
+                    pay = BigDecimalUtil.add(pay, item.getPay());
                 }
-            });
+            }
         }
         settleAccountRecord.setTotal(cost);
         settleAccountRecord.setPay(pay);
@@ -448,13 +448,15 @@ public class AccountServiceImpl implements AccountService {
                 if (settleAccountRecord == null) {
                     settleAccountRecord = settleAccountRecordService.create(billCheckBo, account);
                 }
-                for (Bill b : billCheckBo.getBills()) {
-                    total = BigDecimalUtil.add(total, b.getTotal());
-                    if (Constants.Code.TO_AR.equals(b.getProduct().getCode())) {
-                        flatBills.addAll(billService.addToArFlatBill(b, billCheckBo.getOperationEmployee(), billCheckBo.getShiftCode(), settleAccountRecord.getRecordNum()));
-                    } else {
-                        flatBills.add(billService.addFlatBill(b, billCheckBo.getOperationEmployee(),
-                                billCheckBo.getShiftCode(), settleAccountRecord.getRecordNum()));
+                if (billCheckBo.getBills() != null && !billCheckBo.getBills().isEmpty()) {
+                    for (Bill b : billCheckBo.getBills()) {
+                        total = BigDecimalUtil.add(total, b.getTotal());
+                        if (Constants.Code.TO_AR.equals(b.getProduct().getCode())) {
+                            flatBills.addAll(billService.addToArFlatBill(b, billCheckBo.getOperationEmployee(), billCheckBo.getShiftCode(), settleAccountRecord.getRecordNum()));
+                        } else {
+                            flatBills.add(billService.addFlatBill(b, billCheckBo.getOperationEmployee(),
+                                    billCheckBo.getShiftCode(), settleAccountRecord.getRecordNum()));
+                        }
                     }
                 }
                 if (Constants.Type.SETTLE_TYPE_ACCOUNT.equals(billCheckBo.getCheckType())) {
