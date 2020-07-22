@@ -54,6 +54,10 @@ public class SettleAccountRecord extends PersistenceModel {
     @Column
     private Double total;
     @Column
+    private Double cost;
+    @Column
+    private Double pay;
+    @Column
     private Integer billCount;
     @Column
     private String settleNum;

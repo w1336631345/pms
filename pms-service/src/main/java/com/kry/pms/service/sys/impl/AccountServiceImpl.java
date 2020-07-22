@@ -100,6 +100,7 @@ public class AccountServiceImpl implements AccountService {
         }
         accountDao.saveAndFlush(account);
     }
+
     @Override
     public void deleteTrue(String id) {
         accountDao.deleteById(id);
@@ -266,6 +267,7 @@ public class AccountServiceImpl implements AccountService {
                     if (crep.getStatus() == 0) {
                         settleAccountRecord.setBills(bills);
                         settleAccountRecord.setFlatBills(crep.getData());
+                        processTotal(settleAccountRecord);
                         settleAccountRecordService.modify(settleAccountRecord);
                     }
                 } else {
@@ -372,6 +374,7 @@ public class AccountServiceImpl implements AccountService {
                         settleAccountRecord.setFlatBills(flatBills);
                         settleAccountRecord.setBills(bills);
                         settleAccountRecord.setExtBills(billCheckBo.getExtBills());
+                        processTotal(settleAccountRecord);
                         settleAccountRecordService.modify(settleAccountRecord);
                     } else {
                         rep.error(Constants.BusinessCode.CODE_PARAMETER_INVALID, "转账目标AR账户无法找到");
@@ -389,6 +392,41 @@ public class AccountServiceImpl implements AccountService {
         }
         return rep;
     }
+
+    private void processTotal(SettleAccountRecord settleAccountRecord) {
+        double pay = 0.0, cost = 0.0;
+        if (settleAccountRecord.getBills() != null) {
+            settleAccountRecord.getBills().forEach(item -> {
+                if (item.getCost() != null) {
+                    BigDecimalUtil.add(cost, item.getCost());
+                } else if (item.getPay() != null) {
+                    BigDecimalUtil.add(pay, item.getPay());
+                }
+            });
+        }
+        if (settleAccountRecord.getExtBills() != null) {
+            settleAccountRecord.getExtBills().forEach(item -> {
+                if (item.getCost() != null) {
+                    BigDecimalUtil.add(cost, item.getCost());
+                } else if (item.getPay() != null) {
+                    BigDecimalUtil.add(pay, item.getPay());
+                }
+            });
+        }
+        if (settleAccountRecord.getFlatBills() != null) {
+            settleAccountRecord.getFlatBills().forEach(item -> {
+                if (item.getCost() != null) {
+                    BigDecimalUtil.add(cost, item.getCost());
+                } else if (item.getPay() != null) {
+                    BigDecimalUtil.add(pay, item.getPay());
+                }
+            });
+        }
+        settleAccountRecord.setTotal(cost);
+        settleAccountRecord.setPay(pay);
+        settleAccountRecord.setCost(cost);
+    }
+
     private DtoResponse<Account> checkAccountBill(BillCheckBo billCheckBo) {
         if (billCheckBo.getCheckWay() != null && billCheckBo.getCheckWay().equals(Constants.Type.BILL_CHECK_WAY_SETTLED_AR)) {
             return checkAccountByAr(billCheckBo);
@@ -397,30 +435,36 @@ public class AccountServiceImpl implements AccountService {
         Account account = findById(billCheckBo.getAccountId());
         List<Bill> bills = null;
         if (account != null) {
+            double total = 0.0;
             List<Bill> flatBills = new ArrayList<>();
             SettleAccountRecord settleAccountRecord = null;
-            for (Bill b : billCheckBo.getBills()) {
-                if (b.getTargetAccount() != null) {
-                    settleAccountRecord = settleAccountRecordService.createToAr(billCheckBo, account, b.getTargetAccount());
-                    break;
+            if (billCheckBo.getBills() != null && !billCheckBo.getBills().isEmpty()) {
+                for (Bill b : billCheckBo.getBills()) {
+                    if (b.getTargetAccount() != null) {
+                        settleAccountRecord = settleAccountRecordService.createToAr(billCheckBo, account, b.getTargetAccount());
+                        break;
+                    }
                 }
-            }
-            if (settleAccountRecord == null) {
-                settleAccountRecord = settleAccountRecordService.create(billCheckBo, account);
-            }
-            double total = 0.0;
-            for (Bill b : billCheckBo.getBills()) {
-                total = BigDecimalUtil.add(total, b.getTotal());
-                if (Constants.Code.TO_AR.equals(b.getProduct().getCode())) {
-                    flatBills.addAll(billService.addToArFlatBill(b, billCheckBo.getOperationEmployee(), billCheckBo.getShiftCode(), settleAccountRecord.getRecordNum()));
+                if (settleAccountRecord == null) {
+                    settleAccountRecord = settleAccountRecordService.create(billCheckBo, account);
+                }
+                for (Bill b : billCheckBo.getBills()) {
+                    total = BigDecimalUtil.add(total, b.getTotal());
+                    if (Constants.Code.TO_AR.equals(b.getProduct().getCode())) {
+                        flatBills.addAll(billService.addToArFlatBill(b, billCheckBo.getOperationEmployee(), billCheckBo.getShiftCode(), settleAccountRecord.getRecordNum()));
+                    } else {
+                        flatBills.add(billService.addFlatBill(b, billCheckBo.getOperationEmployee(),
+                                billCheckBo.getShiftCode(), settleAccountRecord.getRecordNum()));
+                    }
+                }
+                if (Constants.Type.SETTLE_TYPE_ACCOUNT.equals(billCheckBo.getCheckType())) {
+                    bills = billService.checkAccountAllBill(account, total, rep, settleAccountRecord.getRecordNum());
                 } else {
-                    flatBills.add(billService.addFlatBill(b, billCheckBo.getOperationEmployee(),
-                            billCheckBo.getShiftCode(), settleAccountRecord.getRecordNum()));
+                    bills = billService.checkBillIds(billCheckBo.getBillIds(), total, rep,
+                            settleAccountRecord.getRecordNum());
                 }
-            }
-            if (Constants.Type.SETTLE_TYPE_ACCOUNT.equals(billCheckBo.getCheckType())) {
-                bills = billService.checkAccountAllBill(account, total, rep, settleAccountRecord.getRecordNum());
             } else {
+                settleAccountRecord = settleAccountRecordService.create(billCheckBo, account);
                 bills = billService.checkBillIds(billCheckBo.getBillIds(), total, rep,
                         settleAccountRecord.getRecordNum());
             }
@@ -428,6 +472,7 @@ public class AccountServiceImpl implements AccountService {
                 settleAccountRecord.setBills(bills);
                 settleAccountRecord.setFlatBills(flatBills);
                 settleAccountRecord.setExtBills(billCheckBo.getExtBills());
+                processTotal(settleAccountRecord);
                 settleAccountRecordService.modify(settleAccountRecord);
 
             }
@@ -663,7 +708,7 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public boolean accountCheckAndSettledZeroBill(Account account){
+    public boolean accountCheckAndSettledZeroBill(Account account) {
         if (account == null) {
             return false;
         } else if (account.getTotal() != 0.0) {
@@ -677,9 +722,10 @@ public class AccountServiceImpl implements AccountService {
 
     }
 
-    private int autoSettleZeroBill(Account account){
+    private int autoSettleZeroBill(Account account) {
         return billService.autoSettleZeroBill(account.getId());
     }
+
     private boolean accountCheck(Account account) {
         if (account == null) {
             return false;

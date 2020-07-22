@@ -277,6 +277,7 @@ public class BillServiceImpl implements BillService {
                 modify(b);
             } else {
                 rep.setStatus(Constants.BusinessCode.CODE_ILLEGAL_OPERATION);
+                rep.setMessage("有部分帐务已经处在结帐状态");
                 break;
             }
         }
