@@ -185,6 +185,13 @@ public class SettleAccountRecordServiceImpl implements SettleAccountRecordServic
         return rep;
     }
 
+    @Override
+    public SettleAccountRecord createARSettle(BillCheckBo billCheckBo, Account account) {
+        String recordNum = businessSeqService.fetchNextSeqNum(billCheckBo.getOperationEmployee().getHotelCode(),
+                Constants.Key.BUSINESS_BUSINESS_AR_SETTLE_NUM_KEY);
+        return create(recordNum,account, account, billCheckBo.getOperationEmployee(), billCheckBo.getShiftCode(),
+                billCheckBo.getCheckWay(), billCheckBo.getMainSettleRecordNum());    }
+
     private DtoResponse<String> cancleTransfer(SettleAccountRecord sar, String shiftCode, Employee operationEmployee) {
         DtoResponse<String> rep = new DtoResponse<String>();
         DtoResponse<List<Bill>> crep = accountService.cancleTransfer(sar.getFlatBills(), sar.getTotal(), sar.getAccount(),
@@ -217,15 +224,16 @@ public class SettleAccountRecordServiceImpl implements SettleAccountRecordServic
 
     @Override
     public SettleAccountRecord create(BillCheckBo billCheckBo, Account account, Account targetAccount) {
-        return create(account, targetAccount, billCheckBo.getOperationEmployee(), billCheckBo.getShiftCode(),
+        String recordNum = businessSeqService.fetchNextSeqNum(billCheckBo.getOperationEmployee().getHotelCode(),
+                Constants.Key.BUSINESS_BUSINESS_TRANSFER_SEQ_KEY);
+        return create(recordNum,account, targetAccount, billCheckBo.getOperationEmployee(), billCheckBo.getShiftCode(),
                 billCheckBo.getCheckWay(), billCheckBo.getMainSettleRecordNum());
     }
 
-    private SettleAccountRecord create(Account account, Account targetAccount, Employee employee, String shiftCode,
+    private SettleAccountRecord create(String recordNum,Account account, Account targetAccount, Employee employee, String shiftCode,
                                        String checkWay, String mainRecordNum) {
         SettleAccountRecord scr = new SettleAccountRecord();
-        scr.setRecordNum(businessSeqService.fetchNextSeqNum(employee.getHotelCode(),
-                Constants.Key.BUSINESS_BUSINESS_TRANSFER_SEQ_KEY));
+        scr.setRecordNum(recordNum);
         scr.setShiftCode(shiftCode);
         if (mainRecordNum != null) {
             scr.setIsSubRecord(true);

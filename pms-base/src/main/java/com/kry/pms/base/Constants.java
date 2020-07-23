@@ -90,6 +90,7 @@ public class Constants {
 		public static final String BUSINESS_PLAN_DATE_SEQ_KEY = "PLAN_DATE";
 		public static final String BUSINESS_BUSINESS_SETTLE_SEQ_KEY = "SETTLE_NUM";
 		public static final String BUSINESS_BUSINESS_TRANSFER_SEQ_KEY = "TRANSFER_NUM";
+		public static final String BUSINESS_BUSINESS_AR_SETTLE_NUM_KEY = "AR_SETTLE_NUM";
 		public static final String BUSINESS_BUSINESS_CUSTOMER_ACCOUNT_SEQ_KEY = "CUSTOMER_ACCOUNT_NUM";
 		public static final String BUSINESS_BUSINESS_GROUP_ACCOUNT_SEQ_KEY = "GROUP_ACCOUNT_NUM";//团队预订账号G开头
 		public static final String BUSINESS_BUSINESS_GROUP_CUSTOMER_ACCOUNT_SEQ_KEY = "GROUP_CUSTOMER_ACCOUNT_NUM";//多人散客预订账号U开头
@@ -175,7 +176,7 @@ public class Constants {
 		public static final String SETTLE_TYPE_IGROUP = "IG";
 		public static final String SETTLE_TYPE_ROOM = "ROOM";
 		public static final String SETTLE_TYPE_NONE = "NONE";
-		
+		public static final String BILL_CHECK_WAY_AR_SETTLED = "V";
 		public static final String BILL_CHECK_WAY_SETTLED = "S";
 		public static final String BILL_CHECK_WAY_TRANSFER = "T";
 		public static final String BILL_CHECK_WAY_SETTLED_AR= "TAR";

@@ -396,7 +396,7 @@ public class AccountServiceImpl implements AccountService {
     private void processTotal(SettleAccountRecord settleAccountRecord) {
         double pay = 0.0, cost = 0.0;
         if (settleAccountRecord.getBills() != null) {
-            for(Bill item : settleAccountRecord.getBills()){
+            for (Bill item : settleAccountRecord.getBills()) {
                 if (item.getCost() != null) {
                     cost = BigDecimalUtil.add(cost, item.getCost());
                 } else if (item.getPay() != null) {
@@ -405,7 +405,7 @@ public class AccountServiceImpl implements AccountService {
             }
         }
         if (settleAccountRecord.getExtBills() != null) {
-            for(Bill item : settleAccountRecord.getExtBills()){
+            for (Bill item : settleAccountRecord.getExtBills()) {
                 if (item.getCost() != null) {
                     cost = BigDecimalUtil.add(cost, item.getCost());
                 } else if (item.getPay() != null) {
@@ -414,7 +414,7 @@ public class AccountServiceImpl implements AccountService {
             }
         }
         if (settleAccountRecord.getFlatBills() != null) {
-            for(Bill item : settleAccountRecord.getFlatBills()){
+            for (Bill item : settleAccountRecord.getFlatBills()) {
                 if (item.getCost() != null) {
                     cost = BigDecimalUtil.add(cost, item.getCost());
                 } else if (item.getPay() != null) {
@@ -466,7 +466,7 @@ public class AccountServiceImpl implements AccountService {
                             settleAccountRecord.getRecordNum());
                 }
             } else {
-                settleAccountRecord = settleAccountRecordService.create(billCheckBo, account);
+                settleAccountRecord = settleAccountRecordService.createARSettle(billCheckBo, account);
                 bills = billService.checkBillIds(billCheckBo.getBillIds(), total, rep,
                         settleAccountRecord.getRecordNum());
             }
