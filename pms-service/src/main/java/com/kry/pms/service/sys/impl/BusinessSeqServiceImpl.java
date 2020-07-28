@@ -139,7 +139,6 @@ public class BusinessSeqServiceImpl implements BusinessSeqService {
 				sb.append(dbs.getCurrentSeq().toString().substring(2));
 			} else {
 				sb.append(dbs.getCurrentSeq());
-
 			}
 			sb.append(String.format(snf, bs.getCurrentSeq()));
 			break;

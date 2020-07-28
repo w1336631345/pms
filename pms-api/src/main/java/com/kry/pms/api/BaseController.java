@@ -229,7 +229,11 @@ public class BaseController<T> {
         for (String key : params.keySet()) {
             val = params.get(key);
             if (val != null) {
-                data.put(key, val.length > 1 ? Arrays.asList(val) : val[0]);
+                if(val.length>1){
+                    data.put(key+"s",Arrays.asList(val));
+                }else{
+                    data.put(key,val[0]);
+                }
             }
         }
         data.put("user_id",getCurrentUserId());
