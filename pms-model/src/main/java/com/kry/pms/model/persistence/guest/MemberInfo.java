@@ -1,12 +1,12 @@
 package com.kry.pms.model.persistence.guest;
 
 import com.kry.pms.model.persistence.PersistenceModel;
+import com.kry.pms.model.persistence.PersistenceModelTo;
 import com.kry.pms.model.persistence.marketing.RoomPriceScheme;
 import com.kry.pms.model.persistence.marketing.SalesMen;
 import com.kry.pms.model.persistence.org.Hotel;
 import com.kry.pms.model.persistence.sys.Account;
 import lombok.Data;
-import org.springframework.data.annotation.Transient;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -17,7 +17,7 @@ import java.time.LocalDate;
 @Data
 @Entity
 @Table(name = "t_member_info")
-public class MemberInfo extends PersistenceModel {
+public class MemberInfo extends PersistenceModelTo {
 
     @Column
     private String cardNum;//会员卡号
@@ -29,8 +29,6 @@ public class MemberInfo extends PersistenceModel {
     private Customer customer;//会员账号
     @Column(columnDefinition = "varchar(100) COMMENT '会员类型'")
     private String type;
-    @Transient
-    private String level;//会员等级(不用了)
     @ManyToOne
     private MemberLevel memberLevel;//会员等级(对象)
     @Column(columnDefinition = "varchar(100) COMMENT '代码'")
@@ -51,8 +49,6 @@ public class MemberInfo extends PersistenceModel {
     private String remark;
     @Column
     private Double integral;//积分
-    @Transient
-    private String integralType;//积分模式
     @ManyToOne
     private MemberIntegralType memberIntegralType;//积分模式
     @Column
@@ -75,5 +71,7 @@ public class MemberInfo extends PersistenceModel {
     private String password;//密码
     @Column
     private String isUsedPassword;//校验密码
+    @Transient
+    private String operator;//操作员
 
 }

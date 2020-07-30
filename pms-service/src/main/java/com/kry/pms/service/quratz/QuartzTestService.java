@@ -1,4 +1,4 @@
-package com.kry.pms.service.quratz.impl;
+package com.kry.pms.service.quratz;
 
 public interface QuartzTestService {
     String getTest(String test);

@@ -12,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -22,11 +24,35 @@ public class MemberRechargeController extends BaseController<MemberRecharge> {
 	@PostMapping
 	public HttpResponse<MemberRecharge> add(@RequestBody MemberRecharge memberRecharge) {
 		memberRecharge.setHotelCode(getCurrentHotleCode());
+		memberRecharge.setCreateDate(LocalDateTime.now());
+		memberRecharge.setCreateUser(getUserId());
+		memberRecharge.setShiftCode(getShiftCode());
 		return getDefaultResponse().addData(memberRechargeService.add(memberRecharge));
+	}
+
+	/**
+	 * 功能描述: <br>充值
+	 * 〈〉
+	 * @Param: [memberRecharge]
+	 * @Return: com.kry.pms.base.HttpResponse<com.kry.pms.model.persistence.guest.MemberRecharge>
+	 * @Author: huanghaibin
+	 * @Date: 2020/7/27 16:59
+	 */
+	@PostMapping(path = "/recharge")
+	public HttpResponse<MemberRecharge> recharge(@RequestBody MemberRecharge memberRecharge) {
+		HttpResponse hr = new HttpResponse();
+		memberRecharge.setHotelCode(getCurrentHotleCode());
+		memberRecharge.setCreateDate(LocalDateTime.now());
+		memberRecharge.setCreateUser(getUserId());
+		memberRecharge.setShiftCode(getShiftCode());
+		hr = memberRechargeService.recharge(memberRecharge);
+		return hr;
 	}
 
 	@PutMapping
 	public HttpResponse<MemberRecharge> modify(@RequestBody MemberRecharge memberRecharge) {
+		memberRecharge.setUpdateDate(LocalDateTime.now());
+		memberRecharge.setUpdateUser(getUserId());
 		return getDefaultResponse().addData(memberRechargeService.modify(memberRecharge));
 	}
 
@@ -49,6 +75,12 @@ public class MemberRechargeController extends BaseController<MemberRecharge> {
 		HttpResponse<List<MemberRecharge>> rep = new HttpResponse<List<MemberRecharge>>();
 //		List<MemberRecharge> list = memberRechargeService.getAllByHotelCode(getCurrentHotleCode());
 		List<MemberRecharge> list = memberRechargeService.getList(getCurrentHotleCode());
+		return rep.addData(list);
+	}
+	@GetMapping(path = "/cardNum")
+	public HttpResponse<List<MemberRecharge>> getByHotelCodeAndCardNum(String cardNum){
+		HttpResponse<List<MemberRecharge>> rep = new HttpResponse<List<MemberRecharge>>();
+		List<MemberRecharge> list = memberRechargeService.getByHotelCodeAndCardNum(getCurrentHotleCode(), cardNum);
 		return rep.addData(list);
 	}
 

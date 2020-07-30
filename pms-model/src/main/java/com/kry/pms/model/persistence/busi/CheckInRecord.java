@@ -7,6 +7,7 @@ import com.kry.pms.model.annotation.PropertyMsg;
 import com.kry.pms.model.persistence.PersistenceModel;
 import com.kry.pms.model.persistence.goods.SetMeal;
 import com.kry.pms.model.persistence.guest.Customer;
+import com.kry.pms.model.persistence.guest.MemberInfo;
 import com.kry.pms.model.persistence.marketing.*;
 import com.kry.pms.model.persistence.org.Employee;
 import com.kry.pms.model.persistence.room.GuestRoom;
@@ -189,11 +190,16 @@ public class CheckInRecord extends PersistenceModel {
 	@PropertyMsg("VIP")
 	private String vipCode;//主单vip
 
+	@ManyToOne
+	private MemberInfo memberInfo;//会员
+
 	@Transient
 	private String isSync;//修改时间是否同步子单
 	@Transient
 	private String isGOrU;//预订来至团队（G）还是多人（U）
 
+	public MemberInfo getMemberInfo() { return memberInfo; }
+	public void setMemberInfo(MemberInfo memberInfo) { this.memberInfo = memberInfo; }
 	public String getIsSync() { return isSync; }
 	public void setIsSync(String isSync) { this.isSync = isSync; }
 	public String getOrderNumOld() { return orderNumOld; }

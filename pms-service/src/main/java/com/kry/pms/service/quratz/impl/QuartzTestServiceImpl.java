@@ -1,8 +1,7 @@
 package com.kry.pms.service.quratz.impl;
 
+import com.kry.pms.service.quratz.QuartzTestService;
 import org.springframework.stereotype.Service;
-
-import java.sql.SQLOutput;
 
 @Service
 public class QuartzTestServiceImpl implements QuartzTestService {
