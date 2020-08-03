@@ -683,10 +683,13 @@ public class BillServiceImpl implements BillService {
         targetBill.setSourceBill(bill);
         targetBill.setFeeFlag(Constants.Flag.FEE_TRANSFER);
         targetBill.setTranferRemark("From:" + bill.getAccount().getCode());
+        targetBill.setSid(bill.getId());
         targetBill.setStatus(Constants.Status.BILL_NEED_SETTLED);
         targetBill.setCurrentSettleAccountRecordNum(recordNum);
         data.add(strikeBill);
-        data.add(add(targetBill));
+        targetBill = add(targetBill);
+        bill.setTid(targetBill.getId());
+        data.add(targetBill);
         return rep.addData(data);
     }
 

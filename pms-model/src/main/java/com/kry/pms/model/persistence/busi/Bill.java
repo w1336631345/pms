@@ -80,6 +80,8 @@ public class Bill extends PersistenceModel {
 	@Column
 	private String sid;
 	@Column
+	private String tid;
+	@Column
 	private String itemType;
 	@OneToOne
 	private Bill sourceBill;
