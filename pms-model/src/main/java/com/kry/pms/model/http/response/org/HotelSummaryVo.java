@@ -9,5 +9,6 @@ public class HotelSummaryVo {
 	private String wechatCodeUrl;
 	private String address;
 	private String mobile;
+	private String hotelCode;
 
 }

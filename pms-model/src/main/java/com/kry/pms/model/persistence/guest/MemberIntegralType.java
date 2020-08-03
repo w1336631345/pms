@@ -29,6 +29,8 @@ public class MemberIntegralType extends PersistenceModel {
     @Column
     private LocalDate endTime;//结束时间
     @Column
+    private Integer effectiveDuration;//有效时长
+    @Column
     private String isUsed;//是否启用
     @OneToMany(cascade={CascadeType.REMOVE})
     private List<MemberIntegralTypeInfo> memberIntegralTypeInfos;//积分明细

@@ -1,4 +1,4 @@
-package com.kry.pms.service.quratz.impl;
+package com.kry.pms.service.quratz;
 
 import com.kry.pms.model.persistence.quartz.QuartzSet;
 import com.kry.pms.model.persistence.sys.User;

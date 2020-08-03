@@ -52,16 +52,21 @@ public class ScheduleJobModel {
     @Column(columnDefinition = "varchar(32) default 'AUDIT' COMMENT 'ALL全部执行  AUDIT夜审入账 NORMAL平常的'")
     private String type_;
 
+    //自定义定时任务配置
+    //1、class_path配置类名全路径，如：com.kry.pms.service.quratz.impl.QuartzSetServiceImpl
+    //2、class_name配置spring管理的类名，spring默认bean首字母是小写，如：quartzSetServiceImpl
+    //3、method_name直接配置定时要调用的方法名称（注：默认方法都会传入hotelCode参数），如：addTest
+    //4、暂时不支持多参数
     @Column(columnDefinition = "varchar(1000) COMMENT '描述'")
     private String remark;
     @Column(columnDefinition = "varchar(500) COMMENT '方法所在类全路径'")
     private String classPath;
+    @Column(columnDefinition = "varchar(64) COMMENT '对象名称'")
+    private String className;
     @Column(columnDefinition = "varchar(256) COMMENT '方法名称'")
     private String methodName;
     @Column(columnDefinition = "varchar(64) COMMENT '参数类型'")
     private String paramsType;
     @Column(columnDefinition = "varchar(64) COMMENT '参数值'")
     private String paramsValue;
-    @Column(columnDefinition = "varchar(64) COMMENT '对象名称'")
-    private String className;
 }

@@ -1,21 +1,22 @@
 package com.kry.pms.model.persistence.guest;
 
-import com.kry.pms.model.persistence.PersistenceModel;
+import com.kry.pms.model.persistence.PersistenceModelTo;
 import com.kry.pms.model.persistence.goods.Product;
 import lombok.Data;
 
 import javax.persistence.*;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Data
 @Entity
 @Table(name="t_member_recharge")
-public class MemberRecharge extends PersistenceModel {
+public class MemberRecharge extends PersistenceModelTo {
     @Column
     private String cardNum;//会员卡号
     @Column
     private String macNum;//物理卡号
+    @ManyToOne
+    private MemberInfo memberInfo;//会员卡
     @ManyToOne
     private Product payType;//付款方式
     @Column
@@ -35,7 +36,21 @@ public class MemberRecharge extends PersistenceModel {
     @Column
     private String remark;//备注
     @Column
-    private LocalDate termOfValidity;//有效期
+    private LocalDate limitationDate;//有效期
     @Transient
     private String operator;//操作员
+    @Column
+    private Double useAmount;//使用充值金额
+    @Column
+    private Double useGiveAmount;//使用赠送金额
+    @Column
+    private String rechargeOrUse;//充值（R）或使用（U）或过期（O）
+    @Column
+    private Integer isOverdue;//是否过期(0有效，1过期)
+    @Column
+    private Double overAmount;//过期金额
+    @Column
+    private Double overGiveAmount;//过期赠送金额
+    @Transient
+    private String shiftCode;//班次
 }

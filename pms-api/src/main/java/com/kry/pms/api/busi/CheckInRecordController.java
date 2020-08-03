@@ -242,7 +242,14 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
         rep.addData(checkInRecordService.findByOrderNumC2(getCurrentHotleCode(), orderNum));
         return rep;
     }
-
+    /**
+     * 功能描述: <br>主单列表查询
+     * 〈〉
+     * @Param: [orderNum]
+     * @Return: com.kry.pms.base.HttpResponse<java.util.List<java.util.Map<java.lang.String,java.lang.Object>>>
+     * @Author: huanghaibin
+     * @Date: 2020/7/29 17:16
+     */
     @GetMapping(path = "/orderNum2/{orderNum}")
     public HttpResponse<List<Map<String, Object>>> findDetailByOrderNumSQL(@PathVariable("orderNum") String orderNum) throws IOException, TemplateException {
         HttpResponse<List<Map<String, Object>>> rep = new HttpResponse<List<Map<String, Object>>>();
