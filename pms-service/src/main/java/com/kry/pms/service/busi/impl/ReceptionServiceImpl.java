@@ -300,10 +300,13 @@ public class ReceptionServiceImpl implements ReceptionService {
 		}
 		return rep;
 	}
-
 	@Override
-	public AccountSummaryVo getAccountSummaryByCheckRecordId(String id) {
-		CheckInRecord cir = checkInRecordService.findById(id);
+	public AccountSummaryVo getAccountSummaryByAccountCode(String hotelCode,String code){
+		CheckInRecord cir = checkInRecordService.findByAccountCode(hotelCode,code);
+		return getAccountSummaryByCheckRecord(cir);
+	}
+
+	private AccountSummaryVo getAccountSummaryByCheckRecord(CheckInRecord cir){
 		AccountSummaryVo asv = null;
 		if (cir != null && cir.getGroupType() != null) {
 			if(cir.getMainRecord()!=null){
@@ -346,6 +349,12 @@ public class ReceptionServiceImpl implements ReceptionService {
 			// 散客
 		}
 		return asv;
+	}
+
+	@Override
+	public AccountSummaryVo getAccountSummaryByCheckRecordId(String id) {
+		CheckInRecord cir = checkInRecordService.findById(id);
+		return getAccountSummaryByCheckRecord(cir);
 	}
 
 	@Override

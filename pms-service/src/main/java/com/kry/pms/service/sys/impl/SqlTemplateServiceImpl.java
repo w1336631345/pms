@@ -228,7 +228,7 @@ public class SqlTemplateServiceImpl implements SqlTemplateService {
         return list;
     }
     @Override
-    public List<Map<String, Object>> callProcedure(String name, Object[] params) {
+    public List<Map<String, Object>> callProcedure(String name, Object... params) {
         StringWriter stringWriter = new StringWriter();
         StoredProcedureQuery query = entityManager.createStoredProcedureQuery(name);
         int i = 0;

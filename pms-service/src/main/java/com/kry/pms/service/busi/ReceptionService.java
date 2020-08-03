@@ -51,7 +51,9 @@ public interface ReceptionService {
 
 	DtoResponse<String> checkIn(CheckInRecord cir);
 
-    public AccountSummaryVo getAccountSummaryByCheckRecordId(String id);
+	AccountSummaryVo getAccountSummaryByAccountCode(String hotelCode,String code);
+
+	public AccountSummaryVo getAccountSummaryByCheckRecordId(String id);
 
 	public DtoResponse<List<AccountSummaryVo>> groupCheckBillConfirm(String id);
 

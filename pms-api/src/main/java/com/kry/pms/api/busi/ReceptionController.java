@@ -100,6 +100,13 @@ public class ReceptionController extends BaseController<String> {
 		rep.setData(accountSummaryVo);
 		return rep;
 	}
+	@GetMapping(path="/account/summary/code/{code}")
+	public HttpResponse<AccountSummaryVo> getAccountSummaryByCode(@PathVariable String code){
+		HttpResponse<AccountSummaryVo> rep = new HttpResponse<>();
+		AccountSummaryVo accountSummaryVo = receptionService.getAccountSummaryByAccountCode(getCurrentHotleCode(),code);
+		rep.setData(accountSummaryVo);
+		return rep;
+	}
 
 	/**
 	 * 结账确认

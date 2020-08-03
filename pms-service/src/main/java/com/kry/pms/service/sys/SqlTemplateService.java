@@ -28,7 +28,7 @@ public interface SqlTemplateService extends BaseService<SqlTemplate> {
 
     List<Map<String, Object>> storedProcedure(String hotelCode, LocalDate businessDate, String name, Map<String, Object> params);
 
-    List<Map<String, Object>> callProcedure(String name, Object[] params);
+    List<Map<String, Object>> callProcedure(String name, Object... params);
 
     PageResponse<Map<String, Object>> queryForPage(String hotelCode, String code, PageRequest<Map<String, Object>> pageRequest) throws IOException, TemplateException;
 

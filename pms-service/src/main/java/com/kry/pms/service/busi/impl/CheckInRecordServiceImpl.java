@@ -2936,4 +2936,9 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
         return list;
     }
 
+    @Override
+    public CheckInRecord findByAccountCode(String hotelCode, String code) {
+        return checkInRecordDao.findByAccountCodeAndHotelCode(code,hotelCode);
+    }
+
 }
