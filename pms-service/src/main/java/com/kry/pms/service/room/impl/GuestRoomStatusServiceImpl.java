@@ -191,7 +191,6 @@ public class GuestRoomStatusServiceImpl implements GuestRoomStatusService {
         grs.setHotelCode(guestRoom.getHotelCode());
         grs.setRoomStatus(Constants.Status.ROOM_STATUS_VACANT_CLEAN);
         grs.setRoomTypeName(guestRoom.getRoomType().getName());
-
         return grs;
     }
 

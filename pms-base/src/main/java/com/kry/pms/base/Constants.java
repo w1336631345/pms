@@ -32,10 +32,10 @@ public class Constants {
 		public static final String BOOKING_PART_CHECK_IN = "part_check_in";
 		public static final String BOOKING_PART_CHECK_OUT = "part_check_out";
 		public static final String BOOKING_ALL_CHECK_OUT = "all_check_out";
-		public static final String ROOM_STATUS_VACANT_CLEAN = "VC";
-		public static final String ROOM_STATUS_VACANT_DIRTY = "VD";
-		public static final String ROOM_STATUS_OCCUPY_CLEAN = "OC";
-		public static final String ROOM_STATUS_OCCUPY_DIRTY = "OD";
+		public static final String ROOM_STATUS_VACANT_CLEAN = "VC";//空静
+		public static final String ROOM_STATUS_VACANT_DIRTY = "VD";//空脏
+		public static final String ROOM_STATUS_OCCUPY_CLEAN = "OC";//住静
+		public static final String ROOM_STATUS_OCCUPY_DIRTY = "OD";//住脏
 		public static final String ROOM_STATUS_OUT_OF_ORDER = "OO";
 		public static final String ROOM_STATUS_OUT_OF_SERVCIE = "OS";
 		public static final String ROOM_STATUS_EXPECTE_DEPARTURE = "ED";
