@@ -27,6 +27,8 @@ public interface MemberInfoService extends BaseService<MemberInfo>{
 
     List<MemberInfo> parmsList(String hotelCode, String type, String isUsed, String moreParams);
 
+    List<MemberInfo> findByCustomer(String customerId);
+
     //定时任务：每日计算积分/金额过期内容
     void boOverdueList(String code);
 }

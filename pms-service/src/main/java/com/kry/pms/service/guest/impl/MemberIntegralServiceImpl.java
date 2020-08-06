@@ -10,11 +10,16 @@ import com.kry.pms.dao.guest.MemberIntegralDao;
 import com.kry.pms.dao.quartz.QuartzSetDao;
 import com.kry.pms.model.persistence.guest.MemberInfo;
 import com.kry.pms.model.persistence.guest.MemberIntegral;
+import com.kry.pms.model.persistence.guest.MemberIntegralType;
+import com.kry.pms.model.persistence.guest.MemberIntegralTypeInfo;
+import com.kry.pms.model.persistence.org.Employee;
 import com.kry.pms.model.persistence.quartz.QuartzSet;
+import com.kry.pms.model.persistence.sys.User;
 import com.kry.pms.service.guest.MemberInfoService;
 import com.kry.pms.service.guest.MemberIntegralService;
 import com.kry.pms.service.sys.AccountService;
 import com.kry.pms.service.sys.BusinessSeqService;
+import org.apache.commons.collections4.MapUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Sort;
@@ -25,6 +30,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class MemberIntegralServiceImpl implements MemberIntegralService {
@@ -145,6 +151,42 @@ public class MemberIntegralServiceImpl implements MemberIntegralService {
 					MemberInfo memberInfo = memberInfoDao.findByHotelCodeAndCardNum(entity.getHotelCode(), entity.getCardNum());
 					memberInfo.setIntegral(memberInfo.getIntegral() - overIntegral);
 					memberInfoDao.saveAndFlush(memberInfo);
+				}
+			}
+		}
+	}
+	@Override
+	public void auditInInteger(List<Map<String, Object>> list, LocalDate businessDate, User auditUser) {
+		for (int i = 0; i < list.size(); i++) {
+			Map<String, Object> map = list.get(i);
+			String member_info_id = MapUtils.getString(map, "member_info_id");
+			if(member_info_id != null){
+				Double cost = MapUtils.getDouble(map, "cost");
+				MemberInfo memberInfo = memberInfoDao.getOne(member_info_id);
+				MemberIntegralType type = memberInfo.getMemberIntegralType();
+				List<MemberIntegralTypeInfo> typeInfos = type.getMemberIntegralTypeInfos();
+				for(int j=0; j<typeInfos.size(); j++){
+					MemberIntegralTypeInfo typeInfo = typeInfos.get(j);
+					if("rm".equals(typeInfo.getCode())){//房费
+						if(cost > typeInfo.getStartStep()){
+							MemberIntegral memberIntegral = new MemberIntegral();
+							memberIntegral.setBusinessDate(businessDate);
+							memberIntegral.setHotelCode(auditUser.getHotelCode());
+							memberIntegral.setCreateDate(LocalDateTime.now());
+							memberIntegral.setCreateUser(auditUser.getId());
+							memberIntegral.setInOrOut("IN");
+							memberIntegral.setCardNum(memberInfo.getCardNum());
+							memberIntegral.setMacNum(memberInfo.getMacNum());
+							memberIntegral.setMemberInfo(memberInfo);
+							memberIntegral.setRoomPrice(cost);//设置积分
+							memberIntegral.setIntegralType(type);
+							memberIntegral.setRemark("夜审房费积分");
+							memberIntegral.setConsDate(LocalDate.now());
+							memberIntegral.setLimitationDate(LocalDate.now().plusDays(type.getEffectiveDuration()));
+							add(memberIntegral);
+
+						}
+					}
 				}
 			}
 		}

@@ -36,6 +36,7 @@ public interface RoomRecordDao extends BaseDao<RoomRecord> {
     @Query(nativeQuery = true, value = " select \n" +
             " trr.id, \n" +
             " tcr.id cirId, \n" +
+            " tcr.member_info_id, \n" +
             " tgr.room_num roomNum, \n" +
             " main.account_id mainAccountId, \n" +
             " tsm.id setMealId, \n" +

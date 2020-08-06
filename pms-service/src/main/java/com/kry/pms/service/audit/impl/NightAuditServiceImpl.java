@@ -15,6 +15,7 @@ import com.kry.pms.service.audit.NightAuditService;
 import com.kry.pms.service.busi.BillService;
 import com.kry.pms.service.busi.DailyVerifyService;
 import com.kry.pms.service.busi.RoomRecordService;
+import com.kry.pms.service.guest.MemberIntegralService;
 import com.kry.pms.service.org.EmployeeService;
 import com.kry.pms.service.report.*;
 import com.kry.pms.service.sys.BusinessSeqService;
@@ -62,6 +63,8 @@ public class NightAuditServiceImpl implements NightAuditService {
     CheckInRecordDao checkInRecordDao;
     @Autowired
     SqlTemplateService sqlTemplateService;
+    @Autowired
+    MemberIntegralService memberIntegralService;
 
     @Override
     public RoomRecord add(RoomRecord entity) {
@@ -145,6 +148,7 @@ public class NightAuditServiceImpl implements NightAuditService {
         Employee emp = employeeService.findByUser(loginUser);
 //        billService.putAcount(list, businessDate, emp, shiftCode);
         billService.putAcountMap(list, businessDate, emp, shiftCode, loginUser.getHotelCode());
+//        memberIntegralService.auditInInteger(list, businessDate, loginUser);//夜审的房费录入会员积分
         //入账完成，记录入账记录
         DailyVerify dv = new DailyVerify();
         dv.setOperationEmployee(emp);

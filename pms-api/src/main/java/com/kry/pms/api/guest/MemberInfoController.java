@@ -54,6 +54,12 @@ public class MemberInfoController extends BaseController<MemberInfo> {
 		List<MemberInfo> list = memberInfoService.getAllByHotelCode(getCurrentHotleCode());
 		return rep.addData(list);
 	}
+    @GetMapping(path = "/findByCustomer")
+    public HttpResponse<List<MemberInfo>> findByCustomer(String customerId){
+        HttpResponse<List<MemberInfo>> rep = new HttpResponse<List<MemberInfo>>();
+        List<MemberInfo> list = memberInfoService.findByCustomer(customerId);
+        return rep.addData(list);
+    }
 	/**
 	 * 功能描述: <br>会员列表-条件查询
 	 * 〈〉

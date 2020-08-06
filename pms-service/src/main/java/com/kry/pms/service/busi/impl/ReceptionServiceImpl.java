@@ -12,6 +12,7 @@ import java.util.Map;
 import javax.transaction.Transactional;
 
 import com.kry.pms.base.HttpResponse;
+import com.kry.pms.dao.busi.CheckInRecordDao;
 import com.kry.pms.model.persistence.busi.DailyVerify;
 import com.kry.pms.model.persistence.org.Employee;
 import com.kry.pms.model.persistence.sys.User;
@@ -82,6 +83,8 @@ public class ReceptionServiceImpl implements ReceptionService {
 	DateTimeService dateTimeService;
 	@Autowired
 	DailyVerifyService dailyVerifyService;
+	@Autowired
+	CheckInRecordDao checkInRecordDao;
 
 	private List<CheckInRecord> createGroupMainCheckInRecord(BookingRecord br) {
 		String tempName = br.getName();
@@ -299,6 +302,45 @@ public class ReceptionServiceImpl implements ReceptionService {
 			roomStatisticsService.checkIn(new CheckInRecordWrapper(cir));
 		}
 		return rep;
+	}
+	//重新入住的房间状态查询
+	@Override
+	public HttpResponse getRoomStatus(String guestRoomId){
+		HttpResponse hr = new HttpResponse();
+		GuestRoom gr = new GuestRoom();
+		gr.setId(guestRoomId);
+		GuestRoomStatus guestRoomStatus = guestRoomStatusService.findGuestRoomStatusByGuestRoom(gr);
+		hr.setData(guestRoomStatus.getRoomStatus());
+		return hr;
+	}
+	//重新入住
+	@Override
+	public HttpResponse overCheckId(String cirId){
+		HttpResponse hr = new HttpResponse();
+		CheckInRecord cir = checkInRecordDao.getOne(cirId);
+		if(!cir.getActualTimeOfLeave().toLocalDate().isEqual(LocalDate.now())){
+			return hr.error("不是本日退房，不能重新入住");
+		}
+		if(cir.getMainRecord() != null){//是团队
+			CheckInRecord main = cir.getMainRecord();
+			if("O".equals(main.getStatus())){
+				main.setStatus("I");
+				main.setActualTimeOfLeave(null);
+				checkInRecordDao.save(main);
+			}
+			cir.setStatus("I");
+			cir.setActualTimeOfLeave(null);
+//				cir.setArriveTime(LocalDateTime.now());
+			checkInRecordDao.save(cir);
+			roomStatisticsService.updateGuestRoomStatus(new CheckInRecordWrapper(cir));
+		}else {
+			cir.setStatus("I");
+			cir.setActualTimeOfLeave(null);
+//				cir.setArriveTime(LocalDateTime.now());
+			checkInRecordDao.save(cir);
+			roomStatisticsService.updateGuestRoomStatus(new CheckInRecordWrapper(cir));
+		}
+		return hr;
 	}
 	@Override
 	public AccountSummaryVo getAccountSummaryByAccountCode(String hotelCode,String code){

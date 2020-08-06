@@ -13,6 +13,7 @@ import lombok.Data;
 public class AccountSummaryVo {
     private String orderNum;
     private String id;
+    private String cirId;
     private String name;
     private Double total;
     private String roomNum;
@@ -34,11 +35,12 @@ public class AccountSummaryVo {
 
     }
 
-    public AccountSummaryVo(String orderNum, String id, String name, Double total, String roomNum,
+    public AccountSummaryVo(String orderNum, String id, String cirId, String name, Double total, String roomNum,
                             String type, Double pay, Double cost, Double creditLimit, Double availableCreditLimit,
                             String roomStatus, String accountCode, LocalDateTime arriveTime, LocalDateTime leaveTime, String guestRoomId,Double personalPrice) {
         this.orderNum = orderNum;
         this.id = id;
+        this.cirId = cirId;
         this.name = name;
         this.total = total;
         this.roomNum = roomNum;

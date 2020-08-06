@@ -93,6 +93,35 @@ public class ReceptionController extends BaseController<String> {
 		return rep;
 	}
 
+	/**
+	 * 功能描述: <br>获取重新入住房间状态
+	 * 〈〉
+	 * @Param: [id]
+	 * @Return: com.kry.pms.base.HttpResponse<java.lang.String>
+	 * @Author: huanghaibin
+	 * @Date: 2020/8/5 10:14
+	 */
+	@GetMapping(path = "/getRoomStatus")
+	public HttpResponse<String> getRoomStatus(String guestRoomId) {
+		HttpResponse<String> rep = new HttpResponse<String>();
+		rep = receptionService.getRoomStatus(guestRoomId);
+		return rep;
+	}
+	/**
+	 * 功能描述: <br>重新入住
+	 * 〈〉
+	 * @Param: [guestRoomId]
+	 * @Return: com.kry.pms.base.HttpResponse<java.lang.String>
+	 * @Author: huanghaibin
+	 * @Date: 2020/8/5 10:15
+	 */
+	@GetMapping(path = "/overCheckId")
+	public HttpResponse overCheckId(String cirId) {
+		HttpResponse rep = new HttpResponse();
+		rep = receptionService.overCheckId(cirId);
+		return rep;
+	}
+
 	@GetMapping(path="/account/summary/{id}")
 	public HttpResponse<AccountSummaryVo> getAccountSummary(@PathVariable String id){
 		HttpResponse<AccountSummaryVo> rep = new HttpResponse<>();

@@ -6,6 +6,7 @@ import java.util.List;
 import javax.validation.Valid;
 
 import com.kry.pms.base.DtoResponse;
+import com.kry.pms.base.HttpResponse;
 import com.kry.pms.model.http.request.busi.BillItemBo;
 import com.kry.pms.model.http.request.busi.BillSettleBo;
 import com.kry.pms.model.http.request.busi.BookingBo;
@@ -51,7 +52,12 @@ public interface ReceptionService {
 
 	DtoResponse<String> checkIn(CheckInRecord cir);
 
-	AccountSummaryVo getAccountSummaryByAccountCode(String hotelCode,String code);
+    //重新入住
+    HttpResponse getRoomStatus(String guestRoomId);
+
+    HttpResponse overCheckId(String cirId);
+
+    AccountSummaryVo getAccountSummaryByAccountCode(String hotelCode, String code);
 
 	public AccountSummaryVo getAccountSummaryByCheckRecordId(String id);
 

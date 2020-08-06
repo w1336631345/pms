@@ -185,6 +185,14 @@ public class MemberInfoServiceImpl implements MemberInfoService {
 		return list;
 	}
 
+    @Override
+    public List<MemberInfo> findByCustomer(String customerId){
+	    Customer customer = new Customer();
+	    customer.setId(customerId);
+        List<MemberInfo> list = memberInfoDao.findByCustomer(customer);
+        return list;
+    }
+
 	//定时任务：每日计算积分、金额过期内容
 	@Override
 	public void boOverdueList(String code) {

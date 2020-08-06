@@ -1,6 +1,7 @@
 package com.kry.pms.dao.guest;
 
 import com.kry.pms.dao.BaseDao;
+import com.kry.pms.model.persistence.guest.Customer;
 import com.kry.pms.model.persistence.guest.MemberInfo;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -12,6 +13,8 @@ import java.util.Map;
 public interface MemberInfoDao extends BaseDao<MemberInfo>{
 
 	List<MemberInfo> findByHotelCode(String hotelCode);
+
+	List<MemberInfo> findByCustomer(Customer customer);
 
 	MemberInfo findByHotelCodeAndCardNum(String hotelCode, String cardNum);
 
