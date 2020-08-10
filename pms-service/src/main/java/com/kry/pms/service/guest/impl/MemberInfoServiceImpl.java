@@ -3,10 +3,13 @@ package com.kry.pms.service.guest.impl;
 import com.kry.pms.base.Constants;
 import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
+import com.kry.pms.dao.guest.CustMarketDao;
 import com.kry.pms.dao.guest.CustomerDao;
 import com.kry.pms.dao.guest.MemberInfoDao;
+import com.kry.pms.model.persistence.guest.CustMarket;
 import com.kry.pms.model.persistence.guest.Customer;
 import com.kry.pms.model.persistence.guest.MemberInfo;
+import com.kry.pms.model.persistence.sys.Account;
 import com.kry.pms.service.guest.MemberInfoService;
 import com.kry.pms.service.guest.MemberIntegralService;
 import com.kry.pms.service.guest.MemberRechargeService;
@@ -14,8 +17,6 @@ import com.kry.pms.service.sys.AccountService;
 import com.kry.pms.service.sys.BusinessSeqService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -43,6 +44,8 @@ public class MemberInfoServiceImpl implements MemberInfoService {
 	MemberIntegralService memberIntegralService;
 	@Autowired
 	MemberRechargeService memberRechargeService;
+	@Autowired
+	CustMarketDao custMarketDao;
 
 	@Override
 	public MemberInfo add(MemberInfo entity) {
@@ -62,7 +65,8 @@ public class MemberInfoServiceImpl implements MemberInfoService {
 //		Customer cust = customerDao.getOne(entity.getCustomer().getId());
 //		entity.setCustomer(cust);
 		entity.setName(entity.getCustomer().getName());
-		accountService.createMemberAccount(entity.getName(), entity.getHotelCode());
+		Account account = accountService.createMemberAccount(entity.getCustomer(), entity.getHotelCode());
+		entity.setAccount(account);
 		return memberInfoDao.saveAndFlush(entity);
 	}
 
@@ -171,6 +175,15 @@ public class MemberInfoServiceImpl implements MemberInfoService {
 				return criteriaBuilder.and(list.toArray(array));
 			}
 		});
+		for(int i=0; i<list.size(); i++){
+			if(list.get(i).getCustomer() != null){
+				String custId = list.get(i).getCustomer().getId();
+				List<CustMarket> custMarket = custMarketDao.findByCustomerId(custId);
+				if(custMarket != null && !custMarket.isEmpty()){
+					list.get(i).setCustMarket(custMarket.get(0));
+				}
+			}
+		}
 		return list;
 	}
 

@@ -669,13 +669,14 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public Account createMemberAccount(String name, String hotelCode) {
+    public Account createMemberAccount(Customer customer, String hotelCode) {
         Account account = new Account(0, 0);
         account.setCode(businessSeqService.fetchNextSeqNum(hotelCode,
                 Constants.Key.BUSINESS_BUSINESS_ACCOUNT_SEQ_MEMBER));
         account.setHotelCode(hotelCode);
-        account.setName(name);
-        account.setType(Constants.Type.ACCOUNT_CUSTOMER);
+        account.setCustomer(customer);
+        account.setName(customer.getName());
+        account.setType(Constants.Type.ACCOUNT_MEMBER);
         return add(account);
     }
 

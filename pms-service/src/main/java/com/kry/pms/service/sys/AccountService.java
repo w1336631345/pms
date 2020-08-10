@@ -37,7 +37,7 @@ public interface AccountService extends BaseService<Account> {
 
     Account createAccount(Customer customer, String roomNum);
 
-    Account createMemberAccount(String name, String hotelCode);
+    Account createMemberAccount(Customer customer, String hotelCode);
 
     DtoResponse<Double> queryRoomPrice(String id);
 
