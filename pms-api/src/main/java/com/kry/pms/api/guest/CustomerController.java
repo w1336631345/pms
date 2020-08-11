@@ -189,4 +189,19 @@ public class CustomerController extends BaseController<Customer> {
 		return rep.addData(customer);
 	}
 
+	/**
+	 * 功能描述: <br>今日新增客史
+	 * 〈〉
+	 * @Param: [id]
+	 * @Return: com.kry.pms.base.HttpResponse
+	 * @Author: huanghaibin
+	 * @Date: 2020/8/11 16:06
+	 */
+	@GetMapping(path = "/toDayCount")
+	public HttpResponse toDayCount(String dateTime){
+		HttpResponse rep = new HttpResponse();
+		Integer count = customerService.toDayCount(getCurrentHotleCode(), dateTime);
+		return rep.addData(count);
+	}
+
 }

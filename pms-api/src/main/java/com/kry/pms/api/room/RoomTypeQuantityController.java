@@ -53,6 +53,20 @@ public class RoomTypeQuantityController extends BaseController<RoomTypeQuantity>
 		List<RoomTypeQuantityVo> data = roomTypeQuantityService.queryByDay(getCurrentHotleCode(),LocalDate.parse(startDate),LocalDate.parse(endDate));
 		return rep.addData(data);
 	}
+	/**
+	 * 功能描述: <br>首页房态实时统计
+	 * 〈〉
+	 * @Param: [dateTime]
+	 * @Return: com.kry.pms.base.HttpResponse<java.util.List<com.kry.pms.model.http.response.room.RoomTypeQuantityVo>>
+	 * @Author: huanghaibin
+	 * @Date: 2020/8/11 15:48
+	 */
+	@GetMapping(path="/homeRoom")
+	public HttpResponse<List<RoomTypeQuantityVo>> query(String dateTime){
+		HttpResponse<List<RoomTypeQuantityVo>> rep = new HttpResponse<>();
+		List<RoomTypeQuantityVo> data = roomTypeQuantityService.queryByDay2(getCurrentHotleCode(),LocalDate.parse(dateTime));
+		return rep.addData(data);
+	}
 	@GetMapping(path="/today")
 	public HttpResponse<List<RoomTypeQuantityVo>> today(){
 		HttpResponse<List<RoomTypeQuantityVo>> rep = new HttpResponse<>();

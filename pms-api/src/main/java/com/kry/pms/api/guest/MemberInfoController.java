@@ -90,6 +90,20 @@ public class MemberInfoController extends BaseController<MemberInfo> {
 		return rep.addData(list);
 	}
 	/**
+	 * 功能描述: <br>今日新办会员数量
+	 * 〈〉
+	 * @Param: [createDate]
+	 * @Return: com.kry.pms.base.HttpResponse<java.lang.Integer>
+	 * @Author: huanghaibin
+	 * @Date: 2020/8/11 16:02
+	 */
+	@GetMapping(path = "/createDateCount")
+	public HttpResponse<Integer> createDateCount(String createDate){
+		HttpResponse<Integer> rep = new HttpResponse<Integer>();
+		Integer count = memberInfoService.getByCreateDateCount(getCurrentHotleCode(), createDate);
+		return rep.addData(count);
+	}
+	/**
 	 * 功能描述: <br>新办会员报表-统计
 	 * 〈〉
 	 * @Param: [createDate]

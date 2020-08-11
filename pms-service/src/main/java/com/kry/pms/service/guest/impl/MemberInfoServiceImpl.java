@@ -109,6 +109,11 @@ public class MemberInfoServiceImpl implements MemberInfoService {
 		return list;
 	}
 	@Override
+	public Integer getByCreateDateCount(String hotelCode, String createDate){
+		Integer count = memberInfoDao.getByCreateDateCount(hotelCode, createDate);
+		return count;
+	}
+	@Override
 	public List<Map<String, Object>> countByCreateUser(String hotelCode, String createDate){
 		List<Map<String, Object>> list = memberInfoDao.countByCreateUser(hotelCode, createDate);
 		return list;

@@ -38,4 +38,6 @@ public interface CustomerService extends BaseService<Customer>{
     int updateIsUsed(String isUsed, String id);
 
     int updateDeleted(String deleted, String id);
+
+    Integer toDayCount(String hotelCode, String createDate);
 }

@@ -1,6 +1,7 @@
 package com.kry.pms.service.marketing.impl;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
@@ -77,6 +78,12 @@ public class  MarketingSourcesServiceImpl implements  MarketingSourcesService{
 	@Override
 	public List<MarketingSources> getByHotelCodeAndIsUsed(String currentHotleCode, String isUsed, int deleted) {
 		return marketingSourcesDao.findByHotelCodeAndIsUsedAndDeleted(currentHotleCode,isUsed,deleted);
+	}
+
+	@Override
+	public List<Map<String, Object>> countRoom(String dateTime, String hotelCode){
+	 	List<Map<String, Object>> list = marketingSourcesDao.countRoom(dateTime, hotelCode);
+	 	return list;
 	}
 	 
 }

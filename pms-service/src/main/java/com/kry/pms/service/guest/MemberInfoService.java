@@ -13,6 +13,8 @@ public interface MemberInfoService extends BaseService<MemberInfo>{
 
     List<MemberInfo> getByCreateDate(String hotelCode, String createDate);
 
+    Integer getByCreateDateCount(String hotelCode, String createDate);
+
     List<Map<String, Object>> countByCreateUser(String hotelCode, String createDate);
 
     List<Map<String, Object>> rechargeReport(String hotelCode, String rechargeDate);

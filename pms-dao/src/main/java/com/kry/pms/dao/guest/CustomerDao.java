@@ -89,5 +89,8 @@ public interface CustomerDao extends BaseDao<Customer>{
 	@Query(value = " update t_customer set deleted = ?1 where id = ?2 ",nativeQuery = true)
 	int updateDeleted(String deleted, String id);
 
+	@Query(nativeQuery = true, value = " select IFNULL(count(id),0) from t_customer tc \n" +
+			" where tc.hotel_code = ?1 and DATE_FORMAT(tc.create_date,'%Y-%m-%d') = ?2 ")
+	Integer toDayCount(String hotelCode, String createDate);
 
 }

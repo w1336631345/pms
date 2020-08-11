@@ -551,6 +551,26 @@ public class RoomTypeQuantityServiceImpl implements RoomTypeQuantityService {
         }
         return data;
     }
+    @Override
+    public List<RoomTypeQuantityVo> queryByDay2(String hotelCode, LocalDate dataTime){
+        List<RoomTypeQuantityVo> data = new ArrayList<RoomTypeQuantityVo>();
+        RoomTypeQuantityVo rv = null;
+        for (RoomTypeQuantity r : roomTypeQuantityDao.queryByDay2(hotelCode, dataTime)) {
+            rv = new RoomTypeQuantityVo();
+            BeanUtils.copyProperties(r, rv);
+            rv.setRoomTypeId(r.getRoomType().getId());
+            rv.setRoomTypeName(r.getRoomType().getName());
+            rv.setRoomTypeCode(r.getRoomType().getCode());
+            if(r.getRoomCount() == 0){
+                rv.setSalesRate(0.0);
+            }else {
+                Double salesRate = Double.valueOf(r.getUsedTotal())/Double.valueOf(r.getRoomCount());
+                rv.setSalesRate(salesRate);
+            }
+            data.add(rv);
+        }
+        return data;
+    }
 
     @Override
     public boolean useRoomType(UseInfoAble info, String userType) {

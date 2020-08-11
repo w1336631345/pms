@@ -1,6 +1,7 @@
 package com.kry.pms.service.marketing.impl;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
@@ -80,8 +81,12 @@ public class  DistributionChannelServiceImpl implements  DistributionChannelServ
 		// TODO Auto-generated method stub
 		return distributionChannelDao.findByHotelCodeAndDeleted(currentHotleCode,deleted);
 	}
-	 
-	 
+
+	@Override
+	public List<Map<String, Object>> countRoom(String dateTime, String hotelCode){
+		List<Map<String, Object>> list = distributionChannelDao.countRoom(dateTime, hotelCode);
+		return list;
+	}
 	 
 	 
 }

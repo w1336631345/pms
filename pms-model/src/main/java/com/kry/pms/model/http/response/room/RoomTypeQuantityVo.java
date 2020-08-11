@@ -8,21 +8,22 @@ import lombok.Data;
 @Data
 public class RoomTypeQuantityVo implements Serializable {
 	private String roomTypeId;
-	private String roomTypeName;
+	private String roomTypeName;//房型
 	private String roomTypeCode;
 	private LocalDate quantityDate;
-	private Integer roomCount;
-	private Integer availableTotal;// 可用的
+	private Integer roomCount;//房间总数
+	private Integer availableTotal;// 可用数/可卖
 	private Integer predictableTotal;// 可预订的
-	private Integer bookingTotal = 0;
-	private Integer willLeaveTotal = 0;
-	private Integer willArriveTotal = 0;
-	private Integer repairTotal = 0;
-	private Integer lockedTotal = 0;
-	private Integer usedTotal = 0;
-	private Integer reserveTotal = 0;
-	private Integer hseTotal = 0;
-	private Integer freeTotal = 0;
+	private Integer bookingTotal = 0;//预订数
+	private Integer willLeaveTotal = 0;//将离
+	private Integer willArriveTotal = 0;//将到
+	private Integer repairTotal = 0;//维修房
+	private Integer lockedTotal = 0;//锁房
+	private Integer usedTotal = 0;//在住
+	private Integer reserveTotal = 0;//预留数
+	private Integer hseTotal = 0;//自用房
+	private Integer freeTotal = 0;//免费房
+	private Double salesRate = 0.0;//售卖率
 
 	public RoomTypeQuantityVo() {
 	}

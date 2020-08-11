@@ -249,4 +249,10 @@ public class CustomerServiceImpl implements CustomerService {
 		return customerDao.updateDeleted(deleted, id);
 	}
 
+	@Override
+	public Integer toDayCount(String hotelCode, String createDate) {
+		Integer coutn = customerDao.toDayCount(hotelCode, createDate);
+		return coutn;
+	}
+
 }

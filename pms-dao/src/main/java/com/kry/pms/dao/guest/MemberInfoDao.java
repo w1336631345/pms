@@ -27,6 +27,10 @@ public interface MemberInfoDao extends BaseDao<MemberInfo>{
 			" where tmi.hotel_code = ?1 and DATE_FORMAT(tmi.create_date,'%Y-%m-%d') = ?2 ")
 	List<MemberInfo> getByCreateDate(String hotelCode, String createDate);
 
+	@Query(nativeQuery = true, value = " select IFNULL(count(id),0) from t_member_info tmi \n" +
+			" where tmi.hotel_code = ?1 and DATE_FORMAT(tmi.create_date,'%Y-%m-%d') = ?2 ")
+	Integer getByCreateDateCount(String hotelCode, String createDate);
+
 	@Query(nativeQuery = true, value = " select t1.create_user, te.`name`, \n" +
 			" IFNULL(t1.yearCount,0) yearCount, IFNULL(t2.mouthCount,0) mouthCount, IFNULL(t3.dayCount,0) dayCount \n" +
 			" from\n" +
