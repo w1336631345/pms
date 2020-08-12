@@ -16,6 +16,15 @@ qiniu:
     bucket: pms-oss
     path: http://pkoqxs4zt.bkt.clouddn.com
     image-host: http://oss.rooibook.com/
+server:
+  address: 0.0.0.0
+  port: 8070
+  servlet:
+    context-path: /manager
+  compression:
+    enabled: true
+    mime-types: application/json
+    min-response-size: 1024
 wx:
   mp:
     configs:

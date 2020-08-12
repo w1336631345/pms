@@ -14,7 +14,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping(path = "/api/v1/report/reportTableDefinition")
-public class ReportTableDefinitionController {
+public class ReportTableDefinitionController extends  BaseController<ReportTableDefinition>{
     @Autowired
     ReportTableDefinitionService reportTableDefinitionService;
 
@@ -46,7 +46,7 @@ public class ReportTableDefinitionController {
     @GetMapping
     public HttpResponse<PageResponse<ReportTableDefinition>> query(HttpServletRequest request) throws InstantiationException, IllegalAccessException {
         HttpResponse<PageResponse<ReportTableDefinition>> rep = new HttpResponse<PageResponse<ReportTableDefinition>>();
-        PageRequest<ReportTableDefinition> req = new PageRequest<>();
+        PageRequest<ReportTableDefinition> req = parse2PageRequest(request);
         return rep.addData(reportTableDefinitionService.listPage(req));
     }
 

@@ -12,7 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping(path = "/api/v1/sys/sqlTemplate")
-public class SqlTemplateController  {
+public class SqlTemplateController  extends BaseController<SqlTemplate>{
     @Autowired
     SqlTemplateService sqlTemplateService;
     @PostMapping
@@ -35,7 +35,7 @@ public class SqlTemplateController  {
     @GetMapping
     public HttpResponse<PageResponse<SqlTemplate>> query(HttpServletRequest request) throws InstantiationException, IllegalAccessException{
         HttpResponse<PageResponse<SqlTemplate>> rep = new HttpResponse<PageResponse<SqlTemplate>>();
-        PageRequest<SqlTemplate> req =  new PageRequest<>();
+        PageRequest<SqlTemplate> req = parse2PageRequest(request);
         return rep.addData(sqlTemplateService.listPage(req));
     }
 

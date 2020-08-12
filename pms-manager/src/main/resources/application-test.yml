@@ -1,13 +1,3 @@
-logging:
-  file: api.log
-  level:
-    org.hibernate.type.descriptor.sql.BasicBinder: trace
-    com.kry.pms: debug
-server:
-  address: 0.0.0.0
-  port: 8090
-  servlet:
-    context-path: /pms
 spring:
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
