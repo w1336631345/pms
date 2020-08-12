@@ -427,4 +427,13 @@ public interface CheckInRecordDao extends BaseDao<CheckInRecord> {
 
     @Query(nativeQuery = true, value = "select a.* from t_checkin_record a,t_account b where a.account_id = b.id and b.code = ?1 and a.hotel_code = ?2")
     CheckInRecord findByAccountCodeAndHotelCode(String code, String hotelCode);
+
+    @Query(nativeQuery = true, value = " select IFNULL(count(id),0) from t_checkin_record \n" +
+            "  where hotel_code = ?1 and `status` = 'I' and deleted =0 and type_ = 'C'  ")
+    int nowLiveIn(String hotelCode);
+
+    @Query(nativeQuery = true, value = " select IFNULL(count(id),0) from t_checkin_record \n" +
+            "  where hotel_code = ?1 and `status` = 'O' and type_ = 'C' \n" +
+            " and DATE_FORMAT(actual_time_of_leave,'%Y-%m-%d') = ?2  ")
+    int nowCheckOut(String hotelCode, String leaveTime);
 }

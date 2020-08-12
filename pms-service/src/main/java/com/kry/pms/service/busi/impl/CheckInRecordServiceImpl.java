@@ -2940,5 +2940,15 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
     public CheckInRecord findByAccountCode(String hotelCode, String code) {
         return checkInRecordDao.findByAccountCodeAndHotelCode(code,hotelCode);
     }
+    @Override
+    public int nowLiveIn(String hotelCode){
+        int count = checkInRecordDao.nowLiveIn(hotelCode);
+        return count;
+    }
+    @Override
+    public int nowCheckOut(String hotelCode, String leaveTime){
+        int count = checkInRecordDao.nowCheckOut(hotelCode, leaveTime);
+        return count;
+    }
 
 }

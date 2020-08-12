@@ -763,4 +763,34 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
         hr.setData(list);
         return hr;
     }
+    /**
+     * 功能描述: <br>当前在住人数
+     * 〈〉
+     * @Param: [orderNum]
+     * @Return: com.kry.pms.base.HttpResponse
+     * @Author: huanghaibin
+     * @Date: 2020/8/12 10:30
+     */
+    @GetMapping(value = "/nowLiveIn")
+    public HttpResponse nowLiveIn() {
+        HttpResponse hr = new HttpResponse();
+        int count = checkInRecordService.nowLiveIn(getCurrentHotleCode());
+        hr.setData(count);
+        return hr;
+    }
+    /**
+     * 功能描述: <br>今日退房人数
+     * 〈〉
+     * @Param: [orderNum]
+     * @Return: com.kry.pms.base.HttpResponse
+     * @Author: huanghaibin
+     * @Date: 2020/8/12 10:30
+     */
+    @GetMapping(value = "/nowCheckOut")
+    public HttpResponse nowCheckOut(String leaveTime) {
+        HttpResponse hr = new HttpResponse();
+        int count = checkInRecordService.nowCheckOut(getCurrentHotleCode(), leaveTime);
+        hr.setData(count);
+        return hr;
+    }
 }

@@ -205,4 +205,8 @@ public interface CheckInRecordService extends BaseService<CheckInRecord> {
     List<Map<String, Object>> printDeposit(String hotelCode, String orderNum);
 
     CheckInRecord findByAccountCode(String hotelCode, String code);
+
+    int nowLiveIn(String hotelCode);
+
+    int nowCheckOut(String hotelCode, String leaveTime);
 }
