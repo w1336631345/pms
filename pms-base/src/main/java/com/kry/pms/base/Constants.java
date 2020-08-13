@@ -275,6 +275,7 @@ public class Constants {
 		public static final String  FULL_DAY_ROOM_FEE = "1001";
 		public static final String  NIGHT_TRIAL = "1000";
 		public static final String  TO_AR = "9014";
+		public static final String  TO_MEMBER = "9016";
 	}
 
 	public interface quartzType {

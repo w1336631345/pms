@@ -54,7 +54,7 @@ public interface BillService extends BaseService<Bill> {
 	public List<Bill> checkBillIds(List<String> billIds, double total, DtoResponse<Account> rep, String recordNum);
 
 	public List<Bill> addFlatBills(List<Bill> bills, Employee employee,String shiftCode, String recordNum);
-
+	public List<Bill> addToMemberFlatBill(Bill bill, Employee employee, String shiftCode, String orderNum);
 	public DtoResponse<Bill> offset(String id,Employee employee,String shiftCode);
 	/**
 	 * 拆账   冲掉原来的帐，重新入两笔一样的 金额分别是val1，val2

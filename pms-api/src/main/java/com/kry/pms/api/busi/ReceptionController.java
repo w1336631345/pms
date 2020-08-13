@@ -151,16 +151,6 @@ public class ReceptionController extends BaseController<String> {
 		return rep;
 	}
 	/**
-	 * 团队结账
-	 * @return
-	 */
-	@GetMapping(path="/bill/check/group/{id}")
-	@OperationLog(remark = "团队结账")
-	public HttpResponse<String> groupCheckBill(){
-		HttpResponse<String> rep = new HttpResponse<String>();
-		return rep;
-	}
-	/**
 	 * 宾客结账
 	 *
 	 * @return

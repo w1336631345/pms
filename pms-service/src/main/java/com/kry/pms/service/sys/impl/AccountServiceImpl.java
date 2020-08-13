@@ -1,20 +1,32 @@
 package com.kry.pms.service.sys.impl;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.*;
-
-import javax.transaction.Transactional;
-
+import com.kry.pms.base.*;
 import com.kry.pms.dao.busi.RoomRecordDao;
+import com.kry.pms.dao.sys.AccountDao;
 import com.kry.pms.model.dto.BillStatistics;
+import com.kry.pms.model.http.request.busi.BillCheckBo;
+import com.kry.pms.model.http.response.busi.AccountSummaryVo;
+import com.kry.pms.model.http.response.busi.SettleInfoVo;
+import com.kry.pms.model.persistence.busi.Bill;
+import com.kry.pms.model.persistence.busi.CheckInRecord;
+import com.kry.pms.model.persistence.busi.RoomRecord;
+import com.kry.pms.model.persistence.busi.SettleAccountRecord;
 import com.kry.pms.model.persistence.goods.Product;
+import com.kry.pms.model.persistence.guest.Customer;
+import com.kry.pms.model.persistence.org.Employee;
 import com.kry.pms.model.persistence.room.GuestRoom;
-import com.kry.pms.service.busi.*;
+import com.kry.pms.model.persistence.sys.Account;
+import com.kry.pms.service.busi.BillService;
+import com.kry.pms.service.busi.CheckInRecordService;
+import com.kry.pms.service.busi.CreditGrantingRecordService;
+import com.kry.pms.service.busi.SettleAccountRecordService;
 import com.kry.pms.service.goods.ProductService;
+import com.kry.pms.service.guest.MemberRechargeService;
 import com.kry.pms.service.room.GuestRoomService;
 import com.kry.pms.service.room.GuestRoomStatusService;
+import com.kry.pms.service.sys.AccountService;
+import com.kry.pms.service.sys.BusinessSeqService;
+import com.kry.pms.util.BigDecimalUtil;
 import org.apache.commons.collections4.MapUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,24 +36,11 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
-import com.kry.pms.base.Constants;
-import com.kry.pms.base.DtoResponse;
-import com.kry.pms.base.PageRequest;
-import com.kry.pms.base.PageResponse;
-import com.kry.pms.dao.sys.AccountDao;
-import com.kry.pms.model.http.request.busi.BillCheckBo;
-import com.kry.pms.model.http.response.busi.AccountSummaryVo;
-import com.kry.pms.model.http.response.busi.SettleInfoVo;
-import com.kry.pms.model.persistence.busi.Bill;
-import com.kry.pms.model.persistence.busi.CheckInRecord;
-import com.kry.pms.model.persistence.busi.RoomRecord;
-import com.kry.pms.model.persistence.busi.SettleAccountRecord;
-import com.kry.pms.model.persistence.guest.Customer;
-import com.kry.pms.model.persistence.org.Employee;
-import com.kry.pms.model.persistence.sys.Account;
-import com.kry.pms.service.sys.AccountService;
-import com.kry.pms.service.sys.BusinessSeqService;
-import com.kry.pms.util.BigDecimalUtil;
+import javax.transaction.Transactional;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 
 @Service
 public class AccountServiceImpl implements AccountService {
@@ -63,6 +62,8 @@ public class AccountServiceImpl implements AccountService {
     RoomRecordDao roomRecordDao;
     @Autowired
     ProductService productService;
+    @Autowired
+    MemberRechargeService memberRechargeService;
     @Autowired
     GuestRoomService guestRoomService;
 
@@ -427,6 +428,8 @@ public class AccountServiceImpl implements AccountService {
         settleAccountRecord.setCost(cost);
     }
 
+
+
     private DtoResponse<Account> checkAccountBill(BillCheckBo billCheckBo) {
         if (billCheckBo.getCheckWay() != null && billCheckBo.getCheckWay().equals(Constants.Type.BILL_CHECK_WAY_SETTLED_AR)) {
             return checkAccountByAr(billCheckBo);
@@ -441,7 +444,17 @@ public class AccountServiceImpl implements AccountService {
             if (billCheckBo.getBills() != null && !billCheckBo.getBills().isEmpty()) {
                 for (Bill b : billCheckBo.getBills()) {
                     if (b.getTargetAccount() != null) {
-                        settleAccountRecord = settleAccountRecordService.createToAr(billCheckBo, account, b.getTargetAccount());
+                        Account targetAccount = findById(b.getTargetAccount().getId());
+                        if (Constants.Code.TO_AR.equals(b.getProduct().getCode())) {
+                            settleAccountRecord = settleAccountRecordService.createToAr(billCheckBo, account, b.getTargetAccount());
+                        }else if (Constants.Code.TO_MEMBER.equals(b.getProduct().getCode())){
+                            settleAccountRecord = settleAccountRecordService.createToMember(billCheckBo, account, b.getTargetAccount());
+                            HttpResponse response = memberRechargeService.useAmount(billCheckBo.getHotelCode(),targetAccount.getId(),b.getTotal(),settleAccountRecord.getRecordNum());
+                            if(response.getStatus()!=0){
+                                rep.error(response.getStatus(),response.getMessage());
+                                return rep;
+                            }
+                        }
                         break;
                     }
                 }
@@ -453,6 +466,8 @@ public class AccountServiceImpl implements AccountService {
                         total = BigDecimalUtil.add(total, b.getTotal());
                         if (Constants.Code.TO_AR.equals(b.getProduct().getCode())) {
                             flatBills.addAll(billService.addToArFlatBill(b, billCheckBo.getOperationEmployee(), billCheckBo.getShiftCode(), settleAccountRecord.getRecordNum()));
+                        }else if (Constants.Code.TO_MEMBER.equals(b.getProduct().getCode())){
+                            flatBills.addAll(billService.addToMemberFlatBill(b, billCheckBo.getOperationEmployee(), billCheckBo.getShiftCode(), settleAccountRecord.getRecordNum()));
                         } else {
                             flatBills.add(billService.addFlatBill(b, billCheckBo.getOperationEmployee(),
                                     billCheckBo.getShiftCode(), settleAccountRecord.getRecordNum()));

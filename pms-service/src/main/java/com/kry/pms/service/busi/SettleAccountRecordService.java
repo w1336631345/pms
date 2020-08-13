@@ -19,4 +19,6 @@ public interface SettleAccountRecordService extends BaseService<SettleAccountRec
 	DtoResponse<String> cancle(String id, String shiftCode, Employee operationEmployee);
 
     SettleAccountRecord createARSettle(BillCheckBo billCheckBo, Account account);
+
+    SettleAccountRecord createToMember(BillCheckBo billCheckBo, Account account, Account targetAccount);
 }

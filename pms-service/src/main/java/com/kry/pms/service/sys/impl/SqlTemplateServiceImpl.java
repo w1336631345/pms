@@ -1,14 +1,11 @@
 package com.kry.pms.service.sys.impl;
 
-import java.io.IOException;
-import java.io.StringWriter;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.kry.pms.base.Constants;
+import com.kry.pms.base.PageRequest;
+import com.kry.pms.base.PageResponse;
+import com.kry.pms.dao.sys.SqlTemplateDao;
+import com.kry.pms.model.persistence.sys.SqlTemplate;
+import com.kry.pms.service.sys.SqlTemplateService;
 import com.kry.pms.util.SqlUtil;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
@@ -21,17 +18,18 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
-import com.kry.pms.base.Constants;
-import com.kry.pms.base.PageRequest;
-import com.kry.pms.base.PageResponse;
-import com.kry.pms.dao.sys.SqlTemplateDao;
-import com.kry.pms.model.persistence.sys.SqlTemplate;
-import com.kry.pms.service.sys.SqlTemplateService;
-
 import javax.persistence.EntityManager;
 import javax.persistence.ParameterMode;
 import javax.persistence.Query;
 import javax.persistence.StoredProcedureQuery;
+import java.io.IOException;
+import java.io.StringWriter;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class SqlTemplateServiceImpl implements SqlTemplateService {
@@ -164,7 +162,7 @@ public class SqlTemplateServiceImpl implements SqlTemplateService {
             String templateValue = st.getSql();
             parmrs.put("hotelCode", hotelCode);
             StringWriter stringWriter = new StringWriter();
-            Template template = new Template(hotelCode, templateValue, configuration);
+            Template template = new Template(hotelCode+code, templateValue, configuration);
             template.process(parmrs, stringWriter);
             String data = stringWriter.toString();
             stringWriter.close();

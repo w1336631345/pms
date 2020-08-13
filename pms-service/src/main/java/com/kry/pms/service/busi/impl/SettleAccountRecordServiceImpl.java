@@ -192,6 +192,22 @@ public class SettleAccountRecordServiceImpl implements SettleAccountRecordServic
         return create(recordNum,account, account, billCheckBo.getOperationEmployee(), billCheckBo.getShiftCode(),
                 billCheckBo.getCheckWay(), billCheckBo.getMainSettleRecordNum());    }
 
+    @Override
+    public SettleAccountRecord createToMember(BillCheckBo billCheckBo, Account account, Account targetAccount) {
+        SettleAccountRecord scr = new SettleAccountRecord();
+        scr.setRecordNum(businessSeqService.fetchNextSeqNum(targetAccount.getHotelCode(),
+                Constants.Key.BUSINESS_BUSINESS_TRANSFER_SEQ_KEY));
+        scr.setShiftCode(billCheckBo.getShiftCode());
+        scr.setAccount(account);
+        scr.setBusinessDate(businessSeqService.getBuinessDate(targetAccount.getHotelCode()));
+        scr.setTargetAccount(targetAccount);
+        scr.setSettleWay(billCheckBo.getCheckWay());
+        scr.setHotelCode(account.getHotelCode());
+        scr.setOperationEmployee(billCheckBo.getOperationEmployee());
+        scr.setSettleTime(LocalDateTime.now());
+        return add(scr);
+    }
+
     private DtoResponse<String> cancleTransfer(SettleAccountRecord sar, String shiftCode, Employee operationEmployee) {
         DtoResponse<String> rep = new DtoResponse<String>();
         DtoResponse<List<Bill>> crep = accountService.cancleTransfer(sar.getFlatBills(), sar.getTotal(), sar.getAccount(),

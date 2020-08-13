@@ -320,8 +320,29 @@ public class BillServiceImpl implements BillService {
         data.add(createArSettleBill(bill,employee, shiftCode, orderNum));
         return data;
     }
+    @Override
+    public List<Bill> addToMemberFlatBill(Bill bill, Employee employee, String shiftCode, String orderNum) {
+        List<Bill> data = new ArrayList<>();
+        bill.setStatus(Constants.Status.BILL_SETTLED);
+        bill.setOperationEmployee(employee);
+        bill.setShiftCode(shiftCode);
+        bill.setHotelCode(employee.getHotelCode());
+        bill.setCurrentSettleAccountRecordNum(orderNum);
+        bill = add(bill);
+        data.add(bill);
+        data.add(createMemberSettleBill(bill,employee, shiftCode, orderNum));
+        return data;
+    }
+
 
     private Bill createArSettleBill(Bill res, Employee employee, String shiftCode, String recordNum) {
+        return addArBill(createPackageBill(res,employee,shiftCode,recordNum));
+    }
+    private Bill createMemberSettleBill(Bill res, Employee employee, String shiftCode, String recordNum) {
+        Bill bill  = createPackageBill(res,employee,shiftCode,recordNum);
+        return addArBill(bill);
+    }
+    private Bill createPackageBill(Bill res, Employee employee, String shiftCode, String recordNum){
         Bill bill = new Bill();
         bill.setCost(res.getPay());
         bill.setPay(0.0);
@@ -338,7 +359,7 @@ public class BillServiceImpl implements BillService {
         bill.setSid(res.getId());
         bill.setRemark("前台转入 " + res.getAccount().getCode());
         bill.setReceiptNum(recordNum);
-        return addArBill(bill);
+        return bill;
     }
 
 
