@@ -13,6 +13,8 @@ public interface MemberRechargeService extends BaseService<MemberRecharge>{
 
     HttpResponse use(MemberRecharge entity);
 
+    HttpResponse useAmount(String hotelCode, String cardNum, Double amount);
+
     List<MemberRecharge> getList(String code);
 
     List<MemberRecharge> getByHotelCodeAndCardNum(String code, String cardNum);

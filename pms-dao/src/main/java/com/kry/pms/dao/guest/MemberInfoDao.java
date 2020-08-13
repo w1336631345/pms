@@ -18,6 +18,8 @@ public interface MemberInfoDao extends BaseDao<MemberInfo>{
 
 	MemberInfo findByHotelCodeAndCardNum(String hotelCode, String cardNum);
 
+	MemberInfo findByHotelCodeAndAccountId(String hotelCode, String accountId);
+
 	@Modifying
 	@Query(nativeQuery = true, value = " update t_member_info set integral = ?1, update_date = SYSDATE() where id = ?2 ")
 	void updateIntegral(Double integral, String id);

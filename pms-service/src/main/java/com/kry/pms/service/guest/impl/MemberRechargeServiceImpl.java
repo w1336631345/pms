@@ -10,6 +10,7 @@ import com.kry.pms.model.persistence.busi.Bill;
 import com.kry.pms.model.persistence.guest.MemberInfo;
 import com.kry.pms.model.persistence.guest.MemberRecharge;
 import com.kry.pms.model.persistence.org.Employee;
+import com.kry.pms.model.persistence.sys.Account;
 import com.kry.pms.model.persistence.sys.User;
 import com.kry.pms.service.busi.BillService;
 import com.kry.pms.service.goods.ProductService;
@@ -80,6 +81,11 @@ public class MemberRechargeServiceImpl implements MemberRechargeService {
 		memberInfoDao.saveAndFlush(memberInfo);
 		entity = memberRechargeDao.saveAndFlush(entity);
 
+		//修改账号金额，所有（充值+赠送）
+		Account account = memberInfo.getAccount();
+		account.setTotal(account.getTotal() + memberInfo.getBalance() + memberInfo.getGivePrice());
+		accountService.modify(account);
+
 		//入账
 		Bill bill = new Bill();
 		Employee emp = employeeDao.findByUserId(entity.getCreateUser());
@@ -112,6 +118,40 @@ public class MemberRechargeServiceImpl implements MemberRechargeService {
 		memberInfo.setGivePrice(memberInfo.getGivePrice() - entity.getUseGiveAmount());
 		memberInfoDao.saveAndFlush(memberInfo);
 		hr.setData(memberRechargeDao.saveAndFlush(entity));
+		return hr;
+	}
+	//后端调用，使用金额
+	@Override
+	public HttpResponse useAmount(String hotelCode, String accountId, Double amount) {
+		HttpResponse hr = new HttpResponse();
+//		MemberInfo memberInfo = memberInfoDao.findByHotelCodeAndCardNum(hotelCode, cardNum);
+		MemberInfo memberInfo = memberInfoDao.findByHotelCodeAndAccountId(hotelCode, accountId);
+		if((memberInfo.getBalance() + memberInfo.getGivePrice()) <amount){
+			return hr.error("余额不足");
+		}
+		if(memberInfo.getGivePrice() >= amount){//赠送大于消费，直接扣赠送
+			memberInfo.setGivePrice(memberInfo.getGivePrice() - amount);
+		}else{
+			memberInfo.setBalance(memberInfo.getBalance() - (amount - memberInfo.getGivePrice()));
+			memberInfo.setGivePrice(0.0);
+		}
+
+		memberInfoDao.saveAndFlush(memberInfo);
+
+		MemberRecharge entity = new MemberRecharge();
+		entity.setUseAmount(amount);
+		entity.setRechargeOrUse("U");
+		entity.setUseGiveAmount(0.0);
+		entity.setIsOverdue(0);
+		entity.setCardNum(memberInfo.getCardNum());
+		entity.setMacNum(memberInfo.getMacNum());
+		entity.setMemberInfo(memberInfo);
+		hr.setData(memberRechargeDao.saveAndFlush(entity));
+
+		//账号减去过期的钱
+		Account account = memberInfo.getAccount();
+		account.setTotal(account.getTotal() - amount);
+		accountService.modify(account);
 		return hr;
 	}
 
@@ -231,6 +271,11 @@ public class MemberRechargeServiceImpl implements MemberRechargeService {
 				memberInfo.setBalance(memberInfo.getBalance() - nowOverAmount);
 				memberInfo.setGivePrice(memberInfo.getGivePrice() - nowOverGiveAmount);
 				memberInfoDao.saveAndFlush(memberInfo);
+
+				//账号减去过期的钱
+				Account account = memberInfo.getAccount();
+				account.setTotal(account.getTotal() - (nowOverAmount + nowOverGiveAmount));
+				accountService.modify(account);
 			}
 
 		}
