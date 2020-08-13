@@ -150,6 +150,8 @@ public class MemberRechargeServiceImpl implements MemberRechargeService {
 		entity.setMacNum(memberInfo.getMacNum());
 		entity.setMemberInfo(memberInfo);
 		entity.setSettledNo(settledNo);
+		entity.setCreateDate(LocalDateTime.now());
+		entity.setRechargeDate(LocalDate.now());
 		hr.setData(memberRechargeDao.saveAndFlush(entity));
 
 		//账号减去过期的钱
