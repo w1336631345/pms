@@ -7,6 +7,7 @@ import java.util.List;
 import javax.persistence.Transient;
 import javax.transaction.Transactional;
 
+import com.kry.pms.service.guest.MemberRechargeService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
@@ -39,6 +40,8 @@ public class SettleAccountRecordServiceImpl implements SettleAccountRecordServic
     AccountService accountService;
     @Autowired
     BillService billService;
+    @Autowired
+    MemberRechargeService memberRechargeService;
 
     @Override
     public SettleAccountRecord add(SettleAccountRecord settleAccountRecord) {
@@ -146,6 +149,9 @@ public class SettleAccountRecordServiceImpl implements SettleAccountRecordServic
                     rebill.setOperationEmployee(operationEmployee);
                     rebill.setShiftCode(shiftCode);
                     billService.add(rebill);
+                    if(Constants.Code.TO_MEMBER.equals(rebill.getProduct().getCode())){//如果会员帐  取消消费
+                        memberRechargeService.cancelUseAmount(rebill.getHotelCode(),fb.getCurrentSettleAccountRecordNum());
+                    }
                 } catch (CloneNotSupportedException e) {
                     e.printStackTrace();
                 }
@@ -162,9 +168,9 @@ public class SettleAccountRecordServiceImpl implements SettleAccountRecordServic
         SettleAccountRecord sar = findById(id);
         LocalDate businessDate = businessSeqService.getBuinessDate(operationEmployee.getHotelCode());
         if (sar != null) {
-            if (!businessDate.isEqual(sar.getBusinessDate())||!shiftCode.equals(sar.getShiftCode())||!operationEmployee.getId().equals(sar.getOperationEmployee().getId())) {
+            if (!businessDate.isEqual(sar.getBusinessDate()) || !shiftCode.equals(sar.getShiftCode()) || !operationEmployee.getId().equals(sar.getOperationEmployee().getId())) {
                 DtoResponse<String> rep = new DtoResponse<>();
-                rep.error(Constants.BusinessCode.CODE_ILLEGAL_OPERATION,"无法处理（只能撤销本人本班次的结帐）");
+                rep.error(Constants.BusinessCode.CODE_ILLEGAL_OPERATION, "无法处理（只能撤销本人本班次的结帐）");
                 return rep;
             } else {
                 sar.setCancleNum(businessSeqService.fetchNextSeqNum(sar.getHotelCode(),
@@ -181,7 +187,7 @@ public class SettleAccountRecordServiceImpl implements SettleAccountRecordServic
             }
         }
         DtoResponse<String> rep = new DtoResponse<>();
-        rep.error(Constants.BusinessCode.CODE_ILLEGAL_OPERATION,"找不到该结帐信息");
+        rep.error(Constants.BusinessCode.CODE_ILLEGAL_OPERATION, "找不到该结帐信息");
         return rep;
     }
 
@@ -189,8 +195,9 @@ public class SettleAccountRecordServiceImpl implements SettleAccountRecordServic
     public SettleAccountRecord createARSettle(BillCheckBo billCheckBo, Account account) {
         String recordNum = businessSeqService.fetchNextSeqNum(billCheckBo.getOperationEmployee().getHotelCode(),
                 Constants.Key.BUSINESS_BUSINESS_AR_SETTLE_NUM_KEY);
-        return create(recordNum,account, account, billCheckBo.getOperationEmployee(), billCheckBo.getShiftCode(),
-                billCheckBo.getCheckWay(), billCheckBo.getMainSettleRecordNum());    }
+        return create(recordNum, account, account, billCheckBo.getOperationEmployee(), billCheckBo.getShiftCode(),
+                billCheckBo.getCheckWay(), billCheckBo.getMainSettleRecordNum());
+    }
 
     @Override
     public SettleAccountRecord createToMember(BillCheckBo billCheckBo, Account account, Account targetAccount) {
@@ -242,11 +249,11 @@ public class SettleAccountRecordServiceImpl implements SettleAccountRecordServic
     public SettleAccountRecord create(BillCheckBo billCheckBo, Account account, Account targetAccount) {
         String recordNum = businessSeqService.fetchNextSeqNum(billCheckBo.getOperationEmployee().getHotelCode(),
                 Constants.Key.BUSINESS_BUSINESS_TRANSFER_SEQ_KEY);
-        return create(recordNum,account, targetAccount, billCheckBo.getOperationEmployee(), billCheckBo.getShiftCode(),
+        return create(recordNum, account, targetAccount, billCheckBo.getOperationEmployee(), billCheckBo.getShiftCode(),
                 billCheckBo.getCheckWay(), billCheckBo.getMainSettleRecordNum());
     }
 
-    private SettleAccountRecord create(String recordNum,Account account, Account targetAccount, Employee employee, String shiftCode,
+    private SettleAccountRecord create(String recordNum, Account account, Account targetAccount, Employee employee, String shiftCode,
                                        String checkWay, String mainRecordNum) {
         SettleAccountRecord scr = new SettleAccountRecord();
         scr.setRecordNum(recordNum);
