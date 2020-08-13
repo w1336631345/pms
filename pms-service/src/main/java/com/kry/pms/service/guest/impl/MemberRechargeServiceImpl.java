@@ -20,6 +20,7 @@ import com.kry.pms.service.sys.AccountService;
 import com.kry.pms.service.sys.BusinessSeqService;
 import com.kry.pms.service.sys.UserService;
 import org.apache.commons.collections4.MapUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.domain.Example;
@@ -122,8 +123,9 @@ public class MemberRechargeServiceImpl implements MemberRechargeService {
 	}
 	//后端调用，使用金额
 	@Override
-	public HttpResponse useAmount(String hotelCode, String accountId, Double amount) {
+	public HttpResponse useAmount(String hotelCode, String accountId, Double amount, String settledNo) {
 		HttpResponse hr = new HttpResponse();
+		MemberRecharge entity = new MemberRecharge();
 //		MemberInfo memberInfo = memberInfoDao.findByHotelCodeAndCardNum(hotelCode, cardNum);
 		MemberInfo memberInfo = memberInfoDao.findByHotelCodeAndAccountId(hotelCode, accountId);
 		if((memberInfo.getBalance() + memberInfo.getGivePrice()) <amount){
@@ -131,21 +133,23 @@ public class MemberRechargeServiceImpl implements MemberRechargeService {
 		}
 		if(memberInfo.getGivePrice() >= amount){//赠送大于消费，直接扣赠送
 			memberInfo.setGivePrice(memberInfo.getGivePrice() - amount);
+
+			entity.setUseGiveAmount(amount);
 		}else{
 			memberInfo.setBalance(memberInfo.getBalance() - (amount - memberInfo.getGivePrice()));
 			memberInfo.setGivePrice(0.0);
-		}
 
+			entity.setUseAmount(memberInfo.getBalance() - (amount - memberInfo.getGivePrice()));
+			entity.setUseGiveAmount(memberInfo.getGivePrice());
+		}
 		memberInfoDao.saveAndFlush(memberInfo);
 
-		MemberRecharge entity = new MemberRecharge();
-		entity.setUseAmount(amount);
 		entity.setRechargeOrUse("U");
-		entity.setUseGiveAmount(0.0);
 		entity.setIsOverdue(0);
 		entity.setCardNum(memberInfo.getCardNum());
 		entity.setMacNum(memberInfo.getMacNum());
 		entity.setMemberInfo(memberInfo);
+		entity.setSettledNo(settledNo);
 		hr.setData(memberRechargeDao.saveAndFlush(entity));
 
 		//账号减去过期的钱
@@ -153,6 +157,31 @@ public class MemberRechargeServiceImpl implements MemberRechargeService {
 		account.setTotal(account.getTotal() - amount);
 		accountService.modify(account);
 		return hr;
+	}
+	//取消使用金额
+	@Override
+	public HttpResponse cancelUseAmount(String hotelCode, String settledNo) {
+		HttpResponse hr = new HttpResponse();
+		MemberRecharge mr = memberRechargeDao.findByHotelCodeAndSettledNo(hotelCode, settledNo);
+		MemberRecharge nMr = new MemberRecharge();
+		BeanUtils.copyProperties(mr, nMr);
+		nMr.setId(null);
+		MemberInfo memberInfo = mr.getMemberInfo();
+		memberInfo.setBalance(memberInfo.getBalance() + mr.getAmount());
+		memberInfo.setGivePrice(memberInfo.getGivePrice() + mr.getGiveAmount());
+		memberInfoDao.saveAndFlush(memberInfo);
+
+		//账号减去过期的钱
+		Account account = memberInfo.getAccount();
+		account.setTotal(account.getTotal() + (nMr.getUseAmount() + nMr.getUseGiveAmount()));
+		accountService.modify(account);
+
+
+		nMr.setUseAmount(-nMr.getUseAmount());
+		nMr.setUseAmount(-nMr.getUseGiveAmount());
+		memberRechargeDao.save(nMr);
+
+		return hr.ok();
 	}
 
 	@Override

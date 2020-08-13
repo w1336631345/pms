@@ -13,6 +13,8 @@ public interface MemberRechargeDao extends BaseDao<MemberRecharge>{
 
     List<MemberRecharge> findByHotelCodeAndCardNum(String hotelCode, String cardNum);
 
+    MemberRecharge findByHotelCodeAndSettledNo(String hotelCode, String settledNo);
+
     @Query(nativeQuery = true, value = " select DISTINCT tmr.card_num \n" +
             " from t_member_recharge tmr \n" +
             " where tmr.limitation_date < CURRENT_DATE \n" +

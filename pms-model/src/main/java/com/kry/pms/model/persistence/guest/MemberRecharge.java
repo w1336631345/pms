@@ -53,4 +53,6 @@ public class MemberRecharge extends PersistenceModelTo {
     private Double overGiveAmount;//过期赠送金额
     @Transient
     private String shiftCode;//班次
+    @Column
+    private String settledNo;//结账单号
 }
