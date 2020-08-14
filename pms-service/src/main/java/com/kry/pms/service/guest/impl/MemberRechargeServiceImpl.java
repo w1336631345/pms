@@ -144,6 +144,7 @@ public class MemberRechargeServiceImpl implements MemberRechargeService {
 		}
 		memberInfoDao.saveAndFlush(memberInfo);
 
+		entity.setHotelCode(hotelCode);
 		entity.setRechargeOrUse("U");
 		entity.setIsOverdue(0);
 		entity.setCardNum(memberInfo.getCardNum());
