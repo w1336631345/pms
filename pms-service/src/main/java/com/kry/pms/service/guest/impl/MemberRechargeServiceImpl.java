@@ -134,12 +134,13 @@ public class MemberRechargeServiceImpl implements MemberRechargeService {
 		if(memberInfo.getGivePrice() >= amount){//赠送大于消费，直接扣赠送
 			memberInfo.setGivePrice(memberInfo.getGivePrice() - amount);
 
+			entity.setUseAmount(0.0);
 			entity.setUseGiveAmount(amount);
 		}else{
 			memberInfo.setBalance(memberInfo.getBalance() - (amount - memberInfo.getGivePrice()));
 			memberInfo.setGivePrice(0.0);
 
-			entity.setUseAmount(memberInfo.getBalance() - (amount - memberInfo.getGivePrice()));
+			entity.setUseAmount(amount - memberInfo.getGivePrice());
 			entity.setUseGiveAmount(memberInfo.getGivePrice());
 		}
 		memberInfoDao.saveAndFlush(memberInfo);
