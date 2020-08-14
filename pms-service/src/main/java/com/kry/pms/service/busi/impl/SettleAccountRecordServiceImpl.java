@@ -149,8 +149,8 @@ public class SettleAccountRecordServiceImpl implements SettleAccountRecordServic
                     rebill.setOperationEmployee(operationEmployee);
                     rebill.setShiftCode(shiftCode);
                     billService.add(rebill);
-                    if(Constants.Code.TO_MEMBER.equals(rebill.getProduct().getCode())){//如果会员帐  取消消费
-                        memberRechargeService.cancelUseAmount(rebill.getHotelCode(),fb.getCurrentSettleAccountRecordNum());
+                    if(Constants.Type.ACCOUNT_MEMBER.equals(rebill.getAccount().getType())){//如果会员帐  取消消费
+                        memberRechargeService.cancelUseAmount(rebill.getHotelCode(),sar.getRecordNum());
                     }
                 } catch (CloneNotSupportedException e) {
                     e.printStackTrace();

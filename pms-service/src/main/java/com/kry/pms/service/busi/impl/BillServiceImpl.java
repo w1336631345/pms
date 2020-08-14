@@ -323,7 +323,7 @@ public class BillServiceImpl implements BillService {
     @Override
     public List<Bill> addToMemberFlatBill(Bill bill, Employee employee, String shiftCode, String orderNum) {
         List<Bill> data = new ArrayList<>();
-        bill.setStatus(Constants.Status.BILL_NEED_SETTLED);
+        bill.setStatus(Constants.Status.BILL_SETTLED);
         bill.setOperationEmployee(employee);
         bill.setShiftCode(shiftCode);
         bill.setHotelCode(employee.getHotelCode());
@@ -340,6 +340,7 @@ public class BillServiceImpl implements BillService {
     }
     private Bill createMemberSettleBill(Bill res, Employee employee, String shiftCode, String recordNum) {
         Bill bill  = createPackageBill(res,employee,shiftCode,recordNum);
+        bill.setStatus(Constants.Status.BILL_SETTLED);
         return addArBill(bill);
     }
     private Bill createPackageBill(Bill res, Employee employee, String shiftCode, String recordNum){
