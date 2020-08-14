@@ -170,8 +170,8 @@ public class MemberRechargeServiceImpl implements MemberRechargeService {
 		BeanUtils.copyProperties(mr, nMr);
 		nMr.setId(null);
 		MemberInfo memberInfo = mr.getMemberInfo();
-		memberInfo.setBalance(memberInfo.getBalance() + mr.getAmount());
-		memberInfo.setGivePrice(memberInfo.getGivePrice() + mr.getGiveAmount());
+		memberInfo.setBalance(memberInfo.getBalance() + mr.getUseAmount());
+		memberInfo.setGivePrice(memberInfo.getGivePrice() + mr.getUseGiveAmount());
 		memberInfoDao.saveAndFlush(memberInfo);
 
 		//账号减去过期的钱
