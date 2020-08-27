@@ -21,7 +21,7 @@ public interface MemberInfoService extends BaseService<MemberInfo>{
 
     List<Map<String, Object>> integralReport(String hotelCode, String consDate);
 
-    List<MemberInfo> byParamsList(String hotelCode, String limitationDate, String birthDay);
+    List<MemberInfo> byParamsList(String hotelCode, String startTime, String endTime, String birthDay);
 
     List<MemberInfo> getParmsList(String name, String mobile, String cardNum, String idCardNum, String hotelCode);
 
