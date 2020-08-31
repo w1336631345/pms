@@ -127,9 +127,9 @@ public class MemberInfoController extends BaseController<MemberInfo> {
 	 * @Date: 2020/7/28 15:25
 	 */
 	@GetMapping(path = "/byParamsList")
-	public HttpResponse<List<MemberInfo>> byParamsList(String limitationDate, String birthDay){
+	public HttpResponse<List<MemberInfo>> byParamsList(String startTime, String endTime, String birthDay){
 		HttpResponse<List<MemberInfo>> rep = new HttpResponse<List<MemberInfo>>();
-		List<MemberInfo> list = memberInfoService.byParamsList(getCurrentHotleCode(), limitationDate, birthDay);
+		List<MemberInfo> list = memberInfoService.byParamsList(getCurrentHotleCode(), startTime, endTime, birthDay);
 		return rep.addData(list);
 	}
 

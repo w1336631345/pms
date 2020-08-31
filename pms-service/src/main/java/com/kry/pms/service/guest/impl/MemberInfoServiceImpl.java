@@ -130,7 +130,7 @@ public class MemberInfoServiceImpl implements MemberInfoService {
 	}
 
 	@Override
-	public List<MemberInfo> byParamsList(String hotelCode, String limitationDate, String birthDay) {
+	public List<MemberInfo> byParamsList(String hotelCode, String startTime, String endTime, String birthDay) {
 		Specification<MemberInfo> sf = new Specification<MemberInfo>() {
 			@Override
 			public Predicate toPredicate(Root<MemberInfo> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
@@ -138,9 +138,13 @@ public class MemberInfoServiceImpl implements MemberInfoService {
 				if (hotelCode != null) {
 					list.add(criteriaBuilder.equal(root.get("hotelCode"), hotelCode));
 				}
-				//当前时间 > 过期日期
-				if(limitationDate != null){
-					list.add(criteriaBuilder.greaterThan(root.get("limitationDate"), LocalDate.now()));
+				//startTime >= 过期日期
+				if(startTime != null){
+					list.add(criteriaBuilder.greaterThanOrEqualTo(root.get("limitationDate"), LocalDate.parse(startTime)));
+				}
+				//endTime <= 过期日期
+				if(endTime != null){
+					list.add(criteriaBuilder.lessThanOrEqualTo(root.get("limitationDate"), LocalDate.parse(endTime)));
 				}
 				//生日
 				if(birthDay != null){
