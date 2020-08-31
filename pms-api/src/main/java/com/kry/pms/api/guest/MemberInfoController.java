@@ -41,6 +41,14 @@ public class MemberInfoController extends BaseController<MemberInfo> {
 		return rep;
 	}
 
+	@GetMapping(path = "/isPassword")
+	public HttpResponse<Boolean> delete(String id, String password) {
+		HttpResponse<Boolean> rep = new HttpResponse<>();
+		Boolean b = memberInfoService.findByIdAndPassword(id, password);
+		rep.setData(b);
+		return rep;
+	}
+
 	@GetMapping
 	public HttpResponse<PageResponse<MemberInfo>> query(HttpServletRequest request) throws InstantiationException, IllegalAccessException{
 		HttpResponse<PageResponse<MemberInfo>> rep = new HttpResponse<PageResponse<MemberInfo>>();

@@ -31,6 +31,8 @@ public interface MemberInfoService extends BaseService<MemberInfo>{
 
     List<MemberInfo> findByCustomer(String customerId);
 
+    Boolean findByIdAndPassword(String id, String password);
+
     //定时任务：每日计算积分/金额过期内容
     void boOverdueList(String code);
 }

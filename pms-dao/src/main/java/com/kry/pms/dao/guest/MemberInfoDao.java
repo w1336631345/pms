@@ -126,4 +126,6 @@ public interface MemberInfoDao extends BaseDao<MemberInfo>{
 			" (tmi.card_num = :moreParams or tmi.mac_num = :moreParams or tc.`name` like CONCAT('%',:moreParams,'%') or tc.mobile = :moreParams), 1=1 ) ")
 	List<MemberInfo> parmsList(@Param("hotelCode") String hotelCode, @Param("type") String type, @Param("isUsed") String isUsed, @Param("moreParams") String moreParams);
 
+	MemberInfo findByIdAndPassword(String id, String password);
+
 }

@@ -214,6 +214,15 @@ public class MemberInfoServiceImpl implements MemberInfoService {
         List<MemberInfo> list = memberInfoDao.findByCustomer(customer);
         return list;
     }
+    @Override
+    public Boolean findByIdAndPassword(String id, String password){
+		MemberInfo mi = memberInfoDao.findByIdAndPassword(id, password);
+		if(mi != null){
+			return true;
+		}else{
+			return false;
+		}
+	}
 
 	//定时任务：每日计算积分、金额过期内容
 	@Override
