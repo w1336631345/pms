@@ -49,6 +49,8 @@ public class Hotel extends PersistenceModel {
 	private String wechatCodeUrl;
 	@Column(columnDefinition = "double default NUll COMMENT '经度'")
 	private Double latitude;
+	@Column(name = "type_")
+	private String type;
 	@ManyToMany
 	private List<HotelTag> hotelTags;
 	@Column(columnDefinition = "varchar(400) default NUll COMMENT '主图'")

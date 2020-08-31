@@ -165,6 +165,7 @@ public class AccountServiceImpl implements AccountService {
                 if (bill.getRoomNum() == null) {
                     if (cir != null && cir.getGuestRoom() != null) {
                         bill.setRoomNum(cir.getGuestRoom().getRoomNum());
+                        bill.setRoomId(cir.getGuestRoom().getId());
                     }
                 }
                 newTotal = account.getTotal();
@@ -670,6 +671,19 @@ public class AccountServiceImpl implements AccountService {
         }
     }
 
+
+    @Override
+    public Account createAccount(Customer customer) {
+        Account account = new Account(0, 0);
+        account.setCode(businessSeqService.fetchNextSeqNum(customer.getHotelCode(),
+                Constants.Key.BUSINESS_BUSINESS_CUSTOMER_ACCOUNT_SEQ_KEY));
+        account.setCustomer(customer);
+        account.setHotelCode(customer.getHotelCode());
+        account.setName(customer.getName());
+        account.setType(Constants.Type.ACCOUNT_CUSTOMER);
+        return add(account);
+    }
+
     @Override
     public Account createAccount(Customer customer, String roomNum) {
         Account account = new Account(0, 0);
@@ -680,6 +694,20 @@ public class AccountServiceImpl implements AccountService {
         account.setName(customer.getName());
         account.setType(Constants.Type.ACCOUNT_CUSTOMER);
         account.setRoomNum(roomNum);
+        return add(account);
+    }
+
+    @Override
+    public Account createAccount(Customer customer, GuestRoom gr) {
+        Account account = new Account(0, 0);
+        account.setRoomId(gr.getId());
+        account.setCode(businessSeqService.fetchNextSeqNum(customer.getHotelCode(),
+                Constants.Key.BUSINESS_BUSINESS_CUSTOMER_ACCOUNT_SEQ_KEY));
+        account.setCustomer(customer);
+        account.setHotelCode(customer.getHotelCode());
+        account.setName(customer.getName());
+        account.setType(Constants.Type.ACCOUNT_CUSTOMER);
+        account.setRoomNum(gr.getRoomNum());
         return add(account);
     }
 

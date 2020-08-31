@@ -30,6 +30,8 @@ public class Account extends PersistenceModel {
 	@Column(name="type_")
 	private String type;
 	@Column
+	private String roomId;
+	@Column
 	private LocalDate startDate;//有效期起
 	@Column
 	private LocalDate endDate;//有效期止

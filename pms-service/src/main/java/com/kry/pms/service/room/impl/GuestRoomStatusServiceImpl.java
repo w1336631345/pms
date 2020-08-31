@@ -512,6 +512,7 @@ public class GuestRoomStatusServiceImpl implements GuestRoomStatusService {
     @Override
     public void updateStatus(UseInfoAble info) {
         GuestRoomStatus status = guestRoomStatusDao.findByGuestRoomId(info.guestRoom().getId());
+        status.setRoomStatus(info.getRoomStatus());
         status.setFree(info.isFree());
         status.setGroup(info.isGroup());
         status.setOta(info.isOTA());

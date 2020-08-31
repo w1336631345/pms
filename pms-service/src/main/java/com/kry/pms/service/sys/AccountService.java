@@ -12,6 +12,7 @@ import com.kry.pms.model.persistence.busi.CheckInRecord;
 import com.kry.pms.model.persistence.busi.RoomRecord;
 import com.kry.pms.model.persistence.guest.Customer;
 import com.kry.pms.model.persistence.org.Employee;
+import com.kry.pms.model.persistence.room.GuestRoom;
 import com.kry.pms.model.persistence.sys.Account;
 import com.kry.pms.service.BaseService;
 
@@ -36,6 +37,8 @@ public interface AccountService extends BaseService<Account> {
     DtoResponse<Account> checkCustomerBill(BillCheckBo billCheckBo);
 
     Account createAccount(Customer customer, String roomNum);
+    public Account createAccount(Customer customer);
+    Account createAccount(Customer customer, GuestRoom gr);
 
     Account createMemberAccount(Customer customer, String hotelCode);
 

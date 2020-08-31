@@ -879,6 +879,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                 customer = customerService.createTempCustomer(gr.getHotelCode(), tempName + "#" + i);
                 account = new Account(0, 0);
                 account.setRoomNum(gr.getRoomNum());
+                account.setRoomId(gr.getId());
                 account.setCustomer(customer);
                 account.setHotelCode(gr.getHotelCode());
                 account.setName(customer.getName());//设置账号名和用户名相同
@@ -1012,7 +1013,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
             checkInRecord.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION);
             checkInRecord.setType(Constants.Type.CHECK_IN_RECORD_CUSTOMER);
             checkInRecord = add(checkInRecord);
-            Account account = accountService.createAccount(checkInRecord.getCustomer(), null);
+            Account account = accountService.createAccount(checkInRecord.getCustomer());
             checkInRecord.setAccount(account);
             modify(checkInRecord);
         }
@@ -1197,7 +1198,8 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                 } else {
                     customer = customerService.createTempCustomer(checkInRecord.getHotelCode(), gr.getRoomNum() + "#" + (i + 1));
                 }
-                Account account = accountService.createAccount(customer, gr.getRoomNum());
+                Account account = accountService.createAccount(customer, gr);
+                account.setRoomId(gr.getId());
                 checkInRecord.setAccount(account);
                 checkInRecord.setCustomer(customer);
                 checkInRecord.setName(customer.getName());
@@ -1360,7 +1362,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 //			roomStatisticsService.booking(checkInRecord.getRoomType(), checkInRecord.getArriveTime(), 1,
 //					checkInRecord.getDays());
             checkInRecord = add(checkInRecord);
-            Account account = accountService.createAccount(checkInRecord.getCustomer(), null);
+            Account account = accountService.createAccount(checkInRecord.getCustomer());
             checkInRecord.setAccount(account);
             modify(checkInRecord);
 
@@ -2267,6 +2269,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
         Customer customer = customerService.findById(customerId);
         Account account = new Account(0, 0);
         account.setRoomNum(cir.getGuestRoom().getRoomNum());
+        account.setRoomId(cir.getGuestRoom().getId());
         account.setName(customer.getName());
         account.setCustomer(customer);
         account.setCode(businessSeqService.fetchNextSeqNum(cir.getHotelCode(),

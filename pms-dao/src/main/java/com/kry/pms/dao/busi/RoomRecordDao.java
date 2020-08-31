@@ -61,6 +61,7 @@ public interface RoomRecordDao extends BaseDao<RoomRecord> {
             " trr.id, \n" +
             " tcr.id cirId, \n" +
             " tgr.room_num roomNum, \n" +
+            " tgr.id roomId, \n" +
             " main.account_id mainAccountId, \n" +
             " tsm.id setMealId, \n" +
             " tsm.product_id productId, \n" +

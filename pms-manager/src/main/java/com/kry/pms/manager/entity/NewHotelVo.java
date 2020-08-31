@@ -6,8 +6,8 @@ import lombok.Data;
 import java.util.List;
 @Data
 public class NewHotelVo {
-    String name;
-    String code;
-    String srcCode;
-    String corpCode;
+    String name ;//名字
+    String code;//编码
+    String srcCode;//原始酒店编码
+    String corpCode;//公司编码
 }

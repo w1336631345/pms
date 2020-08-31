@@ -114,9 +114,10 @@ public class BillServiceImpl implements BillService {
         Account account = accountService.billEntry(bill);
         if (account.getRoomNum() != null) {
             bill.setRoomNum(account.getRoomNum());
+            bill.setRoomId(account.getRoomId());
         }
         bill.setBillSeq(account.getCurrentBillSeq());
-        if(bill.getItems()!=null&&!bill.getItems().isEmpty()){
+        if (bill.getItems() != null && !bill.getItems().isEmpty()) {
             bill.getItems().forEach(billItem -> {
                 billItem.setHotelCode(account.getHotelCode());
             });
@@ -317,9 +318,10 @@ public class BillServiceImpl implements BillService {
         bill.setCurrentSettleAccountRecordNum(orderNum);
         bill = add(bill);
         data.add(bill);
-        data.add(createArSettleBill(bill,employee, shiftCode, orderNum));
+        data.add(createArSettleBill(bill, employee, shiftCode, orderNum));
         return data;
     }
+
     @Override
     public List<Bill> addToMemberFlatBill(Bill bill, Employee employee, String shiftCode, String orderNum) {
         List<Bill> data = new ArrayList<>();
@@ -330,24 +332,27 @@ public class BillServiceImpl implements BillService {
         bill.setCurrentSettleAccountRecordNum(orderNum);
         bill = add(bill);
         data.add(bill);
-        data.add(createMemberSettleBill(bill,employee, shiftCode, orderNum));
+        data.add(createMemberSettleBill(bill, employee, shiftCode, orderNum));
         return data;
     }
 
 
     private Bill createArSettleBill(Bill res, Employee employee, String shiftCode, String recordNum) {
-        return addArBill(createPackageBill(res,employee,shiftCode,recordNum));
+        return addArBill(createPackageBill(res, employee, shiftCode, recordNum));
     }
+
     private Bill createMemberSettleBill(Bill res, Employee employee, String shiftCode, String recordNum) {
-        Bill bill  = createPackageBill(res,employee,shiftCode,recordNum);
+        Bill bill = createPackageBill(res, employee, shiftCode, recordNum);
         bill.setStatus(Constants.Status.BILL_SETTLED);
         return addArBill(bill);
     }
-    private Bill createPackageBill(Bill res, Employee employee, String shiftCode, String recordNum){
+
+    private Bill createPackageBill(Bill res, Employee employee, String shiftCode, String recordNum) {
         Bill bill = new Bill();
         bill.setCost(res.getPay());
         bill.setPay(0.0);
         bill.setRoomNum(res.getRoomNum());
+        bill.setRoomId(res.getRoomId());
         bill.setOperationEmployee(employee);
         bill.setShiftCode(shiftCode);
         bill.setAccount(res.getTargetAccount());
@@ -387,11 +392,11 @@ public class BillServiceImpl implements BillService {
             if (sm != null) {
                 if (sm.getProduct() != null) {//如果有包价，就一笔整的包价价格账，一笔负的价格账，正负得0
                     Product product = sm.getProduct();//入账项目
-                    addAudit(product, sm.getTotal(), sm.getAccount(), cir.getHotelCode(), emp, shiftCode, null, "M", businessDate, null);
-                    addAudit(product, -sm.getTotal(), sm.getAccount(), cir.getHotelCode(), emp, shiftCode, null, "M", businessDate, null);
+                    addAudit(product, sm.getTotal(), sm.getAccount(), cir.getHotelCode(), emp, shiftCode, null, "M", businessDate, null, null);
+                    addAudit(product, -sm.getTotal(), sm.getAccount(), cir.getHotelCode(), emp, shiftCode, null, "M", businessDate, null, null);
                 }
             }
-            addAudit(p, rr.getCost(), cir.getAccount(), cir.getHotelCode(), emp, shiftCode, rr.getId(), "M", businessDate, null);
+            addAudit(p, rr.getCost(), cir.getAccount(), cir.getHotelCode(), emp, shiftCode, rr.getId(), "M", businessDate, null, null);
             rr.setIsAccountEntry("PAY");// 入账成功后roomRecord里面入账状态改为pay
             roomRecordService.modify(rr);
         }
@@ -406,6 +411,7 @@ public class BillServiceImpl implements BillService {
             String id = MapUtils.getString(map, "id");
             String cirId = MapUtils.getString(map, "cirId");
             String roomNum = MapUtils.getString(map, "roomNum");
+            String roomId = MapUtils.getString(map, "roomId");
             String setMealId = MapUtils.getString(map, "setMealId");
             String mainAccountId = MapUtils.getString(map, "mainAccountId");
             String productId = MapUtils.getString(map, "productId");
@@ -421,8 +427,8 @@ public class BillServiceImpl implements BillService {
                 if (productId != null && !"".equals(productId)) {//如果有包价，就一笔整的包价价格账，一笔负的价格账，正负得0
                     Product product = new Product();//入账项目
                     product.setId(productId);
-                    addAudit(product, setMealCost, setMealAccount, hotelCode, emp, shiftCode, null, "M", businessDate, roomNum);
-                    addAudit(p, -setMealCost, setMealAccount, hotelCode, emp, shiftCode, null, "M", businessDate, roomNum);
+                    addAudit(product, setMealCost, setMealAccount, hotelCode, emp, shiftCode, null, "M", businessDate, roomNum, roomId);
+                    addAudit(p, -setMealCost, setMealAccount, hotelCode, emp, shiftCode, null, "M", businessDate, roomNum, roomId);
                 }
             }
             BookkeepingSet bs = bookkeepingSetService.isExist(hotelCode, mainAccountId, p.getId());
@@ -430,13 +436,13 @@ public class BillServiceImpl implements BillService {
             if (bs != null) {
                 cirAccount.setId(mainAccountId);
             }
-            addAudit(p, cost, cirAccount, hotelCode, emp, shiftCode, id, "M", businessDate, roomNum);
+            addAudit(p, cost, cirAccount, hotelCode, emp, shiftCode, id, "M", businessDate, roomNum, roomId);
             // 入账成功后roomRecord里面入账状态改为pay
             roomRecordDao.updateIsAccountEntry("PAY", id);
         }
     }
 
-    public void addAudit(Product product, Double cost, Account account, String hotelCode, Employee emp, String shiftCode, String roomRecordId, String type, LocalDate businessDate, String roomNum) {
+    public void addAudit(Product product, Double cost, Account account, String hotelCode, Employee emp, String shiftCode, String roomRecordId, String type, LocalDate businessDate, String roomNum, String roomId) {
 //        //入账只入当前营业日期的账
 //        LocalDate businessDate = businessSeqService.getBuinessDate(hotelCode);
         Bill bill = new Bill();
@@ -448,6 +454,7 @@ public class BillServiceImpl implements BillService {
         bill.setHotelCode(hotelCode);
         bill.setRemark(roomNum);
         bill.setRoomNum(roomNum);
+        bill.setRoomId(roomId);
         bill.setShiftCode("3");
         if ("M".equals(type)) {
             bill.setOperationRemark("夜审手动入账");
@@ -473,11 +480,11 @@ public class BillServiceImpl implements BillService {
             if (sm != null) {
                 if (sm.getProduct() != null) {//如果有包价，就一笔整的包价价格账，一笔负的价格账，正负得0
                     Product product = sm.getProduct();//入账项目
-                    addAudit(product, sm.getTotal(), sm.getAccount(), cir.getHotelCode(), null, null, null, "A", businessDate, rr.getGuestRoom().getRoomNum());
-                    addAudit(product, -sm.getTotal(), sm.getAccount(), cir.getHotelCode(), null, null, null, "A", businessDate, rr.getGuestRoom().getRoomNum());
+                    addAudit(product, sm.getTotal(), sm.getAccount(), cir.getHotelCode(), null, null, null, "A", businessDate, rr.getGuestRoom().getRoomNum(), rr.getGuestRoom().getId());
+                    addAudit(product, -sm.getTotal(), sm.getAccount(), cir.getHotelCode(), null, null, null, "A", businessDate, rr.getGuestRoom().getRoomNum(), rr.getGuestRoom().getId());
                 }
             }
-            addAudit(p, rr.getCost(), cir.getAccount(), cir.getHotelCode(), null, null, rr.getId(), "A", businessDate, rr.getGuestRoom().getRoomNum());
+            addAudit(p, rr.getCost(), cir.getAccount(), cir.getHotelCode(), null, null, rr.getId(), "A", businessDate, rr.getGuestRoom().getRoomNum(), rr.getGuestRoom().getId());
             rr.setIsAccountEntry("PAY");// 入账成功后roomRecord里面入账状态改为pay
             roomRecordService.modify(rr);
         }
@@ -555,10 +562,10 @@ public class BillServiceImpl implements BillService {
                 offsetBill.setId(null);
                 offsetBill.setProduct(bill.getProduct());
                 offsetBill.setAccount(bill.getAccount());
-                if(bill.getCost()!=null){
+                if (bill.getCost() != null) {
                     offsetBill.setCost(-bill.getCost());
                 }
-                if(bill.getPay()!=null){
+                if (bill.getPay() != null) {
                     offsetBill.setPay(-bill.getPay());
                 }
                 offsetBill.setTotal(-bill.getTotal());
@@ -770,6 +777,8 @@ public class BillServiceImpl implements BillService {
 
     @Override
     public List<Map<String, Object>> getStatusTotal(String hotelCode, String accountId) {
+
+
         List<String> statusList = new ArrayList<>();
         statusList.add(Constants.Status.BILL_SETTLED);
         statusList.add(Constants.Status.BILL_NEED_SETTLED);
