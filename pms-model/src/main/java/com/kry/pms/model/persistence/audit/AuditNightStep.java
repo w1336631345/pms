@@ -29,5 +29,9 @@ public class AuditNightStep extends PersistenceModel {
     private List<AuditNightStepParam> params;//参数
     @Column
     private String seqNum;
+    @Column
+    private String isUsed="Y";//是否启用（Y启用，N禁用）
+    @Column
+    private String code;//编码
 
 }

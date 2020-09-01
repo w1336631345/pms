@@ -75,7 +75,8 @@ public class AuditNightStepHisServiceImpl implements AuditNightStepHisService {
 
 		List<AuditNightStepHis> list = auditNightStepHisDao.findByHotelCodeAndBusinessDate(code, businessDate);
 		if(list == null || list.isEmpty()){
-			List<AuditNightStep> anss = auditNightStepService.getAllByHotelCode(code);
+//			List<AuditNightStep> anss = auditNightStepService.getAllByHotelCode(code);
+			List<AuditNightStep> anss = auditNightStepService.findByHotelCodeAndIsUsed(code);
 			for(int i=0 ; i<anss.size(); i++){
 				AuditNightStep ans = anss.get(i);
 				AuditNightStepHis ah = new AuditNightStepHis();

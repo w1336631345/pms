@@ -8,6 +8,8 @@ import java.util.List;
 
 public interface AuditNightStepService extends BaseService<AuditNightStep>{
 
+    List<AuditNightStep> findByHotelCodeAndIsUsed(String code);
+
     HttpResponse findByHotelCodeAndBusinessDate(String code);
 
     HttpResponse isAudit(String hotelCode);

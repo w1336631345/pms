@@ -54,7 +54,8 @@ public class AuditNightStepController extends BaseController<AuditNightStep> {
 	@GetMapping(path = "/list")
 	public HttpResponse<List<AuditNightStep>> list() {
 		HttpResponse<List<AuditNightStep>> rep = new HttpResponse<List<AuditNightStep>>();
-		List<AuditNightStep> list = auditNightStepService.getAllByHotelCode(getCurrentHotleCode());
+//		List<AuditNightStep> list = auditNightStepService.getAllByHotelCode(getCurrentHotleCode());
+		List<AuditNightStep> list = auditNightStepService.findByHotelCodeAndIsUsed(getCurrentHotleCode());
 		return rep.addData(list);
 	}
 

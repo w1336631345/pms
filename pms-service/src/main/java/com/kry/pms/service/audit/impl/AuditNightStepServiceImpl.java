@@ -71,6 +71,11 @@ public class AuditNightStepServiceImpl implements AuditNightStepService {
 		List<AuditNightStep> list = auditNightStepDao.findByHotelCode(code);
 		return list;
 	}
+	@Override
+	public List<AuditNightStep> findByHotelCodeAndIsUsed(String code) {
+		List<AuditNightStep> list = auditNightStepDao.findByHotelCodeAndIsUsed(code, "Y");
+		return list;
+	}
 
 	@Override
 	public PageResponse<AuditNightStep> listPage(PageRequest<AuditNightStep> prq) {
@@ -87,7 +92,8 @@ public class AuditNightStepServiceImpl implements AuditNightStepService {
 //			return hr.error(99999, "请先夜审入账");
 //		}
 //		List<AuditNightStep> list = auditNightStepDao.findByHotelCodeAndBusinessDate(code, businessDate);
-		List<AuditNightStep> list = auditNightStepDao.findByHotelCodeOrderBySeqNum(code);
+//		List<AuditNightStep> list = auditNightStepDao.findByHotelCodeOrderBySeqNum(code);
+		List<AuditNightStep> list = auditNightStepDao.findByHotelCodeAndIsUsedOrderBySeqNum(code, "Y");
 		HttpResponse httpResponse = auditNightStepHisService.findByHotelCodeAndBusinessDate(code);
 		List<AuditNightStepHis> anss = (List<AuditNightStepHis>) httpResponse.getData();
 		for(int i=0; i<list.size(); i++){
