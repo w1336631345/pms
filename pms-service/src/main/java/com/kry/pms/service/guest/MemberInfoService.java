@@ -35,4 +35,6 @@ public interface MemberInfoService extends BaseService<MemberInfo>{
 
     //定时任务：每日计算积分/金额过期内容
     void boOverdueList(String code);
+
+    MemberInfo findByAccountId(String hotelCode, String accountId);
 }

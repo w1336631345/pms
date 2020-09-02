@@ -201,4 +201,12 @@ public class MemberInfoController extends BaseController<MemberInfo> {
 		return hr.ok();
 	}
 
+	@GetMapping(path = "/accountId")
+	public HttpResponse findByAccountId(String accountId){
+		HttpResponse hr = new HttpResponse();
+		MemberInfo memberInfo = memberInfoService.findByAccountId(getCurrentHotleCode(), accountId);
+		hr.setData(memberInfo);
+		return hr;
+	}
+
 }

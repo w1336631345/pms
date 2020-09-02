@@ -58,15 +58,15 @@ public class MemberInfoServiceImpl implements MemberInfoService {
 		if(entity.getIntegral() == null){
 			entity.setIntegral(0.0);
 		}
-		if(entity.getCardNum() == null){
-			String num = businessSeqService.fetchNextSeqNum(entity.getHotelCode(), Constants.Key.MENBER_NUM);
-			entity.setCardNum(num);
-		}
-//		Customer cust = customerDao.getOne(entity.getCustomer().getId());
-//		entity.setCustomer(cust);
+		//下面设置的会员卡号，要求与会员账号一致
+//		if(entity.getCardNum() == null){
+//			String num = businessSeqService.fetchNextSeqNum(entity.getHotelCode(), Constants.Key.MENBER_NUM);
+//			entity.setCardNum(num);
+//		}
 		entity.setName(entity.getCustomer().getName());
 		Account account = accountService.createMemberAccount(entity.getCustomer(), entity.getHotelCode());
 		entity.setAccount(account);
+		entity.setCardNum(account.getCode());//设置的会员卡号，要求与会员账号一致、对比上面注释代码设置的卡号
 		return memberInfoDao.saveAndFlush(entity);
 	}
 
@@ -229,5 +229,11 @@ public class MemberInfoServiceImpl implements MemberInfoService {
 	public void boOverdueList(String code) {
 		memberIntegralService.boOverdueList(code);
 		memberRechargeService.boOverdueList(code);
+	}
+
+	@Override
+	public MemberInfo findByAccountId(String hotelCode, String accountId) {
+		MemberInfo memberInfo = memberInfoDao.findByHotelCodeAndAccountId(hotelCode, accountId);
+		return memberInfo;
 	}
 }
