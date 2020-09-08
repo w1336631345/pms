@@ -7,10 +7,7 @@ import com.kry.pms.model.dto.BillStatistics;
 import com.kry.pms.model.http.request.busi.BillCheckBo;
 import com.kry.pms.model.http.response.busi.AccountSummaryVo;
 import com.kry.pms.model.http.response.busi.SettleInfoVo;
-import com.kry.pms.model.persistence.busi.Bill;
-import com.kry.pms.model.persistence.busi.CheckInRecord;
-import com.kry.pms.model.persistence.busi.RoomRecord;
-import com.kry.pms.model.persistence.busi.SettleAccountRecord;
+import com.kry.pms.model.persistence.busi.*;
 import com.kry.pms.model.persistence.goods.Product;
 import com.kry.pms.model.persistence.guest.Customer;
 import com.kry.pms.model.persistence.org.Employee;
@@ -166,6 +163,45 @@ public class AccountServiceImpl implements AccountService {
                     if (cir != null && cir.getGuestRoom() != null) {
                         bill.setRoomNum(cir.getGuestRoom().getRoomNum());
                         bill.setRoomId(cir.getGuestRoom().getId());
+                    }
+                }
+                newTotal = account.getTotal();
+                if ((oldTotal > 0 && newTotal < 0) || (oldTotal < 0 && newTotal >= 0)) {
+                    if (cir != null && cir.getGuestRoom() != null) {
+                        guestRoomStatusService.changeOverdued(cir.getGuestRoom(), newTotal > 0);
+                    }
+                }
+            }
+        } else {
+            return null;
+        }
+        return modify(account);
+    }
+    @Override
+    public Account bosBillEntry(BosBill bosBill) {
+        Account account = findById(bosBill.getAccount().getId());
+        double oldTotal = account.getTotal();
+        double newTotal = 0.0;
+        if (account != null) {
+            if (bosBill.getCost() != null) {
+                account.setCost(BigDecimalUtil.add(account.getCost(), bosBill.getCost()));
+            }
+            if (bosBill.getPay() != null) {
+                account.setPay(BigDecimalUtil.add(account.getPay(), bosBill.getPay()));
+            }
+
+            account.setTotal(BigDecimalUtil.sub(account.getCost(), account.getPay()));
+            account.setCurrentBillSeq(account.getCurrentBillSeq() + 1);
+            account.setStatus(Constants.Status.ACCOUNT_IN);
+            if (Constants.Status.BILL_NEED_SETTLED.equals(bosBill.getStatus())) {
+
+            }
+            if (!account.getType().equals(Constants.Type.ACCOUNT_AR) && bosBill.getGuestRoom() == null) {
+                CheckInRecord cir = checkInRecordService.queryByAccountId(account.getId());
+                if (bosBill.getRoomNum() == null) {
+                    if (cir != null && cir.getGuestRoom() != null) {
+                        bosBill.setRoomNum(cir.getGuestRoom().getRoomNum());
+                        bosBill.setRoomId(cir.getGuestRoom().getId());
                     }
                 }
                 newTotal = account.getTotal();

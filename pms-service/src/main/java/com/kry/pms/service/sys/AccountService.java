@@ -8,6 +8,7 @@ import com.kry.pms.model.http.request.busi.BillCheckBo;
 import com.kry.pms.model.http.response.busi.AccountSummaryVo;
 import com.kry.pms.model.http.response.busi.SettleInfoVo;
 import com.kry.pms.model.persistence.busi.Bill;
+import com.kry.pms.model.persistence.busi.BosBill;
 import com.kry.pms.model.persistence.busi.CheckInRecord;
 import com.kry.pms.model.persistence.busi.RoomRecord;
 import com.kry.pms.model.persistence.guest.Customer;
@@ -29,6 +30,8 @@ public interface AccountService extends BaseService<Account> {
     public Bill enterExtFee(CheckInRecord cir, String type);
     public boolean enterExtFee(List<CheckInRecord> cirs, String type);
     Account billEntry(Bill bill);
+
+    Account bosBillEntry(BosBill bosBill);
 
     Collection<AccountSummaryVo> getAccountSummaryByOrderNum(String orderNum, String checkInType);
 

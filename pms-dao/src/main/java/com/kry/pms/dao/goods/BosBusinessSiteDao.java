@@ -7,6 +7,7 @@ import java.util.List;
 
 public interface BosBusinessSiteDao extends BaseDao<BosBusinessSite>{
 
+    List<BosBusinessSite> findByHotelCodeAndProductId(String hotelCode, String productId);
 
     List<BosBusinessSite> findByHotelCode(String code);
 }

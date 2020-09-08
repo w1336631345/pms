@@ -103,6 +103,8 @@ public class Constants {
 		public static final String MENBER_INTEGRAL_NO = "MENBER_INTEGRAL_NO";// 会员积分单号
 		public static final String BUSINESS_CANCLE_SETTLE_SEQ_KEY = "CANCLE_SETTLE_NUM";
 		public static final String EXECUTE_TYPE_AFTER_NIGHT_AUDT = "ANA";
+		public static final String SERIAL_NUMBER = "SERIAL_NUMBER";//bos流水单号
+		public static final String BOS_CHECK_NUMBER = "BOS_CHECK_NUMBER";//bos结账单号
     }
 
 	public interface Type {
