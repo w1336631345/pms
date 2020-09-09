@@ -51,8 +51,9 @@ public class MemberInfo extends PersistenceModelTo {
     private Double integral;//积分
     @ManyToOne
     private MemberIntegralType memberIntegralType;//积分模式
-    @Column
-    private String deductionType;//扣费模式
+    @ManyToOne
+    private MemberDeductionType memberDeductionType;//扣费模式
+
     @ManyToOne
     private Customer recommender;//推荐人
     @OneToOne
