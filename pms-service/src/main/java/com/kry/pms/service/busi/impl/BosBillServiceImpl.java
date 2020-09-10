@@ -149,6 +149,7 @@ public class BosBillServiceImpl implements BosBillService {
         Account account = new Account();
         account.setId(accountId);
         bosBill.setAccount(account);
+        bosBill.setStatus("R");//转房账
         return bosBillDao.saveAndFlush(bosBill);
     }
 

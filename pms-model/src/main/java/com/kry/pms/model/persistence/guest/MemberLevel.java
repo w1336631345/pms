@@ -35,5 +35,7 @@ public class MemberLevel extends PersistenceModel {
     @Column
     private String passwrod;//初始密码
     @Column
-    private String deductionType;//扣费模式
+    private String deductionType;//扣费模式(停用)
+    @ManyToOne
+    private MemberDeductionType memberDeductionType;//扣费模式
 }
