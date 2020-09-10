@@ -158,4 +158,9 @@ public class AuditNightStepServiceImpl implements AuditNightStepService {
 		}
 	}
 
+	@Override
+	public List<AuditNightStep> batchAdd(List<AuditNightStep> auditNightSteps) {
+		return auditNightStepDao.saveAll(auditNightSteps);
+	}
+
 }

@@ -62,6 +62,12 @@ public class BusinessSeqServiceImpl implements BusinessSeqService {
 		}
 		return null;
 	}
+
+	@Override
+	public List<BusinessSeq> batchAdd(List<BusinessSeq> businessSeqs) {
+		return businessSeqDao.saveAll(businessSeqs);
+	}
+
 	@Override
 	@Transactional
 	public void plusBuinessDate(String hotelCode) {
@@ -94,8 +100,7 @@ public class BusinessSeqServiceImpl implements BusinessSeqService {
 
 	@Override
 	public List<BusinessSeq> getAllByHotelCode(String code) {
-		return null;// 默认不实现
-		// return businessSeqDao.findByHotelCode(code);
+		 return businessSeqDao.findByHotelCode(code);
 	}
 
 	@Override
