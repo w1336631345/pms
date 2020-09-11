@@ -40,6 +40,7 @@ import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -154,8 +155,14 @@ public class BosBillServiceImpl implements BosBillService {
     }
 
     @Override
-    public List<BosBill> findQuery(String hotelCode,String siteId, String roomNum, String accountCode) {
-        List<BosBill> list = bosBillDao.findQuery(hotelCode, siteId, roomNum, accountCode);
+    public List<BosBill> findQuery(String hotelCode,String siteId, String roomNum, String accountCode, String[] statusList) {
+        String listIsNumm = null;
+        List<String> status = null;
+        if(statusList != null){
+            status = Arrays.asList(statusList);
+            listIsNumm = "yes";
+        }
+        List<BosBill> list = bosBillDao.findQuery(hotelCode, siteId, roomNum, accountCode, status, listIsNumm);
         return list;
     }
 
@@ -221,6 +228,18 @@ public class BosBillServiceImpl implements BosBillService {
         bosBill.setCurrentSettleAccountRecordNum(orderNum);
         bosBill = add(bosBill);
         return bosBill;
+    }
+
+    @Override
+    public boolean updateStatus(String bosBillId){
+        BosBill bosBill = bosBillDao.getOne(bosBillId);
+        bosBill.setStatus("M");
+        try {
+            bosBillDao.saveAndFlush(bosBill);
+            return true;
+        }catch (Exception e) {
+            return false;
+        }
     }
 
     @Override

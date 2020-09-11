@@ -17,11 +17,13 @@ public interface BosBillService extends BaseService<BosBill> {
     //转房账
     BosBill transferAccount(String bosBillId, String roomNum, String roomId, String accountId);
 
-    List<BosBill> findQuery(String hotelCode,String siteId, String roomNum, String accountCode);
+    List<BosBill> findQuery(String hotelCode,String siteId, String roomNum, String accountCode, String[] statusList);
 
     HttpResponse<BosBill> cancellation(BosBill bosBill);
 
     HttpResponse check(BosBillCheckBo bosBillCheckBo);
 
     BosBill addFlatBosBill(BosBill bosBill, Employee employee, String shiftCode, String orderNum);
+
+    boolean updateStatus(String bosBillId);
 }
