@@ -99,5 +99,8 @@ public class Bill extends PersistenceModel {
 	private String paymentPlatform;
 	@Column
 	private String packageNum;
-
+	@Column
+	private String extSystem;
+	@Column
+	private String extCode;
 }
