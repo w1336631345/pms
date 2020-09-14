@@ -27,8 +27,10 @@ public interface BosBillDao extends BaseDao<BosBill> {
             "  and if(:hotelCode is not null && :hotelCode != '', tb.hotel_code=:hotelCode, 1=1 ) \n"+
             "  and if(:siteId is not null && :siteId != '', tbbs.id=:siteId, 1=1 ) \n"+
             "  and if(:roomNum is not null && :roomNum != '', tb.room_num=:roomNum, 1=1 ) \n"+
-            "  and if(:accountCode is not null && :accountCode != '', ta.`code`=:accountCode, 1=1 ) ")
-    List<BosBill> findQuery(@Param("hotelCode")String hotelCode, @Param("siteId")String siteId, @Param("roomNum")String roomNum, @Param("accountCode")String accountCode);
+            "  and if(:accountCode is not null && :accountCode != '', ta.`code`=:accountCode, 1=1 ) \n" +
+            "  and if(:listIsNumm is not null, tb.`status` in (:statusList), 1=1 ) ")
+    List<BosBill> findQuery(@Param("hotelCode")String hotelCode, @Param("siteId")String siteId, @Param("roomNum")String roomNum,
+                            @Param("accountCode")String accountCode, @Param("statusList") List<String> statusList, @Param("listIsNumm") String listIsNumm);
 
 
 }

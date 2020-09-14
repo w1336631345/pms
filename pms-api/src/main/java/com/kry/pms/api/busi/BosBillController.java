@@ -67,9 +67,9 @@ public class BosBillController extends BaseController<BosBill> {
 	 * @Date: 2020/9/4 14:54
 	 */
 	@GetMapping(path = "/query")
-	public HttpResponse<List<BosBill>> findQuery(String siteId, String roomNum, String accountCode) {
+	public HttpResponse<List<BosBill>> findQuery(String siteId, String roomNum, String accountCode, String[] statusList) {
 		HttpResponse hr = new HttpResponse();
-		List<BosBill> list = bosBillService.findQuery(getCurrentHotleCode(),siteId, roomNum, accountCode);
+		List<BosBill> list = bosBillService.findQuery(getCurrentHotleCode(),siteId, roomNum, accountCode, statusList);
 		hr.setData(list);
 		return hr;
 	}
