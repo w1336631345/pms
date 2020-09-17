@@ -15,6 +15,7 @@ import com.kry.pms.service.guest.MemberIntegralService;
 import com.kry.pms.service.guest.MemberRechargeService;
 import com.kry.pms.service.sys.AccountService;
 import com.kry.pms.service.sys.BusinessSeqService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Sort;
@@ -174,7 +175,11 @@ public class MemberInfoServiceImpl implements MemberInfoService {
 					list.add(criteriaBuilder.equal(root.join("customer").get("mobile"), mobile));
 				}
 				if (cardNum != null) {
-					list.add(criteriaBuilder.equal(root.get("cardNum"), cardNum));
+//					list.add(criteriaBuilder.equal(root.get("cardNum"), cardNum));
+					List<Predicate> predicateListOr = new ArrayList<>();
+					predicateListOr.add(criteriaBuilder.equal(root.get("cardNum"),  cardNum));
+					predicateListOr.add(criteriaBuilder.equal(root.get("macNum"),  cardNum));
+					list.add(criteriaBuilder.or(predicateListOr.toArray(new Predicate[predicateListOr.size()])));
 				}
 				if (idCardNum != null) {//单位
 					// 外键对象的属性，要用join再get

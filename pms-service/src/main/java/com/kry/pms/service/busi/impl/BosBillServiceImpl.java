@@ -1,48 +1,32 @@
 package com.kry.pms.service.busi.impl;
 
-import com.kry.pms.base.*;
-import com.kry.pms.dao.busi.BillDao;
+import com.kry.pms.base.Constants;
+import com.kry.pms.base.HttpResponse;
+import com.kry.pms.base.PageRequest;
+import com.kry.pms.base.PageResponse;
 import com.kry.pms.dao.busi.BosBillDao;
-import com.kry.pms.dao.busi.CheckInRecordDao;
-import com.kry.pms.dao.busi.RoomRecordDao;
 import com.kry.pms.dao.goods.BosBusinessSiteDao;
-import com.kry.pms.dao.goods.ProductDao;
-import com.kry.pms.dao.goods.SetMealDao;
-import com.kry.pms.model.dto.BillStatistics;
-import com.kry.pms.model.http.request.busi.BillBo;
-import com.kry.pms.model.http.request.busi.BillOperationBo;
-import com.kry.pms.model.http.request.busi.BillSettleBo;
 import com.kry.pms.model.http.request.busi.BosBillCheckBo;
-import com.kry.pms.model.persistence.busi.*;
+import com.kry.pms.model.persistence.busi.Bill;
+import com.kry.pms.model.persistence.busi.BosBill;
+import com.kry.pms.model.persistence.busi.BosBillItem;
 import com.kry.pms.model.persistence.goods.BosBusinessSite;
 import com.kry.pms.model.persistence.goods.Product;
-import com.kry.pms.model.persistence.goods.SetMeal;
 import com.kry.pms.model.persistence.org.Employee;
 import com.kry.pms.model.persistence.sys.Account;
-import com.kry.pms.model.persistence.sys.BookkeepingSet;
-import com.kry.pms.service.busi.*;
+import com.kry.pms.service.busi.BosBillItemService;
+import com.kry.pms.service.busi.BosBillService;
 import com.kry.pms.service.goods.ProductService;
 import com.kry.pms.service.sys.AccountService;
-import com.kry.pms.service.sys.BookkeepingSetService;
 import com.kry.pms.service.sys.BusinessSeqService;
-import com.kry.pms.service.sys.SqlTemplateService;
-import com.kry.pms.util.BigDecimalUtil;
-import org.apache.commons.collections4.MapUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
-import javax.persistence.EntityManager;
-import javax.persistence.Transient;
 import javax.transaction.Transactional;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class BosBillServiceImpl implements BosBillService {
@@ -128,18 +112,22 @@ public class BosBillServiceImpl implements BosBillService {
     @Override
     public BosBill modify(BosBill bosBill) {
         //删除原有的
-        List<BosBillItem> old = bosBillItemService.findByBosBillId(bosBill.getId());
-        for(int j=0; j<old.size(); j++){
-            bosBillItemService.deleteTrue(old.get(j).getId());
-        }
+//        List<BosBillItem> old = bosBillItemService.findByBosBillId(bosBill.getId());
+//        for(int j=0; j<old.size(); j++){
+//            bosBillItemService.deleteTrue(old.get(j).getId());
+//        }
         List<BosBillItem> list = bosBill.getItems();
         for(int i=0; i<list.size(); i++){
             BosBillItem bosBillItem = list.get(i);
             bosBillItem.setBosBill(bosBill);
-            bosBillItemService.add(bosBillItem);
+            if(bosBillItem.getStatus() == null){
+                bosBillItem.setStatus("M");
+            }
+            bosBillItem.setHotelCode(bosBill.getHotelCode());
+//            bosBillItemService.add(bosBillItem);
         }
         bosBillDao.saveAndFlush(bosBill);
-        return null;
+        return bosBill;
     }
     //转房账
     @Override
@@ -194,6 +182,7 @@ public class BosBillServiceImpl implements BosBillService {
     }
 
     @Override
+    @Transactional
     public HttpResponse check(BosBillCheckBo bosBillCheckBo) {
         HttpResponse hr = new HttpResponse();
         BosBill bosBill = bosBillDao.getOne(bosBillCheckBo.getBosBillId());
@@ -208,15 +197,21 @@ public class BosBillServiceImpl implements BosBillService {
             checkTotal = checkTotal + list.get(i).getTotal();
         }
         if(total - checkTotal != 0){
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             return hr.error("账务不平，结账失败");
         }else {
             for(int i=0; i<list.size(); i++){
                 list.get(i).setSerialNumber(bosBill.getSerialNumber());
                 addFlatBosBill(list.get(i), bosBillCheckBo.getEmployee(), bosBillCheckBo.getShiftCode(), num);
             }
+            List<BosBillItem> bbts = bosBill.getItems();
+            for(int j=0; j<bbts.size(); j++){
+                BosBillItem bosBillItem = bbts.get(j);
+                bosBillItem.setStatus("O");
+            }
+            bosBillDao.saveAndFlush(bosBill);
+            return hr.ok();
         }
-        bosBillDao.saveAndFlush(bosBill);
-        return hr.ok();
     }
 
     @Override
