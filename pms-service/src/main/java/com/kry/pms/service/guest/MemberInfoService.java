@@ -37,4 +37,6 @@ public interface MemberInfoService extends BaseService<MemberInfo>{
     void boOverdueList(String code);
 
     MemberInfo findByAccountId(String hotelCode, String accountId);
+
+    MemberInfo getByHotelAndMobile(String hotelCode, String mobile);
 }

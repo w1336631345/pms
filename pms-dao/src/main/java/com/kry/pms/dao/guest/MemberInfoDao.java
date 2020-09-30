@@ -128,4 +128,13 @@ public interface MemberInfoDao extends BaseDao<MemberInfo>{
 
 	MemberInfo findByIdAndPassword(String id, String password);
 
+	@Query(nativeQuery = true, value = " select tmi.* \n" +
+			" from t_member_info tmi \n" +
+			"  left join t_customer tc on tmi.customer_id = tc.id \n" +
+			" where 1=1\n" +
+			"  and if(:hotelCode is not null && :hotelCode != '', tmi.hotel_code=:hotelCode, 1=1 ) " +
+			"  and if(:mobile is not null && :mobile != '', tc.mobile=:mobile, 1=1 ) ")
+	MemberInfo getByHotelAndMobile(@Param("hotelCode") String hotelCode, @Param("mobile") String mobile);
+
+
 }

@@ -108,6 +108,14 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
         return hr;
     }
 
+    @PostMapping(path = "/bookWcaht")
+    public HttpResponse<CheckInRecord> bookWcaht(@RequestBody CheckInRecord checkInRecord) {
+//        checkInRecord.setHotelCode(getCurrentHotleCode());
+        HttpResponse hr = new HttpResponse();
+        hr = checkInRecordService.book(checkInRecord);
+        return hr;
+    }
+
     /**
      * 功能描述: <br>散客的单房预订
      * 〈〉

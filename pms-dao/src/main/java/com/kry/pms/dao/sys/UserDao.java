@@ -22,6 +22,8 @@ public interface UserDao extends BaseDao<User>{
 
     User findByUnionIdAndHotelCode(String unionId, String hotelCode);
 
+    User findByUnionIdAndHotelCodeAndServerType(String unionId, String hotelCode, String serverType);
+
     List<User> findByUnionId(String unionId);
 
     User findTopByHotelCode(String hotelCode);

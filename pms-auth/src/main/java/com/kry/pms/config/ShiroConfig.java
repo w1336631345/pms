@@ -44,8 +44,14 @@ public class ShiroConfig {
         filterChainDefinitionMap.put("/auth/encrypte", "anon");
         filterChainDefinitionMap.put("/auth/wxLogin", "anon");
         filterChainDefinitionMap.put("/api/v1/busi/checkInRecord/noRole/orderNum2", "anon");
+        filterChainDefinitionMap.put("/api/v1/busi/checkInRecord/bookWcaht", "anon");//微信小程序预订
         filterChainDefinitionMap.put("/auth/binding", "anon");
         filterChainDefinitionMap.put("/auth/getHotelList", "anon");
+
+        filterChainDefinitionMap.put("/auth/wxMemberLogin", "anon");
+        filterChainDefinitionMap.put("/auth/wxMemberAuth", "anon");
+        filterChainDefinitionMap.put("/auth/wxMemberRe", "anon");
+
         filterChainDefinitionMap.put("/wx/redirect/**", "anon");
 //        filterChainDefinitionMap.put("/api/**", "anon");
 

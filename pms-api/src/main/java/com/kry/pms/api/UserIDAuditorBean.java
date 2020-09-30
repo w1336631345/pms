@@ -20,7 +20,7 @@ public class UserIDAuditorBean  implements AuditorAware<String> {
     public Optional<String> getCurrentAuditor() {
         User user = ShiroUtils.getUser();
         if(user == null){
-            return null;
+            return Optional.empty();
         }else {
             return Optional.of(user.getId());
         }

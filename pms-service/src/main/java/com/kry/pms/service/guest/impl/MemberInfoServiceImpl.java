@@ -241,4 +241,10 @@ public class MemberInfoServiceImpl implements MemberInfoService {
 		MemberInfo memberInfo = memberInfoDao.findByHotelCodeAndAccountId(hotelCode, accountId);
 		return memberInfo;
 	}
+
+	@Override
+	public MemberInfo getByHotelAndMobile(String hotelCode, String mobile) {
+		MemberInfo memberInfo = memberInfoDao.getByHotelAndMobile(hotelCode, mobile);
+		return memberInfo;
+	}
 }

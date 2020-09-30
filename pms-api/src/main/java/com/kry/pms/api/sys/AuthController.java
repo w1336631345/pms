@@ -1,12 +1,18 @@
 package com.kry.pms.api.sys;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import com.alibaba.fastjson.JSONObject;
+import com.kry.pms.dao.guest.CustomerDao;
+import com.kry.pms.model.persistence.guest.Customer;
+import com.kry.pms.model.persistence.guest.MemberInfo;
 import com.kry.pms.model.persistence.sys.User;
+import com.kry.pms.service.guest.MemberInfoService;
 import com.kry.pms.service.pay.WechatPayService;
 import com.kry.pms.util.WechatLoginUtil;
 import me.chanjar.weixin.mp.bean.result.WxMpOAuth2AccessToken;
@@ -58,6 +64,10 @@ public class AuthController {
     ShiftService shiftService;
     @Autowired
     WechatPayService wechatPayService;
+    @Autowired
+    MemberInfoService memberInfoService;
+    @Autowired
+    CustomerDao customerDao;
 
     @ResponseBody
     @RequestMapping(path = "/admin/login", method = RequestMethod.POST)
@@ -374,5 +384,148 @@ public class AuthController {
         }else{
             return null;
         }
+    }
+
+    /**
+     * 功能描述: <br>小程序-会员注册
+     * 〈〉
+     * @Param: [hotelCode, name, mobile, gender, birthday]
+     * @Return: com.kry.pms.base.HttpResponse
+     * @Author: huanghaibin
+     * @Date: 2020/9/24 15:57
+     */
+    @ResponseBody
+    @GetMapping(value = "/wxMemberRe")
+    public HttpResponse wxMemberRe(String hotelCode, String name, String mobile, String gender, LocalDate birthday, String unionId){
+        HttpResponse hr = new HttpResponse();
+        if(hotelCode == null || "".equals(hotelCode)){
+            return hr.error("请选择酒店");
+        }
+        MemberInfo memberInfo = memberInfoService.getByHotelAndMobile(hotelCode, mobile);
+        if(memberInfo != null){
+            return hr.error("手机号码已注册会员，请直接认证");
+        }
+        User ou = userService.findByUnionIdAndHotelCodeAndServerType(unionId, hotelCode, "C");
+        if(ou != null){
+            return hr.error("微信号已经注册会员");
+        }
+        String username = mobile;
+        String password = MD5Utils.encrypt(username, hotelCode, "123456");
+        User u = new User();
+        u.setPassword(password);
+        u.setUsername(mobile);
+        u.setServerType("C");
+        u.setNickname(name);
+        userService.add(u);
+        MemberInfo mi = new MemberInfo();
+        mi.setName(name);
+        Customer cust = new Customer();
+        cust.setName(name);
+        cust.setGender(gender);
+        cust.setMobile(mobile);
+        cust.setBirthday(birthday);
+        mi.setCustomer(cust);
+        mi.setHotelCode(hotelCode);
+        mi.setCreateDate(LocalDateTime.now());
+        mi.setCreateUser(u.getId());
+        memberInfoService.add(mi);
+
+        User user = userService.getAuditUser(username,password, hotelCode);
+        UsernamePasswordToken token = new UsernamePasswordToken(username, password);
+        Subject subject = SecurityUtils.getSubject();
+        try {
+            subject.login(token);
+            String id = (String) subject.getSession().getId();
+            Map<String, Object> map = new HashMap<>();
+            map.put("token", id);
+            map.put("userInfo", user);
+            hr.addData(id);
+            return hr.ok("注册成功");
+        } catch (AuthenticationException e) {
+            return hr.error(1000, "用户或密码错误");
+        }
+    }
+    /**
+     * 功能描述: <br>小程序-会员认证
+     * 〈〉
+     * @Param: [hotelCode, mobile, vCode, unionId]
+     * @Return: com.kry.pms.base.HttpResponse
+     * @Author: huanghaibin
+     * @Date: 2020/9/24 17:00
+     */
+    @ResponseBody
+    @GetMapping(value = "/wxMemberAuth")
+    public HttpResponse wxMemberAuth(String hotelCode, String mobile, String vCode, String unionId){
+        HttpResponse hr = new HttpResponse();
+        if(hotelCode == null || "".equals(hotelCode)){
+            return hr.error("请选择酒店");
+        }
+        if(vCode == null){
+            //这里做验证码判断逻辑代码，手机发送验证码
+            //逻辑代码（未完成）
+            return hr.error("验证码错误");
+        }
+        MemberInfo memberInfo = memberInfoService.getByHotelAndMobile(hotelCode, mobile);
+        if(memberInfo == null){
+            return hr.error("未注册会员，认证失败");
+        }else {
+            Customer cust = memberInfo.getCustomer();
+            User user = cust.getUser();
+            if(user == null){
+                String password = MD5Utils.encrypt(mobile, hotelCode, "123456");
+                User u = new User();
+                u.setPassword(password);
+                u.setUsername(mobile);
+                u.setServerType("C");
+                u.setNickname(cust.getName());
+                u.setUnionId(unionId);
+                user = userService.add(u);
+                cust.setUser(user);
+                customerDao.saveAndFlush(cust);
+            }else {
+                userService.bindWxUnionId(user, unionId);
+            }
+            UsernamePasswordToken token = new UsernamePasswordToken(user.getUsername(), user.getPassword());
+            Subject subject = SecurityUtils.getSubject();
+            try {
+                subject.login(token);
+                String id = (String) subject.getSession().getId();
+                Map<String, Object> map = new HashMap<>();
+                map.put("token", id);
+                map.put("userInfo", user);
+                hr.addData(id);
+                return hr.ok("认证成功");
+            } catch (AuthenticationException e) {
+                return hr.error(1000, "认证失败");
+            }
+        }
+    }
+    /**
+     * 功能描述: <br>小程序-会员登录
+     * 〈〉
+     * @Param: [unionId, hotelCode]
+     * @Return: com.kry.pms.base.HttpResponse
+     * @Author: huanghaibin
+     * @Date: 2020/9/24 16:40
+     */
+    @ResponseBody
+    @GetMapping(value = "/wxMemberLogin")
+    public HttpResponse wxMemberLogin(String unionId, String hotelCode){
+        HttpResponse hr = new HttpResponse();
+        User user = userService.findByUnionIdAndHotelCodeAndServerType(unionId, hotelCode, "C");
+        Map<String, Object> map = new HashMap<>();
+        if (user == null) {//如果用户为空，表示还没有绑定账号
+            hr.setStatus(1);
+            hr.setMessage("未注册会员");
+        } else {
+            UsernamePasswordToken token = new UsernamePasswordToken(user.getUsername(), user.getPassword());
+            Subject subject = SecurityUtils.getSubject();
+            subject.login(token);
+            String sessionId = (String) subject.getSession().getId();
+            map.put("token", sessionId);
+            map.put("userInfo", user);
+            hr.setData(map);
+        }
+        return hr;
     }
 }

@@ -40,5 +40,7 @@ public class User extends PersistenceModel {
 	private String avatar;
 	@Column(columnDefinition = "varchar(32) default 'normal' COMMENT '是否允许登录（normal：正常可登录状态，audit：夜审不可登录）'")
 	private String allowLogin;
+	@Column
+	private String serverType;//服务来源：C：客户，H：酒店
 
 }
