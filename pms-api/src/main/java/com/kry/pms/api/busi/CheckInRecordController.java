@@ -362,6 +362,20 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
         return rep;
     }
     /**
+     * 功能描述: <br>微信小程序取消（不用登录的）
+     * 〈〉
+     * @Param: [id]
+     * @Return: com.kry.pms.base.HttpResponse
+     * @Author: huanghaibin
+     * @Date: 2020/10/15 15:13
+     */
+    @GetMapping(path = "/callOffGWcaht")
+    public HttpResponse callOffG2(String id) {
+        HttpResponse rep = new HttpResponse();
+        rep = checkInRecordService.callOffG(id);
+        return rep;
+    }
+    /**
      * 功能描述: <br>主单恢复
      * 〈〉
      * @Param: [id]

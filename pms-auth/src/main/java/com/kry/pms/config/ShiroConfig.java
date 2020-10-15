@@ -45,6 +45,7 @@ public class ShiroConfig {
         filterChainDefinitionMap.put("/auth/wxLogin", "anon");
         filterChainDefinitionMap.put("/api/v1/busi/checkInRecord/noRole/orderNum2", "anon");
         filterChainDefinitionMap.put("/api/v1/busi/checkInRecord/bookWcaht", "anon");//微信小程序预订
+        filterChainDefinitionMap.put("/api/v1/busi/checkInRecord/callOffGWcaht", "anon");//微信小程序取消预订
         filterChainDefinitionMap.put("/auth/binding", "anon");
         filterChainDefinitionMap.put("/auth/getHotelList", "anon");
 

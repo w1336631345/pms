@@ -20,6 +20,7 @@ public class UserIDAuditorBean  implements AuditorAware<String> {
     public Optional<String> getCurrentAuditor() {
         User user = ShiroUtils.getUser();
         if(user == null){
+            //此处不能return null，这样会报创建者不能为空的错误。返回empty就不会
             return Optional.empty();
         }else {
             return Optional.of(user.getId());
