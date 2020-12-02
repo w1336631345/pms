@@ -916,7 +916,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
             ncir.setAccount(account);
             ncir.setGroupType(cir.getGroupType());// 设置分组类型（团队/散客）
             ncir.setFitType(cir.getFitType());
-//			ncir.setReserveId(cir.getId());// 添加预留记录id
+			ncir.setReserveId(cir.getId());// 添加预留记录id
             ncir.setMainRecord(cir.getMainRecord());
             //如果有主单，添加主单团名
             if (cir.getMainRecord() != null) {
@@ -1770,24 +1770,21 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
     @Transactional
     public HttpResponse callOffAssignRoom(String[] ids) {
         HttpResponse hr = new HttpResponse();
-        List<String> reserveIds = new ArrayList<>();
+//        List<String> reserveIds = new ArrayList<>();
         String mainRecordId = null;
         for (int i = 0; i < ids.length; i++) {
             CheckInRecord cir = findById(ids[i]);
             if (cir.getMainRecord() != null) {
                 mainRecordId = cir.getMainRecord().getId();
+            }else {
+                continue;
             }
             if (("G").equals(cir.getType())) {
                 return hr.error("主单不能修改");
             }
-            cir.setDeleted(Constants.DELETED_TRUE);
-            // 修改选中的数据状态，排房记录改为删除
-            boolean result = roomStatisticsService.cancleAssign(new CheckInRecordWrapper(cir));
-            if (!result) {
-                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-                return hr.error("资源问题，取消失败");
-            }
-            modify(cir);
+//            cir.setDeleted(Constants.DELETED_TRUE);
+//            // 修改选中的数据状态，排房记录改为删除
+//            modify(cir);
             // 取消排房成功，修改房间状态
             // 修改排放记录状态为删除后，查询此房间是否还有其他人在住
             List<CheckInRecord> list = checkInRecordDao.findByOrderNumAndGuestRoomAndDeleted(cir.getOrderNum(),
@@ -1795,15 +1792,35 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
             // 如果该房间没有人在住了，则修改房间状态
             if (list == null || list.isEmpty()) {
                 // ...修改房间状态代码
-            }
-            // 查出所有的预留记录id，放入集合
-            if (cir.getReserveId() != null) {
-                if (!reserveIds.contains(cir.getReserveId())) {
-                    reserveIds.add(cir.getReserveId());
+            }else {//同房间的人一起取消排房
+                for(int c=0; c<list.size(); c++){
+                    CheckInRecord cr = list.get(c);
+                    boolean result = roomStatisticsService.cancleAssign(new CheckInRecordWrapper(cr));
+                    if (!result) {
+                        TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                        return hr.error("资源问题，取消失败");
+                    }
+                    CheckInRecord reserve = findById(cr.getReserveId());
+                    reserve.setCheckInCount(reserve.getCheckInCount()-1);
+                    reserve.setRoomCount(reserve.getRoomCount() +1);
+                    reserve.setHumanCount(reserve.getHumanCount()+1);
+                    reserve.setDeleted(Constants.DELETED_FALSE);
+                    checkInRecordDao.saveAndFlush(reserve);
+//                    roomRecordDao.deleteByCheckInRecord(cr);//删除roomRecord
+                    accountService.delete(cr.getAccount().getId());//删除多余的account
+                    customerService.delete(cr.getCustomer().getId());//删除customer
+                    cr.setDeleted(Constants.DELETED_TRUE);
+                    checkInRecordDao.saveAndFlush(cr);//暂时做直接删除取消排房的记录
                 }
             }
+            // 查出所有的预留记录id，放入集合
+//            if (cir.getReserveId() != null) {
+//                if (!reserveIds.contains(cir.getReserveId())) {
+//                    reserveIds.add(cir.getReserveId());
+//                }
+//            }
         }
-        updateCount(reserveIds, mainRecordId);
+//        updateCount(reserveIds, mainRecordId);
         return hr;
     }
 

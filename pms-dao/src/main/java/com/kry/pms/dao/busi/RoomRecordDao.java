@@ -89,4 +89,7 @@ public interface RoomRecordDao extends BaseDao<RoomRecord> {
     @Query(nativeQuery = true, value = " select record_date from t_room_record where check_in_record_id = ?1 ")
     List<LocalDate> getRecordDateList(String checkInRecordId);
 
+    @Modifying
+    void deleteByCheckInRecord(CheckInRecord cir);
+
 }
