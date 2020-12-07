@@ -49,9 +49,9 @@ public class SystemConfigController extends BaseController<SystemConfig> {
 	}
 
 	@GetMapping(path = "/byKey")
-	public HttpResponse<SystemConfig> getByHotelCodeAndKey(String hotelCode, String key) {
+	public HttpResponse<SystemConfig> getByHotelCodeAndKey(String key) {
 		HttpResponse hr = new HttpResponse();
-		SystemConfig sc = systemConfigService.getByHotelCodeAndKey(hotelCode, key);
+		SystemConfig sc = systemConfigService.getByHotelCodeAndKey(getCurrentHotleCode(), key);
 		hr.setData(sc);
 		return hr;
 	}
