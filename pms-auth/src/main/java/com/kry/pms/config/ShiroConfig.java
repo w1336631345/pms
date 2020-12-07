@@ -54,6 +54,7 @@ public class ShiroConfig {
         filterChainDefinitionMap.put("/auth/wxMemberRe", "anon");
 
         filterChainDefinitionMap.put("/wx/redirect/**", "anon");
+        filterChainDefinitionMap.put("/msg/**", "anon");
 //        filterChainDefinitionMap.put("/api/**", "anon");
 
         filterChainDefinitionMap.put("/user/**", "authc");

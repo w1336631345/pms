@@ -1,6 +1,7 @@
 package com.kry.pms.api.sys;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -46,5 +47,14 @@ public class SystemConfigController extends BaseController<SystemConfig> {
 		PageRequest<SystemConfig> req = parse2PageRequest(request);
 		return rep.addData(systemConfigService.listPage(req));
 	}
+
+	@GetMapping(path = "/byKey")
+	public HttpResponse<SystemConfig> getByHotelCodeAndKey(String hotelCode, String key) {
+		HttpResponse hr = new HttpResponse();
+		SystemConfig sc = systemConfigService.getByHotelCodeAndKey(hotelCode, key);
+		hr.setData(sc);
+		return hr;
+	}
+
 
 }
