@@ -118,5 +118,7 @@ public class Customer extends PersistenceModel {
 	private String photo;//照片
 	@Column
 	private String isUsed="I";//是否启用(I:启用，O禁用)
+	@Column
+	private String mnemonicCode;//助记码
 
 }

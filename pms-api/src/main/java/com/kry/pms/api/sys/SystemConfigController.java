@@ -3,6 +3,7 @@ package com.kry.pms.api.sys;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import com.kry.pms.model.persistence.sys.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -51,6 +52,7 @@ public class SystemConfigController extends BaseController<SystemConfig> {
 	@GetMapping(path = "/byKey")
 	public HttpResponse<SystemConfig> getByHotelCodeAndKey(String key) {
 		HttpResponse hr = new HttpResponse();
+		User user = getUser();
 		SystemConfig sc = systemConfigService.getByHotelCodeAndKey(getCurrentHotleCode(), key);
 		hr.setData(sc);
 		return hr;
