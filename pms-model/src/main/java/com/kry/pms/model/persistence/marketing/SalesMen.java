@@ -56,4 +56,6 @@ public class SalesMen extends PersistenceModel{
 	private Employee employee;//员工
 	@Column
 	private String description;//备注
+	@Column
+	private String mnemonicCode;//助记码
 }

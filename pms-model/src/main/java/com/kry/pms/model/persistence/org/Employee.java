@@ -44,4 +44,6 @@ public class Employee extends PersistenceModel{
 	private Role role;
 	@Column
 	private Boolean isSalesMen;
+	@Column
+	private String mnemonicCode;//助记码
 }

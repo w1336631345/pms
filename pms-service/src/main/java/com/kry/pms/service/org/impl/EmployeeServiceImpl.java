@@ -1,30 +1,34 @@
 package com.kry.pms.service.org.impl;
 
-import java.util.List;
-import java.util.Map;
-
-import com.kry.pms.util.MD5Utils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Direction;
-import org.springframework.stereotype.Service;
-
 import com.kry.pms.base.Constants;
 import com.kry.pms.base.DtoResponse;
 import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
 import com.kry.pms.dao.org.EmployeeDao;
-import com.kry.pms.model.persistence.marketing.SalesMen;
 import com.kry.pms.model.persistence.org.Employee;
-import com.kry.pms.model.persistence.sys.Account;
 import com.kry.pms.model.persistence.sys.User;
 import com.kry.pms.service.marketing.SalesMenService;
 import com.kry.pms.service.org.EmployeeService;
-import com.kry.pms.service.sys.AccountService;
 import com.kry.pms.service.sys.RoleService;
 import com.kry.pms.service.sys.SystemConfigService;
 import com.kry.pms.service.sys.UserService;
+import com.kry.pms.util.MD5Utils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.stereotype.Service;
+
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class EmployeeServiceImpl implements EmployeeService {
@@ -86,6 +90,40 @@ public class EmployeeServiceImpl implements EmployeeService {
             req = org.springframework.data.domain.PageRequest.of(prq.getPageNum(), prq.getPageSize());
         }
         return convent(employeeDao.findAll(ex, req));
+    }
+    @Override
+    public PageResponse<Employee> listPage2(int pageIndex, int pageSize, String name, String code,
+                                            String mobile, String department_id, String hotelCode) {
+        Pageable page = org.springframework.data.domain.PageRequest.of(pageIndex - 1, pageSize);
+        Page<Employee> pageList = employeeDao.findAll(new Specification<Employee>() {
+            @Override
+            public Predicate toPredicate(Root<Employee> root, CriteriaQuery<?> query,
+                                         CriteriaBuilder criteriaBuilder) {
+                List<Predicate> list = new ArrayList<Predicate>();
+                if (hotelCode != null) {
+                    list.add(criteriaBuilder.equal(root.get("hotelCode"), hotelCode));
+                }
+                if (code != null) {
+                    list.add(criteriaBuilder.equal(root.get("code"), code));
+                }
+                if (mobile != null) {
+                    list.add(criteriaBuilder.equal(root.get("mobile"), mobile));
+                }
+                if (department_id != null) {
+                    list.add(criteriaBuilder.equal(root.join("department").get("id"), department_id));
+                }
+                List<Predicate> predicateListOr = new ArrayList<Predicate>();
+                if (name != null) {
+                    predicateListOr.add(criteriaBuilder.like(root.get("name"), "%" + name + "%"));
+                    predicateListOr.add(criteriaBuilder.like(root.get("mnemonicCode"), "%" + name + "%"));
+                    list.add(criteriaBuilder.or(predicateListOr.toArray(new Predicate[predicateListOr.size()])));
+                }
+
+                Predicate[] array = new Predicate[list.size()];
+                return criteriaBuilder.and(list.toArray(array));
+            }
+        }, page);
+        return convent(pageList);
     }
 
     @Override

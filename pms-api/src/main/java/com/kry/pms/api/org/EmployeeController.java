@@ -5,17 +5,11 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.kry.pms.model.persistence.marketing.SalesMen;
 import com.kry.pms.model.persistence.sys.User;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.kry.pms.api.BaseController;
 import com.kry.pms.base.Constants;
@@ -78,6 +72,13 @@ public class EmployeeController extends BaseController<Employee> {
 		HttpResponse<PageResponse<Employee>> rep = new HttpResponse<PageResponse<Employee>>();
 		PageRequest<Employee> req = parse2PageRequest(request);
 		return rep.addData(employeeService.listPage(req));
+	}
+	@GetMapping(path = "/list2")
+	public HttpResponse<PageResponse<SalesMen>> query2(@RequestParam(value = "pageNum", defaultValue = "1")Integer pageNum,
+													   @RequestParam(value = "pageSize", defaultValue = "20")Integer pageSize,
+													   String name, String code, String mobile, String department_id) {
+		HttpResponse rep = new HttpResponse();
+		return rep.addData(employeeService.listPage2(pageNum, pageSize,name, code, mobile, department_id, getCurrentHotleCode()));
 	}
 
 	/**

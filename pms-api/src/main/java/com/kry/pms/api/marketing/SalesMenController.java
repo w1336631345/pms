@@ -40,6 +40,13 @@ public class SalesMenController extends BaseController<SalesMen> {
 		PageRequest<SalesMen> req = parse2PageRequest(request);
 		return rep.addData(salesMenService.listPage(req));
 	}
+	@GetMapping(path = "/list2")
+	public HttpResponse<PageResponse<SalesMen>> query2(@RequestParam(value = "pageNum", defaultValue = "1")Integer pageNum,
+													   @RequestParam(value = "pageSize", defaultValue = "20")Integer pageSize,
+													   String type, String status, String name, String contactMobile) {
+		HttpResponse rep = new HttpResponse();
+		return rep.addData(salesMenService.listPage2(pageNum, pageSize,type, status, name, contactMobile, getCurrentHotleCode()));
+	}
 
 	@GetMapping(path = "/list")
 	public HttpResponse<List<SalesMen>> getByHotelCode(HttpServletRequest request){
