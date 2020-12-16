@@ -1,6 +1,7 @@
 package com.kry.pms.api.sys;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -53,6 +54,17 @@ public class FunctionController extends BaseController<Function> {
 	public HttpResponse<List<Function>> all() throws InstantiationException, IllegalAccessException{
 		HttpResponse<List<Function>> rep = new HttpResponse<List<Function>>();
 		return rep.addData(functionService.listAll());
+	}
+
+	@GetMapping(path="/allMap")
+	public HttpResponse<List<Map<String, Object>>> allMap(){
+		HttpResponse<List<Map<String, Object>>> rep = new HttpResponse<List<Map<String, Object>>>();
+		return rep.addData(functionService.listMap());
+	}
+	@GetMapping(path="/father")
+	public HttpResponse<List<Map<String, Object>>> father(){
+		HttpResponse<List<Map<String, Object>>> rep = new HttpResponse<List<Map<String, Object>>>();
+		return rep.addData(functionService.listFather());
 	}
 
 }

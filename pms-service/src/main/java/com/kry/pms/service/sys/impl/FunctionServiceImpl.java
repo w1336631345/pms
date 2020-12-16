@@ -1,7 +1,11 @@
 package com.kry.pms.service.sys.impl;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.apache.commons.collections4.MapUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Sort;
@@ -65,5 +69,25 @@ public class  FunctionServiceImpl implements  FunctionService{
 	@Override
 	public List<Function> listAll(){
 		return functionDao.findByStatusAndDeleted(Constants.Status.NORMAL,Constants.DELETED_FALSE);
-	} 
+	}
+
+	@Override
+	public List<Map<String, Object>> listFather(){
+		List<Map<String, Object>> father = functionDao.typeGroup();
+		return father;
+	}
+	@Override
+	public List<Map<String, Object>> listMap(){
+		List<Map<String, Object>> father = functionDao.typeGroup();
+		List<Map<String, Object>> newMapList = new ArrayList<>();
+		for(int i=0; i<father.size(); i++){
+			Map<String, Object> map = new HashMap<>();
+			map.putAll(father.get(i));
+			String type = MapUtils.getString(map, "name");
+			List<Map<String, Object>> childs = functionDao.listChild(type);
+			map.put("children", childs);
+			newMapList.add(map);
+		}
+		return newMapList;
+	}
 }
