@@ -209,4 +209,19 @@ public class MemberInfoController extends BaseController<MemberInfo> {
 		return hr;
 	}
 
+	/**
+	 * 功能描述: <br>发送短信查询的会员列表
+	 * 〈〉
+	 * @Param: [tDay, sDay, leavelIds]
+	 * @Return: com.kry.pms.base.HttpResponse<java.util.List<java.util.Map<java.lang.String,java.lang.Object>>>
+	 * @Author: huanghaibin
+	 * @Date: 2020/12/24 14:48
+	 */
+	@GetMapping(path = "/getSendMsgList")
+	public HttpResponse<List<Map<String, Object>>> getSendMsgList(String tDay, String sDay, String[] leavelIds){
+		HttpResponse<List<Map<String, Object>>> rep = new HttpResponse<List<Map<String, Object>>>();
+		List<Map<String, Object>> list = memberInfoService.getSendMsgList(getCurrentHotleCode(), tDay, sDay, leavelIds);
+		return rep.addData(list);
+	}
+
 }

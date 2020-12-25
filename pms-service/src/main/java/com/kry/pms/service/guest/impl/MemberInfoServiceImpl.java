@@ -28,6 +28,7 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -246,5 +247,15 @@ public class MemberInfoServiceImpl implements MemberInfoService {
 	public MemberInfo getByHotelAndMobile(String hotelCode, String mobile) {
 		MemberInfo memberInfo = memberInfoDao.getByHotelAndMobile(hotelCode, mobile);
 		return memberInfo;
+	}
+
+	@Override
+	public List<Map<String, Object>> getSendMsgList(String hotelCode, String tDay, String sDay, String[] leavelIds){
+		List<String> lids = null;
+		if (leavelIds != null) {
+			lids = Arrays.asList(leavelIds);
+		}
+		List<Map<String, Object>> list = memberInfoDao.getSendMsgList(hotelCode, tDay, sDay, lids);
+		return list;
 	}
 }

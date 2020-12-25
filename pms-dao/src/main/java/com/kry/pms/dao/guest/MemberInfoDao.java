@@ -136,5 +136,14 @@ public interface MemberInfoDao extends BaseDao<MemberInfo>{
 			"  and if(:mobile is not null && :mobile != '', tc.mobile=:mobile, 1=1 ) ")
 	MemberInfo getByHotelAndMobile(@Param("hotelCode") String hotelCode, @Param("mobile") String mobile);
 
+	@Query(nativeQuery = true, value = " select tmi.id, tmi.`name`, tc.mobile, tmi.account_id \n" +
+			"  from t_member_info tmi, t_customer tc \n" +
+			" where tmi.customer_id = tc.id \n" +
+			"  and if(:hotelCode is not null && :hotelCode != '', tmi.hotel_code=:hotelCode, 1=1 ) \n" +
+			"  and if(:tDay is not null && :tDay != '', tmi.account_id in (select tb.account_id from t_bill tb where  tb.create_date >= DATE_SUB(SYSDATE(),INTERVAL 30 DAY)),1=1) \n" +
+			"  and if(:sDay is not null && :sDay != '', tmi.account_id in (select tb.account_id from t_bill tb where  tb.create_date >= DATE_SUB(SYSDATE(),INTERVAL 180 DAY)),1=1) \n" +
+			"  and if(coalesce(:leavelIds, null) is not null, tmi.member_level_id in (:leavelIds), 1=1 ) ")
+	List<Map<String, Object>> getSendMsgList(@Param("hotelCode") String hotelCode, @Param("tDay")String tDay, @Param("sDay")String sDay, @Param("leavelIds") List<String> leavelIds);
+
 
 }

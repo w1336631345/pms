@@ -39,4 +39,6 @@ public interface MemberInfoService extends BaseService<MemberInfo>{
     MemberInfo findByAccountId(String hotelCode, String accountId);
 
     MemberInfo getByHotelAndMobile(String hotelCode, String mobile);
+
+    List<Map<String, Object>> getSendMsgList(String hotelCode, String tDay, String sDay, String[] leavelIds);
 }
