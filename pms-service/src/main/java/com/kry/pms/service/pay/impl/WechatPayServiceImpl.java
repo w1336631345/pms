@@ -60,8 +60,8 @@ public class WechatPayServiceImpl extends WeixinSupport implements WechatPayServ
 
 	private Logger logger = LoggerFactory.getLogger(getClass());
 
-	private static final String appid = "wx09adf502d19bf421";	    //微小公众号appid
-	private static final String secret = "3d1449aedc049746173103927f711e4b";	//微信公众号密钥
+	private static final String appid = "wx09adf502d19bf421";	    //微小程序公众号appid（快订助手）
+	private static final String secret = "5bc57353b29a4862327d2d2f19b064ab";	//微信小程序公众号密钥（快订助手）
 	private static final String grant_type = "authorization_code";
 
 //	private static final String applets_appid = "wx09adf502d19bf421";	    //微小程序appid
