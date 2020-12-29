@@ -17,7 +17,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.concurrent.TimeUnit;
 
 @Controller
-@RequestMapping(path = "/msg")
+@RequestMapping(path = "/msgSend")
 public class MsgSendController  extends BaseController {
 
     @Autowired
