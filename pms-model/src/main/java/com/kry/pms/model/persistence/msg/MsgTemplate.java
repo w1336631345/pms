@@ -17,5 +17,6 @@ public class MsgTemplate extends PersistenceModel {
     private String content;
     private String remark;
     private LocalDateTime sendTime;
+    private String sentType;//发送方式：A自动发送，M手动发送
 
 }
