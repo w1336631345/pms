@@ -112,9 +112,9 @@ public class AuditNightStepServiceImpl implements AuditNightStepService {
 			if(ans.getProcessName() == null || "".equals(ans.getProcessName())){
 				try {
 					Random random = new Random();
-					int s = random.nextInt(5000)%(5000-1000+1) + 1000;
+//					int s = random.nextInt(5000)%(5000-1000+1) + 1000;
 					//线程睡眠一会儿，用来模拟后面生成报表步骤是的耗时
-					Thread.sleep(s);
+					Thread.sleep(1000);
 					ansh.setResultCode("success");
 				} catch (InterruptedException e) {
 					e.printStackTrace();

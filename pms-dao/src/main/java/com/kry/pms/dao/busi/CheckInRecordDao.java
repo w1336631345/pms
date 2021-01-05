@@ -27,9 +27,9 @@ public interface CheckInRecordDao extends BaseDao<CheckInRecord> {
 
     @Query(nativeQuery = true, value = "select trt.`name` roomtype, tcr.room_count, tgr.room_num, tc.`name`, tc.mobile, DATE_FORMAT(tcr.arrive_time,'%Y-%m-%d %T') arrive_time,  "
             + " DATE_FORMAT(tcr.leave_time,'%Y-%m-%d %T') leave_time, tcr.hold_time, tcr.group_name groupname, tcr.`status`, tcr.id, tcr.hotel_code, "
-            + " ta.cost, ta.total, ta.pay, ta.id accountId, tcr.group_type, tcr.order_num "
+            + " ta.cost, ta.total, ta.pay, ta.id accountId, ta.`code`, tcr.group_type, tcr.order_num "
             + " from t_checkin_record tcr LEFT JOIN t_guest_room tgr on tcr.guest_room_id = tgr.id "
-            + " left join t_room_type trt on tgr.room_type_id = trt.id "
+            + " left join t_room_type trt on tcr.room_type_id = trt.id "
             + " left join t_customer tc on tcr.customer_id = tc.id "
             + " left join t_account ta on tcr.account_id = ta.id "
             + " where tcr.type_ != 'G' "
@@ -40,7 +40,7 @@ public interface CheckInRecordDao extends BaseDao<CheckInRecord> {
             + " and if(:hotelCode is not null && :hotelCode != '', tcr.hotel_code=:hotelCode, 1=1 ) ",
             countQuery = "select count(*) "
                     + " from t_checkin_record tcr LEFT JOIN t_guest_room tgr on tcr.guest_room_id = tgr.id "
-                    + " left join t_room_type trt on tgr.room_type_id = trt.id "
+                    + " left join t_room_type trt on tcr.room_type_id = trt.id "
                     + " left join t_customer tc on tcr.customer_id = tc.id "
                     + " left join t_group tg on tcr.group_id = tg.id "
                     + " where tcr.type_ != 'G' "
@@ -54,9 +54,9 @@ public interface CheckInRecordDao extends BaseDao<CheckInRecord> {
 
     @Query(nativeQuery = true, value = "select trt.`name` roomtype, tcr.room_count, tgr.room_num, tc.`name`, tc.mobile, DATE_FORMAT(tcr.arrive_time,'%Y-%m-%d %T') arrive_time,  "
             + " DATE_FORMAT(tcr.leave_time,'%Y-%m-%d %T') leave_time, tcr.hold_time, tcr.group_name groupname, tcr.`status`, tcr.id, tcr.hotel_code, "
-            + " ta.cost, ta.total, ta.pay, ta.id accountId, tcr.group_type, tcr.order_num "
+            + " ta.cost, ta.total, ta.pay, ta.id accountId, ta.`code`, tcr.group_type, tcr.order_num "
             + " from t_checkin_record tcr LEFT JOIN t_guest_room tgr on tcr.guest_room_id = tgr.id "
-            + " left join t_room_type trt on tgr.room_type_id = trt.id "
+            + " left join t_room_type trt on tcr.room_type_id = trt.id "
             + " left join t_customer tc on tcr.customer_id = tc.id "
             + " left join t_account ta on tcr.account_id = ta.id "
             + " where tcr.type_ != 'G' "
