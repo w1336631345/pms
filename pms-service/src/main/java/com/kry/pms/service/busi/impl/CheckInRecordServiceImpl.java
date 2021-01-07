@@ -26,6 +26,8 @@ import com.kry.pms.mq.OrderMqService;
 import com.kry.pms.service.busi.*;
 import com.kry.pms.service.guest.CustomerService;
 import com.kry.pms.service.log.UpdateLogService;
+import com.kry.pms.service.msg.MsgSendService;
+import com.kry.pms.service.msg.impl.MsgSendServiceImpl;
 import com.kry.pms.service.org.EmployeeService;
 import com.kry.pms.service.room.*;
 import com.kry.pms.service.sys.*;
@@ -103,6 +105,8 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
     RoomRecordDao roomRecordDao;
     @Autowired
     ReceptionService receptionService;
+    @Autowired
+    MsgSendService msgSendService;
 
     @Override
     public CheckInRecord add(CheckInRecord checkInRecord) {
@@ -1018,6 +1022,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
             modify(checkInRecord);
         }
         hr.setData(checkInRecord);
+        HttpResponse rep = msgSendService.bookSendMsg(checkInRecord);
         return hr;
     }
 
@@ -1143,6 +1148,8 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
         map.put("nativeUrl", nativeUrl);
         map.put("cir", cir);
         hr.setData(map);
+        //发送短信
+        msgSendService.bookSendMsg(cir);
         return hr;
     }
 
@@ -1243,6 +1250,8 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
             if(hr.getStatus()==0){
                 orderMqService.sendNewOrder(rcir.getHotelCode(),rcir.getOrderNum());
             }
+            //发送短信
+            msgSendService.bookSendMsg(rcir);
             return hr;
         } else {//没有选择房间，生成纯预留
             //************开始分割线*************
@@ -1281,6 +1290,8 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
             if(hr.getStatus()==0){
                 orderMqService.sendNewOrder(cir.getHotelCode(),cir.getOrderNum());
             }
+            //发送短信
+            msgSendService.bookSendMsg(cir);
             return hr;
         }
 

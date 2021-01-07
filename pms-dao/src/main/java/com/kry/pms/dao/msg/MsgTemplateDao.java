@@ -8,4 +8,6 @@ import java.util.List;
 public interface MsgTemplateDao extends BaseDao<MsgTemplate>{
 
     List<MsgTemplate> findByHotelCode(String hotelCode);
+
+    MsgTemplate findByHotelCodeAndStatusAndSentTypeAndTypeCode(String hotelCode, String status, String sentType, String typeCode);
 }

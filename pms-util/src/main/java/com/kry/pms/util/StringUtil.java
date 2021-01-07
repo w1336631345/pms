@@ -1,6 +1,10 @@
 package com.kry.pms.util;
 
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 
 /**
@@ -32,5 +36,12 @@ public class StringUtil {
 			sb.append("%" + Integer.toHexString((b & 0xff)).toUpperCase());
 		}
 		return sb.toString();
+	}
+
+	public static List<String> msgContent(String content){
+		List<String> list = new ArrayList<>();
+		String[] str = content.split("-");
+		list = Arrays.asList(str);
+		return list;
 	}
 }

@@ -14,7 +14,9 @@ import com.kry.pms.model.http.response.busi.CheckInRecordListVo;
 import com.kry.pms.model.persistence.busi.CheckInRecord;
 import com.kry.pms.model.persistence.sys.User;
 import com.kry.pms.service.busi.CheckInRecordService;
+import com.kry.pms.service.msg.MsgSendService;
 import freemarker.template.TemplateException;
+import org.apache.commons.collections4.MapUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -29,6 +31,8 @@ import java.util.Map;
 public class CheckInRecordController extends BaseController<CheckInRecord> {
     @Autowired
     CheckInRecordService checkInRecordService;
+    @Autowired
+    MsgSendService msgSendService;
 
     @PostMapping
     public HttpResponse<CheckInRecord> add(@RequestBody CheckInRecord checkInRecord) {
@@ -131,6 +135,8 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
         User user = getUser();
         checkInRecord.setHotelCode(user.getHotelCode());
         HttpResponse hr = checkInRecordService.singleRoom(checkInRecord);
+        //发送短信
+//        msgSendService.bookSendMsg((CheckInRecord)hr.getData());
         return hr;
     }
 
@@ -150,6 +156,9 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
         User user = getUser();
         checkInRecord.setHotelCode(user.getHotelCode());
         hr = checkInRecordService.bookByRoomTypeTest(checkInRecord, user);
+        //发送短信
+//        Map<String, Object> map = (Map)hr.getData();
+//        msgSendService.bookSendMsg((CheckInRecord)MapUtils.getObject(map, "cir"));
         return hr;
     }
     /**
