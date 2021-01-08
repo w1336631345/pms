@@ -61,7 +61,7 @@ public class MsgSendServiceImpl implements MsgSendService {
 	CustomerDao customerDao;
 
 	@Override
-	public HttpResponse sendMsg(String id, String name, String phone, String content, String sendTime, String hotelCode){
+	public HttpResponse sendMsg(String id, String name, String phone, String content, String sendTime, String hotelCode, String typeCode){
 		HttpResponse hr = new HttpResponse();
 		List<MsgAccount> ma = msgAccountDao.findByHotelCode(hotelCode);
 		MsgAccount msgAccount = null;
@@ -107,6 +107,7 @@ public class MsgSendServiceImpl implements MsgSendService {
 				msgRecords.setResult(result);
 				msgRecords.setStatus(status);
 				msgRecords.setHotelCode(hotelCode);
+				msgRecords.setTypeCode(typeCode);
 				msgRecordsDao.saveAndFlush(msgRecords);
 			}
 		} catch (UnsupportedEncodingException e) {
@@ -209,14 +210,20 @@ public class MsgSendServiceImpl implements MsgSendService {
 						roomTypeNames = name;
 					}
 				}
+//				String c = "【-预订人-】先生/女士，您好！您已成功预订【-房间类型-】共【-房间数量-】间，入住时间为【-到店时间-】到【-离店时间-】，预订号为【-订单号-】，我们恭候您的光临。如有需要请致电：【-酒店电话-】";
 				String content = mt.getContent();
-				content = content.replace("房间类型", roomTypeNames);
-				content = content.replace("订单号", cir.getOrderNum());
+				content = content.replace("-预订人-", cir.getContactName());
+				content = content.replace("-房间类型-", roomTypeNames);
+				content = content.replace("-房间数量-", cir.getRoomCount().toString());
+				DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+				content = content.replace("-到店时间-", fmt.format(cir.getArriveTime()));
+				content = content.replace("-离店时间-", fmt.format(cir.getLeaveTime()));
+				content = content.replace("-订单号-", cir.getOrderNum());
 				Hotel hotel = hotelDao.findByHotelCode(cir.getHotelCode());
 				if(hotel.getTel() != null){
-					content = content.replace("酒店电话", hotel.getTel());
+					content = content.replace("-酒店电话-", hotel.getTel());
 				}
-				hr = sendMsgAuto(cir.getContactName(), cir.getContactMobile(), content, cir.getHotelCode());
+				hr = sendMsgAuto(cir.getContactName(), cir.getContactMobile(), content, cir.getHotelCode(),"R_RES");
 			}
 		}
 		return hr;
@@ -247,7 +254,7 @@ public class MsgSendServiceImpl implements MsgSendService {
 			if(cust != null){
 				tel = cust.getMobile();
 			}
-			hr = sendMsgAuto(cust.getName(), tel, content, mr.getHotelCode());
+			hr = sendMsgAuto(cust.getName(), tel, content, mr.getHotelCode(), "A_CRD");
 			return hr;
 		}
 	}
@@ -278,13 +285,13 @@ public class MsgSendServiceImpl implements MsgSendService {
 			}
 			content = content.replace("-酒店名称-", hotel.getName());
 			if(tel != null){
-				sendMsgAuto(name, tel, content, hotelCode);
+				sendMsgAuto(name, tel, content, hotelCode, "G_BJR");
 			}
 		}
 	}
 
 	@Override
-	public HttpResponse sendMsgAuto(String name, String phone, String content, String hotelCode){
+	public HttpResponse sendMsgAuto(String name, String phone, String content, String hotelCode, String typeCode){
 		HttpResponse hr = new HttpResponse();
 		if(phone == null){
 			System.out.println("电话号码不能为空");

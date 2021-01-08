@@ -63,8 +63,8 @@ public class MsgSendController  extends BaseController {
      */
     @ResponseBody
     @GetMapping(value = "/sendMsg")
-    public HttpResponse sendMsg(String id, String name, String phone, String content, String sendTime){
-        HttpResponse hr = msgSendService.sendMsg(id, name, phone, content, sendTime, getCurrentHotleCode());
+    public HttpResponse sendMsg(String id, String name, String phone, String content, String sendTime, String typeCode){
+        HttpResponse hr = msgSendService.sendMsg(id, name, phone, content, sendTime, getCurrentHotleCode(), typeCode);
         return hr;
     }
 }

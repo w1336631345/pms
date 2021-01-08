@@ -5,7 +5,7 @@ import com.kry.pms.model.persistence.busi.CheckInRecord;
 import com.kry.pms.model.persistence.guest.MemberRecharge;
 
 public interface MsgSendService {
-    HttpResponse sendMsg(String id, String name, String phone, String content, String sendTime, String hotelCode);
+    HttpResponse sendMsg(String id, String name, String phone, String content, String sendTime, String hotelCode, String typeCode);
 
     HttpResponse getVCode(String phone);
 
@@ -20,5 +20,5 @@ public interface MsgSendService {
     //生日祝福短信
     void sendMsgBrithday(String hotelCode);
 
-    HttpResponse sendMsgAuto(String name, String phone, String content, String hotelCode);
+    HttpResponse sendMsgAuto(String name, String phone, String content, String hotelCode, String typeCode);
 }

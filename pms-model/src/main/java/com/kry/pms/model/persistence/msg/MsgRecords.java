@@ -19,4 +19,5 @@ public class MsgRecords extends PersistenceModelTo {
     private Integer total;
     private LocalDateTime sendTime;
     private String result;
+    private String typeCode;
 }
