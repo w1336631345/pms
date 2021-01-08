@@ -96,10 +96,11 @@ public class MsgSendServiceImpl implements MsgSendService {
 			}
 			String[] ids = id.split(",");
 			for(int i=0; i<ids.length; i++){
-				MemberInfo mi = memberInfoDao.getOne(ids[i]);
+//				MemberInfo mi = memberInfoDao.getOne(ids[i]);
+				Customer cust = customerDao.getOne(ids[i]);
 				MsgRecords msgRecords = new MsgRecords();
-				msgRecords.setCustName(mi.getName());
-				msgRecords.setMobile(mi.getCustomer().getMobile());
+				msgRecords.setCustName(cust.getName());
+				msgRecords.setMobile(cust.getMobile());
 				msgRecords.setContent(content);
 				msgRecords.setSendTime(time);
 				msgRecords.setTotal(1);
