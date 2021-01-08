@@ -4,6 +4,7 @@ import com.kry.pms.base.Constants;
 import com.kry.pms.base.HttpResponse;
 import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
+import com.kry.pms.dao.guest.CustomerDao;
 import com.kry.pms.dao.guest.MemberInfoDao;
 import com.kry.pms.dao.msg.MsgAccountDao;
 import com.kry.pms.dao.msg.MsgRecordsDao;
@@ -32,6 +33,7 @@ import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -55,6 +57,8 @@ public class MsgSendServiceImpl implements MsgSendService {
 	HotelDao hotelDao;
 	@Autowired
 	RoomTypeDao roomTypeDao;
+	@Autowired
+	CustomerDao customerDao;
 
 	@Override
 	public HttpResponse sendMsg(String id, String name, String phone, String content, String sendTime, String hotelCode){
@@ -101,6 +105,7 @@ public class MsgSendServiceImpl implements MsgSendService {
 				msgRecords.setTotal(1);
 				msgRecords.setResult(result);
 				msgRecords.setStatus(status);
+				msgRecords.setHotelCode(hotelCode);
 				msgRecordsDao.saveAndFlush(msgRecords);
 			}
 		} catch (UnsupportedEncodingException e) {
@@ -245,6 +250,37 @@ public class MsgSendServiceImpl implements MsgSendService {
 			return hr;
 		}
 	}
+	//生日祝福短信
+	@Override
+	public void sendMsgBrithday(String hotelCode){
+		DateTimeFormatter fmt = DateTimeFormatter.ofPattern("MM-dd");
+		List<Customer> list = customerDao.getBirthdayCust(hotelCode, 0, fmt.format(LocalDate.now()));
+		MsgTemplate mt = msgTemplateDao.findByHotelCodeAndStatusAndSentTypeAndTypeCode(hotelCode, "Y", "A", "G_BJR");
+		Hotel hotel = hotelDao.findByHotelCode(hotelCode);
+		for(int i=0; i<list.size(); i++){
+			Customer cust = list.get(i);
+			String name = cust.getName();
+			String tel = cust.getMobile();
+			String content = mt.getContent();
+//		String content = "尊敬的【-档案姓名-】，【性别】，今天是您的生日，【-酒店名称-】恭祝您生日快乐！";
+			content = content.replace("-档案姓名-", name);
+			String gender = cust.getGender();
+			if(gender != null){
+				if("M".equals(gender)){
+					content = content.replace("性别", "先生");
+				}
+				if("F".equals(gender)){
+					content = content.replace("性别", "女士");
+				}
+			}else {
+				content = content.replace("【性别】，", "");
+			}
+			content = content.replace("-酒店名称-", hotel.getName());
+			if(tel != null){
+				sendMsgAuto(name, tel, content, hotelCode);
+			}
+		}
+	}
 
 	@Override
 	public HttpResponse sendMsgAuto(String name, String phone, String content, String hotelCode){
@@ -287,6 +323,7 @@ public class MsgSendServiceImpl implements MsgSendService {
 			msgRecords.setTotal(1);
 			msgRecords.setResult(result);
 			msgRecords.setStatus(status);
+			msgRecords.setHotelCode(hotelCode);
 			msgRecordsDao.saveAndFlush(msgRecords);
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();

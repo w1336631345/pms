@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -92,5 +93,10 @@ public interface CustomerDao extends BaseDao<Customer>{
 	@Query(nativeQuery = true, value = " select IFNULL(count(id),0) from t_customer tc \n" +
 			" where tc.hotel_code = ?1 and DATE_FORMAT(tc.create_date,'%Y-%m-%d') = ?2 ")
 	Integer toDayCount(String hotelCode, String createDate);
+
+	@Query(nativeQuery = true, value = " select tc.* from t_customer tc \n" +
+			"  where tc.hotel_code = ?1 and tc.deleted = ?2 \n" +
+			"   and DATE_FORMAT(tc.birthday,'%m-%d') = ?3 ")
+	List<Customer> getBirthdayCust(String hotelCode, int deleted, String birthday);
 
 }

@@ -17,5 +17,8 @@ public interface MsgSendService {
     //会员充值发送短信
     HttpResponse sendMsgMemberRecharge(MemberRecharge mr);
 
+    //生日祝福短信
+    void sendMsgBrithday(String hotelCode);
+
     HttpResponse sendMsgAuto(String name, String phone, String content, String hotelCode);
 }
