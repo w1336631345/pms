@@ -15,6 +15,7 @@ import com.kry.pms.model.persistence.sys.User;
 import com.kry.pms.service.busi.BillService;
 import com.kry.pms.service.goods.ProductService;
 import com.kry.pms.service.guest.MemberRechargeService;
+import com.kry.pms.service.msg.MsgSendService;
 import com.kry.pms.service.org.EmployeeService;
 import com.kry.pms.service.sys.AccountService;
 import com.kry.pms.service.sys.BusinessSeqService;
@@ -27,6 +28,7 @@ import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -50,6 +52,8 @@ public class MemberRechargeServiceImpl implements MemberRechargeService {
 	EmployeeDao employeeDao;
 	@Autowired
 	BusinessSeqService businessSeqService;
+	@Autowired
+	MsgSendService msgSendService;
 
 	@Override
 	public MemberRecharge add(MemberRecharge entity) {
@@ -64,9 +68,13 @@ public class MemberRechargeServiceImpl implements MemberRechargeService {
 		memberInfo.setBalance(memberInfo.getBalance() + entity.getAmount());
 		memberInfo.setGivePrice(memberInfo.getGivePrice() + entity.getGiveAmount());
 		memberInfoDao.saveAndFlush(memberInfo);
-		return memberRechargeDao.saveAndFlush(entity);
+		entity = memberRechargeDao.saveAndFlush(entity);
+		//发送短信
+		msgSendService.sendMsgMemberRecharge(entity);
+		return entity;
 	}
 	@Override
+	@Transactional
 	public HttpResponse recharge(MemberRecharge entity) {
 		HttpResponse hr = new HttpResponse();
 		MemberInfo memberInfo = memberInfoDao.findByHotelCodeAndCardNum(entity.getHotelCode(), entity.getCardNum());
@@ -104,6 +112,8 @@ public class MemberRechargeServiceImpl implements MemberRechargeService {
 		billService.add(bill);
 
 		hr.setData(entity);
+		//发送短信
+		msgSendService.sendMsgMemberRecharge(entity);
 		return hr;
 	}
 	//使用金额

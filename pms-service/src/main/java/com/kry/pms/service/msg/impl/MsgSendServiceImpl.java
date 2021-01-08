@@ -11,7 +11,9 @@ import com.kry.pms.dao.msg.MsgTemplateDao;
 import com.kry.pms.dao.org.HotelDao;
 import com.kry.pms.dao.room.RoomTypeDao;
 import com.kry.pms.model.persistence.busi.CheckInRecord;
+import com.kry.pms.model.persistence.guest.Customer;
 import com.kry.pms.model.persistence.guest.MemberInfo;
+import com.kry.pms.model.persistence.guest.MemberRecharge;
 import com.kry.pms.model.persistence.msg.MsgAccount;
 import com.kry.pms.model.persistence.msg.MsgRecords;
 import com.kry.pms.model.persistence.msg.MsgTemplate;
@@ -213,10 +215,44 @@ public class MsgSendServiceImpl implements MsgSendService {
 		}
 		return hr;
 	}
+	//会员充值发送短信
+	@Override
+	public HttpResponse sendMsgMemberRecharge(MemberRecharge mr){
+		HttpResponse hr = new HttpResponse();
+		MsgTemplate mt = msgTemplateDao.findByHotelCodeAndStatusAndSentTypeAndTypeCode(mr.getHotelCode(), "Y", "A", "A_CRD");
+		if(mt == null){
+			System.out.println("没有设置或开启会员充值短信模板");
+			return hr.error("没有设置或开启会员充值短信模板");
+		}else{
+//			String content = "【卡号】会员：您于【-时间-】充值¥【-充值金额-】，您账户余额为¥【-余额-】，如有疑问，请致电：【酒店电话】。";
+			String content = mt.getContent();
+			content = content.replace("卡号", mr.getCardNum());
+			DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+			content = content.replace("-时间-", fmt.format(LocalDateTime.now()));
+			content = content.replace("-充值金额-", mr.getAmount().toString());
+//		MemberInfo memberInfo = memberInfoDao.findByHotelCodeAndCardNum(mr.getHotelCode(), mr.getCardNum());
+			content = content.replace("-余额-", mr.getMemberInfo().getBalance().toString());
+			Hotel hotel = hotelDao.findByHotelCode(mr.getHotelCode());
+			if(hotel.getTel() != null){
+				content = content.replace("酒店电话", hotel.getTel());
+			}
+			Customer cust = mr.getMemberInfo().getCustomer();
+			String tel = null;
+			if(cust != null){
+				tel = cust.getMobile();
+			}
+			hr = sendMsgAuto(cust.getName(), tel, content, mr.getHotelCode());
+			return hr;
+		}
+	}
 
 	@Override
 	public HttpResponse sendMsgAuto(String name, String phone, String content, String hotelCode){
 		HttpResponse hr = new HttpResponse();
+		if(phone == null){
+			System.out.println("电话号码不能为空");
+			return hr.error("电话号码不能为空");
+		}
 		List<MsgAccount> ma = msgAccountDao.findByHotelCode(hotelCode);
 		MsgAccount msgAccount = null;
 		if(ma == null || ma.isEmpty()){

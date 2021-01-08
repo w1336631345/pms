@@ -27,6 +27,14 @@ public class MemberIntegralController extends BaseController<MemberIntegral> {
 		memberIntegral.setCreateUser(getUserId());
 		return getDefaultResponse().addData(memberIntegralService.add(memberIntegral));
 	}
+	/**
+	 * 功能描述: <br>消费扣减积分
+	 * 〈〉
+	 * @Param: [memberIntegral]
+	 * @Return: com.kry.pms.base.HttpResponse<com.kry.pms.model.persistence.guest.MemberIntegral>
+	 * @Author: huanghaibin
+	 * @Date: 2021/1/7 11:24
+	 */
 	@PostMapping(path = "/reduce")
 	public HttpResponse<MemberIntegral> reduce(@RequestBody MemberIntegral memberIntegral) {
 		memberIntegral.setHotelCode(getCurrentHotleCode());

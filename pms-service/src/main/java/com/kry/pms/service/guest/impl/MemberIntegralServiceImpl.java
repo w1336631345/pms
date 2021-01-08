@@ -58,6 +58,7 @@ public class MemberIntegralServiceImpl implements MemberIntegralService {
 		memberInfoDao.saveAndFlush(memberInfo);
 		return memberIntegralDao.saveAndFlush(entity);
 	}
+	//扣减积分
 	@Override
 	public HttpResponse reduce(MemberIntegral entity) {
 		HttpResponse hr = new HttpResponse();
