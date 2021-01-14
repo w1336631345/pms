@@ -212,7 +212,11 @@ public class MsgSendServiceImpl implements MsgSendService {
 				}
 //				String c = "【-预订人-】先生/女士，您好！您已成功预订【-房间类型-】共【-房间数量-】间，入住时间为【-到店时间-】到【-离店时间-】，预订号为【-订单号-】，我们恭候您的光临。如有需要请致电：【-酒店电话-】";
 				String content = mt.getContent();
-				content = content.replace("-预订人-", cir.getContactName());
+				if(cir.getContactName()!= null){
+					content = content.replace("-预订人-", cir.getContactName());
+				}else{
+					content = content.replace("-预订人-", "");
+				}
 				content = content.replace("-房间类型-", roomTypeNames);
 				content = content.replace("-房间数量-", cir.getRoomCount().toString());
 				DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");

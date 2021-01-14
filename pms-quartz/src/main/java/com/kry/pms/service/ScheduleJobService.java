@@ -1,5 +1,6 @@
 package com.kry.pms.service;
 
+import com.kry.pms.base.Constants;
 import com.kry.pms.base.HttpResponse;
 import com.kry.pms.dao.ScheduleJobDaoRepository;
 import com.kry.pms.job.ScheduleQuartzJob;
@@ -52,7 +53,8 @@ public class ScheduleJobService {
         return list;
     }
     public List<ScheduleJobModel> getJobByHotelAndStatus(String hotelCode) {
-        List<ScheduleJobModel> list = scheduleJobDaoRepository.findByHotelCodeAndStatus(hotelCode, 0);
+//        List<ScheduleJobModel> list = scheduleJobDaoRepository.findByHotelCodeAndStatus(hotelCode, 0);
+        List<ScheduleJobModel> list = scheduleJobDaoRepository.findByHotelCodeAndStatusAndType(hotelCode, 0, Constants.quartzType.NIGHT_AUDIT);
         return list;
     }
 
