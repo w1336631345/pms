@@ -31,10 +31,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class RoomUsageServiceImpl implements RoomUsageService {
@@ -86,6 +83,16 @@ public class RoomUsageServiceImpl implements RoomUsageService {
     public List<RoomUsageListVo> queryByRoomType(String roomTypeId, LocalDateTime startTime,
                                                  LocalDateTime endDateTime) {
         List<RoomUsageListVo> list = roomUsageDao.queryByRoomType(roomTypeId, startTime, endDateTime);
+        return list;
+    }
+    @Override
+    public List<RoomUsageListVo> queryByRoomType2(String hotelCode, String[] ids, LocalDateTime startTime,
+                                                 LocalDateTime endDateTime) {
+        List<String> lids = null;
+        if (ids != null) {
+            lids = Arrays.asList(ids);
+        }
+        List<RoomUsageListVo> list = roomUsageDao.queryByRoomType2(hotelCode,lids, startTime, endDateTime);
         return list;
     }
 

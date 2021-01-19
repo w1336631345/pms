@@ -62,6 +62,21 @@ public class RoomUsageController extends BaseController<RoomUsage> {
 		return rep;
 	}
 	/**
+	 * 功能描述: <br>mini房态
+	 * 〈〉
+	 * @Param: [ids, startTime, endTime]
+	 * @Return: com.kry.pms.base.HttpResponse<java.util.List<com.kry.pms.model.http.response.room.RoomUsageListVo>>
+	 * @Author: huanghaibin
+	 * @Date: 2021/1/19 17:51
+	 */
+	@GetMapping(path="/roomType/mini")
+	public HttpResponse<List<RoomUsageListVo>> queryByRoomType(String[] ids, String startTime, String endTime) {
+		HttpResponse<List<RoomUsageListVo>> rep = new HttpResponse<List<RoomUsageListVo>>();
+		rep.addData(roomUsageService.queryByRoomType2(getCurrentHotleCode(), ids, DateTimeUtil.parse(startTime),
+				DateTimeUtil.parse(endTime)));
+		return rep;
+	}
+	/**
 	 * 功能描述: <br>换房：房间空闲查询-与上述方法比较（当前时间-离店时间）
 	 * 〈〉
 	 * @Param: [roomTypeId, startTime, endTime]

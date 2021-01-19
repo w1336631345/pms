@@ -11,6 +11,7 @@ import org.springframework.data.jpa.repository.Query;
 
 import com.kry.pms.dao.BaseDao;
 import com.kry.pms.model.persistence.room.RoomUsage;
+import org.springframework.data.repository.query.Param;
 
 public interface RoomUsageDao extends BaseDao<RoomUsage> {
 
@@ -75,5 +76,16 @@ public interface RoomUsageDao extends BaseDao<RoomUsage> {
 			"from RoomUsage a ,GuestRoom b,RoomType d where a.guestRoom = b and b.roomType = d "
 			+ " and d.id = ?1 and a.endDateTime>=?2 and a.startDateTime<=?3")
 	List<RoomUsageListVo> queryByRoomType(String roomTypeId, LocalDateTime startTime, LocalDateTime endDateTime);
+
+	@Query(value = " select tru.id, tgr.room_num roomNum, tru.start_date_time startDateTime, tru.end_date_time endDateTime, \n" +
+			"  trt.`name`, tru.usage_status usageStatus, tru.businesskey, tru.business_info businessInfo, tru.duration, tgr.id \n" +
+			" from t_room_usage tru \n" +
+			"  left join t_guest_room tgr on tru.guest_room_id = tgr.id \n" +
+			"  left join t_room_type trt on tgr.room_type_id = trt.id \n" +
+			" where tgr.hotel_code = '0906006'\n" +
+			" and if(coalesce(:ids, null) is not null, tgr.id in (:ids), 1=1 ) " +
+			"  and tru.start_date_time <= :startTime and tru.end_date_time >= :endDateTime ", nativeQuery = true)
+	List<RoomUsageListVo> queryByRoomType2(@Param("hotelCode")String hotelCode, @Param("ids")List<String> ids,
+										   @Param("startTime")LocalDateTime startTime, @Param("endDateTime")LocalDateTime endDateTime);
 	
 }
