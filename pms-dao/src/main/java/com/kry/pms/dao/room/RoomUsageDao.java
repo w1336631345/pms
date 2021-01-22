@@ -99,7 +99,7 @@ public interface RoomUsageDao extends BaseDao<RoomUsage> {
 			"  t_guest_room_status s, t_floor f, t_building tb \n" +
 			" where a.guest_room_id = b.id and b.room_type_id = d.id \n" +
 			"  and a.guest_room_id = s.guest_room_id and b.floor_id = f.id and f.building_id = tb.id \n" +
-			"  and a.hotel_code = :hotelCode and a.start_date_time <= :startTime and a.end_date_time >= :endDateTime " +
+			"  and a.hotel_code = :hotelCode and a.start_date_time <= :endDateTime and a.end_date_time >= :startTime " +
 
 			"  and if(:will_arrive is not null && :will_arrive != '', s.will_arrive=:will_arrive, 1=1 ) " +
 			"  and if(:will_leave is not null && :will_leave != '', s.will_leave=:will_leave, 1=1 ) " +
