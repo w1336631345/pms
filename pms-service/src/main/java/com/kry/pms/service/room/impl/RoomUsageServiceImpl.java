@@ -30,6 +30,7 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 
@@ -904,6 +905,26 @@ public class RoomUsageServiceImpl implements RoomUsageService {
             data = roomUsageDao.queryGuestRoomUsable(gr.getId(), startTime);
         }
         return data != null;
+    }
+
+    @Override
+    public List<Map<String, Object>> miniRoomStatus(String hotelCode, String startTime, String endDateTime,
+                                                    String will_arrive, String will_leave, String hour_room,
+                                                    String group_, String overdued, String ota, String vip,
+                                                    String floorId, String buidId, String roomTypeId, String roomNum) {
+
+        DateTimeFormatter df = DateTimeFormatter.ofPattern( "yyyy-MM-dd HH:mm:ss" );
+        LocalDateTime st = LocalDateTime.now();
+        LocalDateTime et = LocalDateTime.now().plusDays(30);
+        if(startTime != null){
+            st = LocalDateTime.parse(startTime, df);
+        }
+        if(endDateTime != null){
+            et = LocalDateTime.parse(endDateTime, df);
+        }
+        List<Map<String, Object>> list = roomUsageDao.miniRoomStatus(hotelCode, st, et, will_arrive, will_leave,
+                hour_room, group_, overdued, ota, vip, floorId, buidId, roomTypeId, roomNum);
+        return list;
     }
 
 }

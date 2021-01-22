@@ -97,4 +97,9 @@ public interface RoomUsageService extends BaseService<RoomUsage> {
     boolean changeRoom(UseInfoAble info, GuestRoom newGuestRoom, LocalDateTime changeTime);
 
     boolean addTogether(UseInfoAble useInfoAble);
+
+    List<Map<String, Object>> miniRoomStatus(String hotelCode, String startTime, String endDateTime,
+                                             String will_arrive, String will_leave, String hour_room,
+                                             String group_, String overdued, String ota, String vip,
+                                             String floorId, String buidId, String roomTypeId, String roomNum);
 }

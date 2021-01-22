@@ -1,5 +1,6 @@
 package com.kry.pms.api.room;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -62,7 +63,7 @@ public class RoomUsageController extends BaseController<RoomUsage> {
 		return rep;
 	}
 	/**
-	 * 功能描述: <br>mini房态
+	 * 功能描述: <br>mini房态(停用)
 	 * 〈〉
 	 * @Param: [ids, startTime, endTime]
 	 * @Return: com.kry.pms.base.HttpResponse<java.util.List<com.kry.pms.model.http.response.room.RoomUsageListVo>>
@@ -74,6 +75,25 @@ public class RoomUsageController extends BaseController<RoomUsage> {
 		HttpResponse<List<RoomUsageListVo>> rep = new HttpResponse<List<RoomUsageListVo>>();
 		rep.addData(roomUsageService.queryByRoomType2(getCurrentHotleCode(), ids, DateTimeUtil.parse(startTime),
 				DateTimeUtil.parse(endTime)));
+		return rep;
+	}
+	/**
+	 * 功能描述: <br>mini房态(在用)
+	 * 〈〉
+	 * @Param: [ids, startTime, endTime]
+	 * @Return: com.kry.pms.base.HttpResponse<java.util.List<com.kry.pms.model.http.response.room.RoomUsageListVo>>
+	 * @Author: huanghaibin
+	 * @Date: 2021/1/19 17:51
+	 */
+	@GetMapping(path="/roomType/miniNew")
+	public HttpResponse<List<Map<String, Object>>> miniRoomStatus(String startTime, String endDateTime,
+																  String will_arrive, String will_leave, String hour_room,
+																  String group_, String overdued, String ota, String vip,
+																  String floorId, String buidId, String roomTypeId, String roomNum) {
+		HttpResponse<List<Map<String, Object>>> rep = new HttpResponse<List<Map<String, Object>>>();
+		List<Map<String, Object>> list = roomUsageService.miniRoomStatus(getCurrentHotleCode(), startTime, endDateTime,
+				will_arrive, will_leave, hour_room, group_, overdued, ota, vip, floorId, buidId, roomTypeId, roomNum);
+		rep.setData(list);
 		return rep;
 	}
 	/**
