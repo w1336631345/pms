@@ -87,6 +87,8 @@ public class ShiroConfig {
         Collection<SessionListener> listeners = new ArrayList<SessionListener>();
         listeners.add(new BDSessionListener());
         sessionManager.setSessionListeners(listeners);
+//        sessionManager.setSessionValidationScheduler(new QuartzSessionValidationScheduler());
+//        sessionManager.setSessionValidationScheduler((SessionValidationScheduler) SpringContextUtil.getBean("quartzSessionValidationScheduler"));
         return sessionManager;
     }
 

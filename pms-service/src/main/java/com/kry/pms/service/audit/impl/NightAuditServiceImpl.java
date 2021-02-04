@@ -97,7 +97,7 @@ public class NightAuditServiceImpl implements NightAuditService {
     }
 
     /**
-     * 功能描述: <br>手动夜审入账
+     * 功能描述: <br>手动夜审入账(自动入账在：AutomaticNightTrial)
      * 〈〉
      * @Param: [user, ids]——ids暂时没有用到，为前端可以选着性入账准备
      * @Return: com.kry.pms.base.HttpResponse

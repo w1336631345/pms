@@ -145,6 +145,43 @@ public class AuditNightStepServiceImpl implements AuditNightStepService {
 		hr.addData(list);
 		return hr;
 	}
+	//自动夜审执行过程
+	@Override
+	public HttpResponse findByHotelCodeAndBusinessDateAudit(String code) {
+		HttpResponse hr = new HttpResponse();
+		LocalDate businessDate = businessSeqService.getBuinessDate(code);
+		List<AuditNightStep> list = auditNightStepDao.findByHotelCodeAndIsUsedOrderBySeqNum(code, "Y");
+		HttpResponse httpResponse = auditNightStepHisService.findByHotelCodeAndBusinessDate(code);
+		List<AuditNightStepHis> anss = (List<AuditNightStepHis>) httpResponse.getData();
+		for(int i=0; i<list.size(); i++){
+			AuditNightStepHis ansh = anss.get(i);
+			ansh.setStartTime(LocalDateTime.now());
+			ansh.setResultCode("loading");
+			auditNightStepHisService.add(ansh);
+			AuditNightStep ans = list.get(i);
+			if(ans.getProcessName() == null || "".equals(ans.getProcessName())){
+				//没有过程就不执行
+			}else {
+				List<AuditNightStepParam> params = ans.getParams();
+				try {
+					Map<String, Object> map = auditNightStepParamService.toMapParams(params);
+					List<Map<String, Object>> rl = sqlTemplateService.storedProcedure(code, businessDate, ans.getProcessName(), map);
+					ansh.setResultCode("success");
+				}catch (Exception e) {
+					ansh.setResultCode("error");
+					ansh.setResultMsg(e.getMessage());
+				}
+
+			}
+			ansh.setEndTime(LocalDateTime.now());
+			Duration duration = Duration.between(ansh.getStartTime(),ansh.getEndTime());
+			ansh.setDuration(String.valueOf(duration.toMillis()));
+			auditNightStepHisService.add(ansh);
+		}
+		businessSeqService.plusBuinessDate(code);//营业日期+1
+		hr.addData(list);
+		return hr;
+	}
 
 	@Override
 	public HttpResponse isAudit(String hotelCode) {

@@ -166,7 +166,7 @@ public class nightAuditController extends BaseController {
     }
 
     /**
-     * 功能描述: <br>手动夜审入账
+     * 功能描述: <br>手动夜审入账(自动入账在：AutomaticNightTrial)
      * 〈〉
      * @Param: [ids]
      * @Return: com.kry.pms.base.HttpResponse<java.lang.String>

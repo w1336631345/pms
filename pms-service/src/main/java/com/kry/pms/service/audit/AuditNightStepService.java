@@ -12,6 +12,9 @@ public interface AuditNightStepService extends BaseService<AuditNightStep>{
 
     HttpResponse findByHotelCodeAndBusinessDate(String code);
 
+    //自动夜审执行过程
+    HttpResponse findByHotelCodeAndBusinessDateAudit(String code);
+
     HttpResponse isAudit(String hotelCode);
 
     List<AuditNightStep> batchAdd(List<AuditNightStep> auditNightSteps);

@@ -4,6 +4,7 @@ import com.kry.pms.base.Constants;
 import com.kry.pms.model.ScheduleJobModel;
 import com.kry.pms.service.ReflexQuartzService;
 import com.kry.pms.service.ScheduleJobService;
+import com.kry.pms.service.audit.AuditNightStepService;
 import com.kry.pms.service.audit.NightAuditService;
 import com.kry.pms.service.report.RoomReportService;
 import com.kry.pms.service.sys.BusinessSeqService;
@@ -12,7 +13,6 @@ import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 
@@ -30,6 +30,9 @@ public class ScheduleQuartzJob implements Job {
     ReflexQuartzService reflexQuartzService;
     @Autowired
     ScheduleJobService scheduleJobService;
+    @Autowired
+    AuditNightStepService auditNightStepService;
+
     @Override
     public void execute(JobExecutionContext context) throws JobExecutionException {
         ScheduleJobModel sjm = (ScheduleJobModel) context.getJobDetail().getJobDataMap().get("scheduleJobModel");
@@ -48,7 +51,8 @@ public class ScheduleQuartzJob implements Job {
             //入账到bill
             automaticNightTrial.accountEntryListAll(sjm.getHotelCode());
             //自动生成报表
-//            nightAuditService.addReportAllAuto(hotelCode);
+//            nightAuditService.addReportAllAuto(sjm.getHotelCode());
+            auditNightStepService.findByHotelCodeAndBusinessDateAudit(sjm.getHotelCode());
         }
         if(Constants.quartzType.NORMAL.equals(sjm.getType())){
             System.out.println("调用了其他定时任务执行代码");

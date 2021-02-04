@@ -21,6 +21,7 @@ import com.kry.pms.service.sys.UserService;
 import org.apache.commons.collections4.MapUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -77,6 +78,7 @@ public class AutomaticNightTrial {
         return list;
     }
     //自动夜审入账
+    @Transactional
     public void accountEntryListAll(String hotelCode) {
         List<ScheduleJobModel> listQ = getStartByHotelCode(hotelCode);
         for(int i=0; i<listQ.size(); i++){
@@ -108,17 +110,30 @@ public class AutomaticNightTrial {
                 checkInRecordService.hangUp(id,Constants.Type.EXT_FEE_NONE);
             }
             //查询需要自动入账的记录（注：自动入账为最近营业日期的账，入账后营业日期+1，下面是查询的所有记录，后期整改）
-            List<RoomRecord> list = roomRecordService.accountEntryListAll(listQ.get(i).getHotelCode(), businessDate);
-            billService.putAcountAUTO(list, businessDate);//保存到bill
-            //同时添加入账记录（t_daily_verify）
+//            List<RoomRecord> list = roomRecordService.accountEntryListAll(listQ.get(i).getHotelCode(), businessDate);
+//            billService.putAcountAUTO(list, businessDate);//保存到bill
+//            //同时添加入账记录（t_daily_verify）
+//            DailyVerify dv = new DailyVerify();
+//            dv.setBusinessDate(businessDate);
+//            dv.setType(Constants.auditNightMode.NIGHT_AUDIT_AUTO);//夜审方式，自动
+//            dv.setHotelCode(listQ.get(i).getHotelCode());
+//            dv.setVerifyDate(LocalDate.now());
+//            dv.setCreateDate(LocalDateTime.now());
+//            dv.setStatus("success");
+//            dailyVerifyService.add(dv);
+            List<Map<String, Object>> list = roomRecordService.accountEntryListAllMap(businessDate, listQ.get(i).getHotelCode(), "NO");
+            billService.putAcountMap(list, businessDate, null, "1", listQ.get(i).getHotelCode());
+//        memberIntegralService.auditInInteger(list, businessDate, loginUser);//夜审的房费录入会员积分
+            //入账完成，记录入账记录
             DailyVerify dv = new DailyVerify();
             dv.setBusinessDate(businessDate);
-            dv.setType(Constants.auditNightMode.NIGHT_AUDIT_AUTO);//夜审方式，自动
-            dv.setHotelCode(listQ.get(i).getHotelCode());
+            dv.setType(Constants.auditNightMode.NIGHT_AUDIT_AUTO);//夜审方式，手动
+            dv.setHotelCode(hotelCode);
             dv.setVerifyDate(LocalDate.now());
             dv.setCreateDate(LocalDateTime.now());
             dv.setStatus("success");
             dailyVerifyService.add(dv);
+
             //一个酒店夜审入账完毕后将用户登录禁止状态修改为正常
             for(int u=0; u<users.size(); u++){
                 User user = users.get(i);
