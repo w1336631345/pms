@@ -506,7 +506,7 @@ public class RoomUsageServiceImpl implements RoomUsageService {
                     pru.setPostRoomUsage(nnpru);
                     modify(pru);
                     if (nnpru != null) {
-                        nnpru.setPostRoomUsage(pru);
+                        nnpru.setPreRoomUsage(pru);
                         modify(nnpru);
                     }
                     ru.setPostRoomUsage(null);
@@ -810,6 +810,7 @@ public class RoomUsageServiceImpl implements RoomUsageService {
                     npur.setUniqueIds(null);
                     npur.setPostRoomUsage(ru.getPostRoomUsage());
                     ru.setEndDateTime(endTime);
+                    ru.setStartDateTime(startTime);
                     ru.setBusinessInfo(businessInfo);
                     ru.setBusinesskey(businesskey);
                     ru.setUsageStatus(status);

@@ -552,6 +552,15 @@ public class BillServiceImpl implements BillService {
         return offset(id, employee, shiftCode, true, BILL_OP_OFFSET);
     }
 
+    /**
+     *
+     * @param id
+     * @param employee
+     * @param shiftCode
+     * @param offsetCheck
+     * @param billFlag
+     * @return
+     */
     public DtoResponse<Bill> offset(String id, Employee employee, String shiftCode, boolean offsetCheck, String billFlag) {
         DtoResponse<Bill> rep = new DtoResponse<Bill>();
         Bill bill = findById(id);
