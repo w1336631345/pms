@@ -20,6 +20,8 @@ public interface ScheduleJobDaoRepository extends JpaRepository<ScheduleJobModel
 
     public List<ScheduleJobModel> findByHotelCodeAndStatus(String hotelCode, Integer status);
 
+    List<ScheduleJobModel> findByHotelCodeAndStatusAndType(String hotelCode, Integer status, String type);
+
     public List<ScheduleJobModel> findByGroupNameAndJobNameAndStatus(String groupName, String jobName, Integer status);
 
     public List<ScheduleJobModel> findAllByStatusInOrderByCreateDateDesc(List<Integer> statusList);

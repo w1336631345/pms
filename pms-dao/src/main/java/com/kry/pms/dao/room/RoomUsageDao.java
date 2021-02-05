@@ -11,6 +11,7 @@ import org.springframework.data.jpa.repository.Query;
 
 import com.kry.pms.dao.BaseDao;
 import com.kry.pms.model.persistence.room.RoomUsage;
+import org.springframework.data.repository.query.Param;
 
 public interface RoomUsageDao extends BaseDao<RoomUsage> {
 
@@ -75,5 +76,46 @@ public interface RoomUsageDao extends BaseDao<RoomUsage> {
 			"from RoomUsage a ,GuestRoom b,RoomType d where a.guestRoom = b and b.roomType = d "
 			+ " and d.id = ?1 and a.endDateTime>=?2 and a.startDateTime<=?3")
 	List<RoomUsageListVo> queryByRoomType(String roomTypeId, LocalDateTime startTime, LocalDateTime endDateTime);
+
+	@Query(value = " select tru.id, tgr.room_num roomNum, tru.start_date_time startDateTime, tru.end_date_time endDateTime, \n" +
+			"  trt.`name`, tru.usage_status usageStatus, tru.businesskey, tru.business_info businessInfo, tru.duration, tgr.id \n" +
+			" from t_room_usage tru \n" +
+			"  left join t_guest_room tgr on tru.guest_room_id = tgr.id \n" +
+			"  left join t_room_type trt on tgr.room_type_id = trt.id \n" +
+			" where tgr.hotel_code = :hotelCode \n" +
+			" and if(coalesce(:ids, null) is not null, tgr.id in (:ids), 1=1 ) " +
+			"  and tru.start_date_time <= :startTime and tru.end_date_time >= :endDateTime ", nativeQuery = true)
+	List<RoomUsageListVo> queryByRoomType2(@Param("hotelCode")String hotelCode, @Param("ids")List<String> ids,
+										   @Param("startTime")LocalDateTime startTime, @Param("endDateTime")LocalDateTime endDateTime);
+
+	@Query(nativeQuery = true, value = " select \n" +
+			"  s.will_arrive, s.will_leave, s.hour_room, s.group_, s.overdued, s.ota, s.vip,\n" +
+			"  s.room_status, f.id floorId, f.`name` floorName, tb.id buidId, tb.`name` buildName,\n" +
+			"  a.id, b.room_num roomNum, d.`name` roomTypeName, " +
+			"  DATE_FORMAT(a.start_date_time,'%Y-%m-%d %T') startDateTime, " +
+			"  DATE_FORMAT(a.end_date_time,'%Y-%m-%d %T') endDateTime, \n" +
+			"  a.usage_status usageStatus, a.businesskey, a.business_info businessInfo, a.duration, b.id guestRoomId, d.id roomTypeId \n" +
+			" from t_room_usage a, t_guest_room b, t_room_type d, \n" +
+			"  t_guest_room_status s, t_floor f, t_building tb \n" +
+			" where a.guest_room_id = b.id and b.room_type_id = d.id \n" +
+			"  and a.guest_room_id = s.guest_room_id and b.floor_id = f.id and f.building_id = tb.id \n" +
+			"  and a.hotel_code = :hotelCode and a.start_date_time <= :endDateTime and a.end_date_time >= :startTime " +
+
+			"  and if(:will_arrive is not null && :will_arrive != '', s.will_arrive=:will_arrive, 1=1 ) " +
+			"  and if(:will_leave is not null && :will_leave != '', s.will_leave=:will_leave, 1=1 ) " +
+			"  and if(:hour_room is not null && :hour_room != '', s.hour_room=:hour_room, 1=1 ) " +
+			"  and if(:group_ is not null && :group_ != '', s.group_=:group_, 1=1 ) " +
+			"  and if(:overdued is not null && :overdued != '', s.overdued=:overdued, 1=1 ) " +
+			"  and if(:ota is not null && :ota != '', s.ota=:ota, 1=1 ) " +
+			"  and if(:vip is not null && :vip != '', s.vip=:vip, 1=1 ) " +
+
+			"  and if(:floorId is not null && :floorId != '', f.id=:floorId, 1=1 ) " +
+			"  and if(:buidId is not null && :buidId != '', tb.id=:buidId, 1=1 ) " +
+			"  and if(:roomTypeId is not null && :roomTypeId != '', d.id=:roomTypeId, 1=1 ) " +
+			"  and if(:roomNum is not null && :roomNum != '', b.room_num=:roomNum, 1=1 )  ")
+	List<Map<String, Object>> miniRoomStatus(@Param("hotelCode")String hotelCode,@Param("startTime")LocalDateTime startTime, @Param("endDateTime")LocalDateTime endDateTime,
+											 @Param("will_arrive")String will_arrive,@Param("will_leave")String will_leave,@Param("hour_room")String hour_room,
+											 @Param("group_")String group_,@Param("overdued")String overdued,@Param("ota")String ota,@Param("vip")String vip,
+											 @Param("floorId")String floorId,@Param("buidId")String buidId,@Param("roomTypeId")String roomTypeId,@Param("roomNum")String roomNum);
 	
 }

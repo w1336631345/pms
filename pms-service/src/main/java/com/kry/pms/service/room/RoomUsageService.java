@@ -19,6 +19,9 @@ public interface RoomUsageService extends BaseService<RoomUsage> {
     List<RoomUsageListVo> queryByRoomType(String roomTypeId, LocalDateTime startTime,
                                           LocalDateTime endDateTime);
 
+    List<RoomUsageListVo> queryByRoomType2(String hotelCode, String[] ids, LocalDateTime startTime,
+                                           LocalDateTime endDateTime);
+
     List<RoomUsageListVo> queryUsableGuestRooms(String roomTypeId, LocalDateTime startTime, LocalDateTime endDateTime);
 
 	public List<RoomUsageListVo> queryUsableGuestRoomsByBookItemId(String bookItemId);
@@ -94,4 +97,9 @@ public interface RoomUsageService extends BaseService<RoomUsage> {
     boolean changeRoom(UseInfoAble info, GuestRoom newGuestRoom, LocalDateTime changeTime);
 
     boolean addTogether(UseInfoAble useInfoAble);
+
+    List<Map<String, Object>> miniRoomStatus(String hotelCode, String startTime, String endDateTime,
+                                             String will_arrive, String will_leave, String hour_room,
+                                             String group_, String overdued, String ota, String vip,
+                                             String floorId, String buidId, String roomTypeId, String roomNum);
 }

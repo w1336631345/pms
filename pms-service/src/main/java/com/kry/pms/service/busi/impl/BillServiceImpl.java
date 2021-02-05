@@ -458,11 +458,11 @@ public class BillServiceImpl implements BillService {
         bill.setShiftCode("3");
         if ("M".equals(type)) {
             bill.setOperationRemark("夜审手动入账");
+            bill.setOperationEmployee(emp);
         }
         if ("A".equals(type)) {
             bill.setOperationRemark("自动夜审入账");
         }
-        bill.setOperationEmployee(emp);
         bill.setRoomRecordId(roomRecordId);
         bill.setBusinessDate(businessDate);
         add(bill);
@@ -488,25 +488,6 @@ public class BillServiceImpl implements BillService {
             rr.setIsAccountEntry("PAY");// 入账成功后roomRecord里面入账状态改为pay
             roomRecordService.modify(rr);
         }
-//        for (int i = 0; i < ids.size(); i++) {
-//            String id = ids.get(i).getId();
-//            RoomRecord rr = roomRecordService.findById(id);
-//            Product p = new Product();
-//            p.setId("10000");
-//            Bill bill = new Bill();
-//            bill.setProduct(p);
-//            bill.setTotal(rr.getCost());
-//            bill.setCost(rr.getCost());
-//            bill.setQuantity(1);
-//            bill.setAccount(rr.getCheckInRecord().getAccount());
-//            bill.setHotelCode(rr.getHotelCode());
-//            bill.setOperationRemark("夜审自动入账");
-//            bill.setRoomRecordId(rr.getId());
-//            bill.setBusinessDate(businessDate);
-//            add(bill);
-//            rr.setIsAccountEntry("PAY");// 入账成功后roomRecord里面入账状态改为pay
-//            roomRecordService.modify(rr);
-//        }
     }
 
     @Transactional

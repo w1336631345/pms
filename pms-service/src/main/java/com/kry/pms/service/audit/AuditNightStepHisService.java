@@ -9,6 +9,8 @@ import java.util.List;
 
 public interface AuditNightStepHisService extends BaseService<AuditNightStepHis>{
 
+    List<AuditNightStepHis> resultRefresh(String code, String businessDate);
+
     HttpResponse findByHotelCodeAndBusinessDate(String code);
 
 }

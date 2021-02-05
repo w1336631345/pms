@@ -49,8 +49,8 @@ public class ScheduleJobModel {
 
     @Column(columnDefinition = "varchar(64) COMMENT '酒店编码'")
     private String hotelCode;
-    @Column(columnDefinition = "varchar(32) default 'AUDIT' COMMENT 'ALL全部执行  AUDIT夜审入账 NORMAL平常的'")
-    private String type_;
+    @Column(name = "type_", columnDefinition = "varchar(32) default 'AUDIT' COMMENT 'ALL全部执行  AUDIT夜审入账 NORMAL平常的'")
+    private String type;
 
     //自定义定时任务配置
     //1、class_path配置类名全路径，如：com.kry.pms.service.quratz.impl.QuartzSetServiceImpl

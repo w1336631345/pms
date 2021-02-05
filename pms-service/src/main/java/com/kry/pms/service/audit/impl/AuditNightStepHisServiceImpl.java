@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -50,7 +51,14 @@ public class AuditNightStepHisServiceImpl implements AuditNightStepHisService {
 
 	@Override
 	public AuditNightStepHis findById(String id) {
-		return null;
+		return auditNightStepHisDao.getOne(id);
+	}
+	@Override
+	public List<AuditNightStepHis> resultRefresh(String code, String businessDate) {
+		DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+		LocalDate date2 = LocalDate.parse(businessDate, fmt);
+		List<AuditNightStepHis> list = auditNightStepHisDao.findByHotelCodeAndBusinessDate(code, date2);
+		return list;
 	}
 
 	@Override

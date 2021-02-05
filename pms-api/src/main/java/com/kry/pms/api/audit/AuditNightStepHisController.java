@@ -66,4 +66,35 @@ public class AuditNightStepHisController extends BaseController<AuditNightStepHi
 		return hr;
 	}
 
+	/**
+	 * 功能描述: <br>查询结果1
+	 * 〈〉
+	 * @Param: [id]
+	 * @Return: com.kry.pms.base.HttpResponse<com.kry.pms.model.persistence.audit.AuditNightStepHis>
+	 * @Author: huanghaibin
+	 * @Date: 2021/1/14 11:25
+	 */
+	@GetMapping(path = "/refreshOne")
+	public HttpResponse<AuditNightStepHis> refreshOne(String id) {
+		HttpResponse hr = new HttpResponse();
+		AuditNightStepHis auditNightStepHis = auditNightStepHisService.findById(id);
+		hr.setData(auditNightStepHis);
+		return hr;
+	}
+	/**
+	 * 功能描述: <br>查询结果all
+	 * 〈〉
+	 * @Param:
+	 * @Return:
+	 * @Author: huanghaibin
+	 * @Date: 2021/1/14 11:25
+	 */
+	@GetMapping(path = "/refreshAll")
+	public HttpResponse<List<AuditNightStepHis>> refreshAll(String businessDate) {
+		HttpResponse hr = new HttpResponse();
+		List<AuditNightStepHis> list = auditNightStepHisService.resultRefresh(getCurrentHotleCode(), businessDate);
+		hr.setData(list);
+		return hr;
+	}
+
 }
