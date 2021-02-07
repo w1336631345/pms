@@ -107,6 +107,8 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
     ReceptionService receptionService;
     @Autowired
     MsgSendService msgSendService;
+    @Autowired
+    CreditGrantingRecordService creditGrantingRecordService;
 
     @Override
     public CheckInRecord add(CheckInRecord checkInRecord) {
@@ -784,6 +786,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
             } else {
                 if (Constants.Status.CHECKIN_RECORD_STATUS_OUT_UNSETTLED.equals(cir.getStatus())) {
                     cir.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_CHECK_OUT);
+//                    creditGrantingRecordService.disableAllCreditGranting(cir.getAccount());
                 } else if (Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION.equals(cir.getStatus())) {
                     //S状态 不需要调整房类资源
                 } else {
@@ -798,6 +801,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                     cir.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_CHECK_OUT);
                     checkRoomRecord(cir);
                 }
+
                 modify(cir);
             }
         } else {
@@ -1546,6 +1550,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                     asv.setType("room");
                     asv.setSettleType(Constants.Type.SETTLE_TYPE_ROOM);
                     asv.setRoomNum(acc.getRoomNum());
+                    asv.setGuestRoomId(cir.getGuestRoom().getId());
                     asv.setId(cir.getGuestRoom().getId());
                     asv.setName(acc.getRoomNum());
                     asv.setChildren(new ArrayList<AccountSummaryVo>());
@@ -1553,7 +1558,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                 } else {
                     asv = asvm.get(acc.getRoomNum());
                 }
-                asv.getChildren().add(new AccountSummaryVo(cir));
+                asv.getChildren().add(new AccountSummaryVo(cir,cir.getGuestRoom().getId()));
             }
         }
         return asvm.values();

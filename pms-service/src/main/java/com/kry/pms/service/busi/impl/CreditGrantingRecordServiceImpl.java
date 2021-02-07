@@ -151,6 +151,17 @@ public class CreditGrantingRecordServiceImpl implements CreditGrantingRecordServ
     }
 
     @Override
+    public boolean disableAllCreditGranting(Account account) {
+        List<CreditGrantingRecord> accountRecord = creditGrantingRecordDao.findByAccountId(account.getId());
+        if (accountRecord != null && accountRecord.size() > 0) {
+            for (CreditGrantingRecord record : accountRecord) {
+                cancle(record.getId());
+            }
+        }
+        return true;
+    }
+
+    @Override
     public DtoResponse<CreditGrantingRecord> cancle(String id) {
         DtoResponse<CreditGrantingRecord> rep = new DtoResponse<>();
         CreditGrantingRecord creditGrantingRecord = creditGrantingRecordDao.findById(id).get();

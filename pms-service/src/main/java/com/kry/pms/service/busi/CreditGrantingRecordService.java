@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.kry.pms.base.DtoResponse;
 import com.kry.pms.model.persistence.busi.CreditGrantingRecord;
+import com.kry.pms.model.persistence.sys.Account;
 import com.kry.pms.service.BaseService;
 
 public interface CreditGrantingRecordService extends BaseService<CreditGrantingRecord>{
@@ -14,6 +15,7 @@ public interface CreditGrantingRecordService extends BaseService<CreditGrantingR
 
 	DtoResponse<CreditGrantingRecord> createRecord(CreditGrantingRecord creditGrantingRecord);
 
+	boolean disableAllCreditGranting(Account account);
 
 	DtoResponse<CreditGrantingRecord> cancle(String id);
 }

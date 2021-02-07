@@ -86,4 +86,14 @@ public class AccountSummaryVo {
         this.arriveTime = cir.getActualTimeOfArrive() != null ? cir.getActualTimeOfArrive() : cir.getArriveTime();
         this.leaveTime = cir.getActualTimeOfLeave() != null ? cir.getActualTimeOfLeave() : cir.getLeaveTime();
     }
+    public AccountSummaryVo(CheckInRecord cir,String guestRoomId) {
+        this(cir.getAccount(), null);
+        this.roomStatus = cir.getStatus();
+        this.orderNum = cir.getOrderNum();
+        this.guestRoomId = guestRoomId;
+        this.personalPrice = cir.getPersonalPrice();
+        this.cirId = cir.getId();
+        this.arriveTime = cir.getActualTimeOfArrive() != null ? cir.getActualTimeOfArrive() : cir.getArriveTime();
+        this.leaveTime = cir.getActualTimeOfLeave() != null ? cir.getActualTimeOfLeave() : cir.getLeaveTime();
+    }
 }

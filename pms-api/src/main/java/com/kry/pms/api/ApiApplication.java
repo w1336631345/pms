@@ -22,6 +22,8 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EnableTransactionManagement
 @EntityScan(basePackages = { "com.kry.pms.model" })
 @EnableCaching
+
+
 public class ApiApplication {
 	public static void main(String[] args) throws Exception {
 		SpringApplication.run(ApiApplication.class, args);
