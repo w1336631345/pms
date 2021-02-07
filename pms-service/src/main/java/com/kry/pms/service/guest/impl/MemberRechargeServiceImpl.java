@@ -78,6 +78,9 @@ public class MemberRechargeServiceImpl implements MemberRechargeService {
 	public HttpResponse recharge(MemberRecharge entity) {
 		HttpResponse hr = new HttpResponse();
 		MemberInfo memberInfo = memberInfoDao.findByHotelCodeAndCardNum(entity.getHotelCode(), entity.getCardNum());
+		if(memberInfo == null){
+			return hr.error("未保存会员前不能充值");
+		}
 		if(entity.getAmount() == null){
 			entity.setAmount(0.0);
 		}
@@ -92,7 +95,8 @@ public class MemberRechargeServiceImpl implements MemberRechargeService {
 
 		//修改账号金额，所有（充值+赠送）
 		Account account = memberInfo.getAccount();
-		account.setTotal(account.getTotal() + memberInfo.getBalance() + memberInfo.getGivePrice());
+//		account.setTotal(account.getTotal() + memberInfo.getBalance() + memberInfo.getGivePrice());
+		account.setTotal(account.getTotal() + entity.getAmount() + entity.getGiveAmount());
 		accountService.modify(account);
 
 		//入账

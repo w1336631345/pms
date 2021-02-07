@@ -139,6 +139,7 @@ public class RoomChangeRecordServiceImpl implements RoomChangeRecordService {
 			updateLog.setOldValue(entity.getOldRoomNum());
 			updateLog.setNewValue(entity.getNewRoomNum());
 			updateLog.setHotelCode(entity.getHotelCode());
+			updateLog.setProductType("GO");
 			updateLogService.add(updateLog);//记录换房日志
 		}
 		hr.setData(roomChangeRecordDao.save(entity));

@@ -17,7 +17,7 @@ public class UpdateLog extends PersistenceModel {
     @Column
     private String product;
     @Column
-    private String productType;
+    private String productType;//GO主单日志，RS房态日志
     @Column
     private String productName;
     @Column
