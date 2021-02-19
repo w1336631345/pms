@@ -209,4 +209,6 @@ public interface CheckInRecordService extends BaseService<CheckInRecord> {
     int nowLiveIn(String hotelCode);
 
     int nowCheckOut(String hotelCode, String leaveTime);
+
+    int updateRemark(String remark, String cirId);
 }

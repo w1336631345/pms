@@ -7,6 +7,7 @@ import com.kry.pms.model.persistence.guest.Customer;
 import com.kry.pms.model.persistence.room.GuestRoom;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Propagation;
@@ -436,4 +437,8 @@ public interface CheckInRecordDao extends BaseDao<CheckInRecord> {
             "  where hotel_code = ?1 and `status` = 'O' and type_ = 'C' \n" +
             " and DATE_FORMAT(actual_time_of_leave,'%Y-%m-%d') = ?2  ")
     int nowCheckOut(String hotelCode, String leaveTime);
+
+    @Modifying
+    @Query(value = " update t_checkin_record set remark = ?1 where id = ?2 ",nativeQuery = true)
+    int updateRemark(String remark, String cirId);
 }

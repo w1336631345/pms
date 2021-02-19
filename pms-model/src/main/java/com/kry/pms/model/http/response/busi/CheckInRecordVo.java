@@ -28,8 +28,9 @@ public class CheckInRecordVo {
     private AccountSummaryVo accountSummaryVo;
     private Double total;
 
+    private String remark;
 
-    public CheckInRecordVo() {
+   public CheckInRecordVo() {
 
     }
 
@@ -59,6 +60,9 @@ public class CheckInRecordVo {
         }
         if (cir.getActualTimeOfArrive() != null) {
             cirv.setArriveTime(cir.getActualTimeOfArrive());
+        }
+        if (cir.getRemark() != null) {
+            cirv.setRemark(cir.getRemark());
         }
         return cirv;
 

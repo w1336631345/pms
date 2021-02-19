@@ -2987,4 +2987,11 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
         return count;
     }
 
+    @Override
+    @Transactional
+    public int updateRemark(String remark, String cirId){
+        int count = checkInRecordDao.updateRemark(remark, cirId);
+        return count;
+    }
+
 }
