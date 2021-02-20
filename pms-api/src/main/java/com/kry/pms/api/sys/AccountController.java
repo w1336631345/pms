@@ -92,5 +92,13 @@ public class AccountController extends BaseController<Account> {
         return rep.addData(accountService.findByHotelCodeAndType(getCurrentHotleCode()));
     }
 
+    @GetMapping(path = "/getById")
+    public HttpResponse<Account> getById(String id) {
+        HttpResponse<Account> rep = new HttpResponse<Account>();
+        Account a = accountService.findById(id);
+        rep.setData(a);
+        return rep;
+    }
+
 
 }

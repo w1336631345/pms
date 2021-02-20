@@ -360,12 +360,13 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                     for(int m = 0; m<recordDates.size(); m++){
                         RoomRecord rr = null;
                         rr = new RoomRecord();
-                        rr.setCheckInRecord(checkInRecord);
-                        rr.setHotelCode(checkInRecord.getHotelCode());
-                        rr.setCustomer(checkInRecord.getCustomer());
-                        rr.setGuestRoom(checkInRecord.getGuestRoom());
-                        rr.setCost(checkInRecord.getPersonalPrice());
-                        rr.setCostRatio(checkInRecord.getPersonalPercentage());
+//                        rr.setCheckInRecord(checkInRecord);
+                        rr.setCheckInRecord(together.get(t));
+                        rr.setHotelCode(together.get(t).getHotelCode());
+                        rr.setCustomer(together.get(t).getCustomer());
+                        rr.setGuestRoom(together.get(t).getGuestRoom());
+                        rr.setCost(together.get(t).getPersonalPrice());
+                        rr.setCostRatio(together.get(t).getPersonalPercentage());
                         rr.setRecordDate(recordDates.get(m));
                         roomRecordService.add(rr);
                     }
