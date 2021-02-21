@@ -431,10 +431,12 @@ public class BillServiceImpl implements BillService {
                     addAudit(p, -setMealCost, setMealAccount, hotelCode, emp, shiftCode, null, "M", businessDate, roomNum, roomId);
                 }
             }
-            BookkeepingSet bs = bookkeepingSetService.isExist(hotelCode, mainAccountId, p.getId());
-            //如果设置了团付设置，入账到主账号
-            if (bs != null) {
-                cirAccount.setId(mainAccountId);
+            if(mainAccountId != null){
+                BookkeepingSet bs = bookkeepingSetService.isExist(hotelCode, mainAccountId, p.getId());
+                //如果设置了团付设置，入账到主账号
+                if (bs != null) {
+                    cirAccount.setId(mainAccountId);
+                }
             }
             addAudit(p, cost, cirAccount, hotelCode, emp, shiftCode, id, "M", businessDate, roomNum, roomId);
             // 入账成功后roomRecord里面入账状态改为pay
