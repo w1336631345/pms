@@ -3,6 +3,7 @@ package com.kry.pms.service.busi.impl;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.kry.pms.model.http.request.busi.GuestRoomOperation;
 import com.kry.pms.service.room.RoomStatisticsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
@@ -74,16 +75,16 @@ public class RoomLockRecordServiceImpl implements RoomLockRecordService {
         return convent(roomLockRecordDao.findAll(ex, req));
     }
 
-    private RoomLockRecord createRecord(GuestRoom gr, LocalDateTime startTime, LocalDateTime endTime,
-                                       String reason, String endToStatus,String type) {
+    private RoomLockRecord createRecord(GuestRoom gr, GuestRoomOperation op,String type) {
         RoomLockRecord rlr = new RoomLockRecord();
         rlr.setGuestRoom(gr);
         rlr.setHotelCode(gr.getHotelCode());
         rlr.setStatus(Constants.Status.NORMAL);
-        rlr.setStartTime(startTime);
-        rlr.setEndTime(endTime);
-        rlr.setReason(reason);
-        rlr.setEndToStatus(endToStatus);
+        rlr.setStartTime(op.getStartTime());
+        rlr.setEndTime(op.getEndTime());
+        rlr.setReason(op.getReasonId());
+        rlr.setEndToStatus(op.getEndToStatus());
+        rlr.setRemark(op.getRemark());
         rlr.setType(type);
         return rlr;
     }
@@ -107,8 +108,8 @@ public class RoomLockRecordServiceImpl implements RoomLockRecordService {
     }
 
     @Override
-    public boolean lockRoom(GuestRoom gr, LocalDateTime startTime, LocalDateTime endTime, String reasonId, String endToStatus,String type) {
-        RoomLockRecord rlr = createRecord(gr, startTime, endTime, reasonId, endToStatus,type);
+    public boolean lockRoom(GuestRoom gr, GuestRoomOperation op, String type) {
+        RoomLockRecord rlr = createRecord(gr, op,type);
         rlr = add(rlr);
         return roomStatisticsService.lock(rlr);
     }

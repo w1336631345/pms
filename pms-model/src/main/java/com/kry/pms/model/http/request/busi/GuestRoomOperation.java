@@ -18,4 +18,5 @@ public class GuestRoomOperation {
 	private String operationEmployeeId;
 	private LocalDateTime startTime;
 	private LocalDateTime endTime;
+	private String remark;
 }

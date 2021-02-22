@@ -3,6 +3,7 @@ package com.kry.pms.service.busi;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.kry.pms.model.http.request.busi.GuestRoomOperation;
 import com.kry.pms.model.persistence.busi.RoomLockRecord;
 import com.kry.pms.model.persistence.room.GuestRoom;
 import com.kry.pms.service.BaseService;
@@ -13,5 +14,5 @@ public interface RoomLockRecordService extends BaseService<RoomLockRecord>{
 
 	List<RoomLockRecord> findByGuestRoomAndStatus(GuestRoom guestRoom, String status);
 
-	boolean lockRoom(GuestRoom gr, LocalDateTime startTime, LocalDateTime endTime, String reasonId, String endToStatus,String type);
+    boolean lockRoom(GuestRoom gr, GuestRoomOperation op, String type);
 }
