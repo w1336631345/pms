@@ -185,6 +185,7 @@ public class CheckInRecord extends PersistenceModel {
 	@PropertyMsg("房价保密")
 	private Boolean isSecrecy;//房价是否保密
 	@Column
+	@PropertyMsg("外订单号")
 	private String externalOrder;//外部订单号
 	@Column
 	@PropertyMsg("VIP")

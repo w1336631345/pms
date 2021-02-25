@@ -166,7 +166,7 @@ public class AccountServiceImpl implements AccountService {
                     }
                 }
                 newTotal = account.getTotal();
-                if ((oldTotal > 0 && newTotal < 0) || (oldTotal < 0 && newTotal >= 0)) {
+                if ((oldTotal > 0 && newTotal <= 0) || (oldTotal <= 0 && newTotal > 0)) {
                     if (cir != null && cir.getGuestRoom() != null) {
                         guestRoomStatusService.changeOverdued(cir.getGuestRoom(), newTotal > 0);
                     }

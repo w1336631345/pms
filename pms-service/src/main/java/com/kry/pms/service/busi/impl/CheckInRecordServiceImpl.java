@@ -1039,17 +1039,24 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
         List<CheckInRecord> cirs = new ArrayList<>();
         List<CheckInRecord> list = cirlb.getCirs();
         String roomLinkId = null;
+        String orderNum = null;
         if (cirlb.getIsRoomLink()) {
             RoomLink rl = new RoomLink();
             rl.setDeleted(Constants.DELETED_FALSE);
+            rl.setHotelCode(user.getHotelCode());
             roomLinkDao.save(rl);
             roomLinkId = rl.getId();
+            orderNum = businessSeqService.fetchNextSeqNum(user.getHotelCode(), Constants.Key.BUSINESS_ORDER_NUM_SEQ_KEY);
         }
-        String orderNum = businessSeqService.fetchNextSeqNum(user.getHotelCode(), Constants.Key.BUSINESS_ORDER_NUM_SEQ_KEY);
         boolean nativeUrl = false;
         for (int i = 0; i < list.size(); i++) {
-            list.get(i).setOrderNum(orderNum);
-            list.get(i).setRoomLinkId(roomLinkId);
+            if(cirlb.getIsRoomLink()){
+                list.get(i).setOrderNum(orderNum);//前端勾选了联房按钮，就用同一个订单号
+                list.get(i).setRoomLinkId(roomLinkId);
+            }else {//否则就是不联房，用不同的订单号
+                orderNum = businessSeqService.fetchNextSeqNum(user.getHotelCode(), Constants.Key.BUSINESS_ORDER_NUM_SEQ_KEY);
+                list.get(i).setOrderNum(orderNum);
+            }
             list.get(i).setHotelCode(user.getHotelCode());
             HttpResponse hr2 = bookByRoomTypeTest(list.get(i), user);
             if (hr2.getStatus() == 9999) {
