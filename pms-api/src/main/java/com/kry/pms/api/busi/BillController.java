@@ -84,7 +84,7 @@ public class BillController extends BaseController<Bill> {
 //		HttpResponse<List> rep = new HttpResponse<List>();
 //		return rep.addData(billService.queryByBo(query));
 //	}
-	
+	//冲账
 	@GetMapping(path = "/offset/{id}")
 	public HttpResponse<String> offset(@PathVariable String id) throws InstantiationException, IllegalAccessException{
 		HttpResponse<String> rep = new HttpResponse<String>();
