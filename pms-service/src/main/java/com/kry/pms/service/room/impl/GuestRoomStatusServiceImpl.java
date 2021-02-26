@@ -381,7 +381,15 @@ public class GuestRoomStatusServiceImpl implements GuestRoomStatusService {
     public GuestRoomStatusVo detailGuestRoom(String id) {
         GuestRoomStatus status = guestRoomStatusDao.findByGuestRoomId(id);
         inflatRecordInfo(status);
-        return GuestRoomStatusVo.covert(status);
+        List<String> roomRums = null;
+        if(status.getCurrentCheckInRecords() != null && !status.getCurrentCheckInRecords().isEmpty()){
+            List<CheckInRecord> list = status.getCurrentCheckInRecords();
+            String roomLinkId = list.get(0).getRoomLinkId();
+            roomRums = checkInRecordService.findRoomNumByLink(roomLinkId);
+        }
+        GuestRoomStatusVo grsv = GuestRoomStatusVo.covert(status);
+        grsv.setLinkedRoomNums(roomRums);
+        return grsv;
     }
 
     @Override

@@ -27,6 +27,7 @@ public class GuestRoomStatusVo implements Serializable {
 	private Boolean repairRoom;// 维修
 	private Boolean overdued;// 欠费
 	private Boolean ota;
+	private List<String> linkedRoomNums;//联房的房间号
 	private List<CheckInRecordVo> currentCheckInRecord;
 	private List<CheckInRecordVo> willCheckInRecord;
 	private List<RoomLockRecordVo> lockRecord;

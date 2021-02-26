@@ -1521,6 +1521,11 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
         List<AccountSummaryVo> list = checkInRecordDao.querySummeryByOrderNumAndType(hotelCode, orderNum, type);
         return accountListToTree(list);
     }
+    @Override
+    public Collection<AccountSummaryVo> getAccountSummaryByOrderNum3(String hotelCode, String orderNum, String type, String fitType) {
+        List<AccountSummaryVo> list = checkInRecordDao.querySummeryByOrderNumAndType3(hotelCode, orderNum, type, fitType);
+        return accountListToTree(list);
+    }
 
     private Collection<AccountSummaryVo> accountListToTree(List<AccountSummaryVo> list) {
         Map<String, AccountSummaryVo> asvm = new HashMap<>();
@@ -1800,6 +1805,8 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
             CheckInRecord cir = findById(ids[i]);
             if (cir.getMainRecord() != null) {
                 mainRecordId = cir.getMainRecord().getId();
+            }else if("P".equals(cir.getFitType())){//如果没有主单，多半是单人散客或散客同住
+
             }else {
                 continue;
             }
@@ -2438,6 +2445,11 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
     @Override
     public List<CheckInRecord> findByGuestRoomAndStatusAndDeleted(GuestRoom guestRoom, String status, int deleted) {
         return checkInRecordDao.findByGuestRoomAndStatusAndDeleted(guestRoom, status, deleted);
+    }
+
+    @Override
+    public List<String> findRoomNumByLink(String roomLinkId) {
+        return checkInRecordDao.findRoomNumByLink(roomLinkId);
     }
 
     @Override

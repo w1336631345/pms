@@ -380,6 +380,12 @@ public class ReceptionServiceImpl implements ReceptionService {
 				asv.setId(cir.getRoomLinkId());
 				asv.setSettleType(Constants.Type.SETTLE_TYPE_LINK);
 				asv.setChildren(data);
+			}else if("R".equals(cir.getType()) && "P".equals(cir.getFitType())){//预留单
+				Collection<AccountSummaryVo> data = checkInRecordService
+						.getAccountSummaryByOrderNum3(cir.getHotelCode(),cir.getOrderNum(), Constants.Type.CHECK_IN_RECORD_RESERVE, "P");
+				if (data != null && !data.isEmpty()) {
+					asv = (AccountSummaryVo) data.toArray()[0];
+				}
 			}else{
 				Collection<AccountSummaryVo> data = checkInRecordService
 						.getAccountSummaryByOrderNum2(cir.getHotelCode(),cir.getOrderNum(), Constants.Type.CHECK_IN_RECORD_CUSTOMER);

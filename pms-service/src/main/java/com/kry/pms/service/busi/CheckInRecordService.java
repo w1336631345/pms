@@ -23,6 +23,8 @@ public interface CheckInRecordService extends BaseService<CheckInRecord> {
 
     Collection<AccountSummaryVo> getAccountSummaryByOrderNum2(String hotelCode,String orderNum, String type);
 
+    Collection<AccountSummaryVo> getAccountSummaryByOrderNum3(String hotelCode, String orderNum, String type, String fitType);
+
     public PageResponse<CheckInRecordListVo> querySummaryList(PageRequest<CheckInRecord> req);
 
     @Transactional
@@ -164,6 +166,8 @@ public interface CheckInRecordService extends BaseService<CheckInRecord> {
 
     public List<CheckInRecord> findByGuestRoomAndStatusAndDeleted(String guestRoomId,
                                                                   String checkinRecordStatusCheckIn, int deletedFalse);
+
+    List<String> findRoomNumByLink(String roomLinkId);
 
     public List<CheckInRecord> findTodayCheckInRecord(GuestRoom guestRoom, String status);
 
