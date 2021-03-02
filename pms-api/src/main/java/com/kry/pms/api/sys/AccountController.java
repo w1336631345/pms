@@ -99,6 +99,21 @@ public class AccountController extends BaseController<Account> {
         rep.setData(a);
         return rep;
     }
+    /**
+     * 功能描述: <br>根据id查询账户信息，增加查询了客户的市场属性
+     * 〈〉
+     * @Param: '
+     * @Return: com.kry.pms.base.HttpResponse<com.kry.pms.model.persistence.sys.Account>
+     * @Author: huanghaibin
+     * @Date: 2021/3/1 13:49
+     */
+    @GetMapping(path = "/getByIdAndCustMarket")
+    public HttpResponse<Account> getByIdAndCustMarket(String id) {
+        HttpResponse<Account> rep = new HttpResponse<Account>();
+        Account a = accountService.getByIdAndCustMarket(id);
+        rep.setData(a);
+        return rep;
+    }
 
 
 }

@@ -28,7 +28,8 @@ public class Account extends PersistenceModel {
 	@Column
 	private Double total;//余额
 	@Column(name="type_")
-	private String type;
+	private String type;//账号类型，如AR账，个人帐，公司账
+	private String typeInfo;//账务类别明细：如AR账又分：旅行社，公司，网络OTA等
 	@Column
 	private String roomId;
 	@Column

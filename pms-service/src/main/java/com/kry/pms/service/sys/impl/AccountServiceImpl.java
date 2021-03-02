@@ -2,6 +2,7 @@ package com.kry.pms.service.sys.impl;
 
 import com.kry.pms.base.*;
 import com.kry.pms.dao.busi.RoomRecordDao;
+import com.kry.pms.dao.guest.CustMarketDao;
 import com.kry.pms.dao.sys.AccountDao;
 import com.kry.pms.model.dto.BillStatistics;
 import com.kry.pms.model.http.request.busi.BillCheckBo;
@@ -9,6 +10,7 @@ import com.kry.pms.model.http.response.busi.AccountSummaryVo;
 import com.kry.pms.model.http.response.busi.SettleInfoVo;
 import com.kry.pms.model.persistence.busi.*;
 import com.kry.pms.model.persistence.goods.Product;
+import com.kry.pms.model.persistence.guest.CustMarket;
 import com.kry.pms.model.persistence.guest.Customer;
 import com.kry.pms.model.persistence.org.Employee;
 import com.kry.pms.model.persistence.room.GuestRoom;
@@ -63,6 +65,8 @@ public class AccountServiceImpl implements AccountService {
     MemberRechargeService memberRechargeService;
     @Autowired
     GuestRoomService guestRoomService;
+    @Autowired
+    CustMarketDao custMarketDao;
 
     @Override
     public Account add(Account account) {
@@ -107,6 +111,15 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public Account modify(Account account) {
         return accountDao.saveAndFlush(account);
+    }
+    @Override
+    public Account getByIdAndCustMarket(String id) {
+        Account a = accountDao.getOne(id);
+        if(a.getCustomer() != null){
+            CustMarket cm = custMarketDao.getOne(a.getCustomer().getId());
+            a.getCustomer().setCustMarket(cm);
+        }
+        return a;
     }
 
     @Override
@@ -560,7 +573,7 @@ public class AccountServiceImpl implements AccountService {
         DtoResponse<Account> rep = new DtoResponse<Account>();
         GuestRoom guestRoom = guestRoomService.findById(billCheckBo.getAccountId());
         List<CheckInRecord> cirs = checkInRecordService.findByOrderNumAndGuestRoomAndDeleted(billCheckBo.getOrderNum(), guestRoom, Constants.DELETED_FALSE);
-        if (!cirs.isEmpty() && cirs.size() == 0) {
+        if (!cirs.isEmpty() && cirs.size() != 0) {
             billCheckBo.setCheckType(Constants.Type.SETTLE_TYPE_ACCOUNT);
             billCheckBo.setAccountId(cirs.get(0).getAccount().getId());
             return checkAccountBill(billCheckBo);

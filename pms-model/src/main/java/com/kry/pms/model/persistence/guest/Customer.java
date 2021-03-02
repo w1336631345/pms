@@ -120,5 +120,7 @@ public class Customer extends PersistenceModel {
 	private String isUsed="I";//是否启用(I:启用，O禁用)
 	@Column
 	private String mnemonicCode;//助记码
+	@Transient
+	private CustMarket custMarket;//客户市场属性
 
 }

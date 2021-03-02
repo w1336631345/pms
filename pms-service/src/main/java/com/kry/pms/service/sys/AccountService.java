@@ -20,6 +20,8 @@ import com.kry.pms.service.BaseService;
 public interface AccountService extends BaseService<Account> {
     void deleteTrue(String id);
 
+    Account getByIdAndCustMarket(String id);
+
     /**
      * 如客房帐
      *

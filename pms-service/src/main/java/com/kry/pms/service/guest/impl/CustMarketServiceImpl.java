@@ -72,12 +72,17 @@ public class CustMarketServiceImpl implements CustMarketService {
 		if(account != null && !account.isEmpty()){
 			if(custMarkets != null && !custMarkets.isEmpty()){
 				custMarkets.get(0).setAccount(account.get(0));
-			}else{
-				CustMarket custMarket = new CustMarket();
-				custMarket.setCustomerId(customerId);
-				custMarket.setAccount(account.get(0));
 			}
 		}
-		return custMarketDao.findByCustomerId(customerId);
+		return custMarkets;
+	}
+	@Override
+	public CustMarket getByCustId(String custId) {
+		List<CustMarket> custMarkets = custMarketDao.findByCustomerId(custId);
+		if(custMarkets != null && !custMarkets.isEmpty()){
+			return custMarkets.get(0);
+		}else {
+			return null;
+		}
 	}
 }

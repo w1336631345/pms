@@ -9,4 +9,5 @@ public interface CustMarketService extends BaseService<CustMarket>{
 
     List<CustMarket> getByCustomerId(String customerId);
 
+    CustMarket getByCustId(String custId);
 }

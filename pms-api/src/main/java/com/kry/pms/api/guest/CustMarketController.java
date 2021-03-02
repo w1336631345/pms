@@ -58,4 +58,11 @@ public class CustMarketController extends BaseController<CustMarket> {
 		return rep.addData(list);
 	}
 
+	@GetMapping(path = "/getByCustId")
+	public HttpResponse<CustMarket> getByCustId(String custId){
+		HttpResponse<CustMarket> rep = new HttpResponse<CustMarket>();
+		CustMarket cm = custMarketService.getByCustId(custId);
+		return rep.addData(cm);
+	}
+
 }
