@@ -604,10 +604,15 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
             cir.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION);
             checkInRecordDao.save(cir);
             if (Constants.Type.CHECK_IN_RECORD_CUSTOMER.equals(cir.getType())) {
-                boolean result = roomStatisticsService.cancleCheckIn(new CheckInRecordWrapper(cir));
-                if (!result) {
-                    TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-                    return hr.error("资源问题，取消失败");
+                //查询是否还有同房间在住的人，如果有，就不改变资源占用情况
+                List<CheckInRecord> tList = checkInRecordDao.findByOrderNumAndGuestRoomAndDeletedAndStatus(
+                        cir.getOrderNum(), cir.getGuestRoom(), Constants.DELETED_FALSE, Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN);
+                if(tList == null || tList.isEmpty()){
+                    boolean result = roomStatisticsService.cancleCheckIn(new CheckInRecordWrapper(cir));
+                    if (!result) {
+                        TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                        return hr.error("资源问题，取消失败");
+                    }
                 }
             }
         }
@@ -2068,7 +2073,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
         }
         List<CheckInRecord> list = checkInRecordDao.findByReserveIdAndDeleted(cir.getId(), Constants.DELETED_FALSE);
         if (list.size() > 0) {//说嘛预留记录被分房
-            hr.error("预留记录已经有分房操作，不能删除");
+            return hr.error("预留记录已经有分房操作，不能删除");
         }
         cir.setDeleted(Constants.DELETED_TRUE);
         cir.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_CANCLE_BOOK);

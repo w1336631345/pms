@@ -125,6 +125,7 @@ public interface CheckInRecordDao extends BaseDao<CheckInRecord> {
     CheckInRecord findTopByAccountIdAndDeleted(String id, int deleted);
 
     List<CheckInRecord> findByOrderNumAndGuestRoomAndDeleted(String orderNum, GuestRoom guestRoom, int delete);
+    List<CheckInRecord> findByOrderNumAndGuestRoomAndDeletedAndStatus(String orderNum, GuestRoom guestRoom, int delete, String status);
 
     @Query(nativeQuery = true, value = " select IFNULL(count(1),0) from ( "
             + " select guest_room_id, count(guest_room_id) " + " from t_checkin_record "
