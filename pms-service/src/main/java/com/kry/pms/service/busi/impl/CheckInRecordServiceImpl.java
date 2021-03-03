@@ -6,6 +6,7 @@ import com.kry.pms.dao.busi.RoomLinkDao;
 import com.kry.pms.dao.busi.RoomRecordDao;
 import com.kry.pms.dao.marketing.RoomPriceSchemeDao;
 import com.kry.pms.model.annotation.UpdateAnnotation;
+import com.kry.pms.model.func.UseInfoAble;
 import com.kry.pms.model.http.request.busi.*;
 import com.kry.pms.model.http.response.busi.AccountSummaryVo;
 import com.kry.pms.model.http.response.busi.CheckInRecordListVo;
@@ -607,12 +608,20 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                 //查询是否还有同房间在住的人，如果有，就不改变资源占用情况
                 List<CheckInRecord> tList = checkInRecordDao.findByOrderNumAndGuestRoomAndDeletedAndStatus(
                         cir.getOrderNum(), cir.getGuestRoom(), Constants.DELETED_FALSE, Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN);
-                if(tList == null || tList.isEmpty()){
-                    boolean result = roomStatisticsService.cancleCheckIn(new CheckInRecordWrapper(cir));
+                if(tList == null || tList.isEmpty()){//没有同住在住的人，才释放资源
+                    UseInfoAble info = new CheckInRecordWrapper(cir);
+                    boolean result = roomStatisticsService.cancleCheckIn(info);
                     if (!result) {
                         TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                         return hr.error("资源问题，取消失败");
                     }
+                    //这里有个问题，记录资源值记录一条cir数据，同住如果我先取消入住掉记录记录资源的数据，因为房类资源还无需释放
+                    //当所有同住都取消后，取消时找不到原来记录房类资源的cirId（uniqueId），会导致释放资源失败，房态修改失败
+                    //后续继续点入住，房态也不会修改
+                    //处理方式：1、若首要取消掉的cirId是记录资源的uniqueId，则便跟记录资源的uniqueId为剩余的同住在住的cirId
+                    //处理方式：2、
+                }else {
+                    roomUsageService.updateUniqueId(cir.getId(), tList.get(0).getId());
                 }
             }
         }
@@ -1057,7 +1066,9 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
         for (int i = 0; i < list.size(); i++) {
             if(cirlb.getIsRoomLink()){
                 list.get(i).setOrderNum(orderNum);//前端勾选了联房按钮，就用同一个订单号
-                list.get(i).setRoomLinkId(roomLinkId);
+                if(list.size() > 1){//如果批量操作选的房间大于1，又勾选了联房，就设置联房id，否则1间房就不需要设置联房id
+                    list.get(i).setRoomLinkId(roomLinkId);
+                }
             }else {//否则就是不联房，用不同的订单号
                 orderNum = businessSeqService.fetchNextSeqNum(user.getHotelCode(), Constants.Key.BUSINESS_ORDER_NUM_SEQ_KEY);
                 list.get(i).setOrderNum(orderNum);
@@ -1889,7 +1900,11 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                     return hr.error("资源问题，取消失败");
                 }
             }
+            //这里是从在住状态直接取消预订，所以要分两步，取消入住和取消预订（排房），
+            //这个判断入口，一般是从批量操作中，入住状态直接取消预订
             if ((Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN).equals(cir.getStatus())) {
+                //取消入住后是预订状态R，取消入住前，必须先修改cir状态I改为R
+                cir.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION);
                 boolean result = roomStatisticsService.cancleCheckIn(new CheckInRecordWrapper(cir));//先取消入住
                 if (!result) {
                     TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();

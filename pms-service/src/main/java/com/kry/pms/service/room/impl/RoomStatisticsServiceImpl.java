@@ -78,8 +78,10 @@ public class RoomStatisticsServiceImpl implements RoomStatisticsService {
     @Override
     public boolean cancleCheckIn(UseInfoAble info) {
         // 未判断是否为同时离开
-        roomUsageService.cancleCheckIn(info);
-        guestRoomStatusService.changeStatus(info);
+        boolean result = roomUsageService.cancleCheckIn(info);
+        if(result){
+            guestRoomStatusService.changeStatus(info);
+        }
         return true;
     }
 

@@ -102,4 +102,6 @@ public interface RoomUsageService extends BaseService<RoomUsage> {
                                              String will_arrive, String will_leave, String hour_room,
                                              String group_, String overdued, String ota, String vip,
                                              String floorId, String buidId, String roomTypeId, String roomNum);
+
+    int updateUniqueId(String oldId, String newId);
 }

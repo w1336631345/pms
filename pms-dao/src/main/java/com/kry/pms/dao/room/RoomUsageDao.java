@@ -7,6 +7,7 @@ import java.util.Map;
 import com.kry.pms.model.http.response.room.GuestRoomStatusVo;
 import com.kry.pms.model.http.response.room.RoomUsageListVo;
 import com.kry.pms.model.persistence.room.GuestRoom;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import com.kry.pms.dao.BaseDao;
@@ -117,5 +118,9 @@ public interface RoomUsageDao extends BaseDao<RoomUsage> {
 											 @Param("will_arrive")String will_arrive,@Param("will_leave")String will_leave,@Param("hour_room")String hour_room,
 											 @Param("group_")String group_,@Param("overdued")String overdued,@Param("ota")String ota,@Param("vip")String vip,
 											 @Param("floorId")String floorId,@Param("buidId")String buidId,@Param("roomTypeId")String roomTypeId,@Param("roomNum")String roomNum);
-	
+
+
+	@Modifying
+	@Query(value = " update room_usage_unique_ids set unique_ids = ?2 where unique_ids = ?1 ", nativeQuery = true)
+	int updateUniqueId(String oldId, String newId);
 }

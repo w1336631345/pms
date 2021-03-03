@@ -414,8 +414,7 @@ public class RoomUsageServiceImpl implements RoomUsageService {
     @Override
     public boolean cancleCheckIn(UseInfoAble info) {
         if (info.guestRoom() != null) {// 如果没有房间的入住不占用任何资源，可能为主单入住
-            RoomUsage ru = roomUsageDao.findByGuestRoomIdAndBusinesskey(info.guestRoom().getId(),
-                    info.getBusinessKey());
+            RoomUsage ru = roomUsageDao.findByGuestRoomIdAndBusinesskey(info.guestRoom().getId(),info.getBusinessKey());
             if (ru == null) { // 该状态为没有预留直接入住
                 return false;
             } else {// 有预留
@@ -926,6 +925,12 @@ public class RoomUsageServiceImpl implements RoomUsageService {
         List<Map<String, Object>> list = roomUsageDao.miniRoomStatus(hotelCode, st, et, will_arrive, will_leave,
                 hour_room, group_, overdued, ota, vip, floorId, buidId, roomTypeId, roomNum);
         return list;
+    }
+
+    @Override
+    public int updateUniqueId(String oldId, String newId){
+        int i = roomUsageDao.updateUniqueId(oldId, newId);
+        return i;
     }
 
 }
