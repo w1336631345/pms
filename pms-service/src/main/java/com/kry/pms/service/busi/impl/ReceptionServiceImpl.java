@@ -321,6 +321,7 @@ public class ReceptionServiceImpl implements ReceptionService {
 		if(!cir.getActualTimeOfLeave().toLocalDate().isEqual(LocalDate.now())){
 			return hr.error("不是本日退房，不能重新入住");
 		}
+		cir.setActualTimeOfLeave(null);
 		if(cir.getMainRecord() != null){//是团队
 			CheckInRecord main = cir.getMainRecord();
 			if("O".equals(main.getStatus())){
@@ -340,6 +341,7 @@ public class ReceptionServiceImpl implements ReceptionService {
 			checkInRecordDao.save(cir);
 			roomStatisticsService.updateGuestRoomStatus(new CheckInRecordWrapper(cir));
 		}
+		//应该还缺少 RoomTypeQuantity 的计算
 		return hr;
 	}
 	@Override

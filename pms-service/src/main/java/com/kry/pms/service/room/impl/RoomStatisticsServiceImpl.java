@@ -112,12 +112,14 @@ public class RoomStatisticsServiceImpl implements RoomStatisticsService {
                 roomUseStatus = cir.getStatus();
             }
             roomTypeQuantityService.extendTime(info.roomType(), roomUseStatus, info.getStartTime(), info.getEndTime(), newStartTime, newEndTime, 1);
-            if (newStartTime != null) {
-                newStartTime = LocalDateTime.of(newStartTime.toLocalDate(), LocalTime.NOON);
-            }
-            if (newEndTime != null) {
-                newEndTime = LocalDateTime.of(newEndTime.toLocalDate(), LocalTime.NOON);
-            }
+            //下方计算资源，是设计的取开始时间当天12点，到结束时间当天12点
+            //若是开始时间12点之后出现过预订取消，就会占用资源，续住就会出现资源不足
+//            if (newStartTime != null) {
+//                newStartTime = LocalDateTime.of(newStartTime.toLocalDate(), LocalTime.NOON);
+//            }
+//            if (newEndTime != null) {
+//                newEndTime = LocalDateTime.of(newEndTime.toLocalDate(), LocalTime.NOON);
+//            }
             if (newStartTime == null || newStartTime.isEqual(info.getStartTime())) {
                 if (newEndTime == null || (newEndTime != null && newEndTime.isEqual(info.getEndTime()))) {
                     return true;
