@@ -1064,6 +1064,9 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
         }
         boolean nativeUrl = false;
         for (int i = 0; i < list.size(); i++) {
+            if(list.get(i).getFitType() == null){
+                list.get(i).setFitType("P");
+            }
             if(cirlb.getIsRoomLink()){
                 list.get(i).setOrderNum(orderNum);//前端勾选了联房按钮，就用同一个订单号
                 if(list.size() > 1){//如果批量操作选的房间大于1，又勾选了联房，就设置联房id，否则1间房就不需要设置联房id
@@ -1258,11 +1261,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                     cir.setPersonalPercentage(0.0);
                 }
                 CheckInRecord c = checkInRecordDao.saveAndFlush(cir);
-                boolean result = roomStatisticsService.assignRoom(new CheckInRecordWrapper(c));
-                if (!result) {
-                    TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-                    return hr.error("资源不足");
-                }
+
                 roomRecordService.createRoomRecord(c);
                 if (j == 0) {
                     boolean result2 = roomStatisticsService.reserve(new CheckInRecordWrapper(c));
@@ -1272,6 +1271,12 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                     }
                     rcir = c;
                 }
+                boolean result = roomStatisticsService.assignRoom(new CheckInRecordWrapper(c));
+                if (!result) {
+                    TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                    return hr.error("资源不足");
+                }
+
             }
 //            CheckInRecord cir = add(checkInRecord);
             hr.setData(rcir);
@@ -1847,15 +1852,31 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                         TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                         return hr.error("资源问题，取消失败");
                     }
+                    if(cr.getReserveId() == null){//表明之前预定是直接预定有房间的，就没有预留单
+                        TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                        return hr.error("单房预订取消排房，直接点击取消预订即可");
+                    }else {
+
+                    }
                     CheckInRecord reserve = findById(cr.getReserveId());
                     reserve.setCheckInCount(reserve.getCheckInCount()-1);
-                    reserve.setRoomCount(reserve.getRoomCount() +1);
+                    if(c==0){//同住的，取消排房只+1次房间
+                        reserve.setRoomCount(reserve.getRoomCount() +1);
+                    }
                     reserve.setHumanCount(reserve.getHumanCount()+1);
                     reserve.setDeleted(Constants.DELETED_FALSE);
                     checkInRecordDao.saveAndFlush(reserve);
-//                    roomRecordDao.deleteByCheckInRecord(cr);//删除roomRecord
-                    accountService.delete(cr.getAccount().getId());//删除多余的account
-                    customerService.delete(cr.getCustomer().getId());//删除customer
+                    roomRecordDao.deleteByCheckInRecord(cr);//删除roomRecord
+//                    if(cr.getReserveId() != null){//删除所有预留单外，多余的account和customer
+//                        if(reserve.getAccount() != null && !reserve.getAccount().getId().equals(cr.getAccount().getId())){
+//                            accountService.delete(cr.getAccount().getId());//删除多余的account
+//                        }
+//                        if(reserve.getCustomer() != null){
+//                            if(!reserve.getCustomer().getId().equals(cr.getCustomer().getId())){
+//                                customerService.delete(cr.getCustomer().getId());//删除customer
+//                            }
+//                        }
+//                    }
                     cr.setDeleted(Constants.DELETED_TRUE);
                     checkInRecordDao.saveAndFlush(cr);//暂时做直接删除取消排房的记录
                 }
