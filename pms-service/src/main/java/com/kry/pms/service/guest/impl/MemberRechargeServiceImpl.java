@@ -93,18 +93,18 @@ public class MemberRechargeServiceImpl implements MemberRechargeService {
 		memberInfoDao.saveAndFlush(memberInfo);
 		entity = memberRechargeDao.saveAndFlush(entity);
 
-		//修改账号金额，所有（充值+赠送）
-		Account account = memberInfo.getAccount();
+		//修改账号金额，所有（充值+赠送）（账户金额在入账bill的时候有修改）
+//		Account account = memberInfo.getAccount();
 //		account.setTotal(account.getTotal() + memberInfo.getBalance() + memberInfo.getGivePrice());
-		account.setTotal(account.getTotal() + entity.getAmount() + entity.getGiveAmount());
-		accountService.modify(account);
+//		account.setTotal(account.getTotal() + entity.getAmount() + entity.getGiveAmount());
+//		accountService.modify(account);
 
 		//入账
 		Bill bill = new Bill();
 		Employee emp = employeeDao.findByUserId(entity.getCreateUser());
 		bill.setProduct(entity.getPayType());
 		bill.setTotal(entity.getAmount());
-		bill.setCost(entity.getAmount());
+//		bill.setCost(entity.getAmount());
 		bill.setQuantity(1);
 		bill.setAccount(memberInfo.getAccount());
 		bill.setHotelCode(entity.getHotelCode());
@@ -237,6 +237,18 @@ public class MemberRechargeServiceImpl implements MemberRechargeService {
 	@Override
 	public List<MemberRecharge> getByHotelCodeAndCardNum(String code, String cardNum) {
 		List<MemberRecharge> list = memberRechargeDao.findByHotelCodeAndCardNum(code, cardNum);
+		for(int i=0; i<list.size(); i++){
+			String createBy = list.get(i).getCreateUser();
+			if(createBy != null){
+				User user = userService.findById(createBy);
+				list.get(i).setOperator(user.getUsername());
+			}
+		}
+		return list;
+	}
+	@Override
+	public List<MemberRecharge> findByMemberInfoId(String memberId) {
+		List<MemberRecharge> list = memberRechargeDao.findByMemberInfoId(memberId);
 		for(int i=0; i<list.size(); i++){
 			String createBy = list.get(i).getCreateUser();
 			if(createBy != null){

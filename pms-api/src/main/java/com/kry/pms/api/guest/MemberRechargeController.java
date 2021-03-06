@@ -77,10 +77,32 @@ public class MemberRechargeController extends BaseController<MemberRecharge> {
 		List<MemberRecharge> list = memberRechargeService.getList(getCurrentHotleCode());
 		return rep.addData(list);
 	}
+	/**
+	 * 功能描述: <br>查询充值记录1
+	 * 〈〉
+	 * @Param: [cardNum]
+	 * @Return: com.kry.pms.base.HttpResponse<java.util.List<com.kry.pms.model.persistence.guest.MemberRecharge>>
+	 * @Author: huanghaibin
+	 * @Date: 2021/3/6 9:39
+	 */
 	@GetMapping(path = "/cardNum")
 	public HttpResponse<List<MemberRecharge>> getByHotelCodeAndCardNum(String cardNum){
 		HttpResponse<List<MemberRecharge>> rep = new HttpResponse<List<MemberRecharge>>();
 		List<MemberRecharge> list = memberRechargeService.getByHotelCodeAndCardNum(getCurrentHotleCode(), cardNum);
+		return rep.addData(list);
+	}
+	/**
+	 * 功能描述: <br>查询充值记录2
+	 * 〈〉
+	 * @Param: [memberId]
+	 * @Return: com.kry.pms.base.HttpResponse<java.util.List<com.kry.pms.model.persistence.guest.MemberRecharge>>
+	 * @Author: huanghaibin
+	 * @Date: 2021/3/6 9:43
+	 */
+	@GetMapping(path = "/cardNum2")
+	public HttpResponse<List<MemberRecharge>> cardNum2(String memberId){
+		HttpResponse<List<MemberRecharge>> rep = new HttpResponse<List<MemberRecharge>>();
+		List<MemberRecharge> list = memberRechargeService.findByMemberInfoId(memberId);
 		return rep.addData(list);
 	}
 

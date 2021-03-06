@@ -343,7 +343,7 @@ public class BillServiceImpl implements BillService {
 
     private Bill createMemberSettleBill(Bill res, Employee employee, String shiftCode, String recordNum) {
         Bill bill = createPackageBill(res, employee, shiftCode, recordNum);
-        bill.setStatus(Constants.Status.BILL_SETTLED);
+//        bill.setStatus(Constants.Status.BILL_SETTLED);
         return addArBill(bill);
     }
 

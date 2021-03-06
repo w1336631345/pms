@@ -22,5 +22,7 @@ public interface MemberRechargeService extends BaseService<MemberRecharge>{
 
     List<MemberRecharge> getByHotelCodeAndCardNum(String code, String cardNum);
 
+    List<MemberRecharge> findByMemberInfoId(String memberId);
+
     void boOverdueList(String hotelCode);
 }

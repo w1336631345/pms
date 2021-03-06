@@ -13,6 +13,8 @@ public interface MemberRechargeDao extends BaseDao<MemberRecharge>{
 
     List<MemberRecharge> findByHotelCodeAndCardNum(String hotelCode, String cardNum);
 
+    List<MemberRecharge> findByMemberInfoId(String memberId);
+
     MemberRecharge findByHotelCodeAndSettledNo(String hotelCode, String settledNo);
 
     @Query(nativeQuery = true, value = " select DISTINCT tmr.card_num \n" +
