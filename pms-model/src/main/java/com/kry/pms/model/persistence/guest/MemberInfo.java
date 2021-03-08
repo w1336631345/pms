@@ -72,7 +72,7 @@ public class MemberInfo extends PersistenceModelTo {
     private String password;//密码
     @Column
     private String isUsedPassword;//校验密码
-    @Transient
+    @Column
     private String operator;//操作员
     @Transient
     private CustMarket custMarket;

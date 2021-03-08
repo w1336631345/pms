@@ -24,6 +24,7 @@ public class MemberInfoController extends BaseController<MemberInfo> {
 		memberInfo.setHotelCode(getCurrentHotleCode());
 		memberInfo.setCreateDate(LocalDateTime.now());
 		memberInfo.setCreateUser(getUserId());
+		memberInfo.setOperator(getCurrentEmployee().getName());
 		return getDefaultResponse().addData(memberInfoService.add(memberInfo));
 	}
 

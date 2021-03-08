@@ -37,7 +37,7 @@ public class MemberRecharge extends PersistenceModelTo {
     private String remark;//备注
     @Column
     private LocalDate limitationDate;//有效期
-    @Transient
+    @Column
     private String operator;//操作员
     @Column
     private Double useAmount;//使用充值金额
@@ -51,7 +51,7 @@ public class MemberRecharge extends PersistenceModelTo {
     private Double overAmount;//过期金额
     @Column
     private Double overGiveAmount;//过期赠送金额
-    @Transient
+    @Column
     private String shiftCode;//班次
     @Column
     private String settledNo;//结账单号

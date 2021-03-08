@@ -45,6 +45,7 @@ public class MemberRechargeController extends BaseController<MemberRecharge> {
 		memberRecharge.setCreateDate(LocalDateTime.now());
 		memberRecharge.setCreateUser(getUserId());
 		memberRecharge.setShiftCode(getShiftCode());
+		memberRecharge.setOperator(getCurrentEmployee().getName());
 		hr = memberRechargeService.recharge(memberRecharge);
 		return hr;
 	}

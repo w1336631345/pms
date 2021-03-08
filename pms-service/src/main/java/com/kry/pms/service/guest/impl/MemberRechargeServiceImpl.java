@@ -225,37 +225,16 @@ public class MemberRechargeServiceImpl implements MemberRechargeService {
 	@Override
 	public List<MemberRecharge> getList(String code) {
 		List<MemberRecharge> list = memberRechargeDao.findByHotelCode(code);
-		for(int i=0; i<list.size(); i++){
-			String createBy = list.get(i).getCreateUser();
-			if(createBy != null){
-				User user = userService.findById(createBy);
-				list.get(i).setOperator(user.getUsername());
-			}
-		}
 		return list;
 	}
 	@Override
 	public List<MemberRecharge> getByHotelCodeAndCardNum(String code, String cardNum) {
 		List<MemberRecharge> list = memberRechargeDao.findByHotelCodeAndCardNum(code, cardNum);
-		for(int i=0; i<list.size(); i++){
-			String createBy = list.get(i).getCreateUser();
-			if(createBy != null){
-				User user = userService.findById(createBy);
-				list.get(i).setOperator(user.getUsername());
-			}
-		}
 		return list;
 	}
 	@Override
 	public List<MemberRecharge> findByMemberInfoId(String memberId) {
 		List<MemberRecharge> list = memberRechargeDao.findByMemberInfoId(memberId);
-		for(int i=0; i<list.size(); i++){
-			String createBy = list.get(i).getCreateUser();
-			if(createBy != null){
-				User user = userService.findById(createBy);
-				list.get(i).setOperator(user.getUsername());
-			}
-		}
 		return list;
 	}
 
