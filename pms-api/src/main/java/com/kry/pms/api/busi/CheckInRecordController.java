@@ -108,6 +108,7 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
 //    @OperationLog(remark = "团队/多人预订")
     public HttpResponse<CheckInRecord> book(@RequestBody CheckInRecord checkInRecord) {
         checkInRecord.setHotelCode(getCurrentHotleCode());
+        checkInRecord.setOderFrom("菜单团队/多人");
         HttpResponse hr = checkInRecordService.book(checkInRecord);
         return hr;
     }
@@ -115,6 +116,7 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
     @PostMapping(path = "/bookWcaht")
     public HttpResponse<CheckInRecord> bookWcaht(@RequestBody CheckInRecord checkInRecord) {
 //        checkInRecord.setHotelCode(getCurrentHotleCode());
+        checkInRecord.setOderFrom("小程序预订");
         HttpResponse hr = new HttpResponse();
         hr = checkInRecordService.book(checkInRecord);
         return hr;
@@ -134,6 +136,7 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
     public HttpResponse<CheckInRecord> bookOne(@RequestBody CheckInRecord checkInRecord) {
         User user = getUser();
         checkInRecord.setHotelCode(user.getHotelCode());
+        checkInRecord.setOderFrom("菜单散客单房预订");
         HttpResponse hr = checkInRecordService.singleRoom(checkInRecord);
         //发送短信
 //        msgSendService.bookSendMsg((CheckInRecord)hr.getData());
@@ -155,6 +158,7 @@ public class CheckInRecordController extends BaseController<CheckInRecord> {
         HttpResponse hr = new HttpResponse();
         User user = getUser();
         checkInRecord.setHotelCode(user.getHotelCode());
+        checkInRecord.setOderFrom("房态图");
         hr = checkInRecordService.bookByRoomTypeTest(checkInRecord, user);
         //发送短信
 //        Map<String, Object> map = (Map)hr.getData();

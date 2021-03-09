@@ -77,17 +77,17 @@ public class RoomChangeRecordServiceImpl implements RoomChangeRecordService {
 		}
 		CheckInRecord cir = checkInRecordService.findById(entity.getCheckInRecordId());
 		GuestRoom newgr = guestRoomDao.getOne(entity.getNewGuestRoom().getId());
-		//资源调整
-		boolean cresult = roomStatisticsService.changeRoom(new CheckInRecordWrapper(cir), newgr, businessDateTime);
-		if(!cresult){
-			return hr.error("资源问题，换房失败");
-		}
 		if(!Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN.equals(cir.getStatus()) && !Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION.equals(cir.getStatus())){
 			return hr.error("退房/结账等房间不能换房");
 		}
 		if(businessDateTime.isAfter(cir.getLeaveTime())){
 			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 			return hr.error("已经过了离店时间，禁止换房操作");
+		}
+		//资源调整
+		boolean cresult = roomStatisticsService.changeRoom(new CheckInRecordWrapper(cir), newgr, businessDateTime);
+		if(!cresult){
+			return hr.error("资源问题，换房失败");
 		}
 		//有同住记录,把所有同房间的都一起换房
 //			List<CheckInRecord> list = checkInRecordService.findByTogetherCode(hotelCode, cir.getTogetherCode());
@@ -104,22 +104,6 @@ public class RoomChangeRecordServiceImpl implements RoomChangeRecordService {
 			LocalDateTime leaveTime = cirs.getLeaveTime();
 
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-			//***********修改roomRecord开始***********
-			if(businessDateTime.isBefore(leaveTime)){//当前时间在离店时间之前
-				List<RoomRecord> roomRecords = roomRecordDao.recordDateAndCheckInRecord(businessDate, cirs.getId());
-				for(int r=0; r<roomRecords.size(); r++){
-					RoomRecord rr = roomRecords.get(r);
-					rr.setGuestRoom(entity.getNewGuestRoom());
-					if(cirs.getPersonalPercentage() != null){
-						rr.setCost(roomPrice*cirs.getPersonalPercentage());
-					}else {
-						rr.setCost(roomPrice);//承担全部房费
-					}
-//						rr.setCost(entity.getNewPrice());
-					rr.setCostRatio(null);
-					roomRecordService.modify(rr);
-				}
-			}
 			//***********修改roomRecord完毕***********
 			cirs.setGuestRoom(entity.getNewGuestRoom());//修改所有同住人员房间号为新房间
 			cirs.setRoomType(newgr.getRoomType());//修改新房型
@@ -132,6 +116,18 @@ public class RoomChangeRecordServiceImpl implements RoomChangeRecordService {
 				cirs.setPersonalPrice(roomPrice);//承担全部房费
 			}
 			cirs = checkInRecordService.update(cirs);
+			//***********修改roomRecord开始***********
+			if(businessDateTime.isBefore(leaveTime)){//当前时间在离店时间之前
+				List<RoomRecord> roomRecords = roomRecordDao.recordDateAndCheckInRecord(businessDate, cirs.getId());
+				for(int r=0; r<roomRecords.size(); r++){
+					RoomRecord rr = roomRecords.get(r);
+					rr.setGuestRoom(entity.getNewGuestRoom());
+					rr.setCost(cirs.getPersonalPrice());
+					rr.setCostRatio(cirs.getPersonalPercentage());
+					roomRecordService.modify(rr);
+				}
+			}
+
 			UpdateLog updateLog = new UpdateLog();
 			updateLog.setProduct("换房");
 			updateLog.setProductName("订单号");

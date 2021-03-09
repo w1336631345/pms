@@ -120,13 +120,18 @@ public class RoomStatisticsServiceImpl implements RoomStatisticsService {
 //            if (newEndTime != null) {
 //                newEndTime = LocalDateTime.of(newEndTime.toLocalDate(), LocalTime.NOON);
 //            }
-            if (newStartTime == null || newStartTime.isEqual(info.getStartTime())) {
+            if (newStartTime == null || newStartTime.isEqual(info.getStartTime())) {//如果开始时间没有变
                 if (newEndTime == null || (newEndTime != null && newEndTime.isEqual(info.getEndTime()))) {
                     return true;
                 } else {
                     return extendTime(info, newEndTime.toLocalDate());
                 }
             } else {
+                //1、如果是续住，应该算当前时间-离店时间是否有资源
+                //2、如果是排房预定状态，应该算到店时间-离店时间是否有资源
+                if(cir.getStatus().equals(Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN)){//在住
+                    return roomUsageService.extendTime2(info, newEndTime);
+                }
                 return roomUsageService.extendTime(info, newStartTime, newEndTime);
             }
         } else {

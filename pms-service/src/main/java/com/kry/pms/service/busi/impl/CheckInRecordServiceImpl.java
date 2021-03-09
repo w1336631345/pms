@@ -155,16 +155,19 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
         if ((Constants.Type.CHECK_IN_RECORD_RESERVE).equals(dbCir.getType())) {
             return hr.error("预留单请去“修改预留”界面");
         }
+        //判断是否修改房价码
         if (!dbCir.getRoomPriceScheme().getId().equals(checkInRecord.getRoomPriceScheme().getId())) {
             updateRoomPriceS = true;
         }
-        if (!dbCir.getName().equals(checkInRecord.getName())) {//主单修改名称
+        //判断是否修改名称
+        if (!dbCir.getName().equals(checkInRecord.getName())) {
             updateName = true;
             checkInRecord.setGroupName(checkInRecord.getName());
         }
         LocalTime criticalTime = checkInRecord.getArriveTime().toLocalTime();
         LocalDate startDate = checkInRecord.getArriveTime().toLocalDate();
         int days = checkInRecord.getDays();
+        //判断是否修改时间
         if (!dbCir.getArriveTime().isEqual(checkInRecord.getArriveTime()) || !dbCir.getLeaveTime().isEqual(checkInRecord.getLeaveTime())) {
             updateTime = true;
             criticalTime = systemConfigService.getCriticalTime(checkInRecord.getHotelCode());
@@ -206,9 +209,17 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                     if (price == null) {
                         price = cir.getRoomType().getPrice();
                     }
+                    if(!cir.getPersonalPrice().equals(price * cir.getPersonalPercentage())){
+                        List<RoomRecord> list = roomRecordService.findByHotelCodeAndCheckInRecord(cir.getHotelCode(), cir.getId());
+                        for(int r=0; r<list.size(); r++){
+                                list.get(r).setCost(price * cir.getPersonalPercentage());
+                                roomRecordDao.saveAndFlush(list.get(r));
+                        }
+                    }
                     //修改所有主单下数据的房价码
                     cir.setRoomPriceScheme(checkInRecord.getRoomPriceScheme());
                     if (!Constants.Type.CHECK_IN_RECORD_RESERVE.equals(cir.getType())) {
+                        cir.setPurchasePrice(price);
                         cir.setPersonalPrice(price * cir.getPersonalPercentage());
                     }
                     String setMealId = MapUtils.getString(map, "setMealId");
@@ -1077,6 +1088,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                 list.get(i).setOrderNum(orderNum);
             }
             list.get(i).setHotelCode(user.getHotelCode());
+            list.get(i).setOderFrom("房态图批量选房");
             HttpResponse hr2 = bookByRoomTypeTest(list.get(i), user);
             if (hr2.getStatus() == 9999) {
                 return hr2;

@@ -177,7 +177,10 @@ public class RoomTypeQuantityServiceImpl implements RoomTypeQuantityService {
         switch (useType) {
             case Constants.Status.ROOM_USAGE_BOOK:
                 RoomTypeQuantityPredictableVo rqpv = queryPredic(roomType.getHotelCode(), roomType.getId(), startDate, endDate, null);
-                int availableTotal = rqpv.getAvailableTotal();
+                Integer availableTotal = rqpv.getAvailableTotal();
+                if(availableTotal == null){
+                    availableTotal = 0;
+                }
                 if (roomType.getOverReservation() != null) {
                     availableTotal += roomType.getOverReservation();
                 }

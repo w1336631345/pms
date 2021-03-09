@@ -676,6 +676,28 @@ public class RoomUsageServiceImpl implements RoomUsageService {
     }
 
     @Override
+    public boolean extendTime2(UseInfoAble info, LocalDateTime newEndTime) {
+        RoomUsage ru = roomUsageDao.findByGuestRoomIdAndBusinesskey(info.guestRoom().getId(), info.getBusinessKey());
+        //结束时间不能小于开始时间
+        if(newEndTime.isBefore(ru.getStartDateTime())){
+            return false;
+        }
+        //得到下一个空闲资源
+        RoomUsage post = ru.getPostRoomUsage();
+        //只需判断下一个资源（上面的post）的结束时间是否 >= newEndTime
+        if(newEndTime.isBefore(post.getEndDateTime()) || newEndTime.isEqual(post.getEndDateTime())){
+            ru.setEndDateTime(newEndTime);
+            roomUsageDao.saveAndFlush(ru);
+            post.setStartDateTime(newEndTime);//下一段空闲资源开始时间，更新为本次资源占用的结束时间
+            roomUsageDao.saveAndFlush(post);
+            return true;
+        }else {
+            return false;
+        }
+
+    }
+
+    @Override
     public boolean changeRoom(UseInfoAble info, GuestRoom newGuestRoom, LocalDateTime changeTime) {
         RoomUsage ru = roomUsageDao.findByGuestRoomIdAndBusinesskey(info.guestRoom().getId(), info.getBusinessKey());
         if(changeTime.isBefore(info.getStartTime())){

@@ -193,12 +193,16 @@ public class CheckInRecord extends PersistenceModel {
 
 	@ManyToOne
 	private MemberInfo memberInfo;//会员
+	@Column
+	private String oderFrom;//预订来源
 
 	@Transient
 	private String isSync;//修改时间是否同步子单
 	@Transient
 	private String isGOrU;//预订来至团队（G）还是多人（U）
 
+	public String getOderFrom() { return oderFrom; }
+	public void setOderFrom(String oderFrom) { this.oderFrom = oderFrom; }
 	public MemberInfo getMemberInfo() { return memberInfo; }
 	public void setMemberInfo(MemberInfo memberInfo) { this.memberInfo = memberInfo; }
 	public String getIsSync() { return isSync; }
