@@ -50,6 +50,8 @@ public class RoomUsage implements Serializable {
 	@ElementCollection
 	@Cascade(org.hibernate.annotations.CascadeType.REMOVE)
 	private Set<String> uniqueIds;
+	@Column
+	private String remark;
 
 	@Override
 	public Object clone() throws CloneNotSupportedException {

@@ -482,6 +482,7 @@ public class RoomUsageServiceImpl implements RoomUsageService {
             if (ru == null) { // 该状态为没有预留直接入住
                 return false;
             } else {// 有预留
+                ru.setRemark("取消排房");
                 // 修改房间状态
                 if (ru.getUsageStatus().equals(Constants.Status.ROOM_USAGE_ASSIGN)) {
                     if (ru.getUniqueIds() != null && ru.getUniqueIds().contains(info.uniqueId())) {
@@ -594,6 +595,7 @@ public class RoomUsageServiceImpl implements RoomUsageService {
             RoomUsage ru = roomUsageDao.findByGuestRoomIdAndBusinesskey(info.guestRoom().getId(),
                     info.getBusinessKey());
             if (ru != null) {
+                ru.setRemark("退房");
                 if (ru.getUniqueIds() != null && ru.getUniqueIds().contains(info.uniqueId())) {
                     ru.getUniqueIds().remove(info.uniqueId());
                 }
@@ -638,6 +640,7 @@ public class RoomUsageServiceImpl implements RoomUsageService {
         RoomUsage ru = roomUsageDao.findByGuestRoomIdAndBusinesskey(info.guestRoom().getId(),
                 info.getBusinessKey());
         if (ru != null) {
+            ru.setRemark("释放锁房资源");
             if (unUse(ru, cancleDateTime)) {
                 if (!cancleDateTime.isAfter(info.getStartTime())) {
                     roomTypeQuantityService.changeRoomTypeQuantity(info.roomType(), info.getStartTime(),
@@ -657,6 +660,7 @@ public class RoomUsageServiceImpl implements RoomUsageService {
     public boolean extendTime(UseInfoAble info, LocalDate extendDate) {
         RoomUsage ru = roomUsageDao.findByGuestRoomIdAndBusinesskey(info.guestRoom().getId(), info.getBusinessKey());
         String status = ru.getUsageStatus();
+        ru.setRemark("修改时间");
         unUse(ru);
         LocalDateTime endTime = LocalDateTime.of(extendDate, LocalTime.NOON);
         info.setEndTime(endTime);
@@ -669,6 +673,7 @@ public class RoomUsageServiceImpl implements RoomUsageService {
         LocalDateTime endTime = newEndTime;
         LocalDateTime startTime = newStartTime;
         String status = ru.getUsageStatus();
+        ru.setRemark("修改时间");
         unUse(ru);
         info.setStartTime(startTime);
         info.setEndTime(endTime);
@@ -704,8 +709,11 @@ public class RoomUsageServiceImpl implements RoomUsageService {
             changeTime = info.getStartTime();
         }
         if (ru != null) {
-            if (use(newGuestRoom, ru.getUsageStatus(), changeTime, info.getEndTime(), info.getBusinessKey(), info.getSummaryInfo(), info.uniqueId()) && unUse(ru, changeTime)) {
-                return true;
+            ru.setRemark("换房");
+            boolean u = unUse(ru, changeTime);
+            boolean use = use(newGuestRoom, ru.getUsageStatus(), changeTime, info.getEndTime(), info.getBusinessKey(), info.getSummaryInfo(), info.uniqueId());
+            if (u) {
+                return use;
             }
         }
         return false;

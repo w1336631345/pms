@@ -1223,7 +1223,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
             checkInRecord.setPurchasePrice(checkInRecord.getOriginalPrice());
             checkInRecord.setPersonalPrice(checkInRecord.getOriginalPrice());
         }
-        if (checkInRecord.getGuestRoom() != null) {//如果选了房间，直接预订
+        if (checkInRecord.getGuestRoom() != null && checkInRecord.getGuestRoom().getId() != null) {//如果选了房间，直接预订
             checkInRecord.setType(Constants.Type.CHECK_IN_RECORD_CUSTOMER);
 //            checkInRecord.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_ASSIGN);//以前选了房间为排房A，但排房依旧是预定
             checkInRecord.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION);//上句注释对比修改

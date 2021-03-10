@@ -31,13 +31,15 @@ public class AccountSummaryVo {
     private String guestRoomId;
     private Collection<AccountSummaryVo> children;
 
+    private Integer days;
+
     public AccountSummaryVo() {
 
     }
 
     public AccountSummaryVo(String orderNum, String id, String cirId, String name, Double total, String roomNum,
                             String type, Double pay, Double cost, Double creditLimit, Double availableCreditLimit,
-                            String roomStatus, String accountCode, LocalDateTime arriveTime, LocalDateTime leaveTime, String guestRoomId,Double personalPrice) {
+                            String roomStatus, String accountCode, LocalDateTime arriveTime, LocalDateTime leaveTime, String guestRoomId,Double personalPrice, Integer days) {
         this.orderNum = orderNum;
         this.id = id;
         this.cirId = cirId;
@@ -55,6 +57,7 @@ public class AccountSummaryVo {
         this.leaveTime = leaveTime;
         this.guestRoomId = guestRoomId;
         this.personalPrice = personalPrice;
+        this.days = days;
     }
 
     public AccountSummaryVo(Account acc) {
@@ -85,6 +88,7 @@ public class AccountSummaryVo {
         this.personalPrice = cir.getPersonalPrice();
         this.arriveTime = cir.getActualTimeOfArrive() != null ? cir.getActualTimeOfArrive() : cir.getArriveTime();
         this.leaveTime = cir.getActualTimeOfLeave() != null ? cir.getActualTimeOfLeave() : cir.getLeaveTime();
+        this.days = cir.getDays();
     }
     public AccountSummaryVo(CheckInRecord cir,String guestRoomId) {
         this(cir.getAccount(), null);
@@ -95,5 +99,6 @@ public class AccountSummaryVo {
         this.cirId = cir.getId();
         this.arriveTime = cir.getActualTimeOfArrive() != null ? cir.getActualTimeOfArrive() : cir.getArriveTime();
         this.leaveTime = cir.getActualTimeOfLeave() != null ? cir.getActualTimeOfLeave() : cir.getLeaveTime();
+        this.days = cir.getDays();
     }
 }
