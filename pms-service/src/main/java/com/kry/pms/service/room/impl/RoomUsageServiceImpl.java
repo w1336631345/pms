@@ -683,6 +683,9 @@ public class RoomUsageServiceImpl implements RoomUsageService {
     @Override
     public boolean extendTime2(UseInfoAble info, LocalDateTime newEndTime) {
         RoomUsage ru = roomUsageDao.findByGuestRoomIdAndBusinesskey(info.guestRoom().getId(), info.getBusinessKey());
+        if(ru == null){
+            return false;
+        }
         //结束时间不能小于开始时间
         if(newEndTime.isBefore(ru.getStartDateTime())){
             return false;

@@ -1,12 +1,12 @@
 spring:
   profiles:
-    active: rds
+    active: test
   freemarker:
     template-loader-path: classpath:/templates/
     suffix: .ftl
     charset: UTF-8
   activemq:
-    broker-url: tcp://81.68.143.180:61616
+    broker-url: tcp://47.105.67.46:61613
     user: admin
     password: admin
 qiniu:
