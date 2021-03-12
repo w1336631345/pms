@@ -96,17 +96,22 @@ public class RoomLinkServiceImpl implements RoomLinkService {
         for(int i=0; i<ids.length; i++){
             CheckInRecord cir = checkInRecordService.findById(ids[i]);
             if(cir.getGuestRoom() != null){
+                boolean togther = true;
                 if(!roomList.contains(cir.getGuestRoom().getRoomNum())){
                     roomList.add(cir.getGuestRoom().getRoomNum());
+                }else {
+                    togther = false;
                 }
-                List<CheckInRecord> list = checkInRecordService.findByOrderNumAndGuestRoomAndDeleted(cir.getOrderNum(), cir.getGuestRoom(), Constants.DELETED_FALSE);
-                hCount = hCount + list.size();
-                for(int m=0; m<list.size(); m++){
-                    CheckInRecord cirRoomNum = list.get(m);
-                    cirRoomNum.setOrderNumOld(cirRoomNum.getOrderNum());
-                    cirRoomNum.setRoomLinkId(roomLinkId);
-                    cirRoomNum.setOrderNum(roomLinkBo.getOrderNum());
-                    checkInRecordService.update(cirRoomNum);
+                if(togther){
+                    List<CheckInRecord> list = checkInRecordService.findByOrderNumAndGuestRoomAndDeleted(cir.getOrderNum(), cir.getGuestRoom(), Constants.DELETED_FALSE);
+                    hCount = hCount + list.size();
+                    for(int m=0; m<list.size(); m++){
+                        CheckInRecord cirRoomNum = list.get(m);
+                        cirRoomNum.setOrderNumOld(cirRoomNum.getOrderNum());
+                        cirRoomNum.setRoomLinkId(roomLinkId);
+                        cirRoomNum.setOrderNum(roomLinkBo.getOrderNum());
+                        checkInRecordService.update(cirRoomNum);
+                    }
                 }
             }
         }

@@ -348,6 +348,7 @@ public class AccountServiceImpl implements AccountService {
     }
 
     private DtoResponse<Account> checkBill(BillCheckBo billCheckBo) {
+        DtoResponse<Account> rep = new DtoResponse<Account>();
         String recordNum = businessSeqService.fetchNextSeqNum(billCheckBo.getHotelCode(),
                 Constants.Key.BUSINESS_BUSINESS_SETTLE_SEQ_KEY);
         billCheckBo.setMainSettleRecordNum(recordNum);
@@ -360,13 +361,18 @@ public class AccountServiceImpl implements AccountService {
             case Constants.Type.SETTLE_TYPE_GROUP:
                 return checkGroupBill(billCheckBo);
             case Constants.Type.SETTLE_TYPE_LINK:
-                return checkLinkBill(billCheckBo);
+                if(billCheckBo.getMainAccountId() == null){
+                    rep.setStatus(Constants.BusinessCode.CODE_ILLEGAL_OPERATION);
+                    rep.setMessage("联房没有主账户");
+                    return rep;
+                }else{
+                    return checkLinkBill(billCheckBo);
+                }
             case Constants.Type.SETTLE_TYPE_IGROUP:
                 return checkIGroupBill(billCheckBo);
             case Constants.Type.SETTLE_TYPE_ROOM:
                 return checkRoomBill(billCheckBo);
         }
-        DtoResponse<Account> rep = new DtoResponse<Account>();
         return rep;
     }
 

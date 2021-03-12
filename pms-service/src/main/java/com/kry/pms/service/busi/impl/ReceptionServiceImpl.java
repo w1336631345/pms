@@ -379,6 +379,7 @@ public class ReceptionServiceImpl implements ReceptionService {
 				asv = new AccountSummaryVo();
 				asv.setName("联房账务");
 				asv.setType("link");
+				asv.setOrderNum(cir.getOrderNum());
 				asv.setId(cir.getRoomLinkId());
 				asv.setSettleType(Constants.Type.SETTLE_TYPE_LINK);
 				asv.setChildren(data);

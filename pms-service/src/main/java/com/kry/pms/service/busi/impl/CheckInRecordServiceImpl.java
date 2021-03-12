@@ -713,6 +713,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
     public DtoResponse<List<CheckInRecord>> checkOut(String type, String id, String orderNum) {
         switch (type) {
             case Constants.Type.SETTLE_TYPE_ACCOUNT:
+                System.out.println("走的这里");
                 return checkOutAccout(id);
             case Constants.Type.SETTLE_TYPE_PART:
                 DtoResponse<List<CheckInRecord>> response = new DtoResponse<>();
@@ -766,11 +767,14 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
         List<CheckInRecord> data = new ArrayList<>();
         DtoResponse<CheckInRecord> rep = checkOut(cir);
         if (rep.getStatus() != 0) {
+            System.out.println("1111111status!=0");
             BeanUtils.copyProperties(rep, response);
         } else {
+            System.out.println("2222222status就是0");
             List<CheckInRecord> togethers = checkInTogetherByStatus(cir.getHotelCode(), cir.getOrderNum(), cir.getGuestRoom().getId(), Arrays.asList(Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN,
                     Constants.Status.CHECKIN_RECORD_STATUS_ASSIGN));
             if (togethers != null) {
+                System.out.println("222221111status1同住");
                 rep.setStatus(1);
             }
             data.add(rep.getData());
@@ -804,18 +808,21 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
         DtoResponse<CheckInRecord> rep = new DtoResponse<>();
         if (cir == null) {
             rep.setStatus(Constants.BusinessCode.CODE_ILLEGAL_OPERATION);
-            rep.setMessage("找不到订单");
+            rep.setMessage("11找不到订单");
         } else if (cir.getAccount() != null) {
             if (!accountService.accountCheckAndSettledZeroBill(cir.getAccount())) {
                 rep.setStatus(Constants.BusinessCode.CODE_ILLEGAL_OPERATION);
                 rep.setMessage(cir.getAccount().getCode() + ":未完成结帐！");
             } else {
                 if (Constants.Status.CHECKIN_RECORD_STATUS_OUT_UNSETTLED.equals(cir.getStatus())) {
+                    System.out.println("1122=====什么S status");
                     cir.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_CHECK_OUT);
 //                    creditGrantingRecordService.disableAllCreditGranting(cir.getAccount());
                 } else if (Constants.Status.CHECKIN_RECORD_STATUS_RESERVATION.equals(cir.getStatus())) {
+                    System.out.println("1133=====什么R status");
                     //S状态 不需要调整房类资源
                 } else {
+                    System.out.println("1144===最后一种情况 status");
                     cir.setActualTimeOfLeave(LocalDateTime.now());
                     boolean b = roomStatisticsService.checkOut(new CheckInRecordWrapper(cir));
                     if (!b) {
@@ -1599,6 +1606,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                     asv.setGuestRoomId(cir.getGuestRoom().getId());
                     asv.setId(cir.getGuestRoom().getId());
                     asv.setName(acc.getRoomNum());
+                    asv.setOrderNum(cir.getOrderNum());
                     asv.setChildren(new ArrayList<AccountSummaryVo>());
                     asvm.put(acc.getRoomNum(), asv);
                 } else {
