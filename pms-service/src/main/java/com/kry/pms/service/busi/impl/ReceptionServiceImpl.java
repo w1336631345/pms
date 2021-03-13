@@ -288,7 +288,12 @@ public class ReceptionServiceImpl implements ReceptionService {
 		DtoResponse<String> rep = new DtoResponse<>();
 		LocalDateTime now = LocalDateTime.now();
 //		LocalDateTime now = dateTimeService.getBusinessDateTime(cir.getHotelCode());
-		cir.setActualTimeOfArrive(now);
+		//如果是挂S账的重新入住，不修改实际到店时间，修改离店时间为Null（挂S账做过实际退房时间处理）
+		if(Constants.Status.CHECKIN_RECORD_STATUS_OUT_UNSETTLED.equals(cir.getStatus())){
+			cir.setActualTimeOfLeave(null);
+		}else {
+			cir.setActualTimeOfArrive(now);
+		}
 		cir.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN);
 		checkInRecordService.modify(cir);
 		if(Constants.Type.CHECK_IN_RECORD_CUSTOMER.equals(cir.getType())){
@@ -299,7 +304,11 @@ public class ReceptionServiceImpl implements ReceptionService {
 				c.setStatus(Constants.Status.CHECKIN_RECORD_STATUS_CHECK_IN);
 				checkInRecordService.modify(c);
 			}
-			roomStatisticsService.checkIn(new CheckInRecordWrapper(cir));
+			boolean resule = roomStatisticsService.checkIn(new CheckInRecordWrapper(cir));
+			if(!resule){
+				rep.setStatus(Constants.BusinessCode.CODE_PARAMETER_INVALID);
+				rep.setMessage("资源问题，入住失败");
+			}
 		}
 		return rep;
 	}
