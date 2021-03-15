@@ -67,7 +67,7 @@ public class MemberInfo extends PersistenceModelTo {
     @ManyToOne
     private Hotel hotel;//发卡酒店
     @Column
-    private String quota;//消费限额
+    private String quota;//消费限额 F：无，T：有
     @Column
     private String password;//密码
     @Column

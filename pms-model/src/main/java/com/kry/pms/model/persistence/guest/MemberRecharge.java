@@ -44,7 +44,7 @@ public class MemberRecharge extends PersistenceModelTo {
     @Column
     private Double useGiveAmount;//使用赠送金额
     @Column
-    private String rechargeOrUse;//充值（R）或使用（U）或过期（O）
+    private String rechargeType;//充值（R）或使用（U）或过期（O）或转账（T）
     @Column
     private Integer isOverdue;//是否过期(0有效，1过期)
     @Column
@@ -55,4 +55,7 @@ public class MemberRecharge extends PersistenceModelTo {
     private String shiftCode;//班次
     @Column
     private String settledNo;//结账单号
+    @Column
+    private Double transferAccounts;//转账金额
+
 }

@@ -135,32 +135,31 @@ public class MemberRechargeServiceImpl implements MemberRechargeService {
 		hr.setData(memberRechargeDao.saveAndFlush(entity));
 		return hr;
 	}
-	//后端调用，使用金额
+	//后端调用，使用金额(转会员账)
 	@Override
 	public HttpResponse useAmount(String hotelCode, String accountId, Double amount, String settledNo) {
 		HttpResponse hr = new HttpResponse();
 		MemberRecharge entity = new MemberRecharge();
 //		MemberInfo memberInfo = memberInfoDao.findByHotelCodeAndCardNum(hotelCode, cardNum);
 		MemberInfo memberInfo = memberInfoDao.findByHotelCodeAndAccountId(hotelCode, accountId);
-		if((memberInfo.getBalance() + memberInfo.getGivePrice()) <amount){
-			return hr.error("余额不足");
+		if("T".equals(memberInfo.getQuota())){//如果有消费限额，不能大于余额
+			if((memberInfo.getBalance() + memberInfo.getGivePrice()) <amount){
+				return hr.error("余额不足");
+			}
 		}
-		if(memberInfo.getGivePrice() >= amount){//赠送大于消费，直接扣赠送
-			memberInfo.setGivePrice(memberInfo.getGivePrice() - amount);
-
-			entity.setUseAmount(0.0);
-			entity.setUseGiveAmount(amount);
-		}else{
-			memberInfo.setBalance(memberInfo.getBalance() - (amount - memberInfo.getGivePrice()));
-			memberInfo.setGivePrice(0.0);
-
-			entity.setUseAmount(amount - memberInfo.getGivePrice());
-			entity.setUseGiveAmount(memberInfo.getGivePrice());
+		if(amount > 0){//是消费，直接扣减
+			if(memberInfo.getGivePrice() >= amount){//赠送大于消费，直接扣赠送
+				memberInfo.setGivePrice(memberInfo.getGivePrice() - amount);
+			}else{
+				memberInfo.setBalance(memberInfo.getBalance() - (amount - memberInfo.getGivePrice()));
+				memberInfo.setGivePrice(0.0);
+			}
+		}else {// <0 是收款（充值）
+			memberInfo.setBalance(memberInfo.getBalance() - amount);
 		}
 		memberInfoDao.saveAndFlush(memberInfo);
 
 		entity.setHotelCode(hotelCode);
-		entity.setRechargeOrUse("U");
 		entity.setIsOverdue(0);
 		entity.setCardNum(memberInfo.getCardNum());
 		entity.setMacNum(memberInfo.getMacNum());
@@ -168,6 +167,8 @@ public class MemberRechargeServiceImpl implements MemberRechargeService {
 		entity.setSettledNo(settledNo);
 		entity.setCreateDate(LocalDateTime.now());
 		entity.setRechargeDate(LocalDate.now());
+		entity.setRechargeType("T");//充值（R）或使用（U）或过期（O）或转账（T）
+		entity.setTransferAccounts(-amount);//设置转账金额
 		hr.setData(memberRechargeDao.saveAndFlush(entity));
 
 		//账号减去过期的钱
@@ -297,7 +298,7 @@ public class MemberRechargeServiceImpl implements MemberRechargeService {
 				entity.setIsOverdue(1);
 				entity.setOverAmount(nowOverAmount);
 				entity.setOverGiveAmount(nowOverGiveAmount);
-				entity.setRechargeOrUse("O");
+				entity.setRechargeType("O");
 				entity.setCardNum(cardNum);
 				entity.setMacNum(overdue.get(0).getMacNum());
 				entity.setRemark("过期");
