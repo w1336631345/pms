@@ -305,6 +305,7 @@ public class GuestRoomServiceImpl implements GuestRoomService {
                             DtoResponse<String> r = guestRoomStatusService.changeRoomStatus(id, toStatus, 1, false);
                             if (r.getStatus() != 0) {
                                 errorCode = r.getStatus();
+                                rep.setStatus(errorCode);
                                 rep.setMessage(rep.getMessage() + r.getMessage());
                             }
                         }

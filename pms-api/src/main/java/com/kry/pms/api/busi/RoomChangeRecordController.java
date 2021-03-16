@@ -30,7 +30,7 @@ public class RoomChangeRecordController extends BaseController<RoomChangeRecord>
 	 * @Date: 2020/3/16 15:48
 	 */
 	@PostMapping
-	@OperationLog(remark = "换房")
+//	@OperationLog(remark = "换房")
 	public HttpResponse<RoomChangeRecord> add(@RequestBody  RoomChangeRecord roomChangeRecord) {
 		HttpResponse hr = new HttpResponse();
 		User user = getUser();

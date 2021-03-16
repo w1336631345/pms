@@ -71,7 +71,7 @@ public class ReceptionController extends BaseController<String> {
 	 * @Date: 2019/12/17 15:52
 	 */
 	@PostMapping(path = "/checkInAll")
-	@OperationLog(remark = "批量入住")
+//	@OperationLog(remark = "批量入住")
 	public HttpResponse checkIn(@RequestBody String[] ids) {
 		HttpResponse<String> rep = new HttpResponse<String>();
 		BeanUtils.copyProperties(receptionService.checkInAll(ids,getUser()), rep);
@@ -156,16 +156,25 @@ public class ReceptionController extends BaseController<String> {
 	 * @return
 	 */
 	@PostMapping(path="/bill/check")
-	@OperationLog(remark = "宾客结账")
-	public HttpResponse<AccountSummaryVo> customerCheckBill(@RequestBody BillCheckBo	billCheckBo){
+//	@OperationLog(remark = "宾客结账")
+	public HttpResponse customerCheckBill(@RequestBody BillCheckBo	billCheckBo){
 		billCheckBo.setHotelCode(getCurrentHotleCode());
 		billCheckBo.setShiftCode(getShiftCode());
 		billCheckBo.setOperationEmployee(getCurrentEmployee());
-		HttpResponse<AccountSummaryVo> rep = new HttpResponse<AccountSummaryVo>();
+		HttpResponse rep = new HttpResponse();
 		DtoResponse<Account> data = accountService.checkCustomerBill(billCheckBo);
-		BeanUtils.copyProperties(data, rep);
+		rep.setMessage(data.getMessage());
+		rep.setStatus(data.getStatus());
+		rep.setCode(data.getCode());
+//		rep.setSuccess(data.success);
+//		BeanUtils.copyProperties(data, rep);
 		if(data.getData()!=null){
-			rep.setData(new AccountSummaryVo(data.getData()));
+			if(data.getStatus() == 0){
+				rep.setData(new AccountSummaryVo(data.getData()));
+			}else{
+				rep.setMessage(data.getMessage());
+//				rep.setData(data.getData());
+			}
 		}
 		return rep;
 	}

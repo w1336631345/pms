@@ -37,7 +37,7 @@ public class InterfaceUseLogController extends BaseController<InterfaceUseLog> {
 	}
 
 	@GetMapping
-	@OperationLog(remark = "测试卷哦")
+//	@OperationLog(remark = "测试卷哦")
 	public HttpResponse<PageResponse<InterfaceUseLog>> query(HttpServletRequest request) throws InstantiationException, IllegalAccessException{
 		HttpResponse<PageResponse<InterfaceUseLog>> rep = new HttpResponse<PageResponse<InterfaceUseLog>>();
 		PageRequest<InterfaceUseLog> req = parse2PageRequest(request);
