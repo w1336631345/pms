@@ -159,7 +159,7 @@ public class MemberInfoServiceImpl implements MemberInfoService {
 		return list;
 	}
 	@Override
-	public List<MemberInfo> getParmsList(String name, String mobile,String cardNum, String idCardNum, String hotelCode) {
+	public List<MemberInfo> getParmsList(String name, String mobile,String cardNum, String idCardNum, String hotelCode,String isUsed) {
 		List<MemberInfo> list = memberInfoDao.findAll(new Specification<MemberInfo>() {
 			@Override
 			public Predicate toPredicate(Root<MemberInfo> root, CriteriaQuery<?> query,
@@ -186,6 +186,21 @@ public class MemberInfoServiceImpl implements MemberInfoService {
 					// 外键对象的属性，要用join再get
 					list.add(criteriaBuilder.equal(root.join("customer").get("idCardNum"), idCardNum));
 				}
+
+                // isUsed不为空，再去限制会员状态，X的话查初始，在用和恢复，传I,U,R则直接查对应的
+				if (null != isUsed){
+					if("X".equals(isUsed)){
+						List<Predicate> predicateListOr = new ArrayList<>();
+						predicateListOr.add(criteriaBuilder.equal(root.get("isUsed"),  "I"));
+						predicateListOr.add(criteriaBuilder.equal(root.get("isUsed"),  "U"));
+						predicateListOr.add(criteriaBuilder.equal(root.get("isUsed"),  "R"));
+						list.add(criteriaBuilder.or(predicateListOr.toArray(new Predicate[predicateListOr.size()])));
+					}else {
+						list.add(criteriaBuilder.equal(root.get("isUsed"), isUsed));
+					}
+
+				}
+
 				Predicate[] array = new Predicate[list.size()];
 				return criteriaBuilder.and(list.toArray(array));
 			}

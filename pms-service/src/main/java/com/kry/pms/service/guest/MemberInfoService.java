@@ -23,7 +23,7 @@ public interface MemberInfoService extends BaseService<MemberInfo>{
 
     List<MemberInfo> byParamsList(String hotelCode, String startTime, String endTime, String birthDay);
 
-    List<MemberInfo> getParmsList(String name, String mobile, String cardNum, String idCardNum, String hotelCode);
+    List<MemberInfo> getParmsList(String name, String mobile, String cardNum, String idCardNum, String hotelCode,String isUsed);
 
     List<Map<String, Object>> list(String hotelCode, String type, String isUsed, String moreParams);
 

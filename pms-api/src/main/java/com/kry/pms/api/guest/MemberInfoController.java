@@ -30,6 +30,15 @@ public class MemberInfoController extends BaseController<MemberInfo> {
 
 	@PutMapping
 	public HttpResponse<MemberInfo> modify(@RequestBody MemberInfo memberInfo) {
+
+		// 选择了密码校验，则密码必填
+		if (null != memberInfo.getIsUsedPassword() && "T".equals(memberInfo.getIsUsedPassword())
+				&& (null == memberInfo.getPassword() || "".equals(memberInfo.getPassword()))){
+			HttpResponse hr = new HttpResponse();
+			 return hr.error("选择了密码校验请填写密码!");
+		}
+
+
         memberInfo.setUpdateDate(LocalDateTime.now());
         memberInfo.setUpdateUser(getCurrentUserId());
 		return getDefaultResponse().addData(memberInfoService.modify(memberInfo));
@@ -179,9 +188,9 @@ public class MemberInfoController extends BaseController<MemberInfo> {
 	 * @Date: 2020/7/29 15:26
 	 */
 	@GetMapping(value = "/getParmsList")
-	public HttpResponse<List<MemberInfo>> getParmsList(String name, String mobile,String cardNum, String idCardNum){
+	public HttpResponse<List<MemberInfo>> getParmsList(String name, String mobile,String cardNum, String idCardNum,String isUsed){
 		HttpResponse<List<MemberInfo>> rep = new HttpResponse<>();
-		List<MemberInfo> list = memberInfoService.getParmsList(name, mobile, cardNum, idCardNum, getCurrentHotleCode());
+		List<MemberInfo> list = memberInfoService.getParmsList(name, mobile, cardNum, idCardNum, getCurrentHotleCode(),isUsed);
 		rep.addData(list);
 		return rep;
 
