@@ -36,7 +36,7 @@ public class Constants {
 		public static final String ROOM_STATUS_VACANT_DIRTY = "VD";//空脏
 		public static final String ROOM_STATUS_OCCUPY_CLEAN = "OC";//住静
 		public static final String ROOM_STATUS_OCCUPY_DIRTY = "OD";//住脏
-		public static final String ROOM_STATUS_OUT_OF_ORDER = "OO";
+		public static final String ROOM_STATUS_OUT_OF_ORDER = "OO";//维修
 		public static final String ROOM_STATUS_OUT_OF_SERVCIE = "OS";
 		public static final String ROOM_STATUS_EXPECTE_DEPARTURE = "ED";
 		public static final String ROOM_STATUS_FREE = "COM";

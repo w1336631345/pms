@@ -32,11 +32,19 @@ public class AccountController extends BaseController<Account> {
 
     @PostMapping
     public HttpResponse<Account> add(@RequestBody Account account) {
-        return getDefaultResponse().addData(accountService.add(account));
+        Account result = accountService.add(account);
+        if (null == result){
+            return getDefaultResponse().error("账号重复创建失败，请重试");
+        }else{
+            return getDefaultResponse().addData(result);
+        }
     }
 
     @PutMapping
     public HttpResponse<Account> modify(@RequestBody Account account) {
+        if (!account.getHoldArrow() && 0 != account.getTotal()){  //如果要停用必须判断余额不为0，否则不允许停用
+            return getDefaultResponse().error("余额为0的情况下才允许停用");
+        }
         return getDefaultResponse().addData(accountService.modify(account));
     }
 

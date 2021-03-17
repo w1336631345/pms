@@ -17,6 +17,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -126,6 +130,15 @@ public class ReceptionController extends BaseController<String> {
 	public HttpResponse<AccountSummaryVo> getAccountSummary(@PathVariable String id){
 		HttpResponse<AccountSummaryVo> rep = new HttpResponse<>();
 		AccountSummaryVo accountSummaryVo = receptionService.getAccountSummaryByCheckRecordId(id);
+
+		if (null == accountSummaryVo.getActualTimeOfLeave()){  //实际离开时间为空的话则取当前时间作为展示打印账单的时间
+			accountSummaryVo.setActualTimeOfLeave(LocalDateTime.now());
+		}
+		for (AccountSummaryVo vo : accountSummaryVo.getChildren()){
+			if (null == vo.getActualTimeOfLeave()){
+				vo.setActualTimeOfLeave(LocalDateTime.now());
+			}
+		}
 		rep.setData(accountSummaryVo);
 		return rep;
 	}

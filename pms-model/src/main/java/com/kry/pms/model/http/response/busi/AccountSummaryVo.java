@@ -32,6 +32,7 @@ public class AccountSummaryVo {
     private Collection<AccountSummaryVo> children;
 
     private Integer days;
+    private LocalDateTime actualTimeOfLeave;   // 实际离店时间，展示作为打印账单列表的时间
 
     public AccountSummaryVo() {
 
@@ -39,7 +40,7 @@ public class AccountSummaryVo {
 
     public AccountSummaryVo(String orderNum, String id, String cirId, String name, Double total, String roomNum,
                             String type, Double pay, Double cost, Double creditLimit, Double availableCreditLimit,
-                            String roomStatus, String accountCode, LocalDateTime arriveTime, LocalDateTime leaveTime, String guestRoomId,Double personalPrice, Integer days) {
+                            String roomStatus, String accountCode, LocalDateTime arriveTime, LocalDateTime leaveTime, String guestRoomId,Double personalPrice, Integer days,LocalDateTime actualTimeOfLeave) {
         this.orderNum = orderNum;
         this.id = id;
         this.cirId = cirId;
@@ -58,6 +59,8 @@ public class AccountSummaryVo {
         this.guestRoomId = guestRoomId;
         this.personalPrice = personalPrice;
         this.days = days;
+        this.actualTimeOfLeave = actualTimeOfLeave;
+
     }
 
     public AccountSummaryVo(Account acc) {
@@ -89,6 +92,7 @@ public class AccountSummaryVo {
         this.arriveTime = cir.getActualTimeOfArrive() != null ? cir.getActualTimeOfArrive() : cir.getArriveTime();
         this.leaveTime = cir.getActualTimeOfLeave() != null ? cir.getActualTimeOfLeave() : cir.getLeaveTime();
         this.days = cir.getDays();
+        this.actualTimeOfLeave = cir.getActualTimeOfLeave();
     }
     public AccountSummaryVo(CheckInRecord cir,String guestRoomId) {
         this(cir.getAccount(), null);
@@ -100,5 +104,6 @@ public class AccountSummaryVo {
         this.arriveTime = cir.getActualTimeOfArrive() != null ? cir.getActualTimeOfArrive() : cir.getArriveTime();
         this.leaveTime = cir.getActualTimeOfLeave() != null ? cir.getActualTimeOfLeave() : cir.getLeaveTime();
         this.days = cir.getDays();
+        this.actualTimeOfLeave = cir.getActualTimeOfLeave();
     }
 }

@@ -24,6 +24,12 @@ public interface AccountDao extends BaseDao<Account> {
 	@Query(nativeQuery = true,value = "select count(id) from t_account a,t_checkin_record b where a.id = b.account_id and b.order_num = ?1 and b.status=?2")
 	int queryAccounCountByOrderNumAndStatus(String orderNum,String status);
 
+	/**
+	 * 查询某个计算出来的账号是否已经存在
+	 * @author: WangXinHao
+	 * @date: 2021/3/17 0017 15:45
+	 */
+	public  List<Account> findByHotelCodeAndCode(String hotelCode,String code);
 
 
 }

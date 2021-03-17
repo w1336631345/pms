@@ -484,11 +484,11 @@ public class GuestRoomStatusServiceImpl implements GuestRoomStatusService {
         GuestRoomStatus status = findGuestRoomStatusByGuestRoom(info.guestRoom());
         LocalDateTime now = LocalDateTime.now();
         //徐老板说不会存在，锁定结束仍然是锁定状态的情况，2020-04-17
-        if (now.isAfter(info.getStartTime()) && now.isBefore(info.getEndTime())) {
+/*        if (now.isAfter(info.getStartTime()) && now.isBefore(info.getEndTime())) {*/    // 暂时放开判断时间的条件，以免解除维修时间过期的房间状态不变
             status.setRoomStatus(info.nextStatus());
             clearStatus(status);
             modify(status);
-        }
+/*        }*/
     }
 
     @Override

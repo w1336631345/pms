@@ -73,7 +73,15 @@ public class AccountServiceImpl implements AccountService {
         if (account.getTotal() == null) {
             initAccount(account);
         }
-        return accountDao.saveAndFlush(account);
+/*
+        account.setCode("D000007");   // 测试账号重复
+*/
+        List<Account> list = accountDao.findByHotelCodeAndCode(account.getHotelCode(),account.getCode());
+        if (0 != list.size()){   //如果编号已经存在，则不允许插入
+            return null;
+        }else{
+            return accountDao.saveAndFlush(account);
+        }
     }
 
     private void initAccount(Account account) {
