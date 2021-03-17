@@ -2515,8 +2515,10 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
 
     @Override
     public List<CheckInRecord> findTodayCheckInRecord(GuestRoom guestRoom, String status) {
-        return checkInRecordDao.findByGuestRoomIdAndStatusAndDeletedAndStartDate(guestRoom.getId(), status,
-                Constants.DELETED_FALSE, LocalDate.now());
+        LocalDate busDate = businessSeqService.getBuinessDate(guestRoom.getHotelCode());
+        List<CheckInRecord> ar = checkInRecordDao.findByGuestRoomIdAndStatusAndDeletedAndStartDate(guestRoom.getId(), status, Constants.DELETED_FALSE, busDate);
+//        List<CheckInRecord> ar = checkInRecordDao.findByGuestRoomIdAndStatusAndDeletedAndStartDate(guestRoom.getId(), status, Constants.DELETED_FALSE, LocalDate.now());
+        return ar;
     }
 
     @Override
