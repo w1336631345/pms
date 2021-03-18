@@ -4,6 +4,7 @@ import com.kry.pms.api.BaseController;
 import com.kry.pms.base.HttpResponse;
 import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
+import com.kry.pms.dao.guest.MemberInfoDao;
 import com.kry.pms.model.persistence.guest.MemberInfo;
 import com.kry.pms.service.guest.MemberInfoService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,13 +20,29 @@ import java.util.Map;
 public class MemberInfoController extends BaseController<MemberInfo> {
 	@Autowired
 	MemberInfoService memberInfoService;
+	@Autowired
+	MemberInfoDao memberInfoDao;
+
 	@PostMapping
 	public HttpResponse<MemberInfo> add(@RequestBody MemberInfo memberInfo) {
 		memberInfo.setHotelCode(getCurrentHotleCode());
 		memberInfo.setCreateDate(LocalDateTime.now());
 		memberInfo.setCreateUser(getUserId());
 		memberInfo.setOperator(getCurrentEmployee().getName());
-		return getDefaultResponse().addData(memberInfoService.add(memberInfo));
+
+		// 先判重，先判断物理卡号是否存在（手动输入的），然后判断系统卡号是否存在（生成的）
+		List<MemberInfo>  macList = memberInfoDao.findByHotelCodeAndMacNum(memberInfo.getHotelCode(),memberInfo.getMacNum());
+		if (null != macList && 0 != macList.size()){
+			return getDefaultResponse().error("物理卡号已存在，请重新输入");
+		}
+
+
+		MemberInfo result = memberInfoService.add(memberInfo);
+		if (null == result){
+			return  getDefaultResponse().error("系统卡号已存在，请重新输入");
+		}else{
+			return getDefaultResponse().addData(result);
+		}
 	}
 
 	@PutMapping
@@ -38,6 +55,15 @@ public class MemberInfoController extends BaseController<MemberInfo> {
 			 return hr.error("选择了密码校验请填写密码!");
 		}
 
+		// 判断物理卡号是否存在，存在则不允许修改
+		List<MemberInfo>  macList = memberInfoDao.findByHotelCodeAndMacNum(memberInfo.getHotelCode(),memberInfo.getMacNum());
+		if (null != macList && 0 != macList.size() && macList.size() > 1){  // 有两条以上重复记录
+			return getDefaultResponse().error("物理卡号已存在，请重新输入");
+		}else if (null != macList && 0 != macList.size() && macList.size() == 1){  //有一条记录，判断是否是它自己，不是的话则不允许修改
+			if (!memberInfo.getId().equals(macList.get(0).getId())){  //存在的这条记录不是他自己
+				return getDefaultResponse().error("物理卡号已存在，请重新输入");
+			}
+		}
 
         memberInfo.setUpdateDate(LocalDateTime.now());
         memberInfo.setUpdateUser(getCurrentUserId());

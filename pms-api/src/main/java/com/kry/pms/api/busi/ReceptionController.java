@@ -131,17 +131,40 @@ public class ReceptionController extends BaseController<String> {
 		HttpResponse<AccountSummaryVo> rep = new HttpResponse<>();
 		AccountSummaryVo accountSummaryVo = receptionService.getAccountSummaryByCheckRecordId(id);
 
-		if (null == accountSummaryVo.getActualTimeOfLeave()){  //实际离开时间为空的话则取当前时间作为展示打印账单的时间
+/*		if (null == accountSummaryVo.getActualTimeOfLeave()){  //实际离开时间为空的话则取当前时间作为展示打印账单的时间
 			accountSummaryVo.setActualTimeOfLeave(LocalDateTime.now());
 		}
 		for (AccountSummaryVo vo : accountSummaryVo.getChildren()){
 			if (null == vo.getActualTimeOfLeave()){
 				vo.setActualTimeOfLeave(LocalDateTime.now());
 			}
-		}
+		}*/
+
+		initActualLeaveTime(accountSummaryVo);
 		rep.setData(accountSummaryVo);
 		return rep;
 	}
+
+
+	/**
+	 * @desc: 因为AccountSummaryVo 是嵌套的，所以说递归去初始化离店时间（不为空设为当前时间）
+	 * @author: WangXinHao
+	 * @date: 2021/3/18 0018 15:09
+	 */
+	public static void initActualLeaveTime(AccountSummaryVo vo){
+		if (null == vo.getActualTimeOfLeave()){    //先初始化当前元素
+			vo.setActualTimeOfLeave(LocalDateTime.now());
+		}
+	    if (null == vo.getChildren() || 0 == vo.getChildren().size()){  //没有子元素了
+			return;
+        }else{   //否则遍历递归下去
+			for (AccountSummaryVo aVo : vo.getChildren()){
+				initActualLeaveTime(aVo);
+			}
+		}
+    }
+
+
 	@GetMapping(path="/account/summary/code/{code}")
 	public HttpResponse<AccountSummaryVo> getAccountSummaryByCode(@PathVariable String code){
 		HttpResponse<AccountSummaryVo> rep = new HttpResponse<>();

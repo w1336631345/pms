@@ -69,6 +69,15 @@ public class MemberInfoServiceImpl implements MemberInfoService {
 		Account account = accountService.createMemberAccount(entity.getCustomer(), entity.getHotelCode());
 		entity.setAccount(account);
 		entity.setCardNum(account.getCode());//设置的会员卡号，要求与会员账号一致、对比上面注释代码设置的卡号
+
+
+		// entity.setCardNum("MA00006");  //测试重复
+
+		// 判断系统卡号是否重复，重复则不插入
+		List<MemberInfo> cardList = memberInfoDao.findByHotelCodeAndCardNum2(entity.getHotelCode(),entity.getCardNum());
+		if (null != cardList && 0 != cardList.size()){
+			return null;
+		}
 		return memberInfoDao.saveAndFlush(entity);
 	}
 

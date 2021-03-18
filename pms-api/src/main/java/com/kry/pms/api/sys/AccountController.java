@@ -21,6 +21,7 @@ import com.kry.pms.service.org.EmployeeService;
 import com.kry.pms.service.sys.AccountService;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping(path = "/api/v1/sys/account")
@@ -42,7 +43,7 @@ public class AccountController extends BaseController<Account> {
 
     @PutMapping
     public HttpResponse<Account> modify(@RequestBody Account account) {
-        if (!account.getHoldArrow() && 0 != account.getTotal()){  //如果要停用必须判断余额不为0，否则不允许停用
+        if ("N".equals(account.getStatus()) && 0 != account.getTotal()){  //如果要停用必须判断余额不为0，否则不允许停用
             return getDefaultResponse().error("余额为0的情况下才允许停用");
         }
         return getDefaultResponse().addData(accountService.modify(account));

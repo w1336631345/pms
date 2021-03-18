@@ -145,5 +145,21 @@ public interface MemberInfoDao extends BaseDao<MemberInfo>{
 			"  and if(coalesce(:leavelIds, null) is not null, tmi.member_level_id in (:leavelIds), 1=1 ) ")
 	List<Map<String, Object>> getSendMsgList(@Param("hotelCode") String hotelCode, @Param("tDay")String tDay, @Param("sDay")String sDay, @Param("leavelIds") List<String> leavelIds);
 
+	/**
+	 *  查询是否存在该物理账号了
+	 * @author: WangXinHao
+	 * @date: 2021/3/18 0018 13:50
+	 */
+	List<MemberInfo>  findByHotelCodeAndMacNum(String hotelCode,String macNum);
 
+
+	/**
+	 * @desc: 查询是否存在该系统卡号了
+	 * @author: WangXinHao  
+	 * @date: 2021/3/18 0018 14:13
+	 */
+	@Query(nativeQuery = true, value = " select *" +
+			"  from t_member_info\n" +
+			"  where hotel_code =  :hotelCode  and  card_num = :cardNum")
+	List<MemberInfo>  findByHotelCodeAndCardNum2(@Param("hotelCode") String hotelCode, @Param("cardNum")String cardNum);
 }
