@@ -210,7 +210,9 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                         price = cir.getRoomType().getPrice();
                     }
                     if(!cir.getPersonalPrice().equals(price * cir.getPersonalPercentage())){
-                        List<RoomRecord> list = roomRecordService.findByHotelCodeAndCheckInRecord(cir.getHotelCode(), cir.getId());
+                        //修改房价，应该只修改没有支付的，已经夜审支付过的roomRecord不再修改价格
+//                        List<RoomRecord> list = roomRecordService.findByHotelCodeAndCheckInRecord(cir.getHotelCode(), cir.getId());
+                        List<RoomRecord> list = roomRecordService.findByCheckInRecordAndIsAccountEntry(cir.getId(), "NO");
                         for(int r=0; r<list.size(); r++){
                                 list.get(r).setCost(price * cir.getPersonalPercentage());
                                 roomRecordDao.saveAndFlush(list.get(r));
@@ -302,7 +304,9 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
         } else {//不是主单，是宾客信息
             if (!dbCir.getPersonalPrice().equals(checkInRecord.getPersonalPrice())) {//修改房价
                 personalPrice = true;
-                List<RoomRecord> list = roomRecordService.findByHotelCodeAndCheckInRecord(checkInRecord.getHotelCode(), checkInRecord.getId());
+                //修改房价，应该只修改没有支付的，已经夜审支付过的roomRecord不再修改价格
+//                List<RoomRecord> list = roomRecordService.findByHotelCodeAndCheckInRecord(checkInRecord.getHotelCode(), checkInRecord.getId());
+                List<RoomRecord> list = roomRecordService.findByCheckInRecordAndIsAccountEntry(checkInRecord.getId(), "NO");
                 for (int r = 0; r < list.size(); r++) {
                     RoomRecord rr = list.get(r);
                     rr.setCost(checkInRecord.getPersonalPrice());

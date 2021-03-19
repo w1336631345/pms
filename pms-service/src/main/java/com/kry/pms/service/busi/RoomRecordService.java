@@ -34,6 +34,8 @@ public interface RoomRecordService extends BaseService<RoomRecord> {
 
     List<RoomRecord> findByHotelCodeAndCheckInRecord(String hotelCode, String checkInRecordId);
 
+    List<RoomRecord> findByCheckInRecordAndIsAccountEntry(String checkInRecordId, String isAccountEntry);
+
     Map<String, Object> recordDateAndRoomPrice(String recordDate, String checkInRecordId);
 
     List<RoomRecord> getByTimeAndCheckId(String recordDate, String checkInRecordId);
@@ -41,4 +43,6 @@ public interface RoomRecordService extends BaseService<RoomRecord> {
     public int autoOpenLock();
 
     void deletedRecordAfter(String checkInRecordId, LocalDate recordDate);
+
+    void deletedRecordBefor(String checkInRecordId, LocalDate recordDate);
 }

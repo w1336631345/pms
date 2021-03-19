@@ -503,19 +503,44 @@ public class ReceptionServiceImpl implements ReceptionService {
 	public DtoResponse<String> checkInAuditRoomRecord(String status, CheckInRecord cir, LocalDate businessDate, User user) {
 		DtoResponse<String> rep = new DtoResponse<>();
 		LocalDateTime now = LocalDateTime.now();
+		LocalDateTime actualTimeOfArrive = cir.getActualTimeOfArrive();
+		if(actualTimeOfArrive == null){
+			actualTimeOfArrive = now;
+		}
+		LocalDate ar2 = actualTimeOfArrive.toLocalDate();//实际到达日期
+		LocalTime aTime2 = actualTimeOfArrive.toLocalTime();//实际到达时间
 
 		LocalDateTime arriveTime = cir.getArriveTime();
-		LocalDate ar = arriveTime.toLocalDate();
+		LocalDate ar = arriveTime.toLocalDate();//预订到达日期
+		LocalTime aTime = arriveTime.toLocalTime();//预订到达时间
 
-		LocalTime aTime = arriveTime.toLocalTime();
 		LocalTime t = systemConfigService.getCriticalTime(cir.getHotelCode());//过夜审的临界时间
-		if(aTime.isBefore(t)){//如果到达时间在临界时间之前（06:00:00）,房费要算在前一天
+
+		LocalDate start = cir.getStartDate();
+
+		//roomReocrd记录时间是 startDate 到 leaveTime
+		//无论实际到达时间是什么时候，就只有两种可能，夜审临界点之前和之后。临界点之前就多算一天房费，之后就正常计算
+		//1、临界点之前就多算一天房费 actualTimeOfArrive.plusDays(-1) 到 LeaveTime
+		//2、临界点之后正常计算 actualTimeOfArrive 到 LeaveTime
+		if(start.isBefore(ar2)){//如果实际离店日>起始时间，说明延迟入住了，要删除多余的roomRecord
+			if(aTime2.isBefore(t)){//如果实际到达时间在临界时间之前（06:00:00）,房费要算在前一天
+				//所以开始时间要小于实际到达时间 2 天才删除多余的roomRecord
+				if(start.isBefore(ar2.plusDays(-1))){
+					roomRecordService.deletedRecordBefor(cir.getId(), ar2.plusDays(-2));
+				}
+			}else{
+				roomRecordService.deletedRecordBefor(cir.getId(), ar2.plusDays(-1));
+			}
+		}
+
+		if(aTime2.isBefore(t)){//如果实际到达时间在临界时间之前（06:00:00）,房费要算在前一天
+
 			//房费要算前一天，查询前一天夜审是否已过
-			DailyVerify dailyVerify = dailyVerifyService.findByHotelCodeAndBusinessDate(user.getHotelCode(), ar.plusDays(-1));
+			DailyVerify dailyVerify = dailyVerifyService.findByHotelCodeAndBusinessDate(user.getHotelCode(), ar2.plusDays(-1));
 			if(dailyVerify != null){//到达时间前一天的夜审已经过了，已经过夜审，要自动入账到前一天。到达时间-1，离开时间-1
-				List<Map<String, Object>> list = roomRecordService.checkInAuditRoomRecord(status, ar.plusDays(-1), cir.getId(),  cir.getHotelCode(), "NO");
+				List<Map<String, Object>> list = roomRecordService.checkInAuditRoomRecord(status, ar2.plusDays(-1), cir.getId(),  cir.getHotelCode(), "NO");
 				Employee emp = employeeService.findByUser(user);
-				billService.putAcountMap(list, ar, emp, "3", cir.getHotelCode());
+				billService.putAcountMap(list, ar2, emp, "3", cir.getHotelCode());
 			}
 		}
 		return rep;

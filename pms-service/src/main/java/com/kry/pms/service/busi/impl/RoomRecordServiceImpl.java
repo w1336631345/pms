@@ -248,6 +248,14 @@ public class RoomRecordServiceImpl implements RoomRecordService {
 	}
 
 	@Override
+	public List<RoomRecord> findByCheckInRecordAndIsAccountEntry(String checkInRecordId, String isAccountEntry){
+		CheckInRecord cir = new CheckInRecord();
+		cir.setId(checkInRecordId);
+		List<RoomRecord> list = roomRecordDao.findByCheckInRecordAndIsAccountEntry(cir, isAccountEntry);
+		return list;
+	}
+
+	@Override
 	public Map<String, Object> recordDateAndRoomPrice(String recordDate, String checkInRecordId){
 		Map<String, Object> map = roomRecordDao.recordDateAndRoomPrice(recordDate, checkInRecordId);
 		return map;
@@ -288,6 +296,11 @@ public class RoomRecordServiceImpl implements RoomRecordService {
 	@Override
 	public void deletedRecordAfter(String checkInRecordId, LocalDate recordDate) {
 		roomRecordDao.deletedRecordAfter(checkInRecordId, recordDate);
+	}
+
+	@Override
+	public void deletedRecordBefor(String checkInRecordId, LocalDate recordDate) {
+		roomRecordDao.deletedRecordBefor(checkInRecordId, recordDate);
 	}
 
 }

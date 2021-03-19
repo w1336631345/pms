@@ -19,6 +19,8 @@ public interface RoomRecordDao extends BaseDao<RoomRecord> {
 
     List<RoomRecord> findByCheckInRecord(CheckInRecord checkInRecord);
 
+    List<RoomRecord> findByCheckInRecordAndIsAccountEntry(CheckInRecord checkInRecord, String isAccountEntry);
+
     @Query(nativeQuery = true, value = " select DATE_FORMAT(tr.record_date, '%Y-%m-%d') record_date, tr.room_price \n" +
             " from t_room_record tr where 1=1 " +
             " and if(:recordDate is not null && :recordDate != '', DATE_FORMAT(tr.record_date, '%Y-%m-%d')=:recordDate, 1=1 ) " +
@@ -86,10 +88,15 @@ public interface RoomRecordDao extends BaseDao<RoomRecord> {
     @Query(nativeQuery = true, value = " DELETE from t_room_record trr where trr.check_in_record_id = ?1 and trr.record_date >= ?2 and trr.is_account_entry = 'NO' ")
     void deletedRecordAfter(String checkInRecordId, LocalDate recordDate);
 
+    @Modifying
+    @Query(nativeQuery = true, value = " DELETE from t_room_record trr where trr.check_in_record_id = ?1 and trr.record_date <= ?2 and trr.is_account_entry = 'NO' ")
+    void deletedRecordBefor(String checkInRecordId, LocalDate recordDate);
+
     @Query(nativeQuery = true, value = " select record_date from t_room_record where check_in_record_id = ?1 ")
     List<LocalDate> getRecordDateList(String checkInRecordId);
 
     @Modifying
     void deleteByCheckInRecord(CheckInRecord cir);
+
 
 }
