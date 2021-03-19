@@ -2,6 +2,7 @@ package com.kry.pms.service.busi.impl;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import javax.persistence.Transient;
@@ -168,6 +169,20 @@ public class SettleAccountRecordServiceImpl implements SettleAccountRecordServic
         SettleAccountRecord sar = findById(id);
         LocalDate businessDate = businessSeqService.getBuinessDate(operationEmployee.getHotelCode());
         if (sar != null) {
+            // 先判断营业时间和核销时间是否是一天，不是的话则不允许撤销核销
+            String businessDateStr = businessSeqService.getBuinessString(operationEmployee.getHotelCode());  //营业时间
+            LocalDateTime settleTime = sar.getSettleTime();
+            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyyMMdd");
+            String settleTimeStr = settleTime.format(dtf);
+            if (!businessDateStr.equals(settleTimeStr)){  //营业时间和核销时间不是同一天
+                DtoResponse<String> rep = new DtoResponse<>();
+                rep.error(Constants.BusinessCode.CODE_ILLEGAL_OPERATION, "撤销失败（核销日期和营业日期不是同一天）");
+                return rep;
+            }
+
+
+
+
             if (!businessDate.isEqual(sar.getBusinessDate()) || !shiftCode.equals(sar.getShiftCode()) || !operationEmployee.getId().equals(sar.getOperationEmployee().getId())) {
                 DtoResponse<String> rep = new DtoResponse<>();
                 rep.error(Constants.BusinessCode.CODE_ILLEGAL_OPERATION, "无法处理（只能撤销本人本班次的结帐）");

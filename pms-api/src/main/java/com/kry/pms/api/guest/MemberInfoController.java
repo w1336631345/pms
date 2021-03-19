@@ -31,14 +31,19 @@ public class MemberInfoController extends BaseController<MemberInfo> {
 		memberInfo.setOperator(getCurrentEmployee().getName());
 
 		// 先判重，先判断物理卡号是否存在（手动输入的），然后判断系统卡号是否存在（生成的）
-		List<MemberInfo>  macList = memberInfoDao.findByHotelCodeAndMacNum(memberInfo.getHotelCode(),memberInfo.getMacNum());
-		if (null != macList && 0 != macList.size()){
-			return getDefaultResponse().error("物理卡号已存在，请重新输入");
+
+		if (null != memberInfo.getMacNum() && !"".equals(memberInfo.getMacNum())){   //物理卡号非必填，所以判断下,不然为空的也会判重到
+			List<MemberInfo>  macList = memberInfoDao.findByHotelCodeAndMacNum(memberInfo.getHotelCode(),memberInfo.getMacNum());
+			if (null != macList && 0 != macList.size()){
+				return getDefaultResponse().error("物理卡号已存在，请重新输入");
+			}
 		}
 
-
 		MemberInfo result = memberInfoService.add(memberInfo);
+
 		if (null == result){
+			return  getDefaultResponse().error("创建失败，请将信息填写完整");
+		}else if (null != result && null == result.getId()){  //返了对象但是又没有ID，证明是系统卡号重复的
 			return  getDefaultResponse().error("系统卡号已存在，请重新输入");
 		}else{
 			return getDefaultResponse().addData(result);
@@ -56,12 +61,14 @@ public class MemberInfoController extends BaseController<MemberInfo> {
 		}
 
 		// 判断物理卡号是否存在，存在则不允许修改
-		List<MemberInfo>  macList = memberInfoDao.findByHotelCodeAndMacNum(memberInfo.getHotelCode(),memberInfo.getMacNum());
-		if (null != macList && 0 != macList.size() && macList.size() > 1){  // 有两条以上重复记录
-			return getDefaultResponse().error("物理卡号已存在，请重新输入");
-		}else if (null != macList && 0 != macList.size() && macList.size() == 1){  //有一条记录，判断是否是它自己，不是的话则不允许修改
-			if (!memberInfo.getId().equals(macList.get(0).getId())){  //存在的这条记录不是他自己
+		if (null != memberInfo.getMacNum() && !"".equals(memberInfo.getMacNum())) {   //物理卡号非必填，所以判断下,不然为空的也会判重到
+			List<MemberInfo>  macList = memberInfoDao.findByHotelCodeAndMacNum(memberInfo.getHotelCode(),memberInfo.getMacNum());
+			if (null != macList && 0 != macList.size() && macList.size() > 1){  // 有两条以上重复记录
 				return getDefaultResponse().error("物理卡号已存在，请重新输入");
+			}else if (null != macList && 0 != macList.size() && macList.size() == 1){  //有一条记录，判断是否是它自己，不是的话则不允许修改
+				if (!memberInfo.getId().equals(macList.get(0).getId())){  //存在的这条记录不是他自己
+					return getDefaultResponse().error("物理卡号已存在，请重新输入");
+				}
 			}
 		}
 

@@ -78,7 +78,7 @@ public class AccountServiceImpl implements AccountService {
 */
         List<Account> list = accountDao.findByHotelCodeAndCode(account.getHotelCode(),account.getCode());
         if (0 != list.size()){   //如果编号已经存在，则不允许插入
-            return null;
+            return new Account();
         }else{
             return accountDao.saveAndFlush(account);
         }
