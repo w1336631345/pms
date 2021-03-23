@@ -53,7 +53,10 @@ public interface BillService extends BaseService<Bill> {
 
 	public List<Bill> checkBillIds(List<String> billIds, double total, DtoResponse<Account> rep, String recordNum);
 
-	public List<Bill> addFlatBills(List<Bill> bills, Employee employee,String shiftCode, String recordNum);
+    @org.springframework.transaction.annotation.Transactional
+    List<Bill> checkBills(List<Bill> bills, double total, DtoResponse<Account> rep, String recordNum);
+
+    public List<Bill> addFlatBills(List<Bill> bills, Employee employee, String shiftCode, String recordNum);
 	public List<Bill> addToMemberFlatBill(Bill bill, Employee employee, String shiftCode, String orderNum);
 	public DtoResponse<Bill> offset(String id,Employee employee,String shiftCode);
 	/**

@@ -39,6 +39,13 @@ public interface AccountService extends BaseService<Account> {
 
     Collection<Account> getAccountByOrderNumAndStatusAndCheckInType(String orderNum, String checkInType, String status);
 
+    DtoResponse<Account> checkBill(BillCheckBo billCheckBo);
+
+    @org.springframework.transaction.annotation.Transactional
+    DtoResponse<Account> checkRoomBill(BillCheckBo billCheckBo);
+
+    boolean transferBill(List<CheckInRecord> cirs, Account targetAccount, BillCheckBo billCheckBo);
+
     DtoResponse<Account> checkCustomerBill(BillCheckBo billCheckBo);
 
     Account createAccount(Customer customer, String roomNum);

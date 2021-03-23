@@ -355,7 +355,9 @@ public class AccountServiceImpl implements AccountService {
         }
     }
 
-    private DtoResponse<Account> checkBill(BillCheckBo billCheckBo) {
+    @Override
+    @org.springframework.transaction.annotation.Transactional
+    public DtoResponse<Account> checkBill(BillCheckBo billCheckBo) {
         DtoResponse<Account> rep = new DtoResponse<Account>();
         String recordNum = businessSeqService.fetchNextSeqNum(billCheckBo.getHotelCode(),
                 Constants.Key.BUSINESS_BUSINESS_SETTLE_SEQ_KEY);
@@ -369,13 +371,7 @@ public class AccountServiceImpl implements AccountService {
             case Constants.Type.SETTLE_TYPE_GROUP:
                 return checkGroupBill(billCheckBo);
             case Constants.Type.SETTLE_TYPE_LINK:
-                if(billCheckBo.getMainAccountId() == null){
-                    rep.setStatus(Constants.BusinessCode.CODE_ILLEGAL_OPERATION);
-                    rep.setMessage("联房没有主账户");
-                    return rep;
-                }else{
-                    return checkLinkBill(billCheckBo);
-                }
+                return checkLinkBill(billCheckBo);
             case Constants.Type.SETTLE_TYPE_IGROUP:
                 return checkIGroupBill(billCheckBo);
             case Constants.Type.SETTLE_TYPE_ROOM:
@@ -545,9 +541,15 @@ public class AccountServiceImpl implements AccountService {
                             settleAccountRecord.getRecordNum());
                 }
             } else {
-                settleAccountRecord = settleAccountRecordService.createARSettle(billCheckBo, account);
-                bills = billService.checkBillIds(billCheckBo.getBillIds(), total, rep,
-                        settleAccountRecord.getRecordNum());
+                //bills为空说明账务是平的，但是有billIds，说明是所有账务加起来刚好为0
+                if(billCheckBo.getBillIds() != null && !billCheckBo.getBillIds().isEmpty()){
+                    settleAccountRecord = settleAccountRecordService.createARSettle(billCheckBo, account);
+                    bills = billService.checkAccountAllBill(account, total, rep, settleAccountRecord.getRecordNum());
+                }else {
+                    settleAccountRecord = settleAccountRecordService.createARSettle(billCheckBo, account);
+                    bills = billService.checkBillIds(billCheckBo.getBillIds(), total, rep,
+                            settleAccountRecord.getRecordNum());
+                }
             }
             if (rep.getStatus() == 0) {
                 settleAccountRecord.setBills(bills);
@@ -583,32 +585,41 @@ public class AccountServiceImpl implements AccountService {
         return bills;
     }
 
-    private DtoResponse<Account> checkRoomBill(BillCheckBo billCheckBo) {
+    @Override
+    @org.springframework.transaction.annotation.Transactional
+    public DtoResponse<Account> checkRoomBill(BillCheckBo billCheckBo) {
         DtoResponse<Account> rep = new DtoResponse<Account>();
         GuestRoom guestRoom = guestRoomService.findById(billCheckBo.getAccountId());
         List<CheckInRecord> cirs = checkInRecordService.findByOrderNumAndGuestRoomAndDeleted(billCheckBo.getOrderNum(), guestRoom, Constants.DELETED_FALSE);
-        if (!cirs.isEmpty() && cirs.size() != 0) {
-            billCheckBo.setCheckType(Constants.Type.SETTLE_TYPE_ACCOUNT);
-            billCheckBo.setAccountId(cirs.get(0).getAccount().getId());
-            return checkAccountBill(billCheckBo);
-        } else {
-            Account mainAccount = findMainAccount(cirs, billCheckBo.getMainAccountId());
-            if (mainAccount != null) {
-                boolean result = transferBill(cirs, mainAccount, billCheckBo);
-                if (result) {
-                    billCheckBo.setCheckType(Constants.Type.SETTLE_TYPE_ACCOUNT);
-                    billCheckBo.setAccountId(mainAccount.getId());
-                    return checkAccountBill(billCheckBo);
-                } else {
-                    TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-                    rep.setStatus(Constants.BusinessCode.CODE_PARAMETER_INVALID);
-                    rep.setMessage("结帐过程中转账失败");
-                }
+        Account account = accountDao.getOne(billCheckBo.getMainAccountId());
+        boolean transferResult = false;
+        if (billCheckBo.getBills() != null && !billCheckBo.getBills().isEmpty()) {
+            //把所有账转到结账账号
+            transferResult = transferBill(cirs, account, billCheckBo);
+        }else {//bills为空，说明账务是为0或者所有账务加起来刚好为0 两种情况
+            if(billCheckBo.getBillIds() != null && !billCheckBo.getBillIds().isEmpty()){
+                transferResult = transferBill(cirs, account, billCheckBo);
+            }else {
+                rep.setData(account);
+                return rep;
+            }
+        }
+        if(transferResult){
+            if (!cirs.isEmpty() && cirs.size() != 0) {
+                billCheckBo.setCheckType(Constants.Type.SETTLE_TYPE_ACCOUNT);
+//                billCheckBo.setAccountId(cirs.get(0).getAccount().getId());
+                billCheckBo.setAccountId(billCheckBo.getMainAccountId());
+                return checkAccountBill(billCheckBo);
             } else {
                 TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                 rep.setStatus(Constants.BusinessCode.CODE_PARAMETER_INVALID);
-                rep.setMessage("无法找到结帐主账户");
+                rep.setMessage("订单数据出错");
             }
+        }else{
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            rep.setStatus(Constants.BusinessCode.CODE_ILLEGAL_OPERATION);
+            rep.setMessage("部分帐务无法转到主账户");
+            return rep;
         }
         return rep;
     }
@@ -676,8 +687,8 @@ public class AccountServiceImpl implements AccountService {
             return checkAccountBill(billCheckBo);
         }
     }
-
-    private boolean transferBill(List<CheckInRecord> cirs, Account targetAccount, BillCheckBo billCheckBo) {
+    @Override
+    public boolean transferBill(List<CheckInRecord> cirs, Account targetAccount, BillCheckBo billCheckBo) {
         for (CheckInRecord item : cirs) {
             if (Constants.Type.CHECK_IN_RECORD_CUSTOMER.equals(item.getType())) {
                 Account account = item.getAccount();
@@ -710,6 +721,11 @@ public class AccountServiceImpl implements AccountService {
         DtoResponse<Account> rep = new DtoResponse<Account>();
         String id = billCheckBo.getAccountId();
         List<CheckInRecord> cirs = checkInRecordService.findByLinkId(id);
+        if(billCheckBo.getMainAccountId() == null){
+            rep.setStatus(Constants.BusinessCode.CODE_ILLEGAL_OPERATION);
+            rep.setMessage("联房没有主账户");
+            return rep;
+        }
         Account account = findMainAccount(cirs, billCheckBo.getMainAccountId());
         boolean result = transferBill(cirs, account, billCheckBo);
         if (result) {
@@ -724,7 +740,7 @@ public class AccountServiceImpl implements AccountService {
     }
 
 
-    @Transactional
+    @org.springframework.transaction.annotation.Transactional
     @Override
     public DtoResponse<Account> checkCustomerBill(BillCheckBo billCheckBo) {
         if (Constants.Type.BILL_CHECK_WAY_TRANSFER.equals(billCheckBo.getCheckWay())) {

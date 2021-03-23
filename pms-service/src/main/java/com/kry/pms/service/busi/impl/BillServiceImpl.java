@@ -48,6 +48,7 @@ import com.kry.pms.service.goods.ProductService;
 import com.kry.pms.service.sys.AccountService;
 import com.kry.pms.service.sys.BusinessSeqService;
 import com.kry.pms.util.BigDecimalUtil;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 @Service
 public class BillServiceImpl implements BillService {
@@ -264,7 +265,9 @@ public class BillServiceImpl implements BillService {
 
     }
 
-    private List<Bill> checkBills(List<Bill> bills, double total, DtoResponse<Account> rep, String recordNum) {
+    @Override
+    @org.springframework.transaction.annotation.Transactional
+    public List<Bill> checkBills(List<Bill> bills, double total, DtoResponse<Account> rep, String recordNum) {
         for (Bill b : bills) {
             if (Constants.Status.BILL_NEED_SETTLED.equals(b.getStatus())) {
                 if (b.getCost() != null) {
@@ -277,12 +280,14 @@ public class BillServiceImpl implements BillService {
                 b.setCurrentSettleAccountRecordNum(recordNum);
                 modify(b);
             } else {
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                 rep.setStatus(Constants.BusinessCode.CODE_ILLEGAL_OPERATION);
                 rep.setMessage("有部分帐务已经处在结帐状态");
                 break;
             }
         }
         if (total != 0) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             rep.setStatus(Constants.BusinessCode.CODE_ILLEGAL_OPERATION);
             rep.setMessage("账务不平，无法结账");
         }
@@ -370,6 +375,7 @@ public class BillServiceImpl implements BillService {
 
 
     @Override
+    @org.springframework.transaction.annotation.Transactional
     public List<Bill> checkAccountAllBill(Account account, double total, DtoResponse<Account> rep, String recordNum) {
         List<Bill> bills = billDao.findByAccountAndStatus(account, Constants.Status.BILL_NEED_SETTLED);
         bills = checkBills(bills, total, rep, recordNum);
@@ -645,7 +651,7 @@ public class BillServiceImpl implements BillService {
     }
 
     /**
-     * 冲掉原始帐务
+     * 冲掉原始帐务(原数据改结账状态，新建一条一样的负数据，也是结账状态，就是1正1负)
      *
      * @param bill
      * @param targetAccount
