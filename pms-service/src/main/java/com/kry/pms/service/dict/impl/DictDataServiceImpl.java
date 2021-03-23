@@ -74,13 +74,13 @@ public class DictDataServiceImpl implements DictDataService {
         List<DictData> list = dictDataDao.findByHotelCodeAndSafeLevel(hotelCode, 0);
         Map<String, Map<String, String>> data = new HashMap<>();
         Map<String, String> item = null;
-        for (DictData d : list) {
-            if (!data.containsKey(d.getDictTypeCode())) {
+        for (DictData d : list) {      //因为在Map里面过滤了一次，所以说虽然查询有序，但是展示还是乱序了
+            if (!data.containsKey(d.getDictTypeCode())) {  //如果最外层的key不存在（类型，例如ARType），则直接插入
                 item = new HashMap<>();
                 item.put(d.getCode(), d.getDescription());
                 data.put(d.getDictTypeCode(), item);
             } else {
-                data.get(d.getDictTypeCode()).put(d.getCode(), d.getDescription());
+                data.get(d.getDictTypeCode()).put(d.getCode(), d.getDescription());  //否则指定key后插入
             }
         }
         return data;

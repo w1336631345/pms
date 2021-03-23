@@ -3,10 +3,12 @@ package com.kry.pms.api.busi;
 import com.kry.pms.api.BaseController;
 import com.kry.pms.base.DtoResponse;
 import com.kry.pms.base.HttpResponse;
+import com.kry.pms.dao.busi.SettleAccountRecordDao;
 import com.kry.pms.model.annotation.OperationLog;
 import com.kry.pms.model.http.request.busi.*;
 import com.kry.pms.model.http.response.busi.AccountSummaryVo;
 import com.kry.pms.model.persistence.busi.BookingRecord;
+import com.kry.pms.model.persistence.busi.SettleAccountRecord;
 import com.kry.pms.model.persistence.sys.Account;
 import com.kry.pms.service.busi.ReceptionService;
 import com.kry.pms.service.org.EmployeeService;
@@ -40,6 +42,8 @@ public class ReceptionController extends BaseController<String> {
 	EmployeeService employeeService;
 	@Autowired
 	AccountService accountService;
+	@Autowired
+	SettleAccountRecordDao settleAccountRecordDao;
 
 	/**
 	 * 入住
@@ -130,16 +134,6 @@ public class ReceptionController extends BaseController<String> {
 	public HttpResponse<AccountSummaryVo> getAccountSummary(@PathVariable String id){
 		HttpResponse<AccountSummaryVo> rep = new HttpResponse<>();
 		AccountSummaryVo accountSummaryVo = receptionService.getAccountSummaryByCheckRecordId(id);
-
-/*		if (null == accountSummaryVo.getActualTimeOfLeave()){  //实际离开时间为空的话则取当前时间作为展示打印账单的时间
-			accountSummaryVo.setActualTimeOfLeave(LocalDateTime.now());
-		}
-		for (AccountSummaryVo vo : accountSummaryVo.getChildren()){
-			if (null == vo.getActualTimeOfLeave()){
-				vo.setActualTimeOfLeave(LocalDateTime.now());
-			}
-		}*/
-
 		initActualLeaveTime(accountSummaryVo);
 		rep.setData(accountSummaryVo);
 		return rep;
@@ -151,10 +145,17 @@ public class ReceptionController extends BaseController<String> {
 	 * @author: WangXinHao
 	 * @date: 2021/3/18 0018 15:09
 	 */
-	public static void initActualLeaveTime(AccountSummaryVo vo){
+	public  void initActualLeaveTime(AccountSummaryVo vo){
 		if (null == vo.getActualTimeOfLeave()){    //先初始化当前元素
 			vo.setActualTimeOfLeave(LocalDateTime.now());
 		}
+
+		// 再初始化一下每个账号的最后结账时间
+		SettleAccountRecord sar = settleAccountRecordDao.findLastSettleRecord(getCurrentHotleCode(),vo.getId());
+		if (null != sar){
+			vo.setLastSettleTime(sar.getSettleTime());
+		}
+
 	    if (null == vo.getChildren() || 0 == vo.getChildren().size()){  //没有子元素了
 			return;
         }else{   //否则遍历递归下去

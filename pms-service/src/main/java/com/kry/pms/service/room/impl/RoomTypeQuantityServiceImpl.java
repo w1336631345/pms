@@ -255,8 +255,10 @@ public class RoomTypeQuantityServiceImpl implements RoomTypeQuantityService {
                     rtq.setWillArriveTotal(rtq.getWillArriveTotal() + quantity);
                 } else if (Constants.Status.ROOM_USAGE_PREDICTABLE.equals(newUsageStatus) && (Constants.Status.ROOM_USAGE_ASSIGN.equals(oldUsageStatus) || Constants.Status.ROOM_USAGE_RESERVATION.equals(oldUsageStatus))) {
                     rtq.setWillArriveTotal(rtq.getWillArriveTotal() - quantity);
-                } else if (Constants.Status.ROOM_USAGE_CHECK_IN.equals(newUsageStatus) || (Constants.Status.ROOM_USAGE_FREE.equals(newUsageStatus) && (Constants.Status.ROOM_USAGE_ASSIGN.equals(oldUsageStatus))||Constants.Status.ROOM_USAGE_RESERVATION.equals(oldUsageStatus))) {
-                    rtq.setWillArriveTotal(rtq.getWillArriveTotal() - quantity);
+                } /*else if (Constants.Status.ROOM_USAGE_CHECK_IN.equals(newUsageStatus) || (Constants.Status.ROOM_USAGE_FREE.equals(newUsageStatus) && (Constants.Status.ROOM_USAGE_ASSIGN.equals(oldUsageStatus))||Constants.Status.ROOM_USAGE_RESERVATION.equals(oldUsageStatus))) {
+                    rtq.setWillArriveTotal(rtq.getWillArriveTotal() - quantity);    // 在这里又减回去了
+                }*/else if (Constants.Status.ROOM_USAGE_CHECK_IN.equals(newUsageStatus) || (Constants.Status.ROOM_USAGE_FREE.equals(newUsageStatus) && (Constants.Status.ROOM_USAGE_ASSIGN.equals(oldUsageStatus)))) {
+                    rtq.setWillArriveTotal(rtq.getWillArriveTotal() - quantity);    // 在这里又减回去了，将最后一个判断注释掉，不然每次预订了今日将到就不会加一
                 }
             }
             currentDate = currentDate.plusDays(1);
@@ -357,7 +359,7 @@ public class RoomTypeQuantityServiceImpl implements RoomTypeQuantityService {
         while (currentDate.isBefore(endDate)) {
             rtq = findByRoomTypeAndQuantityDateForUpdate(roomType, currentDate);
             if (i == 0) {
-                rtq.setWillArriveTotal(rtq.getWillArriveTotal() + quantity);
+                rtq.setWillArriveTotal(rtq.getWillArriveTotal() + quantity);    // 预订时，在这里加上了一个将到
             }
             rtq.setPredictableTotal(rtq.getPredictableTotal() - quantity);
             rtq.setReserveTotal(rtq.getReserveTotal() + quantity);

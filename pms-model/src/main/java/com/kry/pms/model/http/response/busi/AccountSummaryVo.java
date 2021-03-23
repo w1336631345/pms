@@ -34,6 +34,8 @@ public class AccountSummaryVo {
     private Integer days;
     private LocalDateTime actualTimeOfLeave;   // 实际离店时间，展示作为打印账单列表的时间
 
+    private LocalDateTime lastSettleTime;  //当前账号的最后结账时间（用于展示到账单打印列表的所有已结账等）
+
     public AccountSummaryVo() {
 
     }

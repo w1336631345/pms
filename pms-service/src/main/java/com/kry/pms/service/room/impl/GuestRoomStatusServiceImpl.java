@@ -494,7 +494,7 @@ public class GuestRoomStatusServiceImpl implements GuestRoomStatusService {
     @Override
     public void changeOverdued(GuestRoom gr, boolean status) {
         GuestRoomStatus grs = findGuestRoomStatusByGuestRoom(gr);
-        grs.setOverdued(status);
+        grs.setOverdued(status);   //改成欠费
         modify(grs);
     }
 

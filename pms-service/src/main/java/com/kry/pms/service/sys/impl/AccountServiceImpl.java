@@ -186,10 +186,10 @@ public class AccountServiceImpl implements AccountService {
                         bill.setRoomId(cir.getGuestRoom().getId());
                     }
                 }
-                newTotal = account.getTotal();
+                newTotal = account.getTotal();    //新的余额，小于0代表酒店欠钱，即客户不欠钱。
                 if ((oldTotal > 0 && newTotal <= 0) || (oldTotal <= 0 && newTotal > 0)) {
                     if (cir != null && cir.getGuestRoom() != null) {
-                        guestRoomStatusService.changeOverdued(cir.getGuestRoom(), newTotal > 0);
+                        guestRoomStatusService.changeOverdued(cir.getGuestRoom(), newTotal > 0);  //修改房间欠费状态，false是不欠（0），true是欠钱（1）
                     }
                 }
             }

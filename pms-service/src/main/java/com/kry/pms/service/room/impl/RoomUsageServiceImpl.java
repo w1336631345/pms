@@ -446,7 +446,7 @@ public class RoomUsageServiceImpl implements RoomUsageService {
                 if (result) {
                     // 使用房类资源
                     roomTypeQuantityService.changeRoomTypeQuantity(info.roomType(), info.getStartTime(),
-                            info.getEndTime(), Constants.Status.ROOM_USAGE_RESERVATION, Constants.Status.ROOM_USAGE_ASSIGN, 1);
+                            info.getEndTime(), Constants.Status.ROOM_USAGE_RESERVATION, Constants.Status.ROOM_USAGE_ASSIGN, 1);  //上面的ru返回true的话这里又调用这个方法,第四个参数传R，就必然会将今日将到又减一
                 } else {
                     return false;
                 }
