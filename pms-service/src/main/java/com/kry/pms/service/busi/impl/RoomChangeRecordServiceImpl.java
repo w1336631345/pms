@@ -132,6 +132,9 @@ public class RoomChangeRecordServiceImpl implements RoomChangeRecordService {
 			updateLog.setProduct("换房");
 			updateLog.setProductName("订单号");
 			updateLog.setProductValue(cirs.getOrderNum());
+			if(cirs.getAccount() != null){
+				updateLog.setIdentifier(cirs.getAccount().getCode());
+			}
 			updateLog.setOldValue(entity.getOldRoomNum());
 			updateLog.setNewValue(entity.getNewRoomNum());
 			updateLog.setHotelCode(entity.getHotelCode());

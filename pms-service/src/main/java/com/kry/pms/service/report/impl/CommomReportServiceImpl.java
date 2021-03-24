@@ -3,6 +3,7 @@ package com.kry.pms.service.report.impl;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.kry.pms.base.Constants;
+import com.kry.pms.base.HttpResponse;
 import com.kry.pms.base.PageRequest;
 import com.kry.pms.base.PageResponse;
 import com.kry.pms.model.http.response.report.CommomReportTableData;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -82,5 +84,16 @@ public class CommomReportServiceImpl implements CommomReportService {
         Gson gson = new Gson();
         return gson.fromJson(rd.getHeaderValue(), new TypeToken<List<ReportTableColumn>>() {
         }.getType());
+    }
+    //重算营业日报表
+    @Override
+    public HttpResponse resetProcedure(String procedureName, String hotelCode, LocalDate date){
+        HttpResponse hr = new HttpResponse();
+        try {
+            sqlTemplateService.storedProcedure(hotelCode, date, procedureName);
+        }catch (Exception e) {
+            hr.error("重算失败");
+        }
+        return hr;
     }
 }

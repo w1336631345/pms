@@ -9,15 +9,17 @@ public class ReportTableDefinitionListVo {
     private String groupKey;
     private String type;
     private String queryParams;
+    private String code;
 
     public ReportTableDefinitionListVo() {
     }
 
-    public ReportTableDefinitionListVo(String id, String name, String groupKey, String type,String queryParams) {
+    public ReportTableDefinitionListVo(String id, String name, String groupKey, String type,String queryParams, String code) {
         this.id = id;
         this.name = name;
         this.groupKey = groupKey;
         this.type = type;
         this.queryParams = queryParams;
+        this.code = code;
     }
 }

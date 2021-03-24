@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Map;
 
 @RestController
@@ -53,6 +55,23 @@ public class CommomReportController extends BaseController {
         if (!parmrs.containsKey("employee_id")) {
             parmrs.put("employee_id", getCurrentEmployee().getId());
         }
+    }
+
+    /**
+     * 功能描述: <br>报表资源重算
+     * 〈〉
+     * @Param: [procedureName, date]
+     * @Return: com.kry.pms.base.HttpResponse
+     * @Author: huanghaibin
+     * @Date: 2021/3/24 14:20
+     */
+    @GetMapping("/reset")
+    public HttpResponse fetchData(String procedureName, String date){
+        HttpResponse hr = new HttpResponse();
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate date2 = LocalDate.parse(date, fmt);
+        hr = commomReportService.resetProcedure(procedureName, getCurrentHotleCode(), date2);
+        return hr;
     }
 
 }

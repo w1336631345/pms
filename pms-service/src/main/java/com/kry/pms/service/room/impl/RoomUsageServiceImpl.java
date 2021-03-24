@@ -713,6 +713,7 @@ public class RoomUsageServiceImpl implements RoomUsageService {
         }
         if (ru != null) {
             ru.setRemark("换房");
+            ru.setBusinesskey(ru.getBusinesskey()+"_C");//改掉订单号，防止同一个房间换来换取，后面根据订单号查询roomUsage不唯一
             boolean u = unUse(ru, changeTime);
             boolean use = use(newGuestRoom, ru.getUsageStatus(), changeTime, info.getEndTime(), info.getBusinessKey(), info.getSummaryInfo(), info.uniqueId());
             if (u) {
