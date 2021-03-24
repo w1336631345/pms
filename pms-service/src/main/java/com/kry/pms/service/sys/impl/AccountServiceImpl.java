@@ -187,6 +187,14 @@ public class AccountServiceImpl implements AccountService {
                     }
                 }
                 newTotal = account.getTotal();    //新的余额，小于0代表酒店欠钱，即客户不欠钱。
+
+                // 在这里，考虑同住的情况，把oldTotal和下面的newTotal查询出来，用总的oldTotal和newTotal去判断，不然可能出现一个账户欠费就认为整个房间欠费
+                Double otherTotal = accountDao.getTotalByTongzhu(cir.getGuestRoom().getId(),cir.getOrderNum(),cir.getHotelCode(),cir.getId());
+                if (null != otherTotal){    //不为空的话，证明有同住，将房间的其他账户余额加上再执行判断房间是否欠费的逻辑
+                    oldTotal = oldTotal + otherTotal;
+                    newTotal = newTotal + otherTotal;
+                }
+
                 if ((oldTotal > 0 && newTotal <= 0) || (oldTotal <= 0 && newTotal > 0)) {
                     if (cir != null && cir.getGuestRoom() != null) {
                         guestRoomStatusService.changeOverdued(cir.getGuestRoom(), newTotal > 0);  //修改房间欠费状态，false是不欠（0），true是欠钱（1）

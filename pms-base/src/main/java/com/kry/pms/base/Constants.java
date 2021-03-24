@@ -138,9 +138,9 @@ public class Constants {
 		public static final String CHECK_IN_RECORD_GROUP_TYPE_NO = "N";
 		public static final String CHECK_IN_RECORD_GROUP_TYPE_YES = "Y";
 
-		public static final String CHECK_IN_RECORD_CUSTOMER = "C";
-		public static final String CHECK_IN_RECORD_RESERVE = "R";
-		public static final String CHECK_IN_RECORD_GROUP = "G";
+		public static final String CHECK_IN_RECORD_CUSTOMER = "C"; //客人
+		public static final String CHECK_IN_RECORD_RESERVE = "R";  //预订，预订
+		public static final String CHECK_IN_RECORD_GROUP = "G";   // 主单
 		public static final String CHECK_IN_RECORD_LINK = "L";
 
 		public static final String AUTO_DAILY_VERIFY = "auto_daily_verify";

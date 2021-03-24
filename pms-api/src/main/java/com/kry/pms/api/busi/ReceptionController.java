@@ -146,6 +146,10 @@ public class ReceptionController extends BaseController<String> {
 	 * @date: 2021/3/18 0018 15:09
 	 */
 	public  void initActualLeaveTime(AccountSummaryVo vo){
+	    if (null == vo){
+	        return;
+        }
+
 		if (null == vo.getActualTimeOfLeave()){    //先初始化当前元素
 			vo.setActualTimeOfLeave(LocalDateTime.now());
 		}

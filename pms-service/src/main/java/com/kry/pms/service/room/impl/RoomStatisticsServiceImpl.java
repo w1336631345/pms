@@ -142,9 +142,16 @@ public class RoomStatisticsServiceImpl implements RoomStatisticsService {
 
     @Override
     public boolean updateGuestRoomStatus(UseInfoAble info) {
-        if (info.guestRoom() != null && Constants.Status.ROOM_STATUS_OCCUPY_CLEAN.equals(info.getRoomStatus()) && info.getStartTime().isBefore(LocalDateTime.now()) && info.getEndTime().isAfter(LocalDateTime.now())) {
+        if(null != info.getRoomStatus() && "HU".equals(info.getRoomStatus())){  //自用房，主要是主单里修改市场那个属性的时候
+            guestRoomStatusService.updateStatus(info);
+        }else if (info.guestRoom() != null && Constants.Status.ROOM_STATUS_OCCUPY_CLEAN.equals(info.getRoomStatus()) && info.getStartTime().isBefore(LocalDateTime.now()) && info.getEndTime().isAfter(LocalDateTime.now())) {
             guestRoomStatusService.updateStatus(info);
         }
+
+        // 原代码是下面这一段，但是Constants.Status.ROOM_STATUS_OCCUPY_CLEAN.equals(info.getRoomStatus())限制了只有住净房才会去修改
+       /* if (info.guestRoom() != null && Constants.Status.ROOM_STATUS_OCCUPY_CLEAN.equals(info.getRoomStatus()) && info.getStartTime().isBefore(LocalDateTime.now()) && info.getEndTime().isAfter(LocalDateTime.now())) {
+            guestRoomStatusService.updateStatus(info);
+        }*/
         return true;
     }
 

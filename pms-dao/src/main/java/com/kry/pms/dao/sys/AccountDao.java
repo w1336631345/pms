@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 
 import com.kry.pms.dao.BaseDao;
 import com.kry.pms.model.persistence.sys.Account;
+import org.springframework.data.repository.query.Param;
 
 public interface AccountDao extends BaseDao<Account> {
 
@@ -31,5 +32,19 @@ public interface AccountDao extends BaseDao<Account> {
 	 */
 	public  List<Account> findByHotelCodeAndCode(String hotelCode,String code);
 
+	/**
+	 * @desc: 查询同住情况下，除本账号外其他账号的余额总和，用于判断房间是否欠费
+	 * @author: WangXinHao
+	 * @date: 2021/3/24 0024 9:28
+	 */
+	@Query(nativeQuery = true, value = " select sum(a.total)" +
+			" from t_account a , t_checkin_record  c\n" +
+			" where a.id = c.account_id\n" +
+			" and c.guest_room_id = :guestRoomId\n" +
+			" and c.order_num = :orderNum\n" +
+			" and c.hotel_code = :hotelCode\n" +
+			" and c.id != :checkinRecordId")
+    Double getTotalByTongzhu(@Param("guestRoomId") String guestRoomId, @Param("orderNum") String orderNum,
+							 @Param("hotelCode") String hotelCode,@Param("checkinRecordId") String checkinRecordId);
 
 }

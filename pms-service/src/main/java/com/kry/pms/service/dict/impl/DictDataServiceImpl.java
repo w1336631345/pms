@@ -1,6 +1,7 @@
 package com.kry.pms.service.dict.impl;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -76,7 +77,12 @@ public class DictDataServiceImpl implements DictDataService {
         Map<String, String> item = null;
         for (DictData d : list) {      //因为在Map里面过滤了一次，所以说虽然查询有序，但是展示还是乱序了
             if (!data.containsKey(d.getDictTypeCode())) {  //如果最外层的key不存在（类型，例如ARType），则直接插入
-                item = new HashMap<>();
+//                item = new HashMap<>();
+                if ("ARType".equals(d.getDictTypeCode())){    //AR账务类型的需要有序，初始化成LinkedHashMap，其余的还是声明成HashMap
+                    item = new LinkedHashMap<>();
+                }else{
+                    item = new HashMap<>();
+                }
                 item.put(d.getCode(), d.getDescription());
                 data.put(d.getDictTypeCode(), item);
             } else {

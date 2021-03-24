@@ -2206,7 +2206,7 @@ public class CheckInRecordServiceImpl implements CheckInRecordService {
                 }
                 list.add(criteriaBuilder.isNull(root.get("roomLinkId")));
                 list.add(criteriaBuilder.isNull(root.get("mainRecord")));
-                list.add(criteriaBuilder.equal(root.get("type"), Constants.Type.CHECK_IN_RECORD_CUSTOMER));
+                list.add(criteriaBuilder.equal(root.get("type"), Constants.Type.CHECK_IN_RECORD_CUSTOMER));   // 这里只查客人，也就是分了房的，都没分房的话也无法联房
                 list.add(criteriaBuilder.equal(root.get("deleted"), Constants.DELETED_FALSE));
                 Predicate[] array = new Predicate[list.size()];
                 return criteriaBuilder.and(list.toArray(array));
