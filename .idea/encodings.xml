@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Encoding">
+    <file url="file://$PROJECT_DIR$" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/pms-api" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/pms-api/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/pms-api/src/main/resource" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/pms-asyn-service" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/pms-asyn-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/pms-auth" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/pms-auth/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/pms-base" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/pms-base/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/pms-dao" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/pms-dao/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/pms-ext-api" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/pms-ext-api/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/pms-ext-api/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/pms-manager" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/pms-manager/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/pms-manager/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/pms-model" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/pms-model/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/pms-quartz" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/pms-quartz/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/pms-service" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/pms-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/pms-util" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/pms-util/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/java" charset="UTF-8" />
+  </component>
+</project>

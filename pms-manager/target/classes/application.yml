@@ -1,0 +1,36 @@
+spring:
+  profiles:
+    active: rds
+  freemarker:
+    template-loader-path: classpath:/templates/
+    suffix: .ftl
+    charset: UTF-8
+  activemq:
+    broker-url: tcp://81.68.143.180:61616
+    user: admin
+    password: admin
+qiniu:
+  oss:
+    access-key: 5azdaObcIs01xmYikeM6dSPB4O32Dy97t5Z4R45K
+    secret-key: Bw62mruVQ2-tamUe5YllBf9MFyO67VptKNciuNMl
+    bucket: pms-oss
+    path: http://pkoqxs4zt.bkt.clouddn.com
+    image-host: http://oss.rooibook.com/
+server:
+  address: 0.0.0.0
+  port: 8070
+  servlet:
+    context-path: /manager
+  compression:
+    enabled: true
+    mime-types: application/json
+    min-response-size: 1024
+wx:
+  mp:
+    configs:
+      - appId: wxb16fd80662516230
+        secret: d427febd1b3871447b69b5cc8e9cd4e7
+        token: aa2434123
+        aesKey:
+      - appId: wxea2e9f546f106998
+        secret: 977f160c186209dd9546d73740344729

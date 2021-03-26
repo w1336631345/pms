@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile default="true" name="Default" enabled="true" />
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="pms-util" />
+        <module name="pms-quartz" />
+        <module name="pms-service" />
+        <module name="pms-api" />
+        <module name="pms-base" />
+        <module name="pms-manager" />
+        <module name="pms-model" />
+        <module name="pms-ext-api" />
+        <module name="pms-auth" />
+        <module name="pms-asyn-service" />
+        <module name="pms-dao" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="pms-api" target="1.8" />
+      <module name="pms-asyn-service" target="1.8" />
+      <module name="pms-auth" target="1.8" />
+      <module name="pms-base" target="1.8" />
+      <module name="pms-dao" target="1.8" />
+      <module name="pms-ext-api" target="1.8" />
+      <module name="pms-manager" target="1.8" />
+      <module name="pms-model" target="1.8" />
+      <module name="pms-quartz" target="1.8" />
+      <module name="pms-service" target="1.8" />
+      <module name="pms-util" target="1.8" />
+      <module name="spring-boot-hello-world" target="1.8" />
+    </bytecodeTargetLevel>
+  </component>
+</project>

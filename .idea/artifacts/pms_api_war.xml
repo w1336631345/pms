@@ -1,0 +1,14 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="pms-api:war">
+    <output-path>$PROJECT_DIR$/pms-api/target</output-path>
+    <properties id="maven-jee-properties">
+      <options>
+        <module>pms-api</module>
+        <packaging>war</packaging>
+      </options>
+    </properties>
+    <root id="archive" name="pms.war">
+      <element id="artifact" artifact-name="pms-api:war exploded" />
+    </root>
+  </artifact>
+</component>

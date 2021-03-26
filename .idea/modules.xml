@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/pms-api/pms-api.iml" filepath="$PROJECT_DIR$/pms-api/pms-api.iml" />
+      <module fileurl="file://$PROJECT_DIR$/pms-asyn-service/pms-asyn-service.iml" filepath="$PROJECT_DIR$/pms-asyn-service/pms-asyn-service.iml" />
+      <module fileurl="file://$PROJECT_DIR$/pms-auth/pms-auth.iml" filepath="$PROJECT_DIR$/pms-auth/pms-auth.iml" />
+      <module fileurl="file://$PROJECT_DIR$/pms-base/pms-base.iml" filepath="$PROJECT_DIR$/pms-base/pms-base.iml" />
+      <module fileurl="file://$PROJECT_DIR$/pms-dao/pms-dao.iml" filepath="$PROJECT_DIR$/pms-dao/pms-dao.iml" />
+      <module fileurl="file://$PROJECT_DIR$/pms-ext-api/pms-ext-api.iml" filepath="$PROJECT_DIR$/pms-ext-api/pms-ext-api.iml" />
+      <module fileurl="file://$PROJECT_DIR$/pms-manager/pms-manager.iml" filepath="$PROJECT_DIR$/pms-manager/pms-manager.iml" />
+      <module fileurl="file://$PROJECT_DIR$/pms-model/pms-model.iml" filepath="$PROJECT_DIR$/pms-model/pms-model.iml" />
+      <module fileurl="file://$PROJECT_DIR$/pms-quartz/pms-quartz.iml" filepath="$PROJECT_DIR$/pms-quartz/pms-quartz.iml" />
+      <module fileurl="file://$PROJECT_DIR$/pms-service/pms-service.iml" filepath="$PROJECT_DIR$/pms-service/pms-service.iml" />
+      <module fileurl="file://$PROJECT_DIR$/pms-util/pms-util.iml" filepath="$PROJECT_DIR$/pms-util/pms-util.iml" />
+      <module fileurl="file://$PROJECT_DIR$/spring-boot-hello-world.iml" filepath="$PROJECT_DIR$/spring-boot-hello-world.iml" />
+    </modules>
+  </component>
+</project>

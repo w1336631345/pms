@@ -8,10 +8,7 @@ import freemarker.template.TemplateException;
 import org.apache.http.client.methods.HttpPost;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cglib.core.Local;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -51,5 +48,16 @@ public class RealTimeReportController extends BaseController {
         String hotelCode = getCurrentHotleCode();
         rep.addData(realTimeReportService.sectionDailyReport(hotelCode, LocalDate.parse(startDate), LocalDate.parse(endDate)));
         return rep;
+    }
+
+    @PostMapping
+    @RequestMapping("/section/reCalculation")
+    public HttpResponse<Object> reCalculation(String hotelCode, String editDate, String calcType) {
+        HttpResponse<Object> response = new HttpResponse<>();
+        System.out.println("type ==> " + calcType);
+        System.out.println("hotelCode ==> " + hotelCode);
+        System.out.println("editDate ==> " + editDate);
+        LocalDate quantityDate = LocalDate.parse(editDate);
+        return  response.addData(realTimeReportService.reCalculation(hotelCode, quantityDate, calcType));
     }
 }
